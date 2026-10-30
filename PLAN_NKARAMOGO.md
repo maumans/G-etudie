@@ -121,6 +121,10 @@ spécifié en entier dans `HORS_LIGNE.md`.
 ## 3. Vision produit — la thèse
 
 > **Un soir, quinze minutes, et je sais où j'en suis.**
+>
+> *(Thèse interne du tableau de bord, pas un slogan : la vitrine dit
+> « Tout pour réussir le CEE, le BEPC et le Bac. » — décision de Maurice,
+> 2026-10-30, `DEVBOOK.md` point 11.)*
 
 L'élève ouvre l'application le soir, souvent sur un téléphone partagé, avec peu
 de données. L'écran d'accueil répond immédiatement à trois questions :

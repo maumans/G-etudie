@@ -48,8 +48,7 @@ function PanneauMarque() {
             <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(rgb(255_255_255/0.08)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,black,transparent_75%)] [background-size:22px_22px]" />
 
             <p className="relative max-w-md text-[2.5rem] leading-[1.05] titre-contraste text-balance">
-                Un soir, quinze minutes,{' '}
-                <strong>et je sais où j'en suis.</strong>
+                Tout pour réussir <strong>le CEE, le BEPC et le Bac.</strong>
             </p>
 
             <div className="relative mx-auto grid w-full max-w-sm gap-3">

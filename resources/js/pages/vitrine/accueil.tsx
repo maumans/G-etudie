@@ -1,6 +1,7 @@
 import { Head, Link } from '@inertiajs/react';
 import {
     BookOpen,
+    Check,
     ChevronDown,
     FileCheck2,
     Smartphone,
@@ -9,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { ApercuApplication } from '@/components/apercu-application';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { annoncerBientot } from '@/lib/bientot';
 import type { CleMatiere } from '@/lib/matieres';
@@ -79,15 +81,38 @@ const PREUVES: { titre: string; texte: string; icone: LucideIcon }[] = [
 const ETAPES: { titre: string; texte: string }[] = [
     {
         titre: 'Créez votre compte',
-        texte: 'Un prénom, un pseudo et un numéro de téléphone. Moins d’une minute, sans e-mail.',
+        texte: 'Un prénom, un pseudo et un numéro de téléphone, sans e-mail. Puis votre examen et, au Bac, votre série.',
     },
     {
-        titre: 'Faites la séance du jour',
-        texte: 'Quinze minutes de questions choisies là où l’élève est le plus faible, et là où ça rapporte le plus.',
+        titre: 'Révisez un peu chaque soir',
+        texte: 'La séance du jour : quinze minutes de questions choisies là où vous êtes le plus faible, et là où ça rapporte le plus.',
     },
     {
-        titre: 'Regardez la jauge monter',
-        texte: 'Matière par matière, elle dit la vérité sur la préparation : ni plus, ni moins.',
+        titre: 'Mesurez-vous aux conditions réelles',
+        texte: 'Des examens blancs à la durée de l’épreuve. La jauge vous dit, matière par matière, si vous êtes prêt.',
+    },
+];
+
+/** Les engagements du projet, sous le nom (égalité des chances, PLAN § 1). */
+const ENGAGEMENTS: string[] = [
+    'Le programme national guinéen, rien d’autre',
+    'Des corrigés écrits et relus par des enseignants',
+    'Un socle gratuit, pour que chacun ait sa chance',
+];
+
+/** Ce qui arrive ensuite (PLAN M10, M11, M14, M15) : annoncé, pas promis à une date. */
+const A_VENIR: { titre: string; texte: string }[] = [
+    {
+        titre: 'Le tuteur N’karamögö',
+        texte: 'Une explication plus simple quand une étape du corrigé bloque.',
+    },
+    {
+        titre: 'La culture générale',
+        texte: 'La Guinée, l’Afrique et le monde, en questions du jour.',
+    },
+    {
+        titre: 'Les parents et les enseignants',
+        texte: 'Suivre la progression, donner des exercices à une classe.',
     },
 ];
 
@@ -103,8 +128,8 @@ const ATOUTS: { titre: string; texte: string; icone: LucideIcon }[] = [
         icone: FileCheck2,
     },
     {
-        titre: 'Fait pour le téléphone',
-        texte: 'Léger, rapide, lisible sur un petit écran, même le soir.',
+        titre: 'Pensé d’abord pour le téléphone',
+        texte: 'Léger, rapide, lisible sur un petit écran, même le soir ; à l’aise aussi sur tablette et ordinateur.',
         icone: Smartphone,
     },
     {
@@ -144,8 +169,9 @@ const QUESTIONS: { question: string; reponse: string }[] = [
 /**
  * Accueil public (DESIGN.md § 7). Un seul moment fort : l'illustration du
  * héros, le Nimba au crépuscule et le chemin vers le Bac. Autour, tout reste
- * calme : preuves en filets, examens illustrés, une soirée en trois gestes,
- * l'application, les questions, un appel final. Les images viennent de
+ * calme : preuves en filets, examens illustrés, le sens du nom et
+ * l'engagement, les étapes jusqu'à l'examen, l'application et ce qui arrive
+ * ensuite, les questions, un appel final. Les images viennent de
  * `config/vitrine.php` (dessins par défaut, remplaçables) ; la photo du
  * héros, si Maurice la fournit, se pose devant l'illustration. Vouvoiement ;
  * aucun chiffre ni témoignage non sourcé.
@@ -159,7 +185,7 @@ export default function Accueil({
 }) {
     return (
         <>
-            <Head title="Réviser le CEE, le BEPC et le Baccalauréat" />
+            <Head title="Préparer le CEE, le BEPC et le Baccalauréat" />
 
             {/* Héros */}
             <section className="relative isolate overflow-hidden">
@@ -169,14 +195,13 @@ export default function Accueil({
                 />
                 <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 pt-8 pb-16 sm:px-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] lg:gap-16 lg:px-8 lg:pt-12 lg:pb-24">
                     <div className="grid justify-items-start gap-7">
-                        <h1 className="text-[2.75rem] leading-[1] titre-contraste sm:text-[3.75rem] lg:text-vitrine">
-                            Un soir, quinze minutes,{' '}
-                            <strong>et je sais où j'en suis.</strong>
+                        <h1 className="text-[2.5rem] leading-[1.02] titre-contraste sm:text-[3.5rem] lg:text-[4rem]">
+                            Tout pour réussir{' '}
+                            <strong>le CEE, le BEPC et le Bac.</strong>
                         </h1>
-                        <p className="max-w-[34rem] text-[1.0625rem] leading-relaxed text-ink-600">
-                            Cours, annales corrigées, exercices et examens
-                            blancs pour préparer les examens nationaux guinéens,
-                            sur téléphone, même avec peu de données.
+                        <p className="max-w-[32rem] text-[1.0625rem] leading-relaxed text-ink-600">
+                            Cours, annales corrigées, exercices, examens blancs
+                            et suivi de vos progrès, même hors connexion.
                         </p>
                         <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
                             <Button asChild taille="grande">
@@ -319,7 +344,43 @@ export default function Accueil({
                 </div>
             </section>
 
-            {/* Une soirée de révision, en trois gestes */}
+            {/* Le nom et l'engagement */}
+            <section
+                aria-labelledby="titre-projet"
+                className="mx-auto grid max-w-7xl gap-10 border-t px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16 lg:px-8 lg:py-28"
+            >
+                <h2
+                    id="titre-projet"
+                    className="scroll-mt-28 text-[2rem] leading-[1.05] titre-contraste sm:text-[2.75rem]"
+                >
+                    N'karamögö veut dire <strong>« mon maître ».</strong>
+                </h2>
+                <div className="grid content-start gap-7">
+                    <p className="max-w-[36rem] text-[1.0625rem] leading-relaxed text-ink-600">
+                        Un maître qui explique sans se lasser, disponible le
+                        soir, dans la poche. Et G‑Étudie, c'est la Guinée qui
+                        étudie : à Conakry comme à Kankan, à Labé ou à
+                        Nzérékoré, chaque élève doit avoir les mêmes sujets, les
+                        mêmes corrigés et les mêmes chances le jour de l'examen.
+                    </p>
+                    <ul className="grid gap-3">
+                        {ENGAGEMENTS.map((engagement) => (
+                            <li
+                                key={engagement}
+                                className="flex items-start gap-3 text-[0.9375rem] font-medium"
+                            >
+                                <Check
+                                    aria-hidden
+                                    className="mt-0.5 size-[1.125rem] shrink-0 text-nimba-600 dark:text-nimba-400"
+                                />
+                                {engagement}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            </section>
+
+            {/* De l'inscription au jour de l'examen */}
             <section aria-labelledby="titre-etapes" className="bg-card">
                 <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-28">
                     <img
@@ -336,7 +397,8 @@ export default function Accueil({
                             id="titre-etapes"
                             titre={
                                 <>
-                                    Trois gestes, <strong>chaque soir</strong>
+                                    De l'inscription{' '}
+                                    <strong>au jour de l'examen</strong>
                                 </>
                             }
                         />
@@ -392,10 +454,11 @@ export default function Accueil({
                         id="titre-application"
                         titre={
                             <>
-                                Tout tient <strong>dans le téléphone</strong>
+                                Dans la poche,{' '}
+                                <strong>et partout ailleurs</strong>
                             </>
                         }
-                        texte="Une application web qui s'installe en un geste, sans passer par une boutique, et qui reste légère."
+                        texte="Téléphone, tablette ou ordinateur : une application web qui s'installe en un geste, sans passer par une boutique, et qui reste légère."
                     />
                     <ul className="grid gap-x-8 sm:grid-cols-2">
                         {ATOUTS.map((atout) => (
@@ -416,6 +479,30 @@ export default function Accueil({
                             </li>
                         ))}
                     </ul>
+                    <div className="grid gap-1">
+                        <p className="text-aide text-ink-500">Et bientôt</p>
+                        <ul className="grid">
+                            {A_VENIR.map((element) => (
+                                <li
+                                    key={element.titre}
+                                    className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-0.5 border-b py-3.5 last:border-b-0"
+                                >
+                                    <span className="text-interface font-semibold">
+                                        {element.titre}
+                                    </span>
+                                    <Badge
+                                        variant="nimba"
+                                        className="row-span-2 mt-0.5"
+                                    >
+                                        Bientôt
+                                    </Badge>
+                                    <span className="text-aide text-ink-600">
+                                        {element.texte}
+                                    </span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
                 </div>
                 <div className="relative isolate overflow-hidden rounded-panneau bg-nimba-500/[0.1] px-6 pt-12 dark:bg-nimba-400/10">
                     <Cercles className="absolute top-1/2 left-1/2 -z-10 size-[44rem] -translate-x-1/2 -translate-y-1/2 text-nimba-500/25 dark:text-nimba-400/20" />
@@ -553,7 +640,7 @@ function VisuelHeros({
                             Séance du jour
                         </span>
                         <span className="text-aide text-ink-500">
-                            Maths et physique, 15 min
+                            Mathématiques, 15 min
                         </span>
                     </span>
                 </span>
