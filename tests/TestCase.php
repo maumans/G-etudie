@@ -8,6 +8,17 @@ use RuntimeException;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Les tests ne dépendent pas d'un build : une page ajoutée et pas encore
+     * construite ne doit pas faire échouer sa route en 500.
+     */
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->withoutVite();
+    }
+
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
     {
         if (! Features::enabled($feature)) {

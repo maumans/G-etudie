@@ -4,6 +4,7 @@ import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
+/** Case à cocher : 20 px, bordure ink-400 (≥ 3:1). L'envelopper dans son libellé pour une cible de 48 px. */
 function Checkbox({
   className,
   ...props
@@ -12,7 +13,7 @@ function Checkbox({
     <CheckboxPrimitive.Root
       data-slot="checkbox"
       className={cn(
-        "peer border-input data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground data-[state=checked]:border-primary focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50",
+        "peer size-5 shrink-0 rounded-[6px] border-2 border-input bg-card transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-faux-600 data-[state=checked]:border-nimba-600 data-[state=checked]:bg-nimba-600 data-[state=checked]:text-white dark:aria-invalid:border-faux-400",
         className
       )}
       {...props}
@@ -21,7 +22,7 @@ function Checkbox({
         data-slot="checkbox-indicator"
         className="flex items-center justify-center text-current transition-none"
       >
-        <CheckIcon className="size-3.5" />
+        <CheckIcon aria-hidden className="size-3.5" strokeWidth={3} />
       </CheckboxPrimitive.Indicator>
     </CheckboxPrimitive.Root>
   )

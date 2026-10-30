@@ -1,4 +1,5 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { ConfirmProvider } from '@/components/ui/confirm-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
@@ -13,6 +14,7 @@ void createInertiaApp({
     layout: (name) => {
         switch (true) {
             case name === 'welcome':
+            case name.startsWith('dev/'):
                 return null;
             case name.startsWith('auth/'):
                 return AuthLayout;
@@ -26,8 +28,10 @@ void createInertiaApp({
     withApp(app) {
         return (
             <TooltipProvider delayDuration={0}>
-                {app}
-                <Toaster />
+                <ConfirmProvider>
+                    {app}
+                    <Toaster />
+                </ConfirmProvider>
             </TooltipProvider>
         );
     },

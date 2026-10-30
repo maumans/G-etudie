@@ -715,9 +715,14 @@ hors ligne ; les packs viennent ensuite.
    plugin `@inertiajs/vite` résout les pages lui-même. Le rattrapage de l'échec
    d'import (A.3.3) passe donc par un `resolve` fourni explicitement à
    `createInertiaApp`. À valider à l'étape 2 du lot 0.
-3. **2026-10-30 — Précache des polices.** Les polices sont téléchargées au build
-   par `laravel-vite-plugin` et décrites dans `public/build/fonts-manifest.json`,
-   à côté de `manifest.json` : `PRECACHE` (A.3.1) lit les deux.
+3. **2026-10-30 — Précache des polices.** Les polices (Sora, Lexend) sont
+   importées depuis Fontsource par `app.css` : leurs fichiers figurent dans
+   `public/build/manifest.json` comme les autres ressources, `PRECACHE` (A.3.1)
+   n'a rien d'autre à lire. Fontsource livre aussi des WOFF que les navigateurs
+   visés ne demandent jamais : les écarter du précache (`.woff`, `.ttf`), pour
+   ne pas faire payer à l'élève des fichiers inutiles. (Corrige la première
+   version de cet écart, écrite quand les polices passaient encore par
+   l'option `fonts` du plugin et un `fonts-manifest.json`.)
 
 ## B.6 Points de vigilance
 

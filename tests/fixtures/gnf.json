@@ -1,0 +1,15 @@
+[
+    { "montant": 0, "attendu": "0 GNF" },
+    { "montant": 999, "attendu": "999 GNF" },
+    { "montant": 1000, "attendu": "1 000 GNF" },
+    { "montant": 1500, "attendu": "1 500 GNF" },
+    { "montant": 12500, "attendu": "12 500 GNF" },
+    { "montant": 100000, "attendu": "100 000 GNF" },
+    { "montant": 1234567, "attendu": "1 234 567 GNF" },
+    { "montant": 1000000000, "attendu": "1 000 000 000 GNF" },
+    { "montant": 2500.5, "attendu": "2 500,5 GNF" },
+    { "montant": 10.25, "attendu": "10,25 GNF" },
+    { "montant": 7.1, "attendu": "7,1 GNF" },
+    { "montant": -7500, "attendu": "-7 500 GNF" },
+    { "montant": -0.001, "attendu": "0 GNF" }
+]

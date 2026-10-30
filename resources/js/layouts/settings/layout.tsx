@@ -47,7 +47,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         {sidebarNavItems.map((item, index) => (
                             <Button
                                 key={`${toUrl(item.href)}-${index}`}
-                                size="sm"
+                                taille="petite"
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
