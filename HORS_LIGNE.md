@@ -654,7 +654,7 @@ hors ligne ; les packs viennent ensuite.
 |---|---|---|---|
 | — | Arbitrage HL-D1 à HL-D12 | ✅ fait (2026-10-30) | 12 / 12 |
 | HL0 | Socle | 🟡 fait, sauf HTTPS et contrôles sur vrai téléphone (étape 6 du lot 0) | 10 / 12 |
-| HL1 | Rendu indépendant de la source | ⬜ à faire | 0 / 2 |
+| HL1 | Rendu indépendant de la source | 🟡 format et composant d'affichage faits au lot 1 (écart n° 15) ; branchement élève et pack au lot 2 | 1 / 2 |
 | HL2 | Tentatives et séances | ⬜ à faire | 0 / 4 |
 | HL3 | Examen blanc | ⬜ à faire | 0 / 4 |
 | HL4 | Jauge, séances pré-calculées, trace | ⬜ à faire | 0 / 3 |
@@ -730,6 +730,34 @@ hors ligne ; les packs viennent ensuite.
 ## B.3 HL1 à HL8
 
 *(détaillés par Claude Code au début de chaque lot, sur le modèle de B.2)*
+
+### HL1 — Rendu des contenus indépendant de leur source (A.4)
+
+- [x] **Une seule autorité sur le format des blocs**, en PHP et en
+  TypeScript — `App\Support\BlocsContenu`, `resources/js/lib/contenu/blocs.ts`.
+  Format : le JSON de l'éditeur (TipTap / ProseMirror) réduit à une liste
+  fermée de nœuds (paragraphe, titre 2 et 3, listes, gras, italique, saut de
+  ligne, formule en ligne, formule centrée, encadré « À retenir / Méthode /
+  Exemple résolu / Piège fréquent ») ; 100 Ko au plus, 1 000 caractères par
+  formule, 8 niveaux d'imbrication. Composant `ContenuBlocs`
+  (`components/contenu/contenu-blocs.tsx`) : reçoit un document, ne sait
+  pas d'où il vient, ne charge jamais TipTap. Preuve : `BlocsContenuTest`
+  (PHP) et `tests/js/contenu/blocs.test.ts` sur le même
+  `tests/fixtures/blocs.json` (29 documents, plus formule trop longue,
+  contenu trop lourd ou trop imbriqué, et le résumé) ;
+  `contenu-blocs.test.tsx` (rendu, MathML, texte jamais interprété comme du
+  HTML) ; `editeur.test.ts` (l'éditeur ne produit que des documents
+  valides, même après un collage HTML). *Fait au lot 1* : l'éditeur du
+  back-office écrit déjà ce format (écart n° 15).
+- [ ] Écrans élève (leçon, fiche de révision) qui affichent un contenu
+  depuis les props Inertia ou depuis Dexie avec le même `ContenuBlocs` —
+  lot 2, avec les packs au lot 7 (HL5).
+
+  Ce que le lot 1 laisse au lot 2 : les blocs **image**, **tableau** et
+  **mini-question** n'existent pas encore dans le format (images : stockage
+  et conversion WebP à décider avec les packs ; mini-question : lot 3). Les
+  ajouter, c'est les ajouter **aux deux autorités et au jeu d'exemples** en
+  même temps.
 
 ## B.4 Tests
 
@@ -850,6 +878,18 @@ hors ligne ; les packs viennent ensuite.
 14. **2026-10-30 — Pas de service worker sous `npm run dev`.** L'application
     ne l'inscrit pas en développement (`import.meta.env.DEV`) ; `/sw.js`
     reste un script de désinstallation pour un worker resté d'un build.
+15. **2026-10-31 — Format des blocs posé au lot 1, pas au lot 2.** A.4
+    prévoit `BlocsContenu` « à poser au lot 2 ». L'éditeur du back-office
+    (lot 1) écrit les leçons : il fallait fixer le format avant qu'il ne
+    produise une seule leçon, sinon le lot 2 aurait dû convertir un format
+    déjà en base. Le fichier JS est `lib/contenu/blocs.ts` (TypeScript,
+    écart n° 1). Le format reprend les noms de nœuds de TipTap (`paragraph`,
+    `heading`, `bulletList`…) plus trois nœuds à nous (`formule`,
+    `formuleBloc`, `encadre`) : l'éditeur l'écrit tel quel, sans
+    conversion, et `ContenuBlocs` l'affiche sans TipTap (l'élève ne
+    télécharge pas l'éditeur : 139 Ko compressés, dans le seul fragment de
+    la page d'édition). Le back-office reste un écran **en ligne
+    seulement** (niveau C, A.2) : il n'est pas précaché.
 
 ## B.6 Points de vigilance
 

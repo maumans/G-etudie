@@ -77,4 +77,14 @@ class User extends Authenticatable
             fn (string $nom) => Role::tryFrom($nom)?->estPersonnel() ?? false,
         );
     }
+
+    /**
+     * A écrit, envoyé en relecture ou relu un contenu : sa signature doit
+     * rester (le compte ne se supprime pas lui-même).
+     */
+    public function aSigneDuContenu(): bool
+    {
+        return Lecon::query()->where('auteur_id', $this->id)->exists()
+            || VersionContenu::query()->where('auteur_id', $this->id)->orWhere('decide_par_id', $this->id)->exists();
+    }
 }

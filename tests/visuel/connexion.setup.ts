@@ -53,6 +53,16 @@ preparation('connexion du rédacteur de démonstration', async ({ page }) => {
 });
 
 preparation(
+    'connexion du responsable pédagogique de démonstration',
+    async ({ page }) => {
+        await seConnecter(page, '600000006');
+
+        await expect(page).toHaveURL(/\/contenu$/, ATTENTE);
+        await page.context().storageState({ path: SESSIONS.pedagogie });
+    },
+);
+
+preparation(
     "connexion de l'administrateur plateforme, mot de passe confirmé",
     async ({ page }) => {
         await seConnecter(page, '600000008');

@@ -54,5 +54,8 @@ class DemoSeeder extends Seeder
             $user->forceFill(['telephone_verifie_le' => $user->telephone_verifie_le ?? now()])->save();
             $user->syncRoles([$compte['role']]);
         }
+
+        // Leçons fictives, écrites et relues par ces comptes (lot 1).
+        $this->call(DemoContenuSeeder::class);
     }
 }

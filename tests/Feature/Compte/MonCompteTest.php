@@ -1,7 +1,9 @@
 <?php
 
+use App\Enums\Role;
 use App\Models\EntreeJournalAcces;
 use App\Models\User;
+use App\Services\ContenuService;
 use Illuminate\Support\Facades\Hash;
 use Inertia\Testing\AssertableInertia as Assert;
 
@@ -134,4 +136,20 @@ test('sans le bon mot de passe, le compte n\'est pas supprimé', function () {
         ->assertSessionHasErrors('password');
 
     expect($this->user->fresh())->not->toBeNull();
+});
+
+test('un compte qui a signé une leçon ne se supprime pas lui-même : sa signature reste', function () {
+    $redacteur = User::factory()->avecRole(Role::Redacteur)->create();
+    app(ContenuService::class)->creerLecon($redacteur, notionDeTest(), 'Pythagore');
+
+    $this->actingAs($redacteur)
+        ->get(route('compte.profil.edit'))
+        ->assertInertia(fn ($page) => $page->where('suppression_possible', false));
+
+    $this->actingAs($redacteur)
+        ->delete(route('compte.destroy'), ['password' => 'password'])
+        ->assertSessionHasErrors('password');
+
+    expect($redacteur->fresh())->not->toBeNull();
+    $this->assertAuthenticatedAs($redacteur);
 });

@@ -1,35 +1,18 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import {
-    GABARITS,
-    SESSIONS,
-    THEMES,
-    verifierAccessibilite,
-    verifierSansDebordement,
-} from './gabarits';
+import { GABARITS, SESSIONS, THEMES, capturer } from './gabarits';
 
 /**
- * Écrans clés, capturés dans chaque gabarit et chaque thème. Une différence
- * non voulue avec la capture de référence fait échouer la suite.
+ * Écrans clés du lot 0, capturés dans chaque gabarit et chaque thème. Une
+ * différence non voulue avec la capture de référence fait échouer la suite.
  */
-async function verifierEtCapturer(
+function verifierEtCapturer(
     page: Page,
     ecran: string,
     gabarit: string,
     theme: string,
 ): Promise<void> {
-    await page.evaluate(() => document.fonts.ready);
-    await verifierSansDebordement(page);
-    await verifierAccessibilite(page);
-    // Tableau de segments : une chaîne « lot0/… » serait aplatie en « lot0-… ».
-    await expect(page).toHaveScreenshot(
-        ['lot0', `${ecran}-${gabarit}-${theme}.png`],
-        {
-            fullPage: true,
-            // Heures de connexion, journal : changent à chaque passage.
-            mask: [page.locator('[data-capture="variable"]')],
-        },
-    );
+    return capturer(page, 'lot0', ecran, gabarit, theme);
 }
 
 /** Un jeudi matin à Conakry (UTC+0). */
@@ -40,7 +23,7 @@ const HORLOGE = new Date('2026-10-29T10:00:00Z');
  * titre attendu, statut HTTP attendu (200 par défaut).
  */
 const CONNECTES: Record<
-    keyof typeof SESSIONS,
+    Exclude<keyof typeof SESSIONS, 'pedagogie'>,
     {
         adresse: string;
         ecran: string;

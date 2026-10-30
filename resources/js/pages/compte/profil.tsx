@@ -25,8 +25,11 @@ import { update } from '@/routes/compte/profil';
 
 export default function Profil({
     profil,
+    suppression_possible,
 }: {
     profil: { prenom: string; pseudo: string };
+    /** Faux pour un compte qui a signé des contenus (sa signature reste). */
+    suppression_possible: boolean;
 }) {
     const formule = useFormule();
     const deconnecter = useDeconnexion();
@@ -101,13 +104,17 @@ export default function Profil({
 
             <SectionCompte
                 titre="Supprimer mon compte"
-                description={formule(
-                    'Ton compte et ta progression seront effacés. Cette action ne peut pas être annulée.',
-                    'Votre compte sera effacé. Cette action ne peut pas être annulée.',
-                )}
-                danger
+                description={
+                    suppression_possible
+                        ? formule(
+                              'Ton compte et ta progression seront effacés. Cette action ne peut pas être annulée.',
+                              'Votre compte sera effacé. Cette action ne peut pas être annulée.',
+                          )
+                        : 'Votre compte a signé des contenus (rédigés ou relus) : leur signature doit rester. Demandez à l’administrateur de désactiver le compte.'
+                }
+                danger={suppression_possible}
             >
-                <SuppressionCompte />
+                {suppression_possible && <SuppressionCompte />}
             </SectionCompte>
         </div>
     );

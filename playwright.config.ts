@@ -33,7 +33,15 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
+            testIgnore: /parcours-lot1\.spec\.ts/,
             dependencies: ['connexion'],
+        },
+        // Crée puis efface une leçon : après les captures, qu'il ne doit pas
+        // perturber (compteurs du tableau de bord, file de relecture).
+        {
+            name: 'parcours-contenu',
+            testMatch: /parcours-lot1\.spec\.ts/,
+            dependencies: ['ecrans'],
         },
     ],
     webServer: {

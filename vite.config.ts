@@ -30,7 +30,17 @@ export default defineConfig({
     // les pré-optimiser évite que Vite les découvre en pleine navigation et
     // recharge l'onglet (CLAUDE.md § 4).
     optimizeDeps: {
-        include: ['katex'],
+        // Dépendances des seules pages chargées à la demande : sans elles, Vite
+        // les découvre à la première visite et recharge l'onglet (CLAUDE.md § 4).
+        include: [
+            'katex',
+            '@tiptap/react',
+            '@tiptap/starter-kit',
+            '@tiptap/extensions',
+            '@tiptap/pm/state',
+            '@tiptap/pm/view',
+            '@tiptap/pm/model',
+        ],
     },
     test: {
         environment: 'happy-dom',
