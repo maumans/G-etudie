@@ -254,7 +254,7 @@ faisait effet de manche.
 
 ```tsx
 <h1 className="titre-contraste text-vitrine">
-  Un soir, quinze minutes, <strong>et je sais où j'en suis.</strong>
+  Tout pour réussir <strong>le CEE, le BEPC et le Bac.</strong>
 </h1>
 <h1 className="titre-contraste text-titre-ecran-large">Bonjour, <strong>Aïssatou</strong></h1>
 ```
@@ -451,7 +451,7 @@ d'écran de démo pour un vrai sujet.
 
 | Habillage | Public | Registre |
 |---|---|---|
-| **Vitrine** | visiteurs, parents, partenaires | Le plus expressif (BrightPath, DevSkill), mais **un seul moment fort** : l'illustration du héros. En-tête en texte (pas de pilules), filet discret ; **héros à deux colonnes** — grand titre en contraste, chapeau 17 px, deux boutons de 44 px (plein + contour), examens préparés en étiquettes ; à droite l'illustration du Nimba au crépuscule (photo de Maurice devant si fournie) et deux fiches de l'application qui débordent du cadre (séance du jour, jauge) ; **preuves en filets** (trois colonnes séparées par des traits, pas des cartes) ; examens en cartes illustrées + matières ; « Trois gestes, chaque soir » : illustration du soir + étapes reliées par un trait + principe des corrigés ; « Tout tient dans le téléphone » : atouts en filets + `ApercuApplication` sur cercles concentriques ; FAQ en filets ; **un** appel final `surface-encre` avec le soleil couchant ; pied en colonnes. Puis démo jouable et compte à rebours au lot 8 |
+| **Vitrine** | visiteurs, parents, partenaires | Le plus expressif (BrightPath, DevSkill), mais **un seul moment fort** : l'illustration du héros. En-tête en texte (pas de pilules), filet discret ; **héros à deux colonnes** — grand titre en contraste, chapeau 17 px, deux boutons de 44 px (plein + contour), examens préparés en étiquettes ; à droite l'illustration du Nimba au crépuscule (photo de Maurice devant si fournie) et deux fiches de l'application qui débordent du cadre (séance du jour, jauge) ; **preuves en filets** (trois colonnes séparées par des traits, pas des cartes) ; examens en cartes illustrées + matières ; **le sens du nom** (« N'karamögö veut dire mon maître », G-Étudie, égalité des chances, trois engagements) ; « De l'inscription au jour de l'examen » : illustration du soir + trois étapes reliées par un trait + principe des corrigés ; « Dans la poche, et partout ailleurs » (téléphone, tablette, ordinateur) : atouts en filets, « Et bientôt » (tuteur, culture générale, parents et enseignants) + `ApercuApplication` sur cercles concentriques ; FAQ en filets ; **un** appel final `surface-encre` avec le soleil couchant ; pied en colonnes. Puis démo jouable et compte à rebours au lot 8 |
 | **Espace élève** | élèves | Canevas crème avec `fond-ambiance` ; barre d'onglets en bas sur mobile (Accueil · Cours · Annales · Examens blancs · Moi ; icône active dans une pilule teintée), barre latérale sur desktop (entrée active en relief, carte de l'élève en bas : initiale sur pastille soleil, jamais de photo). Accueil = tableau de bord complet (§ 6.0) |
 | **Back-office contenu** | rédacteurs, relecteurs | Dense, calme, efficace : chrome claire et achromatique, couleur réservée aux statuts (brouillon, en relecture, publié). Éditeur pleine largeur, aperçu « comme l'élève le verra » côte à côte |
 | **Console plateforme** | superadmin | Barre latérale sombre : on n'est pas « dans » une école, on est au-dessus. Signal permanent, pas un message qu'on ferme |
@@ -851,3 +851,38 @@ découpés en cartes identiques, trois surfaces fortes concurrentes.
 référence régénérées après relecture) ; 118 Pest (dont 7 dans
 `VitrineTest` : dessins par défaut, remplacement, repli), 125 Vitest ; `tsc`,
 `vp check`, Pint, Larastan et `npm run build` passent.
+
+### Vitrine — un titre qui dit ce que fait le produit (2026-10-30)
+
+*Constat* (Maurice) : « Un soir, quinze minutes, et je sais où j'en suis » est
+vide de sens et ne représente pas le projet. Relue contre le PLAN (§ 0 à 5),
+la page avait aussi des incohérences : « Tout tient dans le téléphone » alors
+que la plaquette demande téléphones, tablettes **et** ordinateurs ; « Trois
+gestes, chaque soir » dont le premier geste est l'inscription ; une étape
+écrite à la troisième personne (« là où l'élève ») dans une page qui
+vouvoie ; une séance « Maths et physique » au BEPC (matières non
+confirmées) ; rien sur le sens du nom ni sur l'égalité des chances, cœur de
+la plaquette ; rien sur ce qui arrive ensuite (tuteur, culture générale,
+parents, enseignants).
+
+*Correction* : titre « Préparez le CEE, le BEPC et le Bac **avec les annales
+corrigées.** » et chapeau concret (sujets depuis 2010 corrigés par des
+enseignants, cours du programme guinéen, examens blancs aux conditions
+réelles) ; même phrase dans le panneau de connexion ; section « N'karamögö
+veut dire « mon maître » » (G-Étudie, égalité des chances, trois
+engagements) ; étapes « De l'inscription au jour de l'examen » au
+vouvoiement ; « Dans la poche, et partout ailleurs » ; liste « Et bientôt »
+marquée d'un badge ; séance de la fiche réduite aux mathématiques ; pied de
+page qui explique le nom ; « G‑Étudie » avec un trait d'union insécable.
+
+*Preuve* : captures 360 et 1366 relues ; 98 Playwright verts (captures de la
+vitrine, de la connexion, de l'inscription et du mot de passe oublié
+régénérées) ; 118 Pest ; `tsc`, `vp check`, build verts.
+
+*Puis, le même jour* : ce titre était encore trop long et ne couvrait que
+les annales. Maurice veut **bref, et qui résume tout ce que gère
+l'application**. Titre : « Tout pour réussir **le CEE, le BEPC et le
+Bac.** » (sept mots) ; chapeau : « Cours, annales corrigées, exercices,
+examens blancs et suivi de vos progrès, même hors connexion. » — les six
+piliers en une ligne. Le détail (2010, enseignants, programme guinéen) reste
+plus bas, dans les preuves et la section sur le nom.

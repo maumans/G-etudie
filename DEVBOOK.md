@@ -55,7 +55,8 @@
   sans halo ni flèche, **tableau de bord élève complet en données
   d'exemple** (`TableauDeBordExemple`, bandeau « EXEMPLE »), **vitrine
   illustrée** (cinq dessins par défaut remplaçables dans
-  `config/vitrine.php`). **Avant tout écran : `DESIGN.md` § 0 et
+  `config/vitrine.php`). Titre de la vitrine : « Tout pour réussir le CEE,
+  le BEPC et le Bac. » (point 11). **Avant tout écran : `DESIGN.md` § 0 et
   § 0.1, la compétence `design-ardoise`, `CLAUDE.md` § 3 bis.**
 - **Images de la vitrine** : dessins par défaut en place ; Maurice peut les
   remplacer (`config('vitrine.illustrations')`, mêmes proportions) et, s'il le
@@ -680,6 +681,34 @@ cette question à sa façon. Elle distingue deux notions :
      de référence régénérées après relecture. Totaux : 118 Pest, 125 Vitest,
      98 Playwright (axe sans violation sérieuse) ; `tsc`, `vp check`, Pint,
      Larastan, build verts.
+
+11. [x] **Vitrine : un titre qui a du sens, et les incohérences corrigées** (2026-10-30)
+   - **Constat** : Maurice trouve le titre « Un soir, quinze minutes, et je
+     sais où j'en suis » vide de sens, sans rapport avec son projet. Relecture
+     de la page contre le PLAN : « Tout tient dans le téléphone » (la
+     plaquette veut téléphones, tablettes et ordinateurs) ; « Trois gestes,
+     chaque soir » dont le premier est l'inscription ; « l'élève » à la
+     troisième personne dans une page qui vouvoie ; séance « Maths et
+     physique » au BEPC ; ni le sens du nom, ni l'égalité des chances, ni ce
+     qui arrive ensuite.
+   - **Décision** : titre « Préparez le CEE, le BEPC et le Bac avec les
+     annales corrigées. » (aussi dans le panneau de connexion) ; section sur
+     le nom (« mon maître », G-Étudie, égalité des chances, trois
+     engagements : programme national, corrigés relus par des enseignants,
+     socle gratuit) ; étapes « De l'inscription au jour de l'examen » ;
+     « Dans la poche, et partout ailleurs » ; liste « Et bientôt » (tuteur,
+     culture générale, parents et enseignants) ; pied de page qui explique le
+     nom. Le slogan reste la thèse interne du tableau de bord (PLAN § 3, note).
+   - **Puis** : premier titre retenu (« Préparez le CEE, le BEPC et le Bac
+     avec les annales corrigées. ») jugé trop verbeux et trop étroit par
+     Maurice. Titre final, bref et qui couvre tout : « Tout pour réussir le
+     CEE, le BEPC et le Bac. » ; chapeau : « Cours, annales corrigées,
+     exercices, examens blancs et suivi de vos progrès, même hors
+     connexion. » Même titre sur le panneau de connexion.
+   - **À confirmer par Maurice** : la traduction « mon maître » (reprise du
+     PLAN § 2.8) et la liste des villes citées.
+   - **Preuve** : captures 360 et 1366 relues ; 98 Playwright, 118 Pest ;
+     `tsc`, `vp check`, build verts.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

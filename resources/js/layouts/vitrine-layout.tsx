@@ -89,8 +89,8 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
                     <div className="grid content-start gap-3">
                         <Marque />
                         <p className="max-w-xs text-aide text-ink-600">
-                            Réviser le CEE, le BEPC et le Baccalauréat unique,
-                            un soir après l'autre.
+                            N'karamögö, « mon maître ». G‑Étudie : la Guinée
+                            étudie, du CEE au Baccalauréat unique.
                         </p>
                     </div>
                     <nav
