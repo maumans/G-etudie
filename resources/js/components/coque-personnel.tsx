@@ -1,5 +1,13 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { LogOut, Menu } from 'lucide-react';
+import {
+    CircleUser,
+    GraduationCap,
+    LayoutDashboard,
+    Library,
+    LogOut,
+    Menu,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { EntreeNavigation } from '@/components/lien-navigation';
 import { LienNavigation } from '@/components/lien-navigation';
@@ -10,8 +18,36 @@ import {
     FeuilleContenu,
     FeuilleDeclencheur,
 } from '@/components/ui/feuille';
+import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn } from '@/lib/utils';
 import { logout } from '@/routes';
+import { edit as monCompte } from '@/routes/compte/profil';
+import { accueil as accueilConsole } from '@/routes/console';
+import { accueil as accueilContenu } from '@/routes/contenu';
+import { accueil as accueilEleve } from '@/routes/eleve';
+import type { Espace } from '@/types';
+
+/** Raccourcis vers les autres espaces du compte (l'administrateur plateforme ouvre aussi le back-office). */
+const ESPACES: Record<
+    Espace,
+    { libelle: string; href: string; icone: LucideIcon }
+> = {
+    console: {
+        libelle: 'Console plateforme',
+        href: accueilConsole().url,
+        icone: LayoutDashboard,
+    },
+    contenu: {
+        libelle: 'Back-office contenu',
+        href: accueilContenu().url,
+        icone: Library,
+    },
+    eleve: {
+        libelle: 'Espace élève',
+        href: accueilEleve().url,
+        icone: GraduationCap,
+    },
+};
 
 /**
  * Coque commune au back-office contenu et à la console plateforme
@@ -22,11 +58,14 @@ import { logout } from '@/routes';
  */
 export function CoquePersonnel({
     espace,
+    cle,
     entrees,
     sombre = false,
     children,
 }: {
     espace: string;
+    /** L'espace affiché ; absent pour la coque réduite de « Mon compte ». */
+    cle?: Espace;
     entrees: EntreeNavigation[];
     sombre?: boolean;
     children: ReactNode;
@@ -55,7 +94,7 @@ export function CoquePersonnel({
             >
                 <EnTete espace={espace} accueil={accueil} lateral />
                 {navigation}
-                <PiedCompte className="mt-auto" />
+                <PiedCompte actuel={cle} className="mt-auto" />
             </aside>
 
             <div className="min-w-0 flex-1">
@@ -78,7 +117,10 @@ export function CoquePersonnel({
                                 <Menu aria-hidden />
                             </Button>
                         </FeuilleDeclencheur>
-                        <FeuilleContenu titre={espace} pied={<PiedCompte />}>
+                        <FeuilleContenu
+                            titre={espace}
+                            pied={<PiedCompte actuel={cle} />}
+                        >
                             {navigation}
                         </FeuilleContenu>
                     </Feuille>
@@ -126,18 +168,67 @@ function EnTete({
     );
 }
 
-function PiedCompte({ className }: { className?: string }) {
+function PiedCompte({
+    actuel,
+    className,
+}: {
+    actuel?: Espace;
+    className?: string;
+}) {
     const { auth } = usePage().props;
+    const { isCurrentOrParentUrl } = useCurrentUrl();
+    const autres = (auth.user?.espaces ?? []).filter(
+        (espace) => espace !== actuel,
+    );
+    const dansMonCompte = isCurrentOrParentUrl('/compte');
 
     return (
-        <div className={cn('grid gap-1 border-t pt-3', className)}>
+        <div className={cn('grid gap-0.5 border-t pt-3', className)}>
             {auth.user && (
-                <p className="truncate px-2.5 pb-1 text-meta text-ink-500">
+                <p className="truncate px-2.5 pb-1.5 text-meta text-ink-500">
                     Connecté :{' '}
                     <span className="font-medium text-ink-900">
                         {auth.user.pseudo}
                     </span>
                 </p>
+            )}
+            {autres.map((espace) => {
+                const { libelle, href, icone: Icone } = ESPACES[espace];
+
+                return (
+                    <Button
+                        key={espace}
+                        asChild
+                        variant="ghost"
+                        taille="compacte"
+                        className="justify-start"
+                    >
+                        <Link href={href} prefetch>
+                            <Icone aria-hidden />
+                            {libelle}
+                        </Link>
+                    </Button>
+                );
+            })}
+            {actuel && (
+                <Button
+                    asChild
+                    variant="ghost"
+                    taille="compacte"
+                    className={cn(
+                        'justify-start',
+                        dansMonCompte && 'bg-ink-900/[0.05] text-ink-900',
+                    )}
+                >
+                    <Link
+                        href={monCompte()}
+                        prefetch
+                        aria-current={dansMonCompte ? 'page' : undefined}
+                    >
+                        <CircleUser aria-hidden />
+                        Mon compte
+                    </Link>
+                </Button>
             )}
             <Button
                 asChild

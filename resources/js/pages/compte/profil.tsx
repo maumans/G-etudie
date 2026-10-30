@@ -1,6 +1,10 @@
 import { Form, Link, router } from '@inertiajs/react';
 import { LogOut, Trash2 } from 'lucide-react';
-import { EnteteCompte, SectionCompte } from '@/components/entete-compte';
+import {
+    EnteteCompte,
+    SectionCompte,
+    useFormule,
+} from '@/components/entete-compte';
 import { Button } from '@/components/ui/button';
 import { Champ } from '@/components/ui/champ';
 import {
@@ -24,13 +28,18 @@ export default function Profil({
 }: {
     profil: { prenom: string; pseudo: string };
 }) {
+    const formule = useFormule();
+
     return (
         <div className="mx-auto grid w-full max-w-3xl gap-6">
             <EnteteCompte titre="Profil" />
 
             <SectionCompte
                 titre="Profil"
-                description="Ton pseudo est ce que voient les autres élèves ; ton prénom reste entre toi et tes enseignants."
+                description={formule(
+                    'Ton pseudo est ce que voient les autres élèves ; ton prénom reste entre toi et tes enseignants.',
+                    'Votre pseudo est ce que voient les autres utilisateurs ; votre prénom reste dans votre compte.',
+                )}
             >
                 <Form {...update.form()} className="grid gap-5">
                     {({ processing, errors }) => (
@@ -74,7 +83,10 @@ export default function Profil({
 
             <SectionCompte
                 titre="Se déconnecter"
-                description="Sur un téléphone partagé, pense à te déconnecter quand tu as fini."
+                description={formule(
+                    'Sur un téléphone partagé, pense à te déconnecter quand tu as fini.',
+                    'Sur un appareil partagé, pensez à vous déconnecter quand vous avez fini.',
+                )}
             >
                 <Button asChild variant="outline" className="sm:w-fit">
                     <Link
@@ -90,7 +102,10 @@ export default function Profil({
 
             <SectionCompte
                 titre="Supprimer mon compte"
-                description="Ton compte et ta progression seront effacés. Cette action ne peut pas être annulée."
+                description={formule(
+                    'Ton compte et ta progression seront effacés. Cette action ne peut pas être annulée.',
+                    'Votre compte sera effacé. Cette action ne peut pas être annulée.',
+                )}
                 danger
             >
                 <SuppressionCompte />
@@ -100,6 +115,8 @@ export default function Profil({
 }
 
 function SuppressionCompte() {
+    const formule = useFormule();
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -114,12 +131,16 @@ function SuppressionCompte() {
                         <>
                             <DialogHeader>
                                 <DialogTitle>
-                                    Supprimer ton compte ?
+                                    {formule(
+                                        'Supprimer ton compte ?',
+                                        'Supprimer votre compte ?',
+                                    )}
                                 </DialogTitle>
                                 <DialogDescription>
-                                    Ta progression, tes séances et tes examens
-                                    blancs seront effacés. Saisis ton mot de
-                                    passe pour confirmer.
+                                    {formule(
+                                        'Ta progression, tes séances et tes examens blancs seront effacés. Saisis ton mot de passe pour confirmer.',
+                                        'Votre compte sera effacé. Saisissez votre mot de passe pour confirmer.',
+                                    )}
                                 </DialogDescription>
                             </DialogHeader>
                             <Champ

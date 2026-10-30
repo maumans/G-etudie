@@ -674,7 +674,10 @@ hors ligne ; les packs viennent ensuite.
     profil local pour les ordinateurs partagés d'une école (sinon la limite les
     bloque).
   - **HL-D10** : 30 jours glissants pour élèves et parents ; **12 h** pour les
-    rôles back-office et console.
+    rôles back-office et console. *Appliqué au lot 0, étape 5* :
+    `SessionCourtePersonnel` (12 h après la connexion, même en activité ;
+    cookie « se souvenir de moi » refusé au personnel). Le code local de
+    profil reste à faire (lot 7).
   - **HL-D12** : Vitest 5 (fourni par Vite+) + `fake-indexeddb`.
 
 ## B.2 HL0 — Socle

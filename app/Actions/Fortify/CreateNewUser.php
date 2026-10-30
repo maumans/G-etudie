@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Enums\Role;
 use App\Models\User;
 use App\Support\JournalAcces;
 use App\Support\ReglesCompte;
@@ -27,7 +28,10 @@ class CreateNewUser implements CreatesNewUsers
             'password' => ReglesCompte::motDePasse(),
         ])->validate();
 
+        // L'inscription ouvre un compte élève, et seulement élève : les autres
+        // rôles sont donnés par un administrateur.
         $user = User::create($donnees);
+        $user->assignRole(Role::Eleve);
 
         JournalAcces::consigner('compte.cree', $user, auteur: $user);
 

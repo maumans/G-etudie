@@ -13,7 +13,7 @@ test('on se connecte avec son numéro, quelle que soit la façon de l\'écrire',
     $user = User::factory()->create(['telephone' => '+224622123456']);
 
     $this->post(route('login.store'), ['telephone' => $saisie, 'password' => 'password'])
-        ->assertRedirect(route('eleve.accueil', absolute: false));
+        ->assertRedirect(route('accueil', absolute: false));
 
     $this->assertAuthenticatedAs($user);
 })->with(['622123456', '622 12 34 56', '+224 622 12 34 56', '00224622123456']);
@@ -68,5 +68,8 @@ test('chaque page ne reçoit du compte que l\'identifiant, le prénom, le pseudo
                 'prenom' => 'Ibrahima',
                 'pseudo' => 'ibra',
                 'numero_verifie' => true,
+                'espace' => 'eleve',
+                'espaces' => ['eleve'],
+                'double_authentification' => false,
             ]));
 });

@@ -69,5 +69,12 @@ export async function verifierAccessibilite(page: Page): Promise<void> {
     expect(graves, JSON.stringify(graves, null, 2)).toEqual([]);
 }
 
-/** Session du compte de démonstration, écrite par connexion.setup.ts. */
-export const SESSION = 'tests/visuel/.auth/compte.json';
+/**
+ * Sessions des comptes de démonstration (DemoSeeder), écrites par
+ * connexion.setup.ts : un compte par espace.
+ */
+export const SESSIONS = {
+    eleve: 'tests/visuel/.auth/eleve.json',
+    contenu: 'tests/visuel/.auth/contenu.json',
+    console: 'tests/visuel/.auth/console.json',
+} as const;

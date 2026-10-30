@@ -1,4 +1,4 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     Clock,
     Compass,
@@ -10,6 +10,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EtatVide } from '@/components/ui/etat-vide';
+import { accueil, home } from '@/routes';
 
 type Statut = 403 | 404 | 419 | 429 | 500 | 503;
 
@@ -63,6 +64,10 @@ const MESSAGES: Record<
 
 export default function Erreur({ statut }: { statut: Statut }) {
     const contenu = MESSAGES[statut] ?? MESSAGES[500];
+    // Un compte connecté retourne dans son espace (un élève qui ouvre
+    // /console n'a rien à faire sur la vitrine).
+    const { auth } = usePage().props;
+    const retour = auth?.user ? accueil() : home();
 
     return (
         <>
@@ -93,7 +98,9 @@ export default function Erreur({ statut }: { statut: Statut }) {
                                             : 'default'
                                     }
                                 >
-                                    <Link href="/">Retour à l'accueil</Link>
+                                    <Link href={retour}>
+                                        Retour à l'accueil
+                                    </Link>
                                 </Button>
                             </div>
                         }

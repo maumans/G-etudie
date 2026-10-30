@@ -2,12 +2,21 @@
 
 namespace Tests;
 
+use Database\Seeders\RolesEtPermissionsSeeder;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Laravel\Fortify\Features;
 use RuntimeException;
 
 abstract class TestCase extends BaseTestCase
 {
+    /**
+     * Rôles et permissions semés une fois, à la création de la base de test :
+     * comme en production, où chaque déploiement lance `db:seed`.
+     */
+    protected bool $seed = true;
+
+    protected string $seeder = RolesEtPermissionsSeeder::class;
+
     /**
      * Les tests ne dépendent pas d'un build : une page ajoutée et pas encore
      * construite ne doit pas faire échouer sa route en 500.

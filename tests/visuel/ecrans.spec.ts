@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import {
     GABARITS,
-    SESSION,
+    SESSIONS,
     THEMES,
     verifierAccessibilite,
     verifierSansDebordement,
@@ -24,30 +24,80 @@ async function verifierEtCapturer(
     // Tableau de segments : une chaîne « lot0/… » serait aplatie en « lot0-… ».
     await expect(page).toHaveScreenshot(
         ['lot0', `${ecran}-${gabarit}-${theme}.png`],
-        { fullPage: true },
+        {
+            fullPage: true,
+            // Heures de connexion, journal : changent à chaque passage.
+            mask: [page.locator('[data-capture="variable"]')],
+        },
     );
 }
 
 /** Un jeudi matin à Conakry (UTC+0). */
 const HORLOGE = new Date('2026-10-29T10:00:00Z');
 
-/** Entrées des espaces connectés : adresse, nom de capture, titre attendu. */
-const ESPACES = [
-    { adresse: '/eleve', ecran: 'eleve-accueil', titre: /^Bonjour, / },
+/**
+ * Écrans connectés, par compte de démonstration : adresse, nom de capture,
+ * titre attendu, statut HTTP attendu (200 par défaut).
+ */
+const CONNECTES: Record<
+    keyof typeof SESSIONS,
     {
-        adresse: '/contenu',
-        ecran: 'contenu-accueil',
-        titre: 'Tableau de bord',
-    },
-    { adresse: '/console', ecran: 'console-accueil', titre: "Vue d'ensemble" },
-    { adresse: '/compte/profil', ecran: 'compte-profil', titre: 'Mon compte' },
-    { adresse: '/compte/numero', ecran: 'compte-numero', titre: 'Mon compte' },
-    {
-        adresse: '/compte/affichage',
-        ecran: 'compte-affichage',
-        titre: 'Mon compte',
-    },
-];
+        adresse: string;
+        ecran: string;
+        titre: string | RegExp;
+        statut?: number;
+    }[]
+> = {
+    eleve: [
+        { adresse: '/eleve', ecran: 'eleve-accueil', titre: /^Bonjour, / },
+        {
+            adresse: '/compte/profil',
+            ecran: 'compte-profil',
+            titre: 'Mon compte',
+        },
+        {
+            adresse: '/compte/numero',
+            ecran: 'compte-numero',
+            titre: 'Mon compte',
+        },
+        {
+            adresse: '/compte/affichage',
+            ecran: 'compte-affichage',
+            titre: 'Mon compte',
+        },
+        // Un élève qui ouvre la console : « Accès réservé », retour à son espace.
+        {
+            adresse: '/console',
+            ecran: 'erreur-403',
+            titre: 'Accès réservé',
+            statut: 403,
+        },
+    ],
+    contenu: [
+        {
+            adresse: '/contenu',
+            ecran: 'contenu-accueil',
+            titre: 'Tableau de bord',
+        },
+        {
+            adresse: '/compte/profil',
+            ecran: 'compte-profil-contenu',
+            titre: 'Mon compte',
+        },
+    ],
+    console: [
+        {
+            adresse: '/console',
+            ecran: 'console-accueil',
+            titre: "Vue d'ensemble",
+        },
+        {
+            adresse: '/compte/securite',
+            ecran: 'compte-securite',
+            titre: 'Mon compte',
+        },
+    ],
+};
 
 /** Écrans ouverts aux visiteurs (hors vitrine). */
 const PUBLICS = [
@@ -139,28 +189,37 @@ for (const gabarit of GABARITS) {
                 });
             }
 
-            test.describe('connecté', () => {
-                test.use({ storageState: SESSION });
-
-                for (const espace of ESPACES) {
-                    test(`lot 0 — ${espace.ecran}`, async ({ page }) => {
-                        await page.goto(espace.adresse);
-                        await expect(
-                            page.getByRole('heading', {
-                                level: 1,
-                                name: espace.titre,
-                            }),
-                        ).toBeVisible();
-
-                        await verifierEtCapturer(
-                            page,
-                            espace.ecran,
-                            gabarit.nom,
-                            theme.nom,
-                        );
+            for (const [compte, ecrans] of Object.entries(CONNECTES)) {
+                test.describe(`connecté (${compte})`, () => {
+                    test.use({
+                        storageState: SESSIONS[compte as keyof typeof SESSIONS],
                     });
-                }
-            });
+
+                    for (const ecran of ecrans) {
+                        test(`lot 0 — ${ecran.ecran}`, async ({ page }) => {
+                            const reponse = await page.goto(ecran.adresse);
+                            expect(reponse?.status()).toBe(ecran.statut ?? 200);
+                            await expect(
+                                ecran.statut === 403
+                                    ? page.getByText(ecran.titre, {
+                                          exact: true,
+                                      })
+                                    : page.getByRole('heading', {
+                                          level: 1,
+                                          name: ecran.titre,
+                                      }),
+                            ).toBeVisible();
+
+                            await verifierEtCapturer(
+                                page,
+                                ecran.ecran,
+                                gabarit.nom,
+                                theme.nom,
+                            );
+                        });
+                    }
+                });
+            }
         });
     }
 }

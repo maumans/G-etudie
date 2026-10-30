@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
@@ -39,6 +40,25 @@ class UserFactory extends Factory
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
         ];
+    }
+
+    /**
+     * Comme l'inscription : un compte a toujours un rôle, élève par défaut
+     * (un décor sans rôle ne ressemble pas à la réalité, CLAUDE.md § 4).
+     */
+    public function configure(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            if ($user->roles()->doesntExist()) {
+                $user->assignRole(Role::Eleve);
+            }
+        });
+    }
+
+    /** Compte d'un autre rôle (personnel, parent…), à la place de l'élève. */
+    public function avecRole(Role $role): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->syncRoles([$role]));
     }
 
     /** Numéro pas encore vérifié par code SMS (la vérification n'est pas bloquante, D3). */
