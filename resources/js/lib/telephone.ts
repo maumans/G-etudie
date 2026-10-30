@@ -1,7 +1,7 @@
 /**
  * Numéros mobiles guinéens : indicatif +224, puis 9 chiffres commençant par 6
- * (affichés « 622 12 34 56 »). Équivalent PHP au lot 0, étape 4 :
- * App\Support\Telephone, testé sur le même jeu d'exemples
+ * (affichés « 622 12 34 56 »). Jumeau PHP : App\Support\Telephone, testé
+ * sur le même jeu d'exemples
  * (tests/fixtures/telephones.json).
  */
 export const INDICATIF = '+224';

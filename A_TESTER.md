@@ -105,7 +105,7 @@
   téléphone, la barre de gestes d'Android ou d'iPhone peut la recouvrir, et
   les cibles de 72 px de large à 360 px doivent rester faciles à toucher.
 - Matériel : l'Android d'entrée de gamme, un iPhone récent si disponible.
-- Comment le provoquer : se connecter (compte du `DatabaseSeeder`), ouvrir
+- Comment le provoquer : se connecter (élève de démonstration +224 600 00 00 01, `DemoSeeder`), ouvrir
   `/eleve`, toucher chaque onglet, faire défiler la page.
 - Quoi observer : la barre reste visible au-dessus de la barre de gestes ;
   « Accueil » ouvre l'accueil ; « Cours », « Annales », « Examens blancs »

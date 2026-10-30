@@ -147,8 +147,8 @@ return [
      * N'karamögö (D3, DA4) : connexion par téléphone et mot de passe. La
      * récupération du mot de passe passe par un code SMS (routes
      * compte.recuperation.*, hors Fortify) ; pas de vérification d'e-mail ni
-     * de passkeys. La 2FA reste disponible : son réglage sera proposé aux
-     * seuls rôles back-office et console (étape 5).
+     * de passkeys. La 2FA n'est proposée qu'au personnel (« Mon compte ›
+     * Sécurité ») ; son activation est gardée par ActiverDoubleAuthentification.
      */
     'features' => [
         Features::registration(),
