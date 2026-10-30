@@ -19,11 +19,12 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-31 (lot 1 fait sur la branche `lot-1` ; lot 0 en attente de D11)
+### État au 2026-10-31 (lot 1 fait et fusionné ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte le lot 0 ; le lot 1 est sur la branche
-  **`lot-1`** (un commit par étape), **pas encore fusionnée** : la fusion
-  attend l'accord de Maurice. Pas de dépôt distant (DA6).
+- **Dépôt git** : `main` porte les lots 0 et 1 (branche **`lot-1`**
+  fusionnée le 2026-10-31 en avance rapide, sur décision de Maurice, un
+  commit par étape) ; le lot suivant avance sur sa branche (`lot-2`). Pas
+  de dépôt distant (DA6).
 - **Lot 1 fait** (point 15) : référentiel pédagogique (matières, épreuves
   avec coefficient et durée **vides tant que l'équipe ne les a pas
   saisis**, matières phares D1, programme en chapitres et notions, années
@@ -121,9 +122,8 @@
    préproduction en HTTPS en suivant la section 12, et contrôles bloqués de
    `A_TESTER.md` (installation, mode avion, déploiement pendant une coupure,
    double authentification, session de 12 h).
-2. **Maurice : relire le lot 1** (captures, comptes de démo 04 rédacteur,
-   05 relectrice, 06 responsable pédagogique) et décider de fusionner
-   `lot-1` dans `main`.
+2. **Maurice : essayer le lot 1** (comptes de démo 04 rédacteur,
+   05 relectrice, 06 responsable pédagogique).
 3. **Lot 2** : cours côté élève, accueil élève, parcours d'accueil ;
    brancher `ContenuBlocs` sur les props et sur Dexie (HL1, second point).
 4. **Équipe pédagogique** : saisir dans le référentiel le programme
@@ -933,7 +933,8 @@ cette question à sa façon. Elle distingue deux notions :
    - **Preuve** : 202 Pest, 165 Vitest, 125 Playwright — verts.
 
 15. [x] **Lot 1 — référentiel pédagogique et back-office contenu**
-   (2026-10-31, branche `lot-1`, commits par étape)
+   (2026-10-31, branche `lot-1`, commits par étape, fusionnée dans `main`
+   le 2026-10-31 sur décision de Maurice)
    - **Constat** : back-office vide (état « bientôt ») ; aucune table de
      référentiel ; liste des matières phares (D1) non fournie — Maurice a
      demandé à Claude Code de la choisir ; question de savoir si
