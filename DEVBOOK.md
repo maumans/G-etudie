@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-10-30)
+## 0. Reprise — où en est le projet (mis à jour le 2026-10-30, après l'étape 5)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,7 +19,7 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (lot 0, étapes 0 à 4 faites, puis refonte du design v2)
+### État au 2026-10-30 (lot 0, étapes 0 à 5 faites)
 
 - **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
   lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
@@ -58,29 +58,35 @@
   `config/vitrine.php`). Titre de la vitrine : « Tout pour réussir le CEE,
   le BEPC et le Bac. » (point 11). **Avant tout écran : `DESIGN.md` § 0 et
   § 0.1, la compétence `design-ardoise`, `CLAUDE.md` § 3 bis.**
+- **Étape 5 faite** (point 12) : rôles et permissions (spatie 8.3.2),
+  énumérations `Role`, `Permission`, `Espace`, `Perimetre` ; chaque espace
+  porte son `can:` et `AccesParRoleTest` garde le routeur ; après connexion,
+  `/accueil` envoie chaque compte dans son espace ; un compte de démo par
+  rôle ; « Mon compte » dans l'habillage de l'espace ; double
+  authentification proposée au personnel (onglet « Sécurité ») ; session de
+  12 h pour le personnel.
 - **Images de la vitrine** : dessins par défaut en place ; Maurice peut les
   remplacer (`config('vitrine.illustrations')`, mêmes proportions) et, s'il le
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 118 Pest (MySQL `g_etudie_test`), 125 Vitest, 98 Playwright
-  (connexion + 12 écrans × 4 gabarits × 2 thèmes + un parcours complet
-  inscription → suppression) — verts. `tsc`, `vp check`, Pint, Larastan
-  (niveau 7) et `npm run build` passent.
-- **⚠ Les trois espaces connectés ne sont gardés que par `auth`** : n'importe
-  quel compte connecté ouvre `/contenu` et `/console`. Les permissions
-  (`can:`) arrivent à l'étape 5, et `AccesParRoleTest` les exigera.
+- **Tests** : 167 Pest (MySQL `g_etudie_test`, rôles semés une fois par
+  `TestCase`), 127 Vitest, 124 Playwright (une session par espace + 15
+  écrans × 4 gabarits × 2 thèmes + un parcours complet) — verts. `tsc`,
+  `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
 - **⚠ Aucun SMS ne part** : le pilote `JournalSms` écrit le code dans
   `storage/logs/laravel.log` (en production, il signale seulement l'absence
   de fournisseur). Fournisseur SMS à choisir avant le lot 8 (D3).
-- **Pas encore fait dans le lot 0** : rôles et permissions (avec la 2FA
-  proposée au personnel et la session de 12 h des rôles back-office et
-  console), socle hors ligne.
+- **Pas encore fait dans le lot 0** : socle hors ligne HL0 (étape 6),
+  clôture (étape 7).
+- **Comptes sans espace** : parent, enseignant et gestionnaire n'ouvrent que
+  « Mon compte » jusqu'au lot 11.
 - **Lancer l'application** : `.claude/launch.json` déclare `laravel`
   (`php artisan serve`, port 8000) et `vite` (`npm run dev`, port 5173).
-  Base : `php artisan migrate:fresh` puis `php artisan db:seed` — le seeder
-  crée l'élève de démonstration (+224 600 00 00 01) avec le mot de passe
-  `DEMO_MOT_DE_PASSE` de `.env`. **MySQL** : celui de Laragon
+  Base : `php artisan migrate:fresh` puis `php artisan db:seed` — rôles et
+  permissions, puis un compte de démonstration par rôle (+224 600 00 00 01
+  élève … 08 administrateur plateforme, `DemoSeeder::COMPTES`) avec le mot
+  de passe `DEMO_MOT_DE_PASSE` de `.env`. **MySQL** : celui de Laragon
   (`D:\Applications\laragon`), à démarrer s'il ne tourne pas — sans lui,
   chaque requête attend la base puis échoue. Les captures de référence se prennent sur le
   build : arrêter `npm run dev` et vérifier l'absence de `public/hot` avant
@@ -88,14 +94,13 @@
 
 ### Prochaines étapes, par ordre de priorité
 
-1. **Lot 0, étape 5 — rôles et permissions** : `spatie/laravel-permission`,
-   `RolesEtPermissionsSeeder`, `DemoSeeder` (un compte par rôle, connexion par
-   téléphone), `App\Support\Perimetre`, `AccesParRoleTest` (les routes
-   `/eleve`, `/contenu`, `/console` prennent leur `can:` ; « Mon compte » et
-   la vérification du numéro entrent dans `OUVERTES_A_TOUS` avec leur
-   raison) ; redirection après connexion selon le rôle ; 2FA proposée aux
-   rôles back-office et console ; session de 12 h pour ces rôles (HL-D10).
-2. **Étape 6 — socle hors ligne HL0**, puis clôture (étape 7).
+1. **Lot 0, étape 6 — socle hors ligne HL0** (`HORS_LIGNE.md` B.2) :
+   service worker, manifeste et icônes, Dexie, UUID v7, file d'opérations et
+   `POST /sync/operations`, appareils enregistrés à la connexion, garde de
+   navigation et composants hors ligne. Les routes de synchronisation
+   prennent leur `can:` (`AccesParRoleTest`).
+2. **Étape 7 — clôture du lot 0** : domaine et hébergement (D11, HTTPS),
+   relecture complète, captures, `A_TESTER.md`.
 3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
@@ -250,6 +255,7 @@ permission s'exerce (section 7).
 | Habillages vitrine, élève, back-office, console (coquilles et pages d'entrée) | ✅ lot 0, étape 3 (point 6) |
 | Vitrine finale (démo jouable, compte à rebours, tarifs) | ⬜ lot 8 |
 | Connexion / inscription par téléphone, vérification du numéro, mot de passe oublié, « Mon compte » | ✅ lot 0, étape 4 (point 7) |
+| « Mon compte » dans l'habillage de chaque espace, onglet « Sécurité » du personnel (double authentification, session, activité), page 403 | ✅ lot 0, étape 5 (point 12) |
 | Parcours d'accueil (examen, série, établissement, objectif) | ⬜ lot 2 |
 | Accueil élève (jauge, séance du jour, trace) | ⬜ |
 | Leçon, fiche de révision | ⬜ |
@@ -269,17 +275,20 @@ composants hors ligne (`HORS_LIGNE.md` A.3.7 à A.3.9), formatage GNF dans
 
 | Seeder | Rôle | État |
 |---|---|---|
-| `RolesEtPermissionsSeeder` | **source unique** des rôles et permissions (`syncPermissions`) | ⬜ |
+| `RolesEtPermissionsSeeder` | recopie `App\Enums\Role` et `App\Enums\Permission` en base (`syncPermissions`, permissions inconnues supprimées) ; lancé aussi en production | ✅ étape 5 |
 | `ReferentielSeeder` | structure des examens, séries, classes, matières — **coefficients et durées laissés vides**, à saisir et valider par l'équipe pédagogique | ⬜ |
-| `DemoSeeder` | comptes de démo par rôle, leçons et questions **`est_exemple = true`** | ⬜ |
+| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 08, `DemoSeeder::COMPTES`) ✅ étape 5 ; leçons et questions **`est_exemple = true`** ⬜ lot 1 | 🟡 |
 
 ⚠ Les permissions ne viennent que des seeders : un déploiement lance `migrate`
 **puis** `db:seed`. Comptes créés en `firstOrCreate` (un re-seed ne réinitialise
 jamais un mot de passe).
 
-Comptes de démo prévus (mots de passe dans le `.env` de développement, jamais en
-production) : un élève BEPC, un élève Bac SE, un parent, un enseignant, un
-rédacteur, un relecteur, un admin contenu, un superadmin.
+Comptes de démo (mot de passe `DEMO_MOT_DE_PASSE` du `.env` de développement,
+jamais en production — `DatabaseSeeder` n'appelle `DemoSeeder` que hors
+production) : 01 élève (Aïssatou), 02 parent, 03 enseignante, 04 rédacteur,
+05 relectrice, 06 responsable pédagogique, 07 gestionnaire d'établissement,
+08 administrateur plateforme. Un second élève (Bac SE) viendra avec les
+profils d'examen (lot 2).
 
 ## 7. Rôles et périmètres
 
@@ -710,6 +719,92 @@ cette question à sa façon. Elle distingue deux notions :
    - **Preuve** : captures 360 et 1366 relues ; 98 Playwright, 118 Pest ;
      `tsc`, `vp check`, build verts.
 
+12. [x] **Lot 0, étape 5 — rôles et permissions** (2026-10-30)
+   - **Constat** : les trois espaces n'étaient gardés que par `auth` (un élève
+     ouvrait `/console`) ; aucun rôle ; « Mon compte » toujours dans
+     l'habillage élève ; la 2FA de Fortify active sans écran ; aucune limite
+     de session pour le personnel.
+   - **Décision** :
+     - `spatie/laravel-permission` **8.3.2** (compatible Laravel 13 ; tables
+       du paquet gardées en anglais, `roles`, `permissions`… : imposé par le
+       paquet) ;
+     - **une autorité par question** : `App\Enums\Permission` (ce qu'un
+       compte peut faire : `espace.eleve`, `espace.contenu`,
+       `espace.console`, `compte.double_authentification`),
+       `App\Enums\Role` (les 8 rôles du PLAN § 4, leurs permissions,
+       `estPersonnel()` = rédacteur, relecteur, responsable pédagogique,
+       superadmin), `App\Enums\Espace` (où arrive un compte : console >
+       contenu > élève > « Mon compte »), `App\Support\Perimetre` (sur
+       quels élèves : consultation / rattachement ; lot 0 = soi-même pour
+       l'élève, consultation de tous pour le superadmin ; parent, groupe,
+       établissement au lot 11) ;
+     - routes `/eleve`, `/contenu`, `/console` avec `->can(Permission::…)` ;
+       nouvelle route `/accueil` (`AiguillageController`, `fortify.home`,
+       `redirectUsersTo`) qui envoie chaque compte dans son espace après
+       connexion, double authentification ou page d'invité ;
+     - **`AccesParRoleTest`** (classe PHPUnit) : énumère le routeur, échoue
+       sur toute route authentifiée sans `can:` ni dérogation ; second test
+       sur les dérogations disparues ou devenues inutiles ; matrice 8 rôles ×
+       3 espaces. `OUVERTES_A_TOUS` : aiguillage, déconnexion, « Mon
+       compte », vérification du numéro, confirmation du mot de passe et
+       routes 2FA de Fortify (chacune avec sa raison) ;
+     - **403, pas 404**, pour un espace interdit : c'est une permission, pas
+       une ressource hors périmètre ; la page « Accès réservé » renvoie vers
+       `/accueil` (son espace) au lieu de la vitrine ;
+     - l'inscription donne le rôle `eleve`, et seulement lui ; la fabrique
+       `UserFactory` aussi (état `avecRole()` pour les autres) ; `TestCase`
+       sème les rôles une fois (`$seed`, `$seeder`), comme un déploiement ;
+     - `DatabaseSeeder` = `RolesEtPermissionsSeeder` partout + `DemoSeeder`
+       hors production (il refusait tout en production, ce qui aurait cassé
+       le `db:seed` de déploiement) ;
+     - **double authentification** proposée au personnel (DA4) : onglet
+       « Mon compte › Sécurité » (`SecuriteController`, derrière `can:` et
+       `password.confirm`) ; activation gardée **au geste** par
+       `ActiverDoubleAuthentification` (les routes de Fortify n'ont pas de
+       `can:` : un élève qui les appelle reçoit 403) ; QR code à l'encre sur
+       blanc, **libellé = pseudo, jamais le numéro** (Fortify y mettait
+       l'identifiant de connexion) ; activation, désactivation et nouveaux
+       codes de secours journalisés ;
+     - **session de 12 h du personnel** (HL-D10) : `SessionCourtePersonnel`,
+       12 h après la connexion même en activité, reconnexion par cookie
+       « se souvenir de moi » refusée ; élèves et parents gardent 30 jours ;
+     - « Mon compte » prend l'habillage de l'espace du compte
+       (`CompteLayout`) ; coque réduite pour un compte sans espace ; pied de
+       la coque du personnel : « Mon compte » et raccourci vers l'autre
+       espace (superadmin → back-office) ; textes au vouvoiement hors élève
+       (`useFormule()`), confirmation du mot de passe au vouvoiement ;
+     - données partagées : `auth.user.espace`, `espaces`,
+       `double_authentification` (toujours sans numéro) ;
+     - `JournalAcces::LIBELLES` : libellés des actions, pour « Activité du
+       compte » (et la console plus tard).
+   - **Écart** : parent, enseignant et gestionnaire d'établissement n'ont pas
+     encore d'espace (lot 11) : ils arrivent sur « Mon compte », et gardent la
+     session de 30 jours (HL-D10 ne les nomme pas) — à trancher au lot 11
+     (points ouverts).
+   - **Outillage** : `composer require` relance `boost:update`, qui ajoute
+     ses consignes anglaises à la fin de `CLAUDE.md` ; ajout retiré (elles
+     sont déjà dans `AGENTS.md`). À refaire après chaque `composer require`.
+   - **Vu avec Playwright** : `compte-securite`, `compte-profil-contenu`,
+     `erreur-403` en 4 gabarits × 2 thèmes. Corrigé après relecture : page
+     « Sécurité » à moitié vide à 1366 → sections « Session de travail »
+     (barre, heures d'ouverture et de reconnexion) et « Activité du compte »
+     (5 derniers gestes sensibles faits par le compte ou sur lui) ; cinq
+     onglets en 3 + 2 à 360 px (une case vide sinon) ; badge d'état passé
+     sous le titre (il écrasait « Mot de passe seul ») ; profil du personnel
+     qui parlait d'« élèves » et de « progression ». Parcours d'activation
+     (QR, clé, mauvais code) vu par script en 360 clair et 1366 sombre, hors
+     références (la clé change à chaque fois). Zones horaires masquées dans
+     les captures (`data-capture="variable"`). Préparation Playwright : un
+     compte par espace (`SESSIONS`), délai de 30 s pour l'aiguillage
+     (`php artisan serve` traite une requête à la fois).
+   - **Preuve** : Pest `AccesParRoleTest`, `RolesEtPermissionsTest`,
+     `SessionCourtePersonnelTest` (avec un témoin : le même cookie reconnecte
+     un élève), `Compte\SecuriteTest` (parcours complet avec un vrai code
+     TOTP, mauvais code, élève refusé, activité), `PerimetreTest`,
+     `SeederDemonstrationTest` réécrit ; Vitest `entete-compte`. Totaux :
+     **167 Pest, 127 Vitest, 124 Playwright** — verts ; `tsc`, `vp check`,
+     Pint, Larastan (niveau 7), `npm run build` passent.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -724,6 +819,13 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
   passe** : l'écran dit « demande de l'aide à ton enseignant ou à
   N'karamögö » ; le canal d'assistance (et l'écran administrateur qui
   réinitialise un mot de passe) reste à définir.
+- **Espaces parent, enseignant, gestionnaire** (lot 11) : d'ici là, ces
+  comptes n'ouvrent que « Mon compte ». Décider alors si enseignants et
+  gestionnaires (qui verront des données d'élèves) prennent la session de
+  12 h et la double authentification du personnel.
+- **Suppression de son compte par le personnel** : ouverte comme pour
+  l'élève (DA5) ; à revoir au lot 1, quand un rédacteur aura des contenus
+  signés (garder l'auteur, désactiver plutôt que supprimer ?).
 - **Changement de mot de passe** : les autres sessions ouvertes ne sont pas
   fermées (pas de `AuthenticateSession`) ; à décider avec l'étape 6 (appareils
   enregistrés, révocation).
@@ -738,12 +840,28 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
 ## 10. Enums
 
-*(à remplir — prévus : `CodeExamen` (`CEE`, `BEPC`, `BAC`), `CodeSerie`
-(`SM`, `SE`, `SS`), `Filiere` (`general`, `franco_arabe`), `TypeQuestion`,
-`StatutContenu` (`brouillon`, `en_relecture`, `publie`, `archive`),
-`ModeTentative` (`seance`, `entrainement`, `examen_blanc`), `Role`.)*
+| Enum | Valeurs | Rôle |
+|---|---|---|
+| `Role` | `eleve`, `parent`, `enseignant`, `redacteur`, `relecteur`, `admin_contenu`, `gestionnaire_etablissement`, `superadmin` | permissions de chaque rôle, `estPersonnel()` |
+| `Permission` | `espace.eleve`, `espace.contenu`, `espace.console`, `compte.double_authentification` | seule liste des permissions |
+| `Espace` | `console`, `contenu`, `eleve` (ordre de priorité) | où arrive un compte (`accueilDe()`) |
+| `MotifCode` | `verification`, `recuperation`, `changement_numero` | motif d'un code SMS |
+
+*(prévus : `CodeExamen` (`CEE`, `BEPC`, `BAC`), `CodeSerie` (`SM`, `SE`,
+`SS`), `Filiere` (`general`, `franco_arabe`), `TypeQuestion`, `StatutContenu`
+(`brouillon`, `en_relecture`, `publie`, `archive`), `ModeTentative`
+(`seance`, `entrainement`, `examen_blanc`).)*
 
 ## 11. Routes
 
-*(à remplir — chaque groupe avec son middleware `can:` ; toute exception
-justifiée dans `AccesParRoleTest::OUVERTES_A_TOUS`.)*
+| Groupe | Garde | Fichier |
+|---|---|---|
+| `/` vitrine, `/dev/composants` (hors production) | publiques | `routes/web.php` |
+| `/accueil` (aiguillage) | `auth`, dérogation | `routes/web.php` |
+| `/eleve` · `/contenu` · `/console` | `auth` + `can:espace.eleve` · `can:espace.contenu` · `can:espace.console` | `routes/web.php` |
+| `/compte/*` (profil, mot de passe, numéro, affichage, vérification, suppression) | `auth`, dérogations « Mon compte » | `routes/compte.php` |
+| `/compte/securite` | `auth` + `can:compte.double_authentification` + `password.confirm` | `routes/compte.php` |
+| `/mot-de-passe-oublie*` | `guest` | `routes/compte.php` |
+| Fortify : connexion, inscription, 2FA, confirmation du mot de passe | Fortify ; routes authentifiées en dérogation, activation 2FA gardée au geste | paquet |
+
+Toute exception est justifiée dans `AccesParRoleTest::OUVERTES_A_TOUS`.

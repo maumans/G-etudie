@@ -886,3 +886,32 @@ Bac.** » (sept mots) ; chapeau : « Cours, annales corrigées, exercices,
 examens blancs et suivi de vos progrès, même hors connexion. » — les six
 piliers en une ligne. Le détail (2010, enseignants, programme guinéen) reste
 plus bas, dans les preuves et la section sur le nom.
+
+### Lot 0, étape 5 — « Mon compte » du personnel et onglet « Sécurité » (2026-10-30)
+
+*Constat* : « Mon compte » restait dans l'habillage élève pour tout le monde,
+tutoyait un rédacteur et lui parlait de « progression » ; la coque du
+personnel n'avait aucun lien vers « Mon compte ». La première capture de
+l'onglet « Sécurité » était à moitié vide à 1366 px ; à 360 px, cinq onglets
+en grille de 3 laissaient une case vide, et le badge d'état écrasait le titre.
+
+*Décision* :
+- « Mon compte » prend l'habillage de l'espace du compte (`CompteLayout`) ;
+  une coque réduite à « Mon compte » pour un compte sans espace ;
+- pied de la coque du personnel : « Mon compte » (actif sous `/compte`) et
+  raccourci vers l'autre espace ouvert ;
+- tutoiement pour l'élève, vouvoiement pour les autres (`useFormule()`) ;
+- onglet « Sécurité » : ligne d'état (tuile 40 px, titre + badge, précision),
+  une seule action pleine ; configuration en deux étapes numérotées à
+  l'encre ; QR code à l'encre sur blanc fixe (`clair`), lisible en sombre ;
+  clé groupée par 4 en `font-data` ; codes de secours masqués par défaut ;
+  puis deux cartes utiles côte à côte : « Session de travail » (barre,
+  heures d'ouverture et de reconnexion) et « Activité du compte » (cinq
+  derniers gestes sensibles, en filets) ;
+- cinq onglets à 360 px : 3 + 2 (grille de 6, `col-span-2` / `col-span-3`) ;
+- zones qui changent à chaque passage (heures, journal) marquées
+  `data-capture="variable"` et masquées dans les captures de référence.
+
+*Preuve* : `compte-securite`, `compte-profil-contenu`, `erreur-403` en
+4 gabarits × 2 thèmes, axe sans violation sérieuse ; parcours d'activation vu
+en 360 clair et 1366 sombre ; 124 Playwright verts.

@@ -6,14 +6,14 @@ import { MotDePasseInput } from '@/components/ui/mot-de-passe-input';
 import { Spinner } from '@/components/ui/spinner';
 import { store } from '@/routes/password/confirm';
 
-/** Confirmation du mot de passe avant un réglage sensible (Fortify). */
+/** Confirmation du mot de passe avant un réglage sensible (Fortify) ; seul le personnel y passe : vouvoiement. */
 export default function ConfirmerMotDePasse() {
     return (
         <>
             <Head title="Confirmer le mot de passe" />
             <EnTeteConnexion
                 titre="Confirmer le mot de passe"
-                description="Cette partie est protégée : saisis ton mot de passe pour continuer."
+                description="Cette partie est protégée : saisissez votre mot de passe pour continuer."
             />
 
             <Form

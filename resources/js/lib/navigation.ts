@@ -55,6 +55,16 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
     { libelle: 'Signalements', icone: Flag },
 ];
 
+/** Compte sans espace (parent, enseignant, gestionnaire avant le lot 11). */
+export const NAVIGATION_COMPTE: EntreeNavigation[] = [
+    {
+        libelle: 'Mon compte',
+        icone: CircleUser,
+        href: monCompte().url,
+        actifSous: '/compte',
+    },
+];
+
 /** Console plateforme : superadmin. */
 export const NAVIGATION_CONSOLE: EntreeNavigation[] = [
     {

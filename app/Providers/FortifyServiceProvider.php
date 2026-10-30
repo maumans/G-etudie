@@ -2,16 +2,25 @@
 
 namespace App\Providers;
 
+use App\Actions\Fortify\ActiverDoubleAuthentification;
 use App\Actions\Fortify\CreateNewUser;
+use App\Http\Middleware\SessionCourtePersonnel;
 use App\Models\User;
+use App\Support\JournalAcces;
 use App\Support\Telephone;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Inertia\Inertia;
+use Laravel\Fortify\Actions\EnableTwoFactorAuthentication;
 use Laravel\Fortify\Contracts\RegisterResponse;
+use Laravel\Fortify\Events\RecoveryCodesGenerated;
+use Laravel\Fortify\Events\TwoFactorAuthenticationConfirmed;
+use Laravel\Fortify\Events\TwoFactorAuthenticationDisabled;
 use Laravel\Fortify\Fortify;
 
 /**
@@ -31,6 +40,9 @@ class FortifyServiceProvider extends ServiceProvider
                 return redirect()->route('compte.verification.edit');
             }
         });
+
+        // Double authentification réservée au personnel (DA4), gardée au geste.
+        $this->app->bind(EnableTwoFactorAuthentication::class, ActiverDoubleAuthentification::class);
     }
 
     public function boot(): void
@@ -57,6 +69,22 @@ class FortifyServiceProvider extends ServiceProvider
 
         $this->configurerVues();
         $this->configurerLimitations();
+        $this->configurerEcouteurs();
+    }
+
+    private function configurerEcouteurs(): void
+    {
+        // Point de départ des 12 h du personnel (SessionCourtePersonnel).
+        Event::listen(function (Login $evenement) {
+            if (request()->hasSession()) {
+                request()->session()->put(SessionCourtePersonnel::CLE, now()->getTimestamp());
+            }
+        });
+
+        // Journal des accès sensibles (CLAUDE.md § 9).
+        Event::listen(fn (TwoFactorAuthenticationConfirmed $evenement) => JournalAcces::consigner('double_authentification.activee', $evenement->user));
+        Event::listen(fn (TwoFactorAuthenticationDisabled $evenement) => JournalAcces::consigner('double_authentification.desactivee', $evenement->user));
+        Event::listen(fn (RecoveryCodesGenerated $evenement) => JournalAcces::consigner('double_authentification.codes_regeneres', $evenement->user));
     }
 
     private function configurerVues(): void

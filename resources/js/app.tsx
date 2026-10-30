@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { initialiserReglagesAffichage } from '@/hooks/use-reglages-affichage';
+import CompteLayout from '@/layouts/compte-layout';
 import ConnexionLayout from '@/layouts/connexion-layout';
 import ConsoleLayout from '@/layouts/console-layout';
 import ContenuLayout from '@/layouts/contenu-layout';
@@ -48,10 +49,9 @@ void createInertiaApp({
                 return ConsoleLayout;
             case name.startsWith('auth/'):
                 return ConnexionLayout;
-            // « Mon compte » : dans l'espace élève (les rôles du personnel
-            // auront leur habillage à l'étape 5).
+            // « Mon compte » : dans l'habillage de l'espace du compte.
             case name.startsWith('compte/'):
-                return EleveLayout;
+                return CompteLayout;
             default:
                 return null;
         }

@@ -10,6 +10,7 @@ import { NAVIGATION_CONSOLE } from '@/lib/navigation';
 export default function ConsoleLayout({ children }: { children: ReactNode }) {
     return (
         <CoquePersonnel
+            cle="console"
             espace="Console plateforme"
             entrees={NAVIGATION_CONSOLE}
             sombre

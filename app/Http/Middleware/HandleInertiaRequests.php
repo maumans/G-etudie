@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\Espace;
+use App\Enums\Permission;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -45,15 +47,22 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user();
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             // Données minimales (PLAN § 10) : chaque page reçoit le prénom, le
             // pseudo et si le numéro est vérifié — jamais le numéro lui-même.
+            // `espace` : celui où le compte arrive (son habillage de « Mon
+            // compte ») ; `espaces` : ceux qu'il peut ouvrir.
             'auth' => [
-                'user' => $request->user() ? [
-                    ...$request->user()->only(['id', 'prenom', 'pseudo']),
-                    'numero_verifie' => $request->user()->telephoneVerifie(),
+                'user' => $user ? [
+                    ...$user->only(['id', 'prenom', 'pseudo']),
+                    'numero_verifie' => $user->telephoneVerifie(),
+                    'espace' => Espace::principalDe($user)?->value,
+                    'espaces' => array_map(fn (Espace $espace) => $espace->value, Espace::accessiblesA($user)),
+                    'double_authentification' => $user->can(Permission::DoubleAuthentification->value),
                 ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',

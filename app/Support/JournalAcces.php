@@ -14,6 +14,24 @@ use Illuminate\Support\Str;
  */
 class JournalAcces
 {
+    /** Ce que chaque action veut dire, pour l'afficher (« Mon compte › Sécurité », console). */
+    public const LIBELLES = [
+        'compte.cree' => 'Compte créé',
+        'compte.supprime' => 'Compte supprimé',
+        'mot_de_passe.change' => 'Mot de passe changé',
+        'mot_de_passe.recupere' => 'Mot de passe retrouvé par SMS',
+        'numero.verifie' => 'Numéro vérifié',
+        'numero.change' => 'Numéro changé',
+        'double_authentification.activee' => 'Double authentification activée',
+        'double_authentification.desactivee' => 'Double authentification désactivée',
+        'double_authentification.codes_regeneres' => 'Nouveaux codes de secours',
+    ];
+
+    public static function libelle(string $action): string
+    {
+        return self::LIBELLES[$action] ?? $action;
+    }
+
     /**
      * @param  array<string, scalar|null>  $details
      */

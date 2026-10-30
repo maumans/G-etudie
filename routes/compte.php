@@ -1,7 +1,9 @@
 <?php
 
+use App\Enums\Permission;
 use App\Http\Controllers\Compte\MonCompteController;
 use App\Http\Controllers\Compte\RecuperationController;
+use App\Http\Controllers\Compte\SecuriteController;
 use App\Http\Controllers\Compte\VerificationNumeroController;
 use Illuminate\Support\Facades\Route;
 
@@ -20,7 +22,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // « Mon compte » : chaque compte gère le sien. Ouvert à tout compte connecté,
-// avec sa raison, dans AccesParRoleTest::OUVERTES_A_TOUS (étape 5).
+// avec sa raison, dans AccesParRoleTest::OUVERTES_A_TOUS.
 Route::middleware('auth')->prefix('compte')->name('compte.')->group(function () {
     Route::redirect('/', '/compte/profil')->name('accueil');
 
@@ -50,6 +52,12 @@ Route::middleware('auth')->prefix('compte')->name('compte.')->group(function () 
     Route::delete('numero/en-attente', [MonCompteController::class, 'annulerNumero'])->name('numero.annuler');
 
     Route::get('affichage', [MonCompteController::class, 'affichage'])->name('affichage.edit');
+
+    // Double authentification : personnel seulement (DA4).
+    Route::get('securite', [SecuriteController::class, 'edit'])
+        ->can(Permission::DoubleAuthentification)
+        ->middleware('password.confirm')
+        ->name('securite.edit');
 
     Route::delete('/', [MonCompteController::class, 'supprimer'])
         ->middleware('throttle:6,1')

@@ -9,6 +9,7 @@ import { NAVIGATION_CONTENU } from '@/lib/navigation';
 export default function ContenuLayout({ children }: { children: ReactNode }) {
     return (
         <CoquePersonnel
+            cle="contenu"
             espace="Back-office contenu"
             entrees={NAVIGATION_CONTENU}
         >

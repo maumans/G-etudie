@@ -1,5 +1,9 @@
 import { Form } from '@inertiajs/react';
-import { EnteteCompte, SectionCompte } from '@/components/entete-compte';
+import {
+    EnteteCompte,
+    SectionCompte,
+    useFormule,
+} from '@/components/entete-compte';
 import { Button } from '@/components/ui/button';
 import { Champ } from '@/components/ui/champ';
 import { MotDePasseInput } from '@/components/ui/mot-de-passe-input';
@@ -11,13 +15,18 @@ import { update } from '@/routes/compte/mot-de-passe';
  * communiqué à l'ouverture du compte ne doit pas rester le même.
  */
 export default function MotDePasse() {
+    const formule = useFormule();
+
     return (
         <div className="mx-auto grid w-full max-w-3xl gap-6">
             <EnteteCompte titre="Mot de passe" />
 
             <SectionCompte
                 titre="Changer mon mot de passe"
-                description="8 caractères au moins. Choisis-en un que tu retiens sans l'écrire."
+                description={formule(
+                    "8 caractères au moins. Choisis-en un que tu retiens sans l'écrire.",
+                    "8 caractères au moins. Choisissez-en un que vous retenez sans l'écrire.",
+                )}
             >
                 <Form
                     {...update.form()}

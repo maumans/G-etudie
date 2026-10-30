@@ -24,7 +24,7 @@ test('un numéro vérifié reçoit un code, et le code + un nouveau mot de passe
     $this->post(route('compte.recuperation.update'), [
         'code' => $this->sms->dernierCode('+224622123456'),
         'password' => 'nouveau-mdp',
-    ])->assertRedirect('/eleve');
+    ])->assertRedirect('/accueil');
 
     $this->assertAuthenticatedAs($user);
     expect(Hash::check('nouveau-mdp', $user->fresh()->password))->toBeTrue()

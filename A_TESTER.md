@@ -141,6 +141,48 @@
 - En cas d'échec, relever : capture, heure, ce qui s'est affiché.
 - État : à faire
 
+### [Lot 0] Double authentification du personnel avec une vraie application
+- Pourquoi : les tests calculent le code avec la même bibliothèque que le
+  serveur ; seul un vrai téléphone prouve que le QR code (encre sur blanc, en
+  clair comme en sombre) se scanne et que l'horloge du téléphone s'accorde
+  avec celle du serveur (DA4).
+- Matériel : un Android avec Google Authenticator ou Aegis, un iPhone si
+  possible ; un poste avec l'application (build, sans `npm run dev`).
+- Comment le provoquer :
+  1. Se connecter avec le compte de démonstration administrateur plateforme
+     (+224 600 00 00 08) ; « Mon compte » → « Sécurité » ; retaper le mot de
+     passe.
+  2. « Activer la double authentification » ; scanner le QR code, en thème
+     clair puis en thème sombre (luminosité du poste au minimum).
+  3. Saisir le code affiché ; « Afficher les codes » et les noter.
+  4. Se déconnecter, se reconnecter : saisir le code de l'application ; puis
+     une seconde fois avec un code de secours.
+  5. « Désactiver » et vérifier que la connexion ne demande plus de code.
+- Quoi observer : le scan réussit du premier coup dans les deux thèmes ;
+  l'application affiche « N'karamögö » et le pseudo (`plateforme_demo`),
+  **jamais le numéro** ; le code est accepté ; un code de secours sert une
+  seule fois ; « Activité du compte » liste activation et désactivation.
+- En cas d'échec, relever : application utilisée, écart d'heure entre
+  téléphone et poste, message affiché, capture.
+- État : à faire
+
+### [Lot 0] Session de 12 h du personnel
+- Pourquoi : HL-D10 — un rédacteur ou un administrateur se reconnecte 12 h
+  après sa connexion, même s'il travaille, et « Rester connecté » ne le
+  prolonge pas (un poste partagé dans un bureau).
+- Matériel : un ordinateur, Chrome ; le compte de démonstration rédacteur
+  (+224 600 00 00 04).
+- Comment le provoquer : se connecter le matin, case « Rester connecté »
+  cochée ; travailler par intervalles ; 12 h plus tard, ouvrir une page du
+  back-office. Puis fermer Chrome, le rouvrir le lendemain.
+- Quoi observer : à la douzième heure, retour à l'écran de connexion avec le
+  message « Session terminée… 12 heures » ; le lendemain, Chrome rouvert, la
+  connexion est demandée (pas de reconnexion silencieuse). « Mon compte »
+  → « Sécurité » affichait la bonne heure de reconnexion.
+- En cas d'échec, relever : heures de connexion et de déconnexion, message
+  affiché.
+- État : à faire
+
 ## 7. Paiements réels — Orange Money, MTN MoMo, codes prépayés
 
 *(aucune entrée)*

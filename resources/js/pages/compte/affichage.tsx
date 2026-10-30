@@ -1,6 +1,10 @@
 import { Moon, Smartphone, Sun } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { EnteteCompte, SectionCompte } from '@/components/entete-compte';
+import {
+    EnteteCompte,
+    SectionCompte,
+    useFormule,
+} from '@/components/entete-compte';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAppearance } from '@/hooks/use-appearance';
 import type { Appearance } from '@/hooks/use-appearance';
@@ -25,6 +29,7 @@ export default function Affichage() {
     const { appearance, updateAppearance } = useAppearance();
     const { taille, changerTaille, economieDonnees, changerEconomieDonnees } =
         useReglagesAffichage();
+    const formule = useFormule();
 
     return (
         <div className="mx-auto grid w-full max-w-3xl gap-6">
@@ -60,7 +65,10 @@ export default function Affichage() {
 
             <SectionCompte
                 titre="Économie de données"
-                description="Les images lourdes ne se chargent que si tu les demandes, et le poids de chaque téléchargement s'affiche avant."
+                description={formule(
+                    "Les images lourdes ne se chargent que si tu les demandes, et le poids de chaque téléchargement s'affiche avant.",
+                    "Les images lourdes ne se chargent que si vous les demandez, et le poids de chaque téléchargement s'affiche avant.",
+                )}
             >
                 <label className="flex min-h-11 items-center gap-2.5">
                     <Checkbox

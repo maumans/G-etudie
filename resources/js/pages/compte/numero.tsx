@@ -1,5 +1,9 @@
 import { Form, Link } from '@inertiajs/react';
-import { EnteteCompte, SectionCompte } from '@/components/entete-compte';
+import {
+    EnteteCompte,
+    SectionCompte,
+    useFormule,
+} from '@/components/entete-compte';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Champ } from '@/components/ui/champ';
@@ -23,6 +27,8 @@ export default function Numero({
     numeroVerifie: boolean;
     nouveauNumeroMasque: string | null;
 }) {
+    const formule = useFormule();
+
     return (
         <div className="mx-auto grid w-full max-w-3xl gap-6">
             <EnteteCompte titre="Numéro" />
@@ -41,8 +47,10 @@ export default function Numero({
                 {!numeroVerifie && (
                     <div className="grid gap-3">
                         <p className="text-ink-600">
-                            Sans vérification, tu ne pourras pas retrouver ton
-                            compte si tu oublies ton mot de passe.
+                            {formule(
+                                'Sans vérification, tu ne pourras pas retrouver ton compte si tu oublies ton mot de passe.',
+                                'Sans vérification, vous ne pourrez pas retrouver votre compte si vous oubliez votre mot de passe.',
+                            )}
                         </p>
                         <Button asChild className="sm:w-fit">
                             <Link href={verifier()}>Vérifier mon numéro</Link>
@@ -56,7 +64,10 @@ export default function Numero({
                 description={
                     nouveauNumeroMasque
                         ? undefined
-                        : "Un code part par SMS sur le nouveau numéro pour vérifier qu'il est bien le tien."
+                        : formule(
+                              "Un code part par SMS sur le nouveau numéro pour vérifier qu'il est bien le tien.",
+                              "Un code part par SMS sur le nouveau numéro pour vérifier qu'il est bien le vôtre.",
+                          )
                 }
             >
                 {nouveauNumeroMasque ? (
