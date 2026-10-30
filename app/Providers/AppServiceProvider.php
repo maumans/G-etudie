@@ -2,10 +2,12 @@
 
 namespace App\Providers;
 
+use App\Models\Lecon;
 use App\Services\HorsLigne\RegistreOperations;
 use App\Services\Sms\EnvoiSms;
 use App\Services\Sms\JournalSms;
 use Carbon\CarbonImmutable;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -35,6 +37,13 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configurerPagesErreur();
+
+        // Noms courts et stables dans les colonnes polymorphes
+        // (`versions_contenu.contenu_type`). Carte non imposée : les rôles de
+        // spatie gardent le nom de classe de User dans `model_has_roles`.
+        Relation::morphMap([
+            'lecon' => Lecon::class,
+        ]);
     }
 
     /**

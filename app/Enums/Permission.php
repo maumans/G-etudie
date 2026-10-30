@@ -20,6 +20,18 @@ enum Permission: string
     /** Entrer dans la console plateforme. */
     case EspaceConsole = 'espace.console';
 
+    /** Saisir le référentiel : matières, épreuves, programme, années scolaires (PLAN M3). */
+    case GererReferentiel = 'referentiel.gerer';
+
+    /** Rédiger des leçons : créer, modifier ses brouillons, les envoyer en relecture. */
+    case RedigerContenu = 'contenu.rediger';
+
+    /** Relire et publier, ou renvoyer, le contenu des autres (jamais le sien). */
+    case RelireContenu = 'contenu.relire';
+
+    /** Modifier le brouillon de n'importe quel auteur, archiver (responsable pédagogique). */
+    case AdministrerContenu = 'contenu.administrer';
+
     /** Activer la double authentification sur son compte (DA4 : personnel seulement). */
     case DoubleAuthentification = 'compte.double_authentification';
 }
