@@ -23,12 +23,17 @@ export function EnteteCompte({ titre }: { titre: string }) {
     return (
         <div className="grid gap-4">
             <Head title={`${titre} · Mon compte`} />
-            <h1 className="text-titre-ecran font-bold lg:text-titre-ecran-large">
-                Mon compte
-            </h1>
+            <div className="grid gap-1">
+                <h1 className="text-titre-ecran lg:text-titre-ecran-large">
+                    Mon compte
+                </h1>
+                <p className="text-ink-600">
+                    Ton profil, ta sécurité et ton affichage.
+                </p>
+            </div>
             <nav
                 aria-label="Mon compte"
-                className="grid grid-cols-2 gap-1 rounded-controle bg-craie-100 p-1 sm:inline-flex sm:w-fit"
+                className="grid grid-cols-2 gap-0.5 rounded-[12px] bg-craie-100 p-1 sm:inline-flex sm:w-fit"
             >
                 {ONGLETS.map((onglet) => {
                     const actif = isCurrentUrl(onglet.href);
@@ -41,9 +46,9 @@ export function EnteteCompte({ titre }: { titre: string }) {
                             preserveScroll
                             aria-current={actif ? 'page' : undefined}
                             className={cn(
-                                'flex h-10 items-center justify-center rounded-[10px] px-4 text-interface font-medium whitespace-nowrap outline-none focus-visible:outline-2 focus-visible:outline-ring',
+                                'flex h-9 items-center justify-center rounded-[8px] px-3.5 text-interface font-medium whitespace-nowrap transition-colors outline-none focus-visible:outline-2 focus-visible:outline-ring sm:h-8',
                                 actif
-                                    ? 'bg-card text-ink-900 shadow-carte'
+                                    ? 'bg-relief text-ink-900 shadow-xs ring-1 ring-black/5 dark:ring-white/5'
                                     : 'text-ink-600 hover:text-ink-900',
                             )}
                         >
@@ -72,11 +77,11 @@ export function SectionCompte({
         <section
             className={cn(
                 'grid gap-5 rounded-carte border bg-card p-5 shadow-carte sm:p-6',
-                danger && 'border-faux-600/40 dark:border-faux-400/40',
+                danger && 'border-faux-600/30 dark:border-faux-400/30',
             )}
         >
             <div className="grid gap-1">
-                <h2 className="text-titre-carte font-semibold">{titre}</h2>
+                <h2 className="text-titre-carte">{titre}</h2>
                 {description && <p className="text-ink-600">{description}</p>}
             </div>
             {children}

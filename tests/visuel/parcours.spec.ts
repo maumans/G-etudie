@@ -36,7 +36,7 @@ test('inscription, vérification proposée sans être imposée, puis suppression
     await page.getByRole('link', { name: 'Plus tard' }).click();
     await expect(page).toHaveURL(/\/eleve$/);
     await expect(
-        page.getByRole('heading', { name: 'Bonjour Mamadou' }),
+        page.getByRole('heading', { name: /^Bon(jour|soir), Mamadou$/ }),
     ).toBeVisible();
     await expect(page.getByText('Vérifie ton numéro.')).toBeVisible();
 

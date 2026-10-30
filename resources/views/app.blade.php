@@ -22,15 +22,15 @@
         {{-- Fond du canevas avant le chargement du CSS (craie-50, DESIGN.md § 2.1) --}}
         <style>
             html {
-                background-color: #F6F7FB;
+                background-color: #FAFAFC;
             }
 
             html.dark {
-                background-color: #0E1220;
+                background-color: #0B0B0E;
             }
         </style>
 
-        <meta name="theme-color" content="#2537C9">
+        <meta name="theme-color" content="#702AED">
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">

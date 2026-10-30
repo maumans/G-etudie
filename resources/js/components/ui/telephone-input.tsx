@@ -5,6 +5,7 @@ import {
   formaterTelephone,
   INDICATIF,
 } from "@/lib/telephone"
+import { CHAMP_CONTENEUR } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 /**
@@ -32,13 +33,14 @@ function TelephoneInput({
     <div
       data-slot="telephone-input"
       className={cn(
-        "flex h-12 w-full min-w-0 items-stretch overflow-hidden rounded-controle border border-input bg-card shadow-carte transition-colors focus-within:border-nimba-600 focus-within:ring-[3px] focus-within:ring-nimba-600/25 has-[input[aria-invalid=true]]:border-faux-600 dark:focus-within:border-nimba-300 dark:focus-within:ring-nimba-300/30 dark:has-[input[aria-invalid=true]]:border-faux-400",
+        CHAMP_CONTENEUR,
+        "flex h-11 w-full min-w-0 items-stretch overflow-hidden sm:h-10",
         className
       )}
     >
       <span
         aria-hidden
-        className="flex items-center border-r border-border bg-craie-100 px-3 font-data text-base text-ink-600"
+        className="flex items-center gap-1.5 border-r border-border bg-craie-50 pr-2.5 pl-3 font-data text-base text-ink-600 sm:text-interface dark:bg-transparent"
       >
         {INDICATIF}
       </span>
@@ -53,7 +55,7 @@ function TelephoneInput({
           setChiffres(nouveaux)
           onValeur?.(nouveaux ? `${INDICATIF}${nouveaux}` : "")
         }}
-        className="w-full min-w-0 bg-transparent px-3 font-data text-base text-ink-900 outline-none placeholder:text-ink-600"
+        className="w-full min-w-0 bg-transparent px-3 font-data text-base text-ink-900 outline-none placeholder:text-ink-500 sm:text-interface"
         {...props}
       />
       {name && <input type="hidden" name={name} value={valeurNormalisee} />}

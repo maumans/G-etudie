@@ -23,7 +23,7 @@ export default function Connexion({ statut }: { statut?: string }) {
             {statut && (
                 <p
                     role="status"
-                    className="rounded-controle bg-juste-600/[0.10] px-3 py-2 font-medium text-juste-700 dark:bg-juste-400/15 dark:text-juste-400"
+                    className="rounded-controle border border-juste-600/25 bg-juste-600/[0.08] px-3 py-2.5 text-juste-700 dark:border-juste-400/25 dark:bg-juste-400/10 dark:text-juste-400"
                 >
                     {statut}
                 </p>
@@ -32,7 +32,7 @@ export default function Connexion({ statut }: { statut?: string }) {
             <Form
                 {...store.form()}
                 resetOnError={['password']}
-                className="grid gap-5"
+                className="grid gap-4"
             >
                 {({ processing, errors }) => (
                     <>
@@ -59,7 +59,7 @@ export default function Connexion({ statut }: { statut?: string }) {
                                 />
                             )}
                         </Champ>
-                        <label className="flex min-h-12 items-center gap-3">
+                        <label className="flex min-h-11 items-center gap-2.5 text-ink-600">
                             <Checkbox name="remember" defaultChecked />
                             <span>Rester connecté sur ce téléphone</span>
                         </label>
@@ -71,10 +71,10 @@ export default function Connexion({ statut }: { statut?: string }) {
                 )}
             </Form>
 
-            <div className="grid gap-2 text-center">
+            <div className="grid gap-2 text-center text-ink-600">
                 <Link
                     href={motDePasseOublie()}
-                    className="font-medium text-lien underline-offset-4 hover:underline"
+                    className="font-medium text-lien underline-offset-4 transition-colors hover:underline"
                 >
                     Mot de passe oublié ?
                 </Link>
@@ -83,7 +83,7 @@ export default function Connexion({ statut }: { statut?: string }) {
                     <Link
                         href={register()}
                         prefetch
-                        className="font-medium text-lien underline-offset-4 hover:underline"
+                        className="font-medium text-lien underline-offset-4 transition-colors hover:underline"
                     >
                         Créer un compte
                     </Link>

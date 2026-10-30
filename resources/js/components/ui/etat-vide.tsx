@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils"
  * État vide (DESIGN.md § 8) : illustration + phrase + **une action**. Un écran
  * vide sans rien à faire est une impasse ; l'action est donc obligatoire.
  *
- * L'illustration est une icône dans un disque en attendant les SVG originaux
+ * L'illustration est une icône dans une tuile en attendant les SVG originaux
  * commandés à un illustrateur.
  */
 function EtatVide({
@@ -27,18 +27,20 @@ function EtatVide({
     <div
       data-slot="etat-vide"
       className={cn(
-        "flex flex-col items-center gap-4 rounded-carte border border-dashed border-ink-400/60 px-6 py-10 text-center",
+        "flex flex-col items-center gap-5 rounded-carte border bg-card px-6 py-12 text-center shadow-carte",
         className
       )}
     >
       <div
         aria-hidden
-        className="flex size-16 items-center justify-center rounded-full bg-nimba-600/[0.10] text-nimba-700 dark:bg-nimba-500/20 dark:text-nimba-300"
+        className="relative flex size-12 items-center justify-center rounded-[14px] bg-nimba-600/[0.10] text-nimba-700 ring-1 ring-nimba-600/15 ring-inset dark:bg-nimba-300/10 dark:text-nimba-300 dark:ring-nimba-300/20"
       >
-        <Illustration className="size-8" strokeWidth={1.75} />
+        <Illustration className="size-6" strokeWidth={1.75} />
       </div>
-      <div className="grid max-w-sm gap-1.5">
-        <p className="font-titre text-titre-carte font-semibold text-ink-900">{titre}</p>
+      <div className="grid max-w-sm gap-1">
+        <p className="text-titre-carte font-semibold tracking-tight text-ink-900">
+          {titre}
+        </p>
         {message && <p className="text-interface text-ink-600">{message}</p>}
       </div>
       {action}

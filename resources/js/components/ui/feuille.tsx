@@ -51,7 +51,7 @@ function FeuilleContenu({
         {...(description ? {} : { "aria-describedby": undefined })}
         style={decalage > 0 ? { transform: `translateY(${decalage}px)` } : undefined}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] flex-col rounded-t-feuille border-t bg-card text-ink-900 shadow-flottant outline-none data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom md:inset-x-auto md:top-1/2 md:bottom-auto md:left-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-carte md:border data-[state=closed]:md:slide-out-to-bottom-0 data-[state=closed]:md:zoom-out-95 data-[state=open]:md:slide-in-from-bottom-0 data-[state=open]:md:zoom-in-95",
+          "fixed inset-x-0 bottom-0 z-50 flex max-h-[90dvh] flex-col rounded-t-feuille border-t bg-relief text-ink-900 shadow-flottant outline-none data-[state=closed]:animate-out data-[state=closed]:slide-out-to-bottom data-[state=open]:animate-in data-[state=open]:slide-in-from-bottom md:inset-x-auto md:top-1/2 md:bottom-auto md:left-1/2 md:w-full md:max-w-lg md:-translate-x-1/2 md:-translate-y-1/2 md:rounded-[20px] md:border data-[state=closed]:md:slide-out-to-bottom-0 data-[state=closed]:md:zoom-out-95 data-[state=open]:md:slide-in-from-bottom-0 data-[state=open]:md:zoom-in-95",
           className
         )}
         {...props}
@@ -72,11 +72,11 @@ function FeuilleContenu({
         >
           <div
             aria-hidden
-            className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-ink-400/60 md:hidden"
+            className="mx-auto mb-3 h-1 w-9 rounded-full bg-ink-400/50 md:hidden"
           />
           <div className="flex items-start gap-3">
             <div className="grid min-w-0 flex-1 gap-1">
-              <DialogPrimitive.Title className="font-titre text-titre-carte font-semibold">
+              <DialogPrimitive.Title className="text-[1.0625rem] leading-snug font-semibold tracking-tight">
                 {titre}
               </DialogPrimitive.Title>
               {description && (
@@ -87,9 +87,9 @@ function FeuilleContenu({
             </div>
             <DialogPrimitive.Close
               ref={boutonFermer}
-              className="-mt-1 -mr-2 flex size-12 shrink-0 items-center justify-center rounded-controle text-ink-600 transition-colors hover:bg-nimba-600/[0.08] hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring dark:hover:bg-nimba-500/20"
+              className="-mt-1.5 -mr-2 flex size-10 shrink-0 items-center justify-center rounded-controle text-ink-500 transition-colors hover:bg-craie-100 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring"
             >
-              <XIcon aria-hidden className="size-5" />
+              <XIcon aria-hidden className="size-4" />
               <span className="sr-only">Fermer</span>
             </DialogPrimitive.Close>
           </div>

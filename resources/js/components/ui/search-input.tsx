@@ -1,6 +1,7 @@
 import { Search, X } from "lucide-react"
 import * as React from "react"
 
+import { CHAMP_BASE } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 
 /** Délai entre la dernière frappe et la recherche. */
@@ -80,7 +81,7 @@ function SearchInput({
     >
       <Search
         aria-hidden
-        className="pointer-events-none absolute left-3.5 size-5 text-ink-600"
+        className="pointer-events-none absolute left-3 size-4 text-ink-500"
       />
       <input
         type="search"
@@ -99,7 +100,7 @@ function SearchInput({
             vider()
           }
         }}
-        className="h-12 w-full min-w-0 rounded-controle border border-input bg-card pr-12 pl-11 text-base text-ink-900 shadow-carte outline-none placeholder:text-ink-600 focus-visible:border-nimba-600 focus-visible:ring-[3px] focus-visible:ring-nimba-600/25 dark:focus-visible:border-nimba-300 dark:focus-visible:ring-nimba-300/30 [&::-webkit-search-cancel-button]:hidden"
+        className={cn(CHAMP_BASE, "h-11 w-full min-w-0 pr-11 pl-9.5 text-base sm:h-10 sm:text-interface [&::-webkit-search-cancel-button]:hidden")}
         {...props}
       />
       {valeur !== "" && (
@@ -107,9 +108,9 @@ function SearchInput({
           type="button"
           aria-label="Effacer la recherche"
           onClick={vider}
-          className="absolute right-1 flex size-10 items-center justify-center rounded-[10px] text-ink-600 hover:bg-nimba-600/[0.08] hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring dark:hover:bg-nimba-500/20"
+          className="absolute right-1 flex size-9 items-center justify-center rounded-[8px] text-ink-500 hover:bg-craie-100 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring sm:size-8"
         >
-          <X aria-hidden className="size-5" />
+          <X aria-hidden className="size-4" />
         </button>
       )}
     </div>

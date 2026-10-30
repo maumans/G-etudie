@@ -18,7 +18,7 @@ function MotDePasseInput({
     <div data-slot="mot-de-passe-input" className="relative">
       <Input
         type={visible ? "text" : "password"}
-        className={cn("pr-12", className)}
+        className={cn("pr-11", className)}
         {...props}
       />
       <button
@@ -26,12 +26,12 @@ function MotDePasseInput({
         onClick={() => setVisible((precedent) => !precedent)}
         aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
         aria-pressed={visible}
-        className="absolute inset-y-0 right-0 flex w-12 items-center justify-center rounded-r-controle text-ink-600 outline-none hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring"
+        className="absolute inset-y-0 right-0 flex w-11 items-center justify-center rounded-r-controle text-ink-500 outline-none transition-colors hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring"
       >
         {visible ? (
-          <EyeOff aria-hidden className="size-5" />
+          <EyeOff aria-hidden className="size-4" />
         ) : (
-          <Eye aria-hidden className="size-5" />
+          <Eye aria-hidden className="size-4" />
         )}
       </button>
     </div>

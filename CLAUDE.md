@@ -19,7 +19,8 @@ mineurs**, sur des Android d'entrée de gamme, avec peu de données.
 
 1. `DEVBOOK.md` § 0 « Reprise » — ce qui est fait, ce qui reste, par quoi reprendre.
 2. Le lot en cours dans `PLAN_NKARAMOGO.md` § 12, et ses décisions (§ 13).
-3. `DESIGN.md` avant de toucher à une interface.
+3. `DESIGN.md` avant de toucher à une interface — **§ 0 « Le niveau d'exigence » d'abord** —
+   et la compétence `design-ardoise` (`.claude/skills/design-ardoise/SKILL.md`).
 4. `HORS_LIGNE.md` (partie A, et le lot HL lié au lot en cours) avant de toucher
    à un geste élève, au service worker ou au stockage local ; mettre à jour sa
    partie B à la fin du lot.
@@ -66,6 +67,31 @@ mineurs**, sur des Android d'entrée de gamme, avec peu de données.
 - Une fiche de détail est gardée par sa **policy**, pas seulement la liste :
   cacher un lien ne ferme pas une porte.
 - Identifiants créés sur l'appareil : **UUID v7** (jamais v4).
+
+## 3 bis. Exigence visuelle — non négociable
+
+Maurice veut un produit **au sommet** : élégant, professionnel, vivant, et
+facile. Le détail est dans `DESIGN.md` § 0 et la compétence `design-ardoise` ;
+l'essentiel ne se rediscute pas :
+
+- **Le hors ligne et la faible connexion ne sont jamais une excuse** pour une
+  interface pauvre. L'élégance ne coûte presque rien en données (police
+  variable, dégradés CSS, ombres) ; on économise sur les images et les
+  bibliothèques, jamais sur le soin.
+- **Dosé, pas gros** : interface à 14 px, titres en 600 (jamais 700),
+  contrôles de 40 px (44 px sur mobile), icônes de 16 px. La hiérarchie vient
+  de l'espace, du contraste et de la couleur.
+- **Jetons seulement** : couleurs, rayons, ombres et tailles du design system
+  (`app.css`) ; aucune valeur inventée dans une page. Un motif répété deux fois
+  devient un composant de `components/ui/`.
+- **Chaque écran a un moment d'expression** (surface de la marque, mot en
+  serif italique, aperçu, halo) — un seul — et **n'est jamais une page plate**
+  ni un vide sans action.
+- **Jamais de bleu roi ni d'orange/jaune d'opérateur** comme couleur de marque :
+  l'accent est le violet `nimba` (`DESIGN.md` § 2.2).
+- Avant de déclarer un écran fini, le comparer honnêtement aux meilleurs
+  produits actuels (Linear, Vercel, Stripe, Brilliant) : s'il fait « ancien
+  site », il n'est pas fini.
 
 ## 4. Règles techniques — pièges connus
 
@@ -119,7 +145,10 @@ règles ne se rediscutent pas.
   **opacité** (`bg-nimba-600/[0.12] dark:bg-nimba-500/25`), jamais en nuance
   claire fixe (`bg-nimba-50`), qui reste blanche en sombre sous un texte devenu
   clair — blanc sur blanc.
-- **Polices auto-hébergées** : une police distante échoue hors ligne.
+- **Polices auto-hébergées** : une police distante échoue hors ligne. Geist
+  variable et Instrument Serif italique, par Fontsource, importées dans `app.css`.
+- **Écran qui affiche la date ou l'heure** : figer l'horloge dans sa capture
+  (`page.clock.setFixedTime`), sinon la référence change chaque jour.
 - **`public/hot` oublié** après un `npm run dev` arrêté : le build semble cassé
   et le service worker se désinstalle. Le vérifier avant toute vérification de
   build.
@@ -193,7 +222,11 @@ Pour **chaque** écran créé ou modifié :
    sombre** (thème forcé par la classe `dark` sur `<html>` ou
    `prefers-color-scheme`).
 4. **Regarder** les captures et corriger ce qui ne va pas (débordement, contraste,
-   action dominante hors écran, formule non rendue, état vide manquant).
+   action dominante hors écran, formule non rendue, état vide manquant) **et ce
+   qui est lourd ou daté** : texte trop gros ou trop gras, contrôles épais,
+   page plate, moitié d'écran vide, surface blanche fixe devenue illisible en
+   sombre (lui donner la classe `clair`). Liste complète : compétence
+   `design-ardoise`, « Relecture d'une capture ».
 5. Lancer l'audit axe (`@axe-core/playwright`) sur l'écran.
 6. Enregistrer les captures validées dans `tests/visuel/captures/` et mettre à
    jour `tests/visuel/ecrans.spec.ts` si l'écran est un écran clé.

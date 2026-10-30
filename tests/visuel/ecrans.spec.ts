@@ -28,9 +28,12 @@ async function verifierEtCapturer(
     );
 }
 
+/** Un jeudi matin à Conakry (UTC+0). */
+const HORLOGE = new Date('2026-10-29T10:00:00Z');
+
 /** Entrées des espaces connectés : adresse, nom de capture, titre attendu. */
 const ESPACES = [
-    { adresse: '/eleve', ecran: 'eleve-accueil', titre: /^Bonjour/ },
+    { adresse: '/eleve', ecran: 'eleve-accueil', titre: /^Bonjour, / },
     {
         adresse: '/contenu',
         ecran: 'contenu-accueil',
@@ -63,6 +66,13 @@ for (const gabarit of GABARITS) {
             test.use({
                 viewport: { width: gabarit.largeur, height: gabarit.hauteur },
                 colorScheme: theme.schema,
+            });
+
+            // Horloge figée : l'accueil élève affiche la date et salue
+            // « Bonjour » ou « Bonsoir » selon l'heure ; sans cela, la capture
+            // de référence changerait chaque jour.
+            test.beforeEach(async ({ page }) => {
+                await page.clock.setFixedTime(HORLOGE);
             });
 
             test('lot 0 — catalogue des composants', async ({ page }) => {

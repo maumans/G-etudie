@@ -26,7 +26,7 @@ export default function Inscription() {
             <Form
                 {...store.form()}
                 resetOnError={['password']}
-                className="grid gap-5"
+                className="grid gap-4"
             >
                 {({ processing, errors }) => (
                     <>
@@ -98,7 +98,7 @@ export default function Inscription() {
                 <Link
                     href={login()}
                     prefetch
-                    className="font-medium text-lien underline-offset-4 hover:underline"
+                    className="font-medium text-lien underline-offset-4 transition-colors hover:underline"
                 >
                     Se connecter
                 </Link>

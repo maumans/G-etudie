@@ -44,7 +44,7 @@ function Pagination({
 
   const classeFleche = cn(
     buttonVariants({ variant: "outline", taille: "compacte" }),
-    "w-12 gap-1 px-0 sm:w-auto sm:px-3"
+    "w-9 gap-1 px-0 sm:w-auto sm:px-3"
   )
 
   return (

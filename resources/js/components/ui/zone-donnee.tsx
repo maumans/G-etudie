@@ -62,7 +62,7 @@ function ZoneDonnee({
         <p className="flex items-start gap-2 text-interface font-medium text-ink-900">
           <CircleAlert
             aria-hidden
-            className="mt-0.5 size-5 shrink-0 text-faux-600 dark:text-faux-400"
+            className="mt-0.5 size-4 shrink-0 text-faux-600 dark:text-faux-400"
           />
           {messageEchec}
         </p>
@@ -73,7 +73,7 @@ function ZoneDonnee({
             variant="outline"
             ton="nimba"
             onClick={onReessayer}
-            className="h-auto min-h-12 max-w-full py-2 whitespace-normal"
+            className="h-auto min-h-10 max-w-full py-2 whitespace-normal"
           >
             <RotateCw aria-hidden />
             Réessayer
@@ -81,7 +81,7 @@ function ZoneDonnee({
           <Button
             variant="ghost"
             onClick={() => window.location.reload()}
-            className="h-auto min-h-12 max-w-full py-2 whitespace-normal"
+            className="h-auto min-h-10 max-w-full py-2 whitespace-normal"
           >
             Recharger la page
           </Button>

@@ -5,19 +5,19 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 /**
- * Statut (DESIGN.md § 11) : petit rectangle plein à coins de 6 px, sans
- * contour ni icône — une forme qu'on ne prend pas pour un bouton. Fond en
- * opacité (lisible dans les deux thèmes), libellé en nuance 700 / 400.
+ * Statut (DESIGN.md § 11) : petite pilule de 20 px, sans contour — une forme
+ * qu'on ne prend pas pour un bouton (rayon 10 px, 40 px de haut). Fond en
+ * opacité (lisible dans les deux thèmes), libellé en nuance 700 / 300.
  */
 const badgeVariants = cva(
-  "inline-flex w-fit shrink-0 items-center justify-center rounded-badge px-2 py-0.5 text-meta font-semibold whitespace-nowrap",
+  "inline-flex h-5 w-fit shrink-0 items-center justify-center gap-1 rounded-badge px-2 text-meta font-medium whitespace-nowrap [&_svg]:size-3",
   {
     variants: {
       variant: {
-        neutre: "bg-ink-600/[0.12] text-ink-900 dark:bg-ink-400/25",
+        neutre: "bg-ink-600/[0.08] text-ink-600 dark:bg-ink-400/20 dark:text-ink-600",
         nimba:
-          "bg-nimba-600/[0.12] text-nimba-700 dark:bg-nimba-500/25 dark:text-nimba-300",
-        soleil: "bg-soleil-400 text-ink-900 dark:text-[#141a2e]",
+          "bg-nimba-600/[0.10] text-nimba-700 dark:bg-nimba-300/15 dark:text-nimba-300",
+        soleil: "bg-soleil-400 text-soleil-900",
         juste:
           "bg-juste-600/[0.12] text-juste-700 dark:bg-juste-400/15 dark:text-juste-400",
         faux: "bg-faux-600/[0.10] text-faux-700 dark:bg-faux-400/15 dark:text-faux-400",

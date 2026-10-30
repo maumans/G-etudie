@@ -49,7 +49,7 @@ export default function MotDePasseOublie() {
                 demande de l'aide à ton enseignant ou à N'karamögö.{' '}
                 <Link
                     href={login()}
-                    className="font-medium text-lien underline-offset-4 hover:underline"
+                    className="font-medium text-lien underline-offset-4 transition-colors hover:underline"
                 >
                     Retour à la connexion
                 </Link>
