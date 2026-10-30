@@ -16,7 +16,20 @@ export type User = {
     espaces: Espace[];
     /** Double authentification proposée (personnel, DA4). */
     double_authentification: boolean;
+    /** Permissions du compte (App\Enums\Permission) : pour taire ce qui ne le concerne pas. */
+    permissions: Permission[];
 };
+
+/** Les valeurs de App\Enums\Permission. */
+export type Permission =
+    | 'espace.eleve'
+    | 'espace.contenu'
+    | 'espace.console'
+    | 'referentiel.gerer'
+    | 'contenu.rediger'
+    | 'contenu.relire'
+    | 'contenu.administrer'
+    | 'compte.double_authentification';
 
 export type Auth = {
     user: User | null;

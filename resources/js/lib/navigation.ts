@@ -18,6 +18,7 @@ import {
 import type { EntreeNavigation } from '@/components/lien-navigation';
 import { accueil as accueilConsole } from '@/routes/console';
 import { accueil as accueilContenu } from '@/routes/contenu';
+import { index as matieresReferentiel } from '@/routes/contenu/referentiel/matieres';
 import { accueil as accueilEleve } from '@/routes/eleve';
 import { edit as monCompte } from '@/routes/compte/profil';
 
@@ -47,7 +48,13 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
         icone: LayoutDashboard,
         href: accueilContenu().url,
     },
-    { libelle: 'Référentiel', icone: ListTree },
+    {
+        libelle: 'Référentiel',
+        icone: ListTree,
+        href: matieresReferentiel().url,
+        actifSous: '/contenu/referentiel',
+        permission: 'referentiel.gerer',
+    },
     { libelle: 'Leçons', icone: Library },
     { libelle: 'Questions', icone: FileQuestion },
     { libelle: 'Annales', icone: FileText },

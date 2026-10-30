@@ -79,3 +79,12 @@ export function lireNombre(saisie: string): number | null {
 export function formaterGnf(montant: number): string {
     return `${formaterNombre(montant)}${ESPACE_INSECABLE}GNF`;
 }
+
+/** « 1 chapitre », « 3 chapitres » ; `pluriel` quand il n'est pas régulier. */
+export function pluriel(
+    nombre: number,
+    mot: string,
+    motPluriel?: string,
+): string {
+    return `${formaterNombre(nombre)} ${nombre > 1 ? (motPluriel ?? `${mot}s`) : mot}`;
+}

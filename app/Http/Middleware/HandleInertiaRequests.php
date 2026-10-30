@@ -55,7 +55,8 @@ class HandleInertiaRequests extends Middleware
             // Données minimales (PLAN § 10) : chaque page reçoit le prénom, le
             // pseudo et si le numéro est vérifié — jamais le numéro lui-même.
             // `espace` : celui où le compte arrive (son habillage de « Mon
-            // compte ») ; `espaces` : ceux qu'il peut ouvrir.
+            // compte ») ; `espaces` : ceux qu'il peut ouvrir ; `permissions` :
+            // App\Enums\Permission.
             'auth' => [
                 'user' => $user ? [
                     ...$user->only(['id', 'prenom', 'pseudo']),
@@ -63,6 +64,9 @@ class HandleInertiaRequests extends Middleware
                     'espace' => Espace::principalDe($user)?->value,
                     'espaces' => array_map(fn (Espace $espace) => $espace->value, Espace::accessiblesA($user)),
                     'double_authentification' => $user->can(Permission::DoubleAuthentification->value),
+                    // Pour afficher ou taire une entrée ou un bouton ; chaque
+                    // route et chaque policy revérifie (cacher n'est pas fermer).
+                    'permissions' => $user->getAllPermissions()->pluck('name')->sort()->values()->all(),
                 ] : null,
             ],
             // Liste blanche des écrans gardés hors ligne (HORS_LIGNE.md A.3.7) :
