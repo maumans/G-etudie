@@ -1,11 +1,11 @@
 ---
 name: design-ardoise
-description: "Design system « Ardoise » v3 de N'karamögö · G-Étudie (mandarine chaude, Plus Jakarta Sans, tableaux de bord pleins, vitrine incarnée). À invoquer AVANT de créer ou modifier tout écran, layout, composant d'interface, page Inertia/React (.tsx), classe Tailwind, couleur, police, icône ou capture Playwright ; et pour relire une capture d'écran. Donne les références à suivre, les jetons, l'échelle, les recettes d'écran et la grille de relecture."
+description: "Design system « Ardoise » v4 de N'karamögö · G-Étudie (mandarine chaude, Bricolage Grotesque, boutons sobres à 10 px, tableaux de bord pleins, vitrine illustrée). À invoquer AVANT de créer ou modifier tout écran, layout, composant d'interface, page Inertia/React (.tsx), classe Tailwind, couleur, police, icône ou capture Playwright ; et pour relire une capture d'écran. Donne les références à suivre, les jetons, l'échelle, les recettes d'écran et la grille de relecture."
 metadata:
   author: n-karamogo
 ---
 
-# Design « Ardoise » v3 — mode d'emploi
+# Design « Ardoise » v4 — mode d'emploi
 
 Référence complète : `DESIGN.md` (§ 0 et § 0.1 d'abord). Ce fichier est la
 version de travail.
@@ -16,8 +16,10 @@ Les cinq références de Maurice (`DESIGN.md` § 0.1) : tableaux de bord
 « Oliver » et « Eduvo », vitrines « BrightPath » et « DevSkill ». Leur langage :
 **ambiance chaude** (crème, halos pêche), **une couleur vive (mandarine)
 épaulée par le noir**, **chaque matière à sa couleur**, **écrans pleins
-d'informations utiles**, **grands titres en contraste léger / gras**, grands
-rayons, boutons en pilule, cartes blanches sur fond teinté. Le hors ligne
+d'informations utiles**, **grands titres en contraste léger / gras**, rayons
+généreux, cartes blanches sur fond teinté. **v4** : la même direction en plus
+original et plus professionnel — pas de pilule partout, pas de tics de page
+générée (voir § 4 bis). Le hors ligne
 n'excuse jamais un écran pauvre. Si un écran paraît plus vide, plus froid ou
 plus pauvre que les références, il n'est pas fini.
 
@@ -26,8 +28,8 @@ plus pauvre que les références, il n'est pas fini.
 | Besoin | Classe |
 |---|---|
 | Fond de page | `bg-background` (crème `craie-50`) ; espaces connectés : `fond-ambiance` |
-| Carte | `rounded-carte border bg-card p-5 shadow-carte` |
-| Grand panneau | `rounded-panneau` (28 px) |
+| Carte | `rounded-carte border bg-card p-5 shadow-carte` (16 px) |
+| Grand panneau | `rounded-panneau` (24 px) |
 | Surface active / qui flotte | `bg-relief` (+ `ring-1 ring-black/5 shadow-xs`) |
 | Remplissage muet | `bg-craie-100` (texte dessus : `ink-600`, pas `ink-500`) |
 | Texte : principal / secondaire / tertiaire | `text-ink-900` / `text-ink-600` / `text-ink-500` |
@@ -46,16 +48,16 @@ plus pauvre que les références, il n'est pas fini.
 
 ## 3. Typographie et échelle
 
-- Police unique : **Plus Jakarta Sans**. Interface 14 px (`text-interface`),
-  aide 13, méta 12, titre de carte 15-16 en 600, lecture 17.
+- Police unique : **Bricolage Grotesque** (taille optique : vive en grand,
+  calme en petit). Interface 14 px (`text-interface`), aide 13, méta 12,
+  titre de carte 15-16 en 600, lecture 17.
 - **Grand titre** (écran, héros, section ≥ 24 px) : `titre-contraste` — la
-  phrase en 400, les mots clés en `<strong>` 700, éventuellement un mot en
-  `text-nimba-600 dark:text-nimba-400`.
-- Chiffres clés : 700, `font-data`, `tracking-tight`, unité en 600 `ink-500`.
-- **Pas de `tracking-tight` sous 20 px** : Jakarta est étroite, les mots se
-  collent.
-- Hauteurs : `grande` 48 · `normale` 44 → 40 · `compacte` 36 · `petite` 32.
-  Boutons **en pilule** (`Button`). Champs 12 px de rayon.
+  phrase en 350, les mots clés en `<strong>` 600. Pas de mot en couleur.
+- Chiffres clés : 600, `font-data`, `tracking-tight`, unité en 500 `ink-500`.
+- **Pas de `tracking-tight` sous 20 px** : les mots se collent.
+- Hauteurs : `grande` 44 · `normale` 44 → 40 · `compacte` 36 · `petite` 32.
+  Boutons et champs à **10 px** (`rounded-controle`), graisse 500 ; ronds
+  seulement pour badges, pastilles et boutons-icônes.
 - Icônes Lucide 16 (boutons) · 18 (lignes, navigation) · 20 (onglets, atouts).
 
 ## 4. Règles de composition
@@ -83,8 +85,23 @@ plus pauvre que les références, il n'est pas fini.
 9. **Données honnêtes** : aucun chiffre de vitrine non sourcé (« 50K+ »,
    « 4,9 ★ »), aucun sujet, coefficient, durée ou date d'examen inventés,
    aucun classement nominatif (opt-in, PLAN M9).
-10. **Photos** : seulement celle de Maurice (`config('vitrine.photo_heros')`).
+10. **Images** : la vitrine a toujours ses illustrations (dessins par défaut
+    SVG en papier découpé, `public/images/vitrine/defaut/`, remplaçables dans
+    `config('vitrine.illustrations')`, servis par `ImagesVitrine`). Photo :
+    seulement celle de Maurice (`config('vitrine.photo_heros')`), posée devant
+    l'illustration du héros.
 11. Classes Tailwind écrites en entier dans des `.ts` / `.tsx`.
+
+## 4 bis. Ce qui fait « page générée » — à ne pas faire
+
+- la pilule sur chaque bouton, la flèche dans une pastille, le halo coloré
+  sous un bouton plein, un bouton de 48 px ;
+- un sur-titre en capitales espacées au-dessus de chaque titre, un libellé
+  « Mot · Mot · Mot », un mot du titre isolé en couleur ;
+- tout découper en cartes identiques (préférer des filets quand le contenu
+  est une liste) ; trois surfaces fortes qui se disputent l'œil ;
+- une entrée animée sur chaque section. Un seul mouvement orchestré (les
+  fiches du héros), le reste immobile.
 
 ## 5. Recettes
 
@@ -92,16 +109,17 @@ plus pauvre que les références, il n'est pas fini.
   méta + `titre-contraste` ; grille `lg:grid-cols-[minmax(0,1fr)_20rem]` ;
   cartes de matière (tuile, %, notions, tirets) ; liste « Reprendre » (tuile,
   titre, sous-titre, barre fine, minutes, bouton rond) ; série Lu → Di.
-- **Vitrine** : `pages/vitrine/accueil.tsx` — héros à trois colonnes
-  (texte / visuel / atouts en pastilles), bandeau de preuves, sections avec
-  sur-titre en capitales espacées mandarine + titre en contraste, FAQ en
-  `<details>`, double appel final.
+- **Vitrine** : `pages/vitrine/accueil.tsx` — héros à deux colonnes (titre,
+  chapeau, deux boutons de 44 px ; illustration + deux fiches flottantes),
+  preuves en filets, examens illustrés, « Trois gestes » illustré, « Tout
+  tient dans le téléphone » avec l'aperçu, FAQ en filets, un appel final
+  `surface-encre`. Titres de section sans sur-titre.
 - **Écran d'accès** : `ConnexionLayout` — formulaire ≤ 384 px, panneau
   `surface-marque` à partir de 1024 px.
 - **Ligne de liste** : tuile 40 px `rounded-[12px]` + titre 600 + sous-titre
   13 px `ink-500` + action ronde de 40 px à droite.
-- **Sur-titre de section** : `text-meta font-bold tracking-[0.18em] uppercase
-  text-nimba-700 dark:text-nimba-300`.
+- **Précision sous un titre** : une phrase en 13 px `text-ink-500`, casse
+  normale — jamais de sur-titre en capitales.
 
 ## 6. Relecture d'une capture (360 / 768 / 1366, clair et sombre)
 

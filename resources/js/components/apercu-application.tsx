@@ -61,7 +61,7 @@ export function ApercuApplication({ className }: { className?: string }) {
                         </div>
 
                         <div className="relative overflow-hidden rounded-2xl surface-marque p-3.5 text-white">
-                            <span className="text-[0.5625rem] font-semibold tracking-wider text-white/80 uppercase">
+                            <span className="text-[0.625rem] font-medium text-white/80">
                                 Ta séance du jour
                             </span>
                             <p className="mt-0.5 text-[0.9375rem] leading-snug font-bold">
@@ -70,7 +70,7 @@ export function ApercuApplication({ className }: { className?: string }) {
                             <p className="text-[0.625rem] text-white/85">
                                 15 min · 12 questions
                             </p>
-                            <span className="mt-3 flex h-8 items-center justify-center gap-1.5 rounded-full bg-white text-xs font-bold text-nimba-700">
+                            <span className="mt-3 flex h-8 items-center justify-center gap-1.5 rounded-lg bg-white text-xs font-semibold text-nimba-700">
                                 <Play className="size-3 fill-current" />
                                 Commencer
                             </span>

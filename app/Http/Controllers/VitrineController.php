@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Support\PhotoVitrine;
+use App\Support\ImagesVitrine;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -12,7 +12,8 @@ class VitrineController extends Controller
     public function __invoke(): Response
     {
         return Inertia::render('vitrine/accueil', [
-            'photoHeros' => PhotoVitrine::url(),
+            'illustrations' => ImagesVitrine::illustrations(),
+            'photoHeros' => ImagesVitrine::photoHeros(),
         ]);
     }
 }

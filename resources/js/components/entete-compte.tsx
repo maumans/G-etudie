@@ -33,7 +33,7 @@ export function EnteteCompte({ titre }: { titre: string }) {
             </div>
             <nav
                 aria-label="Mon compte"
-                className="grid grid-cols-2 gap-0.5 rounded-[12px] bg-craie-100 p-1 sm:inline-flex sm:w-fit"
+                className="grid grid-cols-2 gap-0.5 rounded-controle bg-craie-100 p-1 sm:inline-flex sm:w-fit"
             >
                 {ONGLETS.map((onglet) => {
                     const actif = isCurrentUrl(onglet.href);
@@ -46,7 +46,7 @@ export function EnteteCompte({ titre }: { titre: string }) {
                             preserveScroll
                             aria-current={actif ? 'page' : undefined}
                             className={cn(
-                                'flex h-9 items-center justify-center rounded-[8px] px-3.5 text-interface font-medium whitespace-nowrap transition-colors outline-none focus-visible:outline-2 focus-visible:outline-ring sm:h-8',
+                                'flex h-9 items-center justify-center rounded-[7px] px-3.5 text-interface font-medium whitespace-nowrap transition-colors outline-none focus-visible:outline-2 focus-visible:outline-ring sm:h-8',
                                 actif
                                     ? 'bg-relief text-ink-900 shadow-xs ring-1 ring-black/5 dark:ring-white/5'
                                     : 'text-ink-600 hover:text-ink-900',

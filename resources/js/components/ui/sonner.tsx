@@ -19,7 +19,7 @@ function Toaster({ ...props }: ToasterProps) {
             containerAriaLabel="Notifications"
             toastOptions={{
                 classNames: {
-                    toast: 'font-sans text-interface rounded-[12px]! shadow-flottant!',
+                    toast: 'font-sans text-interface rounded-controle! shadow-flottant!',
                     description: 'text-ink-600!',
                     title: 'font-medium!',
                 },

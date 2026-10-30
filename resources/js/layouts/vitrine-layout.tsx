@@ -1,5 +1,4 @@
 import { Link, usePage } from '@inertiajs/react';
-import { ArrowRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Marque } from '@/components/marque';
 import { Button } from '@/components/ui/button';
@@ -10,12 +9,13 @@ import { accueil as accueilEleve } from '@/routes/eleve';
 const SECTIONS = [
     { libelle: 'Examens', ancre: '#titre-examens' },
     { libelle: 'Comment ça marche', ancre: '#titre-etapes' },
+    { libelle: "L'application", ancre: '#titre-application' },
     { libelle: 'Questions', ancre: '#titre-questions' },
 ];
 
 /**
  * Habillage public (DESIGN.md § 7) : le plus expressif, vouvoiement.
- * Navigation en pilules au centre (Eduvo), compte à droite. La vitrine
+ * Navigation en texte au centre, compte à droite. La vitrine
  * finale (démo jouable, compte à rebours, tarifs) arrive au lot 8.
  */
 export default function VitrineLayout({ children }: { children: ReactNode }) {
@@ -23,8 +23,8 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
 
     return (
         <div className="flex min-h-dvh flex-col bg-background">
-            <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md">
-                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:px-8">
+            <header className="sticky top-0 z-40 border-b border-ink-900/[0.06] bg-background/85 backdrop-blur-md dark:border-white/[0.06]">
+                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-[4.5rem] lg:px-8">
                     <Link
                         href={home()}
                         className="rounded-controle outline-none focus-visible:outline-2 focus-visible:outline-ring"
@@ -34,13 +34,13 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
                     </Link>
                     <nav
                         aria-label="Sections"
-                        className="hidden items-center gap-1 rounded-full border bg-card/70 p-1 shadow-xs lg:flex"
+                        className="hidden items-center gap-7 lg:flex"
                     >
                         {SECTIONS.map((section) => (
                             <a
                                 key={section.ancre}
                                 href={section.ancre}
-                                className="rounded-full px-4 py-1.5 text-interface font-medium text-ink-600 transition-colors outline-none hover:bg-craie-100 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring"
+                                className="rounded-[6px] text-interface text-ink-600 transition-colors outline-none hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
                             >
                                 {section.libelle}
                             </a>
@@ -54,7 +54,6 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
                             <Button asChild taille="compacte">
                                 <Link href={accueilEleve()} prefetch>
                                     Mon espace
-                                    <ArrowRight aria-hidden />
                                 </Link>
                             </Button>
                         ) : (
@@ -98,7 +97,7 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
                         aria-label="Plateforme"
                         className="grid content-start gap-2.5"
                     >
-                        <p className="text-meta font-bold tracking-wider text-ink-900 uppercase">
+                        <p className="text-aide font-semibold text-ink-900">
                             Plateforme
                         </p>
                         {SECTIONS.map((section) => (
@@ -115,7 +114,7 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
                         aria-label="Mon compte"
                         className="grid content-start gap-2.5"
                     >
-                        <p className="text-meta font-bold tracking-wider text-ink-900 uppercase">
+                        <p className="text-aide font-semibold text-ink-900">
                             Compte
                         </p>
                         <Link
@@ -134,7 +133,7 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
                 </div>
                 <div className="border-t">
                     <p className="mx-auto max-w-7xl px-4 py-5 text-meta text-ink-500 sm:px-6 lg:px-8">
-                        VISION FUTURE – ENTREPRISES Sarlu · Kountya (Coyah),
+                        VISION FUTURE – ENTREPRISES Sarlu, Kountya (Coyah),
                         Guinée
                     </p>
                 </div>

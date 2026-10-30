@@ -1,5 +1,5 @@
 /*
- * Design system « Ardoise » v3 — DESIGN.md.
+ * Design system « Ardoise » v4 — DESIGN.md.
  *
  * - Les palettes fixes (marque, verdicts, matières) vivent dans @theme.
  * - Les neutres basculent en sombre : ils sont posés en variables sur :root et
@@ -14,10 +14,12 @@
 
 @import 'tw-animate-css';
 
-/* Police auto-hébergée (Fontsource) : Plus Jakarta Sans variable, toutes les
-   graisses en un fichier WOFF2 par sous-ensemble (unicode-range) — le
-   français ne télécharge que le latin (27 Ko). */
-@import '@fontsource-variable/plus-jakarta-sans/wght.css';
+/* Police auto-hébergée (Fontsource) : Bricolage Grotesque variable, axes
+   graisse et taille optique en un fichier WOFF2 par sous-ensemble
+   (unicode-range) — le français ne télécharge que le latin (77 Ko). La taille
+   optique fait le caractère : dessin serré et vif en grand, ouvert et calme
+   à 14 px (DESIGN.md § 3). */
+@import '@fontsource-variable/bricolage-grotesque/opsz.css';
 
 @source '../views';
 
@@ -26,14 +28,14 @@
 
 @theme {
     --font-sans:
-        'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif,
+        'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
     --font-titre:
-        'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+        'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
 
     /* Échelle typographique (DESIGN.md § 3). Les grands titres jouent le
-       contraste de graisse (400 / 700), pas la taille seule. */
+       contraste de graisse (350 / 600), pas la taille seule. */
     --text-meta: 0.75rem;
     --text-meta--line-height: 1rem;
     --text-aide: 0.8125rem;
@@ -48,15 +50,16 @@
     --text-titre-ecran-large--line-height: 2.375rem;
     --text-heros: 2.75rem;
     --text-heros--line-height: 1;
-    --text-vitrine: 4rem;
-    --text-vitrine--line-height: 1.02;
+    --text-vitrine: 4.5rem;
+    --text-vitrine--line-height: 0.98;
 
-    /* Formes (DESIGN.md § 4) : boutons en pilule, champs à 12 px, cartes à
-       20 px, grands panneaux à 28 px. */
-    --radius-controle: 12px;
-    --radius-carte: 20px;
-    --radius-panneau: 28px;
-    --radius-feuille: 24px;
+    /* Formes (DESIGN.md § 4) : boutons et champs à 10 px, cartes à 16 px,
+       grands panneaux à 24 px ; seuls les badges et les pastilles restent
+       ronds. Des angles nets : la pilule partout faisait « gabarit ». */
+    --radius-controle: 10px;
+    --radius-carte: 16px;
+    --radius-panneau: 24px;
+    --radius-feuille: 20px;
     --radius-badge: 9999px;
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
@@ -68,9 +71,11 @@
         0 1px 2px 0 rgb(56 32 16 / 0.04), 0 1px 1px 0 rgb(56 32 16 / 0.02);
     --shadow-releve:
         0 1px 2px 0 rgb(56 32 16 / 0.04), 0 8px 24px -6px rgb(56 32 16 / 0.1);
+    /* Bouton plein : un filet de lumière en haut, une ombre courte. Pas de
+       halo coloré. */
     --shadow-bouton:
-        inset 0 1px 0 0 rgb(255 255 255 / 0.2),
-        0 1px 2px 0 rgb(56 32 16 / 0.16), 0 4px 12px -4px rgb(208 73 4 / 0.45);
+        inset 0 1px 0 0 rgb(255 255 255 / 0.16),
+        inset 0 -1px 0 0 rgb(56 32 16 / 0.12), 0 1px 2px 0 rgb(56 32 16 / 0.18);
     --shadow-flottant:
         0 2px 6px 0 rgb(56 32 16 / 0.06), 0 24px 56px -16px rgb(56 32 16 / 0.3);
 
@@ -384,16 +389,15 @@
     font-variant-numeric: tabular-nums;
 }
 
-/* Grand titre en contraste de graisse (DESIGN.md § 3) : la phrase en 400,
-   les mots qui comptent en <strong> 700. « Tu as terminé <strong>3 modules</strong>
-   cette semaine. » */
+/* Grand titre en contraste de graisse (DESIGN.md § 3) : la phrase en 350,
+   les mots qui comptent en <strong> 600. « Tu as terminé <strong>3 modules</strong>
+   cette semaine. » La taille optique resserre déjà le dessin en grand. */
 @utility titre-contraste {
-    font-weight: 400;
-    letter-spacing: -0.02em;
-    word-spacing: 0.04em;
+    font-weight: 350;
+    letter-spacing: -0.025em;
 
     & strong {
-        font-weight: 700;
+        font-weight: 600;
     }
 }
 
@@ -527,8 +531,8 @@
     }
 
     /* Titres : demi-gras. L'approche ne se resserre que sur les grands
-       titres (utilitaire titre-contraste, tracking explicite) : Plus Jakarta
-       est déjà étroite, un titre de carte resserré colle ses mots. */
+       titres (utilitaire titre-contraste, tracking explicite) : en petit,
+       Bricolage a besoin de son espacement d'origine. */
     h1,
     h2,
     h3,

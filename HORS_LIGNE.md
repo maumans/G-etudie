@@ -740,6 +740,12 @@ hors ligne ; les packs viennent ensuite.
    précacher pour le français. La photo de la vitrine
    (`public/images/vitrine/heros.webp`) n'est pas à précacher : la vitrine
    n'est pas un écran hors ligne.
+6. **2026-10-30 — Polices de la v4.** Plus Jakarta Sans est remplacée par
+   Bricolage Grotesque variable, fichier `opsz` (graisse + taille optique) :
+   **76,9 Ko** à précacher pour le français (budget 120 Ko, `DESIGN.md` § 3).
+   Même mécanisme (manifeste du build). Les illustrations de la vitrine
+   (`public/images/vitrine/defaut/*.svg`, 17 Ko) ne sont pas à précacher, pour
+   la même raison que la photo.
 
 ## B.6 Points de vigilance
 
