@@ -1,6 +1,8 @@
 <?php
 
+use App\Services\Sms\EnvoiSms;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Doubles\SmsEnMemoire;
 use Tests\TestCase;
 
 /*
@@ -44,7 +46,14 @@ expect()->extend('toBeOne', function () {
 |
 */
 
-function something()
+/**
+ * Remplace l'envoi de SMS par un double qui garde les messages, pour lire le
+ * code reçu.
+ */
+function smsEnMemoire(): SmsEnMemoire
 {
-    // ..
+    $sms = new SmsEnMemoire;
+    app()->instance(EnvoiSms::class, $sms);
+
+    return $sms;
 }

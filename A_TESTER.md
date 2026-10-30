@@ -94,7 +94,37 @@
 
 ## 6. SMS réels — vérification du numéro, récupération du mot de passe
 
-*(aucune entrée)*
+### [Lot 0] Codes SMS sur de vrais téléphones (quand le fournisseur sera branché)
+- Pourquoi : en développement, aucun SMS ne part (le code est écrit dans
+  `storage/logs/laravel.log`) ; le délai d'arrivée, le texte reçu et le
+  remplissage automatique du code ne se voient que sur un vrai réseau (D3).
+- Matériel : un Android sur chaque opérateur disponible (Orange, MTN…), un
+  iPhone si possible ; le fournisseur SMS choisi, configuré en préproduction.
+- Comment le provoquer :
+  1. S'inscrire avec le numéro du téléphone de test, demander le code
+     depuis l'écran « Vérifie ton numéro ».
+  2. Se déconnecter, « Mot de passe oublié ? », demander un code.
+  3. « Mon compte » → « Numéro » : passer à un second numéro de test.
+- Quoi observer : le SMS arrive en moins d'une minute ; il dit
+  « N'karamögö : ton code est … » ; le clavier propose le code (Android :
+  suggestion, iPhone : « Depuis Messages ») ; le code saisi est accepté ;
+  après 10 minutes, il est refusé.
+- En cas d'échec, relever : opérateur, heure d'envoi et de réception, texte
+  reçu, message d'erreur affiché.
+- État : à faire (bloqué tant qu'aucun fournisseur n'est branché)
+
+### [Lot 0] Connexion qui dure sur un téléphone partagé
+- Pourquoi : « Rester connecté sur ce téléphone » et la session de 30 jours
+  glissants (HL-D10) doivent éviter de retaper le mot de passe chaque soir,
+  et « Se déconnecter » doit vraiment fermer l'accès.
+- Matériel : un Android, l'application ouverte dans Chrome.
+- Comment le provoquer : se connecter avec la case cochée, fermer Chrome,
+  rouvrir le lendemain ; puis « Moi » → « Se déconnecter », revenir en
+  arrière avec le bouton du téléphone.
+- Quoi observer : le lendemain, l'espace élève s'ouvre sans mot de passe ;
+  après déconnexion, le retour arrière ne montre pas l'espace élève.
+- En cas d'échec, relever : capture, heure, ce qui s'est affiché.
+- État : à faire
 
 ## 7. Paiements réels — Orange Money, MTN MoMo, codes prépayés
 

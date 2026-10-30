@@ -19,4 +19,4 @@ Route::middleware('auth')->group(function () {
     Route::inertia('console', 'console/accueil')->name('console.accueil');
 });
 
-require __DIR__.'/settings.php';
+require __DIR__.'/compte.php';

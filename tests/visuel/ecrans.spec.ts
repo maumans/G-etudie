@@ -37,6 +37,24 @@ const ESPACES = [
         titre: 'Tableau de bord',
     },
     { adresse: '/console', ecran: 'console-accueil', titre: "Vue d'ensemble" },
+    { adresse: '/compte/profil', ecran: 'compte-profil', titre: 'Mon compte' },
+    { adresse: '/compte/numero', ecran: 'compte-numero', titre: 'Mon compte' },
+    {
+        adresse: '/compte/affichage',
+        ecran: 'compte-affichage',
+        titre: 'Mon compte',
+    },
+];
+
+/** Écrans ouverts aux visiteurs (hors vitrine). */
+const PUBLICS = [
+    { adresse: '/login', ecran: 'connexion', titre: 'Se connecter' },
+    { adresse: '/register', ecran: 'inscription', titre: 'Créer un compte' },
+    {
+        adresse: '/mot-de-passe-oublie',
+        ecran: 'mot-de-passe-oublie',
+        titre: 'Mot de passe oublié',
+    },
 ];
 
 for (const gabarit of GABARITS) {
@@ -91,6 +109,25 @@ for (const gabarit of GABARITS) {
                     theme.nom,
                 );
             });
+
+            for (const ecran of PUBLICS) {
+                test(`lot 0 — ${ecran.ecran}`, async ({ page }) => {
+                    await page.goto(ecran.adresse);
+                    await expect(
+                        page.getByRole('heading', {
+                            level: 1,
+                            name: ecran.titre,
+                        }),
+                    ).toBeVisible();
+
+                    await verifierEtCapturer(
+                        page,
+                        ecran.ecran,
+                        gabarit.nom,
+                        theme.nom,
+                    );
+                });
+            }
 
             test.describe('connecté', () => {
                 test.use({ storageState: SESSION });

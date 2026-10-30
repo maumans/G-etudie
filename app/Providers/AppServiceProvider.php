@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Services\Sms\EnvoiSms;
+use App\Services\Sms\JournalSms;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +19,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Fournisseur SMS réel à choisir avant le lot 8 (D3) ; d'ici là, le
+        // message est écrit dans le journal et rien ne part.
+        $this->app->bind(EnvoiSms::class, JournalSms::class);
     }
 
     /**
@@ -62,14 +66,10 @@ class AppServiceProvider extends ServiceProvider
             app()->isProduction(),
         );
 
-        Password::defaults(fn (): ?Password => app()->isProduction()
-            ? Password::min(12)
-                ->mixedCase()
-                ->letters()
-                ->numbers()
-                ->symbols()
-                ->uncompromised()
-            : null,
-        );
+        // D3 : 8 caractères au moins, sans règle de complexité — un élève doit
+        // pouvoir le retenir. Pas de vérification de fuite (`uncompromised`) :
+        // elle interroge un service tiers à chaque saisie, et une panne de ce
+        // service bloquerait l'inscription.
+        Password::defaults(fn (): Password => Password::min(8)->max(72));
     }
 }

@@ -19,7 +19,7 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (lot 0, étapes 0 à 3 faites)
+### État au 2026-10-30 (lot 0, étapes 0 à 4 faites)
 
 - **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
   lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
@@ -43,33 +43,43 @@
   back-office, console) et leurs pages d'entrée `/`, `/eleve`, `/contenu`,
   `/console` ; pages `welcome` et `dashboard` du kit retirées ; après
   connexion, on arrive sur `/eleve`.
-- **Tests** : 75 Pest (252 assertions, MySQL `g_etudie_test`), 114 Vitest,
-  49 Playwright (connexion + 6 écrans × 4 gabarits × 2 thèmes) — verts.
-  `tsc`, `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
+- **Étape 4 faite** (point 7) : connexion par téléphone et mot de passe,
+  inscription (prénom, pseudo, téléphone, mot de passe), vérification du
+  numéro par SMS proposée sans être imposée, mot de passe oublié par SMS,
+  « Mon compte » (profil, mot de passe, numéro, affichage, suppression),
+  journal des accès sensibles. Écrans de connexion et de réglages du kit
+  retirés, passkeys et vérification d'e-mail aussi.
+- **Tests** : 103 Pest (MySQL `g_etudie_test`), 117 Vitest, 98 Playwright
+  (connexion + 12 écrans × 4 gabarits × 2 thèmes + un parcours complet
+  inscription → suppression) — verts. `tsc`, `vp check`, Pint, Larastan
+  (niveau 7) et `npm run build` passent.
 - **⚠ Les trois espaces connectés ne sont gardés que par `auth`** : n'importe
   quel compte connecté ouvre `/contenu` et `/console`. Les permissions
   (`can:`) arrivent à l'étape 5, et `AccesParRoleTest` les exigera.
-- **Pas encore fait dans le lot 0** : connexion par téléphone et « Mon
-  compte », rôles et permissions, socle hors ligne. Les écrans de connexion
-  et de réglages du kit (en anglais, par e-mail) sont encore en place ;
-  « Moi » mène à ses réglages.
+- **⚠ Aucun SMS ne part** : le pilote `JournalSms` écrit le code dans
+  `storage/logs/laravel.log` (en production, il signale seulement l'absence
+  de fournisseur). Fournisseur SMS à choisir avant le lot 8 (D3).
+- **Pas encore fait dans le lot 0** : rôles et permissions (avec la 2FA
+  proposée au personnel et la session de 12 h des rôles back-office et
+  console), socle hors ligne.
 - **Lancer l'application** : `.claude/launch.json` déclare `laravel`
   (`php artisan serve`, port 8000) et `vite` (`npm run dev`, port 5173).
-  Les captures de référence se prennent sur le build : arrêter `npm run dev`
-  et vérifier l'absence de `public/hot` avant `npm run test:visuel`. Les
-  écrans connectés demandent le compte du `DatabaseSeeder` en base de
-  développement (`php artisan db:seed`).
+  Base : `php artisan migrate:fresh` puis `php artisan db:seed` — le seeder
+  crée l'élève de démonstration (+224 600 00 00 01) avec le mot de passe
+  `DEMO_MOT_DE_PASSE` de `.env`. Les captures de référence se prennent sur le
+  build : arrêter `npm run dev` et vérifier l'absence de `public/hot` avant
+  `npm run test:visuel`.
 
 ### Prochaines étapes, par ordre de priorité
 
-1. **Lot 0, étape 4 — connexion par téléphone et « Mon compte »** (dont
-   `Password::defaults()` à aligner sur D3 : 8 caractères, sans règle de
-   complexité — le kit impose 12 caractères, casse mixte, symboles et une
-   vérification de fuite par appel réseau en production). La connexion des
-   tests visuels (`tests/visuel/connexion.setup.ts`) passe alors au téléphone.
-2. **Étapes 5 et 6** : rôles, permissions, `AccesParRoleTest` (les routes
-   `/eleve`, `/contenu`, `/console` prennent leur `can:` ; redirection après
-   connexion selon le rôle) → socle hors ligne HL0. Puis clôture (étape 7).
+1. **Lot 0, étape 5 — rôles et permissions** : `spatie/laravel-permission`,
+   `RolesEtPermissionsSeeder`, `DemoSeeder` (un compte par rôle, connexion par
+   téléphone), `App\Support\Perimetre`, `AccesParRoleTest` (les routes
+   `/eleve`, `/contenu`, `/console` prennent leur `can:` ; « Mon compte » et
+   la vérification du numéro entrent dans `OUVERTES_A_TOUS` avec leur
+   raison) ; redirection après connexion selon le rôle ; 2FA proposée aux
+   rôles back-office et console ; session de 12 h pour ces rôles (HL-D10).
+2. **Étape 6 — socle hors ligne HL0**, puis clôture (étape 7).
 3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
@@ -130,7 +140,7 @@ le soir. Utilisateurs principaux : **des mineurs**.
 |---|---|---|---|
 | Framework | Laravel | **laravel/framework 13.39.0** | — |
 | Pont Inertia | Inertia | **inertiajs/inertia-laravel 3.5.2** (Inertia **v3**) | v3 : `Inertia::optional()`, pas d'Axios, événements `httpException` / `networkError`, `router.cancelAll()` |
-| Authentification | téléphone + mot de passe (D3) | **laravel/fortify 1.41.0** : connexion par **e-mail**, inscription, réinitialisation par lien e-mail, vérification d'e-mail, 2FA TOTP, **passkeys** (laravel/passkeys 0.2.1) | à transformer : identifiant `telephone`, récupération par code SMS (hors Fortify), vérification d'e-mail retirée ; 2FA et passkeys : DA4 |
+| Authentification | téléphone + mot de passe (D3) | **laravel/fortify 1.41.0** : connexion par **e-mail**, inscription, réinitialisation par lien e-mail, vérification d'e-mail, 2FA TOTP, **passkeys** (laravel/passkeys 0.2.1) | ✅ (étape 4) identifiant `telephone` normalisé, inscription maison, récupération et vérification par code SMS hors Fortify ; réinitialisation par e-mail, vérification d'e-mail et passkeys retirées (`@laravel/passkeys` désinstallé) ; 2FA gardée pour le personnel (DA4) |
 | Routes typées | — | **laravel/wayfinder 0.1.23** (+ `@laravel/vite-plugin-wayfinder` 0.1.11) | conservé : fonctions TS générées pour chaque route |
 | Permissions | `spatie/laravel-permission` | **absent** | à ajouter : **^8.3** (8.3.2 accepte `illuminate/* ^12\|^13`, PHP ^8.3) |
 | Files d'attente | réelles (Redis ou base) | `QUEUE_CONNECTION=database` | conforme ; tests en `sync` (phpunit.xml) |
@@ -189,9 +199,11 @@ Détail dans `PLAN_NKARAMOGO.md` § 6.
 |---|---|---|
 | Référentiel | `annees_scolaires`, `examens`, `filieres`, `series`, `classes`, `matieres`, `epreuves`, `chapitres`, `notions` | ⬜ prévu (lot 1) |
 | Contenu | `lecons`, `versions_contenu`, `questions`, `indices`, `corriges`, `sujets`, `sujet_parties`, `ressources_externes`, `signalements`, `packs_hors_ligne` | ⬜ prévu (lots 1, 3, 4, 7) |
-| Élève | `users`, `profils_eleves`, `liens_parents`, `tentatives`, `maitrises`, `seances`, `examens_blancs`, `series_jours`, badges, défis | ⬜ prévu (lots 0, 2, 3, 5, 6) |
+| Comptes | `users` (téléphone, prénom, pseudo, nom et e-mail facultatifs, `telephone_verifie_le`, `desactive_le`), `codes_sms` | ✅ lot 0, étape 4 |
+| Élève | `profils_eleves`, `liens_parents`, `tentatives`, `maitrises`, `seances`, `examens_blancs`, `series_jours`, badges, défis | ⬜ prévu (lots 2, 3, 5, 6) |
 | Organisation | `etablissements`, `groupes`, `devoirs`, `abonnements`, `paiements`, `codes_acces`, `conversations_tuteur` | ⬜ prévu (lots 9 à 11) |
-| Hors ligne & audit | `appareils`, `appareil_profils`, `operations_synchronisees`, `journal_acces_plateforme` | ⬜ prévu (lot 0) |
+| Audit | `journal_acces_plateforme` (écrit par `App\Support\JournalAcces`) | ✅ lot 0, étape 4 |
+| Hors ligne | `appareils`, `appareil_profils`, `operations_synchronisees` | ⬜ prévu (lot 0, étape 6) |
 
 **Une seule plateforme, pas de multi-entreprise.** Les établissements, groupes
 et liens parent-enfant sont des **rattachements**, qui disent sur quoi une
@@ -221,7 +233,8 @@ permission s'exerce (section 7).
 | Page `/dev/composants` (catalogue Ardoise) | ✅ lot 0, étape 1 (point 4) |
 | Habillages vitrine, élève, back-office, console (coquilles et pages d'entrée) | ✅ lot 0, étape 3 (point 6) |
 | Vitrine finale (démo jouable, compte à rebours, tarifs) | ⬜ lot 8 |
-| Connexion / inscription par téléphone, parcours d'accueil, « Mon compte » | ⬜ |
+| Connexion / inscription par téléphone, vérification du numéro, mot de passe oublié, « Mon compte » | ✅ lot 0, étape 4 (point 7) |
+| Parcours d'accueil (examen, série, établissement, objectif) | ⬜ lot 2 |
 | Accueil élève (jauge, séance du jour, trace) | ⬜ |
 | Leçon, fiche de révision | ⬜ |
 | Lecteur d'exercice (« l'ardoise ») | ⬜ |
@@ -453,6 +466,67 @@ cette question à sa façon. Elle distingue deux notions :
      espaces en 4 gabarits × 2 thèmes, axe propre, aucun débordement.
      Totaux : 75 Pest, 114 Vitest, 49 Playwright.
 
+7. [x] **Lot 0, étape 4 — connexion par téléphone et « Mon compte »**
+   (2026-10-30)
+   - **Constat** : Fortify du kit par e-mail (réinitialisation par lien,
+     vérification d'e-mail, passkeys), écrans et messages en anglais ;
+     `Password::defaults()` du kit contraire à D3 (12 caractères, symboles,
+     vérification de fuite en production).
+   - **Décision** :
+     - base : migration `users` réécrite sur place (téléphone unique au
+       format `+224…`, prénom, pseudo unique, nom et e-mail facultatifs,
+       `telephone_verifie_le`, `desactive_le`) ; tables `codes_sms` et
+       `journal_acces_plateforme` ; migration passkeys retirée ;
+     - `App\Support\Telephone` (jumeau de `lib/telephone.ts`, mêmes
+       exemples), règle `TelephoneGuineen`, `App\Support\ReglesCompte`
+       (règles uniques pour l'inscription et « Mon compte ») ;
+     - SMS : interface `EnvoiSms`, pilote `JournalSms` (rien ne part) ;
+       `CodeSmsService` : 6 chiffres, 10 min, 5 essais, haché, un nouveau code
+       annule le précédent, 3 envois par numéro et par 15 min, 10 par IP et
+       par heure ; même message pour un code inconnu ou expiré ;
+     - Fortify : identifiant `telephone` normalisé avant recherche et pour la
+       limitation (5 essais par minute par numéro, quelle que soit sa
+       graphie) ; compte désactivé refusé ; après inscription →
+       vérification du numéro, contournable (« Plus tard ») ; fonctions
+       gardées : inscription et 2FA ;
+     - `Password::defaults()` = 8 caractères, sans complexité (D3) ;
+       session de 30 jours glissants (`SESSION_LIFETIME=43200`, HL-D10) ;
+     - contrôleurs `Compte\RecuperationController` (numéro en session, jamais
+       dans l'adresse ; code seulement aux numéros vérifiés),
+       `VerificationNumeroController`, `MonCompteController` (profil, mot de
+       passe, numéro en deux temps — code sur le nouveau numéro —,
+       suppression avec mot de passe) ; `routes/compte.php` ;
+     - `App\Support\JournalAcces::consigner()` : `compte.cree`,
+       `mot_de_passe.change`, `mot_de_passe.recupere`, `numero.verifie`,
+       `numero.change` (numéros masqués), `compte.supprime` (la trace reste,
+       auteur à `null`) ;
+     - pages partagées : `auth.user` réduit à identifiant, prénom, pseudo et
+       état du numéro — jamais le numéro ;
+     - écrans en français : `auth/connexion`, `inscription`,
+       `mot-de-passe-oublie`, `code-recuperation`, `verifier-numero`,
+       `two-factor-challenge`, `confirm-password` (habillage
+       `connexion-layout`) ; `compte/profil`, `mot-de-passe`, `numero`,
+       `affichage` (thème, taille du texte 15/17/19 px, économie de données,
+       locaux au téléphone) ; rappel « Vérifie ton numéro » sur l'accueil
+       élève ;
+     - retirés : écrans, habillages, composants et tests du kit liés à
+       l'e-mail, aux réglages et aux passkeys ; primitives inutilisées
+       (avatar, menu déroulant, sélecteur, barre latérale…) et leurs paquets ;
+     - compte de démonstration : `DatabaseSeeder` (`firstOrCreate`, mot de
+       passe `DEMO_MOT_DE_PASSE` de `.env` via `config/demonstration.php`,
+       refus en production).
+   - **Vu avec Playwright** : connexion, inscription, mot de passe oublié,
+     « Mon compte » (profil, numéro, affichage) en 4 gabarits × 2 thèmes ;
+     corrigé : montant écrit à la main (« 12 500 GNF » coupé en fin de
+     ligne) → `formaterGnf()`. Parcours de bout en bout par les vrais
+     écrans : inscription → vérification proposée → « Plus tard » → rappel
+     sur l'accueil → suppression du compte → connexion refusée.
+   - **Preuve** : Pest `Compte\InscriptionTest`, `ConnexionTest`,
+     `RecuperationTest`, `VerificationNumeroTest`, `MonCompteTest`,
+     `Unit\TelephoneTest`, `SeederDemonstrationTest` — valeurs relues en
+     base ; Vitest `reglages-affichage` ; Playwright `parcours.spec.ts`.
+     Totaux : 103 Pest, 117 Vitest, 98 Playwright.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -461,6 +535,15 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 - **Liste des matières phares** (D1) : attendue de Maurice avant le lot 1.
 - **Domaine et hébergement** (D11) : à fixer avant la clôture du lot 0 (HTTPS).
 - **Logo vectoriel** : remplacera le monogramme provisoire des icônes (DA8).
+- **Fournisseur SMS** (D3) : à choisir avant le lot 8 ; d'ici là, aucun SMS
+  ne part (codes dans le journal Laravel en développement).
+- **Recours d'un élève au numéro jamais vérifié qui a oublié son mot de
+  passe** : l'écran dit « demande de l'aide à ton enseignant ou à
+  N'karamögö » ; le canal d'assistance (et l'écran administrateur qui
+  réinitialise un mot de passe) reste à définir.
+- **Changement de mot de passe** : les autres sessions ouvertes ne sont pas
+  fermées (pas de `AuthenticateSession`) ; à décider avec l'étape 6 (appareils
+  enregistrés, révocation).
 - Liste des établissements (nom, type, préfecture, commune, région) à constituer.
 - Coefficients et durées officiels de chaque épreuve, par série et par filière,
   à obtenir et faire valider.

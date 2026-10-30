@@ -19,7 +19,7 @@ import type { EntreeNavigation } from '@/components/lien-navigation';
 import { accueil as accueilConsole } from '@/routes/console';
 import { accueil as accueilContenu } from '@/routes/contenu';
 import { accueil as accueilEleve } from '@/routes/eleve';
-import { edit as monCompte } from '@/routes/profile';
+import { edit as monCompte } from '@/routes/compte/profil';
 
 /**
  * Navigation des trois espaces connectés (DESIGN.md § 7). Une entrée sans
@@ -32,8 +32,12 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
     { libelle: 'Cours', icone: BookOpen },
     { libelle: 'Annales', icone: FileText },
     { libelle: 'Examens blancs', icone: Timer },
-    // « Mon compte » arrive à l'étape 4 ; d'ici là, les réglages du kit.
-    { libelle: 'Moi', icone: CircleUser, href: monCompte().url },
+    {
+        libelle: 'Moi',
+        icone: CircleUser,
+        href: monCompte().url,
+        actifSous: '/compte',
+    },
 ];
 
 /** Back-office contenu : rédacteurs, relecteurs, admin contenu. */

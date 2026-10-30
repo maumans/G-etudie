@@ -4,27 +4,30 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+/**
+ * Comptes : connexion par téléphone (D3), données minimales (PLAN § 10) —
+ * téléphone, prénom, pseudo. Le nom et l'e-mail sont facultatifs (personnel
+ * du back-office). Aucune date de naissance, aucune photo.
+ *
+ * Réécrite sur place au lot 0 (étape 4), avant tout déploiement : la table
+ * du kit (connexion par e-mail) n'a jamais servi.
+ */
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->string('prenom', 60);
+            $table->string('nom', 80)->nullable();
+            $table->string('pseudo', 30)->unique();
+            $table->string('telephone', 16)->unique()->comment('Format +224XXXXXXXXX');
+            $table->timestamp('telephone_verifie_le')->nullable();
+            $table->string('email')->nullable()->unique();
             $table->string('password');
             $table->rememberToken();
+            $table->timestamp('desactive_le')->nullable();
             $table->timestamps();
-        });
-
-        Schema::create('password_reset_tokens', function (Blueprint $table) {
-            $table->string('email')->primary();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
         });
 
         Schema::create('sessions', function (Blueprint $table) {
@@ -37,13 +40,9 @@ return new class extends Migration
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('users');
-        Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
     }
 };

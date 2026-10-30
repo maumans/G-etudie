@@ -484,3 +484,20 @@ avec sa mesure (ratio de contraste, poids en Ko, capture avant/après). Format
      s'éclaircit en sombre.
    - Pulsation des squelettes retardée de 400 ms (§ 5 : pas d'animation en
      boucle pour une attente courte).
+
+### Lot 0, étapes 3 et 4 — habillages, connexion, « Mon compte » (2026-10-30)
+
+1. **Registres.** Connexion, inscription, récupération et « Mon compte » au
+   tutoiement (écrans de l'espace élève, § 7) ; double authentification au
+   vouvoiement (réservée au personnel) ; vitrine au vouvoiement ; messages de
+   validation et pages d'erreur à la forme neutre (ils servent à tous).
+2. **Jamais de clic mort.** Une entrée de navigation d'un écran à venir
+   reste visible avec « bientôt » et, touchée, le dit par une notification.
+3. **Onglets de « Mon compte » en grille 2 × 2 sur mobile** : une liste qui
+   défile cachait « Affichage » à 360 px.
+4. **Pas de confirmation du mot de passe à l'inscription** : un bouton
+   « Afficher le mot de passe » évite les fautes de frappe sans doubler la
+   saisie (inscription en moins d'une minute, critère du lot 2).
+5. **Numéro masqué** partout où l'élève le revoit (« 6•• •• •4 56 ») : on
+   montre à qui part le code sans exposer le numéro entier sur un téléphone
+   partagé.

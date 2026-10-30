@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EtatVide } from '@/components/ui/etat-vide';
-import { edit as monCompte } from '@/routes/profile';
+import { edit as monCompte } from '@/routes/compte/profil';
 
 /**
  * Vue d'ensemble de la console, version de socle (lot 0). Activité, contenu,

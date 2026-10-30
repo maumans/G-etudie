@@ -4,12 +4,11 @@ import { ConfirmProvider } from '@/components/ui/confirm-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
-import AppLayout from '@/layouts/app-layout';
-import AuthLayout from '@/layouts/auth-layout';
+import { initialiserReglagesAffichage } from '@/hooks/use-reglages-affichage';
+import ConnexionLayout from '@/layouts/connexion-layout';
 import ConsoleLayout from '@/layouts/console-layout';
 import ContenuLayout from '@/layouts/contenu-layout';
 import EleveLayout from '@/layouts/eleve-layout';
-import SettingsLayout from '@/layouts/settings/layout';
 import VitrineLayout from '@/layouts/vitrine-layout';
 import { brancherBarreNavigation } from '@/lib/barre-navigation';
 import { chargerPage } from '@/lib/chargement-page';
@@ -48,11 +47,13 @@ void createInertiaApp({
             case name.startsWith('console/'):
                 return ConsoleLayout;
             case name.startsWith('auth/'):
-                return AuthLayout;
-            case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return ConnexionLayout;
+            // « Mon compte » : dans l'espace élève (les rôles du personnel
+            // auront leur habillage à l'étape 5).
+            case name.startsWith('compte/'):
+                return EleveLayout;
             default:
-                return AppLayout;
+                return null;
         }
     },
     strictMode: true,
@@ -70,5 +71,6 @@ void createInertiaApp({
     progress: false,
 });
 
-// This will set light / dark mode on load...
+// Thème clair / sombre, puis taille du texte et mode données, dès le chargement.
 initializeTheme();
+initialiserReglagesAffichage();
