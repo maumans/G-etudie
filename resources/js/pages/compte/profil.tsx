@@ -1,4 +1,4 @@
-import { Form, Link, router } from '@inertiajs/react';
+import { Form } from '@inertiajs/react';
 import { LogOut, Trash2 } from 'lucide-react';
 import {
     EnteteCompte,
@@ -19,7 +19,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { MotDePasseInput } from '@/components/ui/mot-de-passe-input';
 import { Spinner } from '@/components/ui/spinner';
-import { logout } from '@/routes';
+import { useDeconnexion } from '@/hooks/use-deconnexion';
 import { destroy } from '@/routes/compte';
 import { update } from '@/routes/compte/profil';
 
@@ -29,6 +29,7 @@ export default function Profil({
     profil: { prenom: string; pseudo: string };
 }) {
     const formule = useFormule();
+    const deconnecter = useDeconnexion();
 
     return (
         <div className="mx-auto grid w-full max-w-3xl gap-6">
@@ -88,15 +89,13 @@ export default function Profil({
                     'Sur un appareil partagé, pensez à vous déconnecter quand vous avez fini.',
                 )}
             >
-                <Button asChild variant="outline" className="sm:w-fit">
-                    <Link
-                        href={logout()}
-                        as="button"
-                        onClick={() => router.flushAll()}
-                    >
-                        <LogOut aria-hidden />
-                        Se déconnecter
-                    </Link>
+                <Button
+                    variant="outline"
+                    className="sm:w-fit"
+                    onClick={() => void deconnecter()}
+                >
+                    <LogOut aria-hidden />
+                    Se déconnecter
                 </Button>
             </SectionCompte>
 

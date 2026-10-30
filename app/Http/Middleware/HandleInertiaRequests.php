@@ -65,6 +65,9 @@ class HandleInertiaRequests extends Middleware
                     'double_authentification' => $user->can(Permission::DoubleAuthentification->value),
                 ] : null,
             ],
+            // Liste blanche des écrans gardés hors ligne (HORS_LIGNE.md A.3.7) :
+            // la garde de navigation la lit pour ne jamais laisser un clic mort.
+            'hors_ligne_pages' => array_values(config('hors_ligne.pages')),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

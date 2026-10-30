@@ -1,14 +1,28 @@
-import { Moon, Smartphone, Sun } from 'lucide-react';
+import {
+    CircleCheck,
+    Download,
+    Moon,
+    Share,
+    Smartphone,
+    Sun,
+} from 'lucide-react';
+import { useEffect, useState } from 'react';
 import type { LucideIcon } from 'lucide-react';
 import {
     EnteteCompte,
     SectionCompte,
     useFormule,
 } from '@/components/entete-compte';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAppearance } from '@/hooks/use-appearance';
 import type { Appearance } from '@/hooks/use-appearance';
 import { useReglagesAffichage } from '@/hooks/use-reglages-affichage';
+import {
+    estInstallee,
+    estIphone,
+    useInviteInstallation,
+} from '@/lib/hors-ligne';
 import type { TailleLecture } from '@/hooks/use-reglages-affichage';
 import { cn, formaterGnf } from '@/lib/utils';
 
@@ -81,10 +95,88 @@ export default function Affichage() {
                 </label>
             </SectionCompte>
 
+            <SectionCompte
+                titre="Installer l'application"
+                description={formule(
+                    "Installée, N'karamögö s'ouvre depuis l'écran d'accueil comme une application, et garde tes réponses et tes téléchargements même sans réseau.",
+                    "Installée, N'karamögö s'ouvre depuis l'écran d'accueil comme une application, et fonctionne même sans réseau.",
+                )}
+            >
+                <Installation />
+            </SectionCompte>
+
             <p className="text-aide text-ink-500">
                 Ces réglages ne valent que pour ce téléphone.
             </p>
         </div>
+    );
+}
+
+/**
+ * Bouton « Installer » quand le navigateur le propose ; sur iPhone, la
+ * marche à suivre (Safari n'a pas de bouton) ; sinon, l'état (A.3.2).
+ */
+function Installation() {
+    const { possible, installer } = useInviteInstallation();
+    const formule = useFormule();
+    const [installee, setInstallee] = useState(false);
+    const [iphone, setIphone] = useState(false);
+
+    useEffect(() => {
+        setInstallee(estInstallee());
+        setIphone(estIphone());
+    }, []);
+
+    if (installee) {
+        return (
+            <p className="flex items-center gap-2 text-interface text-ink-900">
+                <CircleCheck
+                    aria-hidden
+                    className="size-[18px] text-juste-600 dark:text-juste-400"
+                />
+                Installée sur ce téléphone.
+            </p>
+        );
+    }
+
+    if (possible) {
+        return (
+            <Button className="sm:w-fit" onClick={() => void installer()}>
+                <Download aria-hidden />
+                Installer N'karamögö
+            </Button>
+        );
+    }
+
+    if (iphone) {
+        return (
+            <ol className="grid gap-2 text-interface text-ink-900">
+                <li className="flex items-center gap-2.5">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink-900 text-meta font-semibold text-craie-50 font-data">
+                        1
+                    </span>
+                    {formule('Dans Safari, touche', 'Dans Safari, touchez')}
+                    <Share aria-label="Partager" className="size-4" />
+                    Partager.
+                </li>
+                <li className="flex items-center gap-2.5">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-ink-900 text-meta font-semibold text-craie-50 font-data">
+                        2
+                    </span>
+                    {formule('Choisis', 'Choisissez')} « Sur l'écran
+                    d'accueil ».
+                </li>
+            </ol>
+        );
+    }
+
+    return (
+        <p className="text-aide text-ink-600">
+            {formule(
+                'Ouvre le menu du navigateur et choisis « Installer l’application » ou « Ajouter à l’écran d’accueil ».',
+                'Ouvrez le menu du navigateur et choisissez « Installer l’application » ou « Ajouter à l’écran d’accueil ».',
+            )}
+        </p>
     );
 }
 

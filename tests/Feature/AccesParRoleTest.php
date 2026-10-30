@@ -62,6 +62,11 @@ class AccesParRoleTest extends TestCase
         'two-factor.secret-key' => 'Fortify : clé de son propre compte (vide si non activée).',
         'two-factor.recovery-codes' => 'Fortify : codes de secours de son propre compte.',
         'two-factor.regenerate-recovery-codes' => 'Fortify : codes de secours de son propre compte.',
+
+        // Hors ligne (HORS_LIGNE.md A.3.6) : l'autorisation se fait par
+        // opération (GestionnaireOperation::permission()), pas par route.
+        'sync.etat' => 'Battement et enregistrement de l\'appareil : tout compte connecté.',
+        'sync.operations' => 'File d\'opérations : chaque opération vérifie la permission de son auteur.',
     ];
 
     #[Test]

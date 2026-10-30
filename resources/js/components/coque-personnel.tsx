@@ -1,4 +1,4 @@
-import { Link, router, usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import {
     CircleUser,
     GraduationCap,
@@ -10,6 +10,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { EntreeNavigation } from '@/components/lien-navigation';
+import { BandeauCopie, BandeauReseau } from '@/components/hors-ligne/bandeaux';
 import { LienNavigation } from '@/components/lien-navigation';
 import { Marque } from '@/components/marque';
 import { Button } from '@/components/ui/button';
@@ -19,8 +20,8 @@ import {
     FeuilleDeclencheur,
 } from '@/components/ui/feuille';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useDeconnexion } from '@/hooks/use-deconnexion';
 import { cn } from '@/lib/utils';
-import { logout } from '@/routes';
 import { edit as monCompte } from '@/routes/compte/profil';
 import { accueil as accueilConsole } from '@/routes/console';
 import { accueil as accueilContenu } from '@/routes/contenu';
@@ -127,6 +128,10 @@ export function CoquePersonnel({
                 </header>
 
                 <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:py-8">
+                    <div className="mb-5 grid gap-2 empty:hidden">
+                        <BandeauReseau eleve={false} />
+                        <BandeauCopie />
+                    </div>
                     {children}
                 </main>
             </div>
@@ -181,6 +186,7 @@ function PiedCompte({
         (espace) => espace !== actuel,
     );
     const dansMonCompte = isCurrentOrParentUrl('/compte');
+    const deconnecter = useDeconnexion();
 
     return (
         <div className={cn('grid gap-0.5 border-t pt-3', className)}>
@@ -231,19 +237,13 @@ function PiedCompte({
                 </Button>
             )}
             <Button
-                asChild
                 variant="ghost"
                 taille="compacte"
                 className="justify-start"
+                onClick={() => void deconnecter()}
             >
-                <Link
-                    href={logout()}
-                    as="button"
-                    onClick={() => router.flushAll()}
-                >
-                    <LogOut aria-hidden />
-                    Se déconnecter
-                </Link>
+                <LogOut aria-hidden />
+                Se déconnecter
             </Button>
         </div>
     );

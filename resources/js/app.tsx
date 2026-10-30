@@ -1,5 +1,6 @@
 import { createInertiaApp, router } from '@inertiajs/react';
 import type { ResolvedComponent } from '@inertiajs/react';
+import { EcranIndisponible } from '@/components/hors-ligne/ecran-indisponible';
 import { ConfirmProvider } from '@/components/ui/confirm-provider';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -13,14 +14,21 @@ import EleveLayout from '@/layouts/eleve-layout';
 import VitrineLayout from '@/layouts/vitrine-layout';
 import { brancherBarreNavigation } from '@/lib/barre-navigation';
 import { chargerPage } from '@/lib/chargement-page';
+import { demarrerHorsLigne } from '@/lib/hors-ligne';
 
 // Le filet de démarrage de app.blade.php (HORS_LIGNE.md A.3.3) attend ce
 // signal : sans lui, impossible de distinguer un démarrage lent d'un code absent.
 window.__nkaramogoPret = true;
+// Démarrage lent mais réussi : le filet s'était peut-être ouvert, on le referme.
+document
+    .getElementById('filet-demarrage')
+    ?.style.setProperty('display', 'none');
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
-// La garde de navigation hors ligne (lot 0, étape 6) s'inscrira avant la barre.
+// Garde de navigation hors ligne d'abord : la barre ignore une visite annulée
+// (HORS_LIGNE.md A.3.7).
+demarrerHorsLigne(router);
 brancherBarreNavigation(router);
 
 void createInertiaApp({
@@ -62,6 +70,7 @@ void createInertiaApp({
             <TooltipProvider delayDuration={0}>
                 <ConfirmProvider>
                     {app}
+                    <EcranIndisponible />
                     <Toaster />
                 </ConfirmProvider>
             </TooltipProvider>

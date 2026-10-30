@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\HorsLigne\RegistreOperations;
 use App\Services\Sms\EnvoiSms;
 use App\Services\Sms\JournalSms;
 use Carbon\CarbonImmutable;
@@ -22,6 +23,9 @@ class AppServiceProvider extends ServiceProvider
         // Fournisseur SMS réel à choisir avant le lot 8 (D3) ; d'ici là, le
         // message est écrit dans le journal et rien ne part.
         $this->app->bind(EnvoiSms::class, JournalSms::class);
+
+        // Une seule liste des types d'opération hors ligne par requête.
+        $this->app->singleton(RegistreOperations::class);
     }
 
     /**
