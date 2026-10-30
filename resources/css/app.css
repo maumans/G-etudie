@@ -362,6 +362,51 @@
     );
 }
 
+/* Barre de progression de navigation (resources/js/lib/barre-navigation.ts).
+   Animée sur transform seulement : le compositeur la fait avancer même
+   pendant un gros rendu React. */
+.barre-navigation {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 100;
+    height: 3px;
+    background: var(--color-nimba-600);
+    transform-origin: left;
+    pointer-events: none;
+}
+
+.dark .barre-navigation {
+    background: var(--color-nimba-300);
+}
+
+.barre-navigation[data-etat='avance'] {
+    animation: barre-navigation-avance 8s cubic-bezier(0.1, 0.7, 0.3, 1)
+        forwards;
+}
+
+.barre-navigation[data-etat='terminee'] {
+    transform: scaleX(1);
+    opacity: 0;
+    transition:
+        transform 150ms ease-out,
+        opacity 200ms ease-in 50ms;
+}
+
+.barre-navigation[data-etat='abandonnee'] {
+    opacity: 0;
+    transition: opacity 200ms ease-in;
+}
+
+@keyframes barre-navigation-avance {
+    from {
+        transform: scaleX(0);
+    }
+
+    to {
+        transform: scaleX(0.92);
+    }
+}
+
 @layer base {
     * {
         @apply border-border;

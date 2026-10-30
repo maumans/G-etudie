@@ -6,6 +6,13 @@ declare module 'react' {
     }
 }
 
+declare global {
+    interface Window {
+        /** Posé par app.tsx au démarrage ; lu par le filet de app.blade.php. */
+        __nkaramogoPret?: boolean;
+    }
+}
+
 declare module '@inertiajs/core' {
     export interface InertiaConfig {
         sharedPageProps: {

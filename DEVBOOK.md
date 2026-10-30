@@ -19,7 +19,7 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (lot 0, étapes 0 et 1 faites)
+### État au 2026-10-30 (lot 0, étapes 0 à 2 faites)
 
 - **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
   lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
@@ -35,12 +35,17 @@
   `/dev/composants` (404 en production), format `100 000 GNF` en TS et en PHP.
   Vue avec Playwright : 4 gabarits × 2 thèmes, axe sans violation sérieuse,
   aucun débordement ; captures de référence dans `tests/visuel/captures/lot0/`.
-- **Tests** : 56 Pest (162 assertions, MySQL `g_etudie_test`), 92 Vitest, 8 Playwright — verts.
-  `tsc`, `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
-- **Pas encore fait dans le lot 0** : garde-fous Inertia (barre de
-  progression, `version()`, `resolve`), habillages, connexion par téléphone et
-  « Mon compte », rôles et permissions, socle hors ligne. Les écrans du kit
-  (connexion par e-mail, tableau de bord, réglages) sont encore en place.
+- **Étape 2 faite** (point 5) : barre de progression maison, `resolve` maison
+  qui rattrape l'échec d'import, `version()` à `null` sous `public/hot`,
+  `useDonneeOptionnelle` et l'outil de test `VerifiePropsOptionnelles`,
+  pages d'erreur et messages de validation en français.
+- **Tests** : 69 Pest (216 assertions, MySQL `g_etudie_test`), 112 Vitest,
+  16 Playwright — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
+  `npm run build` passent.
+- **Pas encore fait dans le lot 0** : habillages (avec le `prefetch` des liens
+  de navigation), connexion par téléphone et « Mon compte », rôles et
+  permissions, socle hors ligne. Les écrans du kit (connexion par e-mail,
+  tableau de bord, réglages) sont encore en place.
 - **Lancer l'application** : `.claude/launch.json` déclare `laravel`
   (`php artisan serve`, port 8000) et `vite` (`npm run dev`, port 5173).
   Les captures de référence se prennent sur le build : arrêter `npm run dev`
@@ -48,14 +53,15 @@
 
 ### Prochaines étapes, par ordre de priorité
 
-1. **Lot 0, étape 2 — garde-fous Inertia** (`CLAUDE.md` § 4) : barre de
-   progression maison, `HandleInertiaRequests::version()` à `null` sous
-   `public/hot`, `resolve` maison (échec d'import, `HORS_LIGNE.md` A.3.3),
-   `useDonneeOptionnelle` + `ZoneDonnee`, `prefetch`, pages d'erreur en
-   français, fichiers `lang/fr`.
-2. **Étapes 3 à 6** : quatre habillages → connexion par téléphone et « Mon
-   compte » → rôles, permissions, `AccesParRoleTest` → socle hors ligne HL0.
-   Puis clôture (étape 7).
+1. **Lot 0, étape 3 — les quatre habillages** (vitrine, élève, back-office,
+   console), avec `prefetch` sur leurs liens de navigation, et remplacement
+   des pages `welcome` / `dashboard` du kit.
+2. **Étapes 4 à 6** : connexion par téléphone et « Mon compte » (dont
+   `Password::defaults()` à aligner sur D3 : 8 caractères, sans règle de
+   complexité — le kit impose 12 caractères, casse mixte, symboles et une
+   vérification de fuite par appel réseau en production) → rôles,
+   permissions, `AccesParRoleTest` → socle hors ligne HL0. Puis clôture
+   (étape 7).
 3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
@@ -357,6 +363,48 @@ cette question à sa façon. Elle distingue deux notions :
    - **Reste** : `App\Support\Telephone` (jumeau PHP de `lib/telephone.ts`)
      arrive à l'étape 4 avec la connexion par téléphone ; contrôles sur vrai
      téléphone inscrits dans `A_TESTER.md`.
+
+5. [x] **Lot 0, étape 2 — garde-fous Inertia** (2026-10-30)
+   - **Constat** : barre de progression d'Inertia ; pages résolues par le
+     plugin `@inertiajs/vite`, sans rattrapage d'un fragment supprimé par un
+     déploiement ; `version()` active sous `npm run dev` ; pages d'erreur et
+     messages de validation de Laravel en anglais.
+   - **Décision** :
+     - `resources/js/lib/barre-navigation.ts` + `progress: false` : départ sur
+       `before` (préchargements, visites sans progression et visites déjà
+       annulées par un écouteur antérieur ignorés), rien sous 80 ms,
+       animation `transform`, fin après `finish` + double
+       `requestAnimationFrame`, avec une **fin de secours à 1 s** — vue au
+       navigateur : une fenêtre qui ne peint pas laissait la barre affichée ;
+       effacement sans aller au bout sur annulation ou erreur ;
+     - `resources/js/lib/chargement-page.ts` : `resolve` fourni à
+       `createInertiaApp` (le plugin n'injecte alors pas le sien) ; échec
+       d'import → rechargement une fois en ligne, écran de secours hors ligne
+       avec rechargement au retour du réseau, dernier recours sinon ; écran
+       en DOM pur, sans CSS ni composant ; `window.__nkaramogoPret` posé au
+       démarrage. « Hors ligne » vient de `navigator.onLine` jusqu'à
+       l'étape 6 (`useHorsLigne`) ;
+     - `HandleInertiaRequests::version()` → `null` si `public/hot` existe ;
+     - `hooks/use-donnee-optionnelle.ts` (états `chargement` / `echec` /
+       `pret`, `onFinish` conclut toujours, 200 sans la prop = échec) et
+       `tests/Concerns/VerifiePropsOptionnelles` (en-têtes Inertia réels,
+       version en chaîne) ;
+     - `Inertia::handleExceptionsUsing()` → page `erreur` (403, 404, 419, 429,
+       500, 503), 500 laissée à la page de débogage sous `APP_DEBUG` ;
+       `lang/fr` (validation complète, noms de champs lisibles, auth, mots
+       de passe, pagination) ; fichiers `lang/en` publiés puis retirés.
+   - **Preuve** : Vitest `barre-navigation` (7), `chargement-page` (8, dont
+     le test 19 de `HORS_LIGNE.md` A.14), `use-donnee-optionnelle` (5) ;
+     Pest `VersionInertiaTest` (3, dossier public jetable : le vrai
+     `public/hot` n'est jamais touché), `PropsOptionnellesTest` (2, la
+     fermeture n'est pas évaluée au chargement complet), `PagesErreurTest`
+     (5), `TraductionsTest` (3, chaque règle de Laravel a sa traduction).
+     Page d'erreur 404 capturée en 4 gabarits × 2 thèmes, axe propre.
+     Navigation Inertia réelle (lien de pagination) vérifiée au navigateur :
+     page rendue, aucun écran de secours, aucune erreur console.
+     Totaux : 69 Pest, 112 Vitest, 16 Playwright.
+   - **Reste** : `prefetch` sur les liens de navigation, à poser avec les
+     habillages (étape 3).
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
