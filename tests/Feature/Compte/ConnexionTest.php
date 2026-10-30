@@ -71,5 +71,6 @@ test('chaque page ne reçoit du compte que l\'identifiant, le prénom, le pseudo
                 'espace' => 'eleve',
                 'espaces' => ['eleve'],
                 'double_authentification' => false,
+                'permissions' => ['espace.eleve'],
             ]));
 });

@@ -32,6 +32,8 @@ Route::middleware('auth')->group(function () {
         ->name('console.accueil');
 });
 
+require __DIR__.'/contenu.php';
+
 require __DIR__.'/compte.php';
 
 require __DIR__.'/hors-ligne.php';

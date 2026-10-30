@@ -40,6 +40,7 @@ function compte(modifications: Partial<User>): User {
         espace: 'eleve',
         espaces: ['eleve'],
         double_authentification: false,
+        permissions: ['espace.eleve'],
         ...modifications,
     };
 }

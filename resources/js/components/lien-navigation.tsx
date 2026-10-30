@@ -6,6 +6,7 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useHorsLigne } from '@/lib/hors-ligne';
 import { estEcranGarde } from '@/lib/hors-ligne/ecrans';
 import { cn } from '@/lib/utils';
+import type { Permission } from '@/types';
 
 /**
  * Une entrée de navigation. Sans `href`, l'écran n'existe pas encore (lot à
@@ -18,6 +19,8 @@ export type EntreeNavigation = {
     href?: string;
     /** Préfixe d'adresse sous lequel l'entrée reste active (« Moi » → /compte). */
     actifSous?: string;
+    /** Entrée tue pour un compte sans cette permission (la route reste gardée). */
+    permission?: Permission;
 };
 
 const STYLES = {
