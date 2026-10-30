@@ -43,9 +43,9 @@ const pastilleVariants = cva(
     variants: {
       etat: {
         neutre: "border-ink-400 text-ink-600",
-        selectionne: "border-nimba-600 bg-nimba-600 text-white dark:border-nimba-300 dark:bg-nimba-300 dark:text-[#0b0b0e]",
-        juste: "border-juste-600 bg-juste-600 text-white dark:border-juste-400 dark:bg-juste-400 dark:text-[#0b0b0e]",
-        faux: "border-faux-600 bg-faux-600 text-white dark:border-faux-400 dark:bg-faux-400 dark:text-[#0b0b0e]",
+        selectionne: "border-nimba-600 bg-nimba-600 text-white dark:border-nimba-300 dark:bg-nimba-300 dark:text-[#110e0b]",
+        juste: "border-juste-600 bg-juste-600 text-white dark:border-juste-400 dark:bg-juste-400 dark:text-[#110e0b]",
+        faux: "border-faux-600 bg-faux-600 text-white dark:border-faux-400 dark:bg-faux-400 dark:text-[#110e0b]",
         bonne_reponse: "border-juste-600 text-juste-700 dark:border-juste-400 dark:text-juste-400",
         ecartee: "border-ink-400 text-ink-600",
       },

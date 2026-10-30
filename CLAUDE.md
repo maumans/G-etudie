@@ -71,27 +71,28 @@ mineurs**, sur des Android d'entrée de gamme, avec peu de données.
 ## 3 bis. Exigence visuelle — non négociable
 
 Maurice veut un produit **au sommet** : élégant, professionnel, vivant, et
-facile. Le détail est dans `DESIGN.md` § 0 et la compétence `design-ardoise` ;
-l'essentiel ne se rediscute pas :
+facile. La cible, ce sont **les cinq références qu'il a fournies** (tableaux de
+bord « Oliver » et « Eduvo », vitrines « BrightPath » et « DevSkill »),
+analysées dans `DESIGN.md` § 0.1 ; la compétence `design-ardoise` en donne la
+recette. L'essentiel ne se rediscute pas :
 
 - **Le hors ligne et la faible connexion ne sont jamais une excuse** pour une
-  interface pauvre. L'élégance ne coûte presque rien en données (police
-  variable, dégradés CSS, ombres) ; on économise sur les images et les
-  bibliothèques, jamais sur le soin.
-- **Dosé, pas gros** : interface à 14 px, titres en 600 (jamais 700),
-  contrôles de 40 px (44 px sur mobile), icônes de 16 px. La hiérarchie vient
-  de l'espace, du contraste et de la couleur.
-- **Jetons seulement** : couleurs, rayons, ombres et tailles du design system
-  (`app.css`) ; aucune valeur inventée dans une page. Un motif répété deux fois
-  devient un composant de `components/ui/`.
-- **Chaque écran a un moment d'expression** (surface de la marque, mot en
-  serif italique, aperçu, halo) — un seul — et **n'est jamais une page plate**
-  ni un vide sans action.
-- **Jamais de bleu roi ni d'orange/jaune d'opérateur** comme couleur de marque :
-  l'accent est le violet `nimba` (`DESIGN.md` § 2.2).
-- Avant de déclarer un écran fini, le comparer honnêtement aux meilleurs
-  produits actuels (Linear, Vercel, Stripe, Brilliant) : s'il fait « ancien
-  site », il n'est pas fini.
+  interface pauvre : on économise les images et les bibliothèques, pas le soin.
+- **Chaud** : crème, pêche, mandarine `nimba`, encre. Jamais de bleu roi, de
+  violet froid, de gris bleuté, ni l'orange pur d'Orange (`#FF7900`).
+- **Plein et utile** : un écran montre l'état de l'élève (jauge, série,
+  matières, à reprendre). Sans données, il garde sa forme avec des données
+  d'exemple marquées `est_exemple` (bandeau), ou un état vide avec une action —
+  jamais un rectangle « bientôt » seul.
+- **Dosé** : interface 14 px ; titres de carte 15-16 px en 600 ; grands titres
+  en contraste 400 / `<strong>` 700 (`titre-contraste`) ; chiffres clés en 700.
+- **Coloré par la matière** (`MATIERES[cle]` : tuile, barre, trait), toujours
+  avec le nom et l'icône.
+- **Jetons seulement** (`app.css`) ; un motif répété devient un composant.
+- **Photos** : uniquement celle que Maurice fournit (personne majeure,
+  autorisation écrite), à l'emplacement `config('vitrine.photo_heros')`.
+- Avant de déclarer un écran fini, le poser à côté des références : s'il paraît
+  plus pauvre, plus froid ou plus vide, il n'est pas fini.
 
 ## 4. Règles techniques — pièges connus
 
@@ -145,8 +146,8 @@ règles ne se rediscutent pas.
   **opacité** (`bg-nimba-600/[0.12] dark:bg-nimba-500/25`), jamais en nuance
   claire fixe (`bg-nimba-50`), qui reste blanche en sombre sous un texte devenu
   clair — blanc sur blanc.
-- **Polices auto-hébergées** : une police distante échoue hors ligne. Geist
-  variable et Instrument Serif italique, par Fontsource, importées dans `app.css`.
+- **Polices auto-hébergées** : une police distante échoue hors ligne. Plus
+  Jakarta Sans variable, par Fontsource, importée dans `app.css`.
 - **Écran qui affiche la date ou l'heure** : figer l'horloge dans sa capture
   (`page.clock.setFixedTime`), sinon la référence change chaque jour.
 - **`public/hot` oublié** après un `npm run dev` arrêté : le build semble cassé

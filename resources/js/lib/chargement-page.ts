@@ -149,8 +149,8 @@ export function afficherSecours(motif: 'hors_ligne' | 'dernier_recours'): void {
         'padding:24px',
         'text-align:center',
         'font-family:system-ui,sans-serif',
-        `background:${sombre ? '#0B0B0E' : '#FAFAFC'}`,
-        `color:${sombre ? '#F5F5F8' : '#18181E'}`,
+        `background:${sombre ? '#110E0B' : '#FCF7F4'}`,
+        `color:${sombre ? '#F8F4F1' : '#1E1814'}`,
     ].join(';');
 
     const titre = document.createElement('p');
@@ -167,7 +167,7 @@ export function afficherSecours(motif: 'hors_ligne' | 'dernier_recours'): void {
     bouton.type = 'button';
     bouton.textContent = 'Recharger';
     bouton.style.cssText =
-        'min-height:44px;padding:0 20px;border:0;border-radius:10px;background:#702AED;color:#fff;font-size:14px;font-weight:500;cursor:pointer';
+        'min-height:44px;padding:0 20px;border:0;border-radius:9999px;background:#D04904;color:#fff;font-size:14px;font-weight:600;cursor:pointer';
     bouton.addEventListener('click', () => window.location.reload());
 
     ecran.append(titre, texte, bouton);

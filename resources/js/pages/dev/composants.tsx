@@ -150,6 +150,7 @@ const NEUTRES = [
 
 const MARQUE = [
     { nom: 'nimba-300', classe: 'bg-nimba-300' },
+    { nom: 'nimba-500', classe: 'bg-nimba-500' },
     { nom: 'nimba-600', classe: 'bg-nimba-600' },
     { nom: 'nimba-700', classe: 'bg-nimba-700' },
     { nom: 'soleil-400', classe: 'bg-soleil-400' },
@@ -236,32 +237,35 @@ function Typographie() {
                 <p className="text-meta font-medium tracking-wide text-nimba-700 uppercase dark:text-nimba-300">
                     J-214 avant le BEPC
                 </p>
-                <p className="text-heros leading-none font-semibold tracking-tight">
+                <p className="text-heros leading-none font-bold tracking-tight">
                     <span className="font-data">47</span>
-                    <span className="text-titre-ecran text-ink-500"> %</span>
+                    <span className="text-titre-ecran font-semibold text-ink-500">
+                        {' '}
+                        %
+                    </span>
                 </p>
-                <p className="text-vitrine leading-none font-semibold tracking-[-0.035em] max-sm:text-[2.5rem]">
-                    Un soir,{' '}
-                    <span className="font-accent font-normal tracking-normal text-nimba-600 italic dark:text-nimba-300">
-                        quinze minutes.
+                <p className="text-vitrine leading-none titre-contraste max-sm:text-[2.5rem]">
+                    Tu as terminé <strong>3 modules</strong>{' '}
+                    <span className="text-nimba-600 dark:text-nimba-400">
+                        cette semaine.
                     </span>
                 </p>
                 <p className="text-titre-ecran-large font-semibold tracking-tight">
-                    Titre d'écran desktop — Geist 28
+                    Titre d'écran desktop — Jakarta 32
                 </p>
                 <p className="text-titre-ecran font-semibold tracking-tight">
-                    Titre d'écran mobile — Geist 22
+                    Titre d'écran mobile — Jakarta 24
                 </p>
                 <p className="text-titre-carte font-semibold tracking-tight">
-                    Titre de carte — Geist 16
+                    Titre de carte — Jakarta 16
                 </p>
                 <p className="text-lecture">
-                    Corps de lecture — Geist 17, interligne 1,65. Au marché de
+                    Corps de lecture — Jakarta 17, interligne 1,65. Au marché de
                     Madina, un kilo de riz coûte {formaterGnf(12500)}.
                 </p>
-                <p>Interface — Geist 14.</p>
-                <p className="text-aide text-ink-500">Aide — Geist 13.</p>
-                <p className="text-meta text-ink-500">Méta — Geist 12.</p>
+                <p>Interface — Jakarta 14.</p>
+                <p className="text-aide text-ink-500">Aide — Jakarta 13.</p>
+                <p className="text-meta text-ink-500">Méta — Jakarta 12.</p>
                 <p className="text-titre-carte font-data">
                     13,5 / 20 · {formaterGnf(100000)} · 01:42:07
                 </p>

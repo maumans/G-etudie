@@ -1,4 +1,4 @@
-# DESIGN.md — « Ardoise » v2
+# DESIGN.md — « Ardoise » v3
 
 Design system de N'karamögö · G-Étudie. Le nom vient de l'ardoise de l'écolier :
 l'endroit où l'on s'essaie, où l'on se trompe, où l'on efface et où l'on recommence.
@@ -6,9 +6,10 @@ l'endroit où l'on s'essaie, où l'on se trompe, où l'on efface et où l'on rec
 > Ce fichier fixe la **direction**. Les valeurs ci-dessous sont vérifiées
 > (contrastes recalculés par `tests/js/contrastes.test.ts`) ; Claude Code les
 > implémente, les **capture avec Playwright**, et consigne chaque ajustement
-> avec sa raison dans la section 13. **v2 (2026-10-30)** : refonte demandée par
-> Maurice — la v1 (bleu roi, Sora/Lexend, contrôles de 48 px, titres en gras)
-> faisait « ancien site » ; voir § 13, « Refonte v2 ».
+> avec sa raison dans la section 13. **v3 (2026-10-30)** : adaptation complète
+> aux références choisies par Maurice (§ 0.1). La v1 (bleu roi, tout gros,
+> tout gras) puis la v2 (violet, neutre, froide, écrans vides) ont été
+> refusées — § 13.
 
 ---
 
@@ -16,39 +17,64 @@ l'endroit où l'on s'essaie, où l'on se trompe, où l'on efface et où l'on rec
 
 Maurice veut un produit **au sommet** : qu'un élève, un parent ou un partenaire
 qui arrive soit attiré d'abord par **l'élégance et le professionnalisme**, puis
-retenu par **la facilité d'usage**. La référence est celle des meilleurs
-produits actuels (Linear, Vercel, Stripe, Brilliant), pas celle d'un portail
-administratif.
+retenu par **la facilité d'usage**. **Le hors ligne n'est jamais une excuse** :
+il sert aux cours que l'élève veut suivre sans réseau ; il ne justifie ni une
+interface pauvre, ni des pages vides. L'élégance ne coûte presque rien en
+données (une police variable de 27 Ko, des dégradés CSS, des ombres) ; on
+économise sur les images et les bibliothèques, jamais sur le soin.
 
-**Le hors ligne n'est jamais une excuse.** Il sert aux cours que l'élève veut
-suivre sans réseau ; il ne justifie ni une interface pauvre, ni des pages
-plates, ni des composants grossiers. L'élégance ne coûte presque rien en
-données : une police variable (29 Ko), des dégradés CSS (0 octet), des ombres
-et des filets bien dosés. Ce qui coûte, ce sont les images et les bibliothèques
-— on s'en passe, on ne se passe pas du soin.
+### 0.1 Les références
 
-Ce qui fait « ancien » et qu'on ne refait plus :
-- **tout gros, tout gras** : titres en 700, texte d'interface à 15-16 px en
-  graisse 500-600, boutons et champs de 48 px partout ;
-- un **bleu roi** de logiciel de gestion et un canevas **gris-bleu** ;
-- des **pages plates** : une carte blanche au milieu d'un fond gris, rien
-  d'autre ; un héros sans visuel, une moitié d'écran vide ;
-- des champs à bordure épaisse et coins mous, des badges criards.
+Cinq maquettes fournies par Maurice le 2026-10-30 (tableaux de bord
+d'apprentissage « Oliver » et « Eduvo », pages d'accueil « BrightPath » et
+« DevSkill ») sont **la cible**. On n'en recopie ni les textes, ni les logos,
+ni les photos : on en reprend le langage.
 
-Ce qui fait « aujourd'hui » et qu'on applique partout :
-- **dosage** : la hiérarchie vient de l'espace, de la couleur et du contraste
-  — pas de la taille ni de l'épaisseur. Texte d'interface **14 px**, titres en
-  **600** (jamais 700), approche resserrée sur les titres (`-0.02em`, jusqu'à
-  `-0.035em` pour un titre de vitrine) ;
-- **petits composants précis** : boutons et champs de 40 px (44 px sur mobile
-  pour le doigt), icônes de 16 px, badges en pilule de 20 px ;
-- **profondeur douce** : filets fins, ombres en couches à 4-8 % d'opacité,
-  surfaces « relief » pour ce qui est actif ;
-- **un moment d'expression par écran** : un mot en *Instrument Serif* italique
-  dans un grand titre, une surface pleine de la marque (`surface-marque`), un
-  halo (`halo-marque`), un aperçu dessiné de l'application — jamais tout à la fois ;
-- **chaque écran vivant** : même vide, un écran montre ce qui arrive (tuiles
-  « bientôt », aperçu), jamais un rectangle pointillé seul.
+| Ce que font les références | Comment on l'applique |
+|---|---|
+| **Ambiance chaude** : fond crème, grands halos pêche, aurore pastel | Canevas crème `craie-50`, `halo-marque` derrière les héros, `fond-ambiance` en haut des espaces connectés |
+| **Une couleur d'action vive**, l'orange, **épaulée par le noir** | Mandarine `nimba` pour l'action et l'énergie ; encre `ink-900` pour les boutons `encre`, le panneau `surface-encre`, les étapes numérotées |
+| **Chaque matière a sa couleur partout** : tuile, barre en tirets, bloc d'emploi du temps | `MATIERES[cle]` : `tuile`, `plein`, `trait` ; `ProgressionSegments` en tirets ; légende de la jauge |
+| **Des écrans pleins d'informations utiles** | Le tableau de bord élève complet (§ 6.0) dès le lot 0, en données d'exemple marquées |
+| **Grands titres en contraste de graisse** : la phrase en léger, les mots clés en gras ou en couleur | Utilitaire `titre-contraste` + `<strong>` (§ 3) |
+| **Vitrine incarnée** : une vraie personne détourée devant une forme orange, atouts en pastilles, bandeau de preuves, FAQ, double appel final | `VisuelHeros` (photo fournie par Maurice, sinon aperçu de l'application), § 7 |
+| **Grands rayons, boutons en pilule, cartes blanches sur fond teinté, icônes fines** | Rayons 12 / 20 / 28 px, `Button` en pilule, `shadow-carte` chaude, Lucide 16-20 px |
+
+Ce qu'on **ne** reprend **pas**, et pourquoi :
+- **les photos d'élèves mineurs et les photos de banque d'images** : seule la
+  photo fournie par Maurice (personne majeure, autorisation écrite) entre sur
+  la vitrine (§ 8) ;
+- **les classements nominatifs** (« 3rd Ranking ») : les classements sont
+  *opt-in* et pseudonymes (PLAN M9) ; le tableau de bord montre les points
+  d'effort et les réussites, pas un rang ;
+- **les chiffres de vitrine** (« 50K+ apprenants », « 4,9 ★ ») tant qu'on ne
+  les a pas : on n'affiche que ce qui est vrai (3 examens, la provenance des
+  annales, un principe) ;
+- **l'orange pur d'Orange** (`#FF7900`) : notre mandarine tire vers le
+  corail et se fonce pour le texte (§ 2.2).
+
+### 0.2 Ce qui fait « ancien » et qu'on ne refait plus
+
+- **tout gros, tout gras** partout ; **tout petit, tout gris** partout (la v2) :
+  la hiérarchie se dose écran par écran ;
+- un **bleu roi** de logiciel de gestion, un canevas gris-bleu, un violet froid ;
+- des **pages vides** : un rectangle « bientôt » au lieu d'un tableau de bord,
+  un héros sans visuel, une moitié d'écran blanche ;
+- des champs à bordure épaisse, des badges criards, des titres de carte en
+  20 px gras.
+
+### 0.3 Ce qui fait « aujourd'hui » et qu'on applique partout
+
+- **Chaud et lumineux** : crème, pêche, mandarine, encre ; jamais de gris froid.
+- **Dosé** : interface à 14 px, titres de carte 15-16 px en 600, grands titres
+  en contraste 400 / 700, chiffres clés en 700 `font-data`.
+- **Plein et utile** : chaque écran montre l'état de l'élève (jauge, série,
+  progression, à reprendre) ; un écran sans données montre sa forme avec des
+  données d'exemple marquées, ou un état vide avec une action.
+- **Coloré par la matière** : l'information se lit à la couleur de sa matière,
+  toujours accompagnée de son nom et de son icône.
+- **Un moment fort par écran** : une surface mandarine (`surface-marque`) ou
+  noire (`surface-encre`), pas trois.
 
 ---
 
@@ -64,27 +90,24 @@ de l'examen. Deux exigences qui tirent en sens inverse :
 - **Sérieux** : ce sont des examens nationaux. La typographie des formules, la
   propreté des corrigés et la précision des chiffres disent « on peut me croire ».
 
-Résolution : **une chrome calme, neutre et précise, et de l'énergie concentrée
-sur les moments qui la méritent** — une bonne réponse, une série tenue, un examen
-blanc réussi, la jauge qui monte, la séance du jour. La couleur porte toujours
+Résolution : **une chrome chaude et précise, et de l'énergie concentrée sur les
+moments qui la méritent** — la séance du jour, une bonne réponse, une série
+tenue, un examen blanc réussi, la jauge qui monte. La couleur porte toujours
 une information, mais ici l'information inclut *« bravo »*.
 
 Trois choses que l'élève doit ressentir en 5 secondes :
 1. **Je sais quoi faire ce soir** (la séance du jour est l'action dominante).
-2. **Je vois que je progresse** (la jauge, la série).
+2. **Je vois que je progresse** (la jauge, la série, mes matières).
 3. **C'est fait pour moi, ici** (examens guinéens nommés juste, exemples locaux,
    prix en GNF, mon examen et ma série partout).
 
 ### Ce qu'on refuse
-- Le look « plateforme e-learning générique » : photos de banque d'images
-  d'étudiants souriants devant un ordinateur, cartes à ombre portée en grille
-  sans hiérarchie. La plaquette en est pleine ; l'application ne doit pas l'être.
+- Le look « plateforme e-learning générique » : photos de banque d'images,
+  cartes en grille sans hiérarchie.
 - L'infantilisation : pas de mascotte bébé, pas de police « comic ». Un lycéen
   de Terminale SM doit se sentir respecté.
 - Les drapeaux et couleurs nationales en aplats décoratifs : le rouge et le vert
   sont réservés au **faux** et au **juste** (§ 2.3).
-- Les couleurs des opérateurs : **orange** (Orange Guinée, Orange Money) et
-  **jaune vif en aplat** (MTN) comme couleur de marque — on serait pris pour eux.
 - Toute animation qui coûte de la batterie ou des données sans rien dire.
 
 ---
@@ -93,55 +116,59 @@ Trois choses que l'élève doit ressentir en 5 secondes :
 
 ### 2.1 Neutres (basculent en mode sombre)
 
-Gris **neutres** (teinte 286 à très faible chroma) : ni gris-bleu « logiciel
-d'administration », ni beige. Valeurs posées sur `:root` / `.dark` dans
-`resources/css/app.css`.
+Crème et encre **chaudes** (OKLCH teinte 60, faible chroma). Valeurs posées sur
+`:root` / `.dark` dans `resources/css/app.css`.
 
 | Token | Clair | Sombre | Rôle |
 |---|---|---|---|
-| `craie-50` | `#FAFAFC` | `#0B0B0E` | Canvas de page |
-| `craie-100` | `#F1F1F5` | `#1D1D23` | Remplissage muet, survol, piste d'onglets |
-| `card` | `#FFFFFF` | `#141418` | Cartes |
-| `relief` | `#FFFFFF` | `#24242B` | Ce qui se détache : onglet actif, entrée de navigation active, dialogue, feuille, menu |
-| `border` | `#E4E4E8` | `#28282E` | Filets de cartes et de séparation |
-| `contour` | `#D3D3D9` | `#37373E` | Contour de bouton `outline`, d'option de QCM au repos |
-| `ink-900` | `#18181E` | `#F5F5F8` | Texte principal — 17,7:1 sur carte |
-| `ink-600` | `#5A5A64` | `#AAAAB1` | Texte secondaire — 6,8:1 / 8,0:1 |
-| `ink-500` | `#72727B` | `#919199` | Texte tertiaire : aide, méta, indication de champ — 4,8:1 / 5,9:1 |
-| `ink-400` | `#8B8B93` | `#71717A` | **Non-texte uniquement** : bordure de champ et de case (≥ 3:1), icônes décoratives |
+| `craie-50` | `#FCF7F4` | `#110E0B` | Canevas crème |
+| `craie-100` | `#F5EFEA` | `#241F1C` | Remplissage muet, survol, piste d'onglets |
+| `card` | `#FFFFFF` | `#1A1613` | Cartes |
+| `relief` | `#FFFFFF` | `#2B2521` | Ce qui se détache : onglet ou entrée active, dialogue, feuille |
+| `border` | `#ECE5DF` | `#302A26` | Filets de cartes |
+| `contour` | `#DDD4CE` | `#3F3934` | Contour de bouton `outline`, d'option de QCM au repos |
+| `ink-900` | `#1E1814` | `#F8F4F1` | Texte principal, **encre** des boutons `encre` — 17,6:1 |
+| `ink-600` | `#655C55` | `#B3ADA8` | Texte secondaire — 6,5:1 / 8,1:1 |
+| `ink-500` | `#766D66` | `#9B948E` | Texte tertiaire : aide, méta — ≥ 4,5:1 sur carte et canevas (pas sur `craie-100` : y utiliser `ink-600`) |
+| `ink-400` | `#988F87` | `#7B736C` | **Non-texte** : bordure de champ et de case (≥ 3:1), icônes décoratives |
 
-Le mode sombre n'est pas une option cosmétique : **les élèves révisent le soir**,
-souvent sur des écrans OLED où le noir économise la batterie.
+Le mode sombre n'est pas cosmétique : **les élèves révisent le soir**. Il reste
+chaud (bruns très sombres), jamais gris bleuté.
 
-### 2.2 La marque
+### 2.2 La marque — mandarine « Nimba »
+
+Le jeton s'appelle toujours `nimba` (le mont Nimba) ; sa valeur est désormais
+la mandarine, OKLCH teinte 42.
 
 | Token | Valeur | Rôle |
 |---|---|---|
-| `nimba-600` | `#702AED` | **L'accent unique** : action principale, navigation active, focus, sélection. Blanc dessus : 6,5:1 |
-| `nimba-700` | `#5D1FC8` | Liens, libellé sur teinte de l'accent, survol du bouton principal — 8,4:1 |
-| `nimba-500` | `#814FFE` | Survol du bouton principal en sombre (blanc dessus 4,7:1) |
-| `nimba-300` | `#B9AEFF` | L'accent en mode sombre (texte, focus) — 9,2:1 sur carte sombre |
-| `soleil-400` | `#FFC21A` | **L'énergie** : série de jours, points, célébration, mot mis en valeur sur surface violette (`soleil-300`). **Jamais du texte sur blanc** ; texte dessus en `soleil-900` |
+| `nimba-500` | `#F6641B` | **La mandarine vive** : surfaces, icônes, segments de progression, pastilles de série, forme du héros. **Jamais du texte de taille courante** (3,1:1 sur blanc) |
+| `nimba-600` | `#D04904` | **Remplissage des boutons** (blanc dessus 4,5:1), base de `surface-marque`, mot coloré d'un grand titre (≥ 24 px : 4,3:1 sur crème) |
+| `nimba-700` | `#A63D02` | Liens, libellés sur teinte, survol du bouton principal — 6,4:1 |
+| `nimba-400` / `nimba-300` | `#FE8959` / `#FEB295` | L'accent en sombre (texte, icônes, focus) — 7,7:1 / 10,3:1 sur carte sombre |
+| `soleil-400` | `#FFC21A` | L'énergie secondaire : étoile du jour de grâce, réussites. Texte dessus `soleil-900` |
 
-Le violet « Nimba » (du mont Nimba) est calculé en OKLCH (teinte 290) :
-**franchement violet**, à plus de 40° du rouge et du vert des verdicts (une
-action ne se confond pas avec un verdict), loin du bleu roi des logiciels de
-gestion et des couleurs des opérateurs. Le soleil est sa complémentaire :
-ensemble ils sont vivants sans être criards.
+Pourquoi pas l'orange pur des références : `#F97316` ou `#FF7900` portent du
+texte blanc à moins de 3:1 et `#FF7900` est la couleur d'Orange Guinée ; la
+mandarine vive garde l'éclat pour tout ce qui n'est pas du texte, et se fonce
+(600, 700) dès qu'il faut lire.
 
-**Surfaces d'expression** (utilitaires de `app.css`, zéro octet téléchargé) :
-- `surface-marque` : violet profond éclairé en haut à gauche — séance du jour,
-  panneau de connexion, appel final de la vitrine. Texte blanc, secondaire
-  `text-white/75`, mot en valeur `text-soleil-300`. **Une seule par écran.**
-- `halo-marque` : lumière violette et touche de soleil derrière un héros.
-- `trame-points` : trame de points estompée vers le bas, fond de héros.
+**Surfaces d'expression** (utilitaires de `app.css`, zéro octet) — **une par
+écran, deux au plus sur la vitrine** :
+- `surface-marque` : mandarine profonde éclairée en haut à droite — séance du
+  jour, panneau de connexion, appel final. Texte blanc, secondaire
+  `text-white/85`, bouton blanc à texte `nimba-700`.
+- `surface-encre` : encre chaude avec une lueur mandarine — tuteur, second
+  appel final.
+- `halo-marque` (héros), `fond-ambiance` (haut des espaces connectés),
+  `trame-points` (fonds décoratifs).
 
 ### 2.3 Les verdicts — trois couleurs, pas une de plus
 
 | Token | Texte (clair) | Rôle |
 |---|---|---|
 | `juste-600` | `#15803D` (5,0:1) · sombre `#4ADE80` (9,8:1) | Bonne réponse, notion maîtrisée, admis |
-| `faux-600` | `#C42B2B` (5,6:1) · sombre `#F87171` (6,2:1) | Mauvaise réponse, ajourné, erreur de saisie |
+| `faux-600` | `#C41942` framboise (5,9:1) · sombre `#FC7184` (6,7:1) | Mauvaise réponse, ajourné, erreur de saisie. Tiré vers le framboise (OKLCH 16) : un rouge orangé se confondrait avec la mandarine |
 | `indice-600` | `#8A5A00` (5,9:1) · remplissage `#F5A524` | Indice, « presque », à revoir, avertissement |
 
 **Règle absolue : un verdict n'est jamais porté par la couleur seule.** Toujours
@@ -192,76 +219,80 @@ l'accent est en nuance **700** (clair) / **300** (sombre), pas 600.
 
 | Usage | Police | Raison |
 |---|---|---|
-| Interface, corps, cours, titres | **Geist** variable (400 → 600) | Grotesque nette et contemporaine, très lisible petite, chiffres tabulaires propres ; un seul fichier variable pour toutes les graisses (29,4 Ko en latin) |
-| Mot mis en valeur d'un grand titre | **Instrument Serif** italique | La touche d'élégance éditoriale : un mot ou une fin de phrase dans un titre de vitrine, de connexion ou d'appel (« *et je sais où j'en suis.* »). Jamais dans un paragraphe, un bouton ou un écran de travail (22,1 Ko) |
+| Tout : interface, corps, titres, chiffres | **Plus Jakarta Sans** variable (400 → 800) | Grotesque chaleureuse et contemporaine, la famille des références (Satoshi, General Sans) en libre ; chiffres nets ; un seul fichier pour toutes les graisses (27,3 Ko en latin) |
 | Formules | **KaTeX** (polices KaTeX locales) | Rendu typographique de qualité « manuel », hors ligne |
 
-- **Toutes les polices sont auto-hébergées** (Fontsource, importées dans
-  `app.css`), découpées par `unicode-range`, `font-display: swap`. Une police
-  distante échoue hors ligne.
-- Budget : **≤ 120 Ko** de polices. Mesure v2 : français courant = **51,5 Ko**
-  (Geist 29,4 + Instrument Serif 22,1).
-- `html { font-size: 16px }`. **L'interface est à 14 px**, le corps de lecture
-  d'une leçon à **17 px** (réglable : 15 / 17 / 19), interligne 1,65. Les champs
-  de saisie passent à 16 px sous 640 px (sinon iPhone zoome au toucher).
-- **Graisses : 400 (texte), 500 (libellés, boutons, navigation), 600 (titres).
-  Jamais 700.** Les titres `h1`–`h4` sont en 600 avec `letter-spacing: -0.02em`
-  et `text-wrap: balance` (posé dans la couche `base`).
+- **Auto-hébergée** (Fontsource, importée dans `app.css`), découpée par
+  `unicode-range`, `font-display: swap`. Une police distante échoue hors ligne.
+- Budget : **≤ 120 Ko** de polices. Mesure v3 : français = **27,3 Ko**.
+- `html { font-size: 16px }`. **Interface à 14 px**, corps de lecture d'une
+  leçon à **17 px** (15 / 17 / 19), interligne 1,65. Champs à 16 px sous 640 px.
+- **Graisses** : 400 texte · 500 libellés · 600 titres de carte, boutons,
+  navigation · **700 chiffres clés et mots en `<strong>` d'un grand titre**.
+- **Approche** : Plus Jakarta est étroite. Titres `h1`–`h4` à `-0.01em` ; ne
+  jamais ajouter `tracking-tight` à un texte de moins de 20 px (les mots se
+  collent : « Majaugedepréparation », vu le 2026-10-30) ; `-0.02em` pour un
+  grand titre, `tracking-tight` pour un chiffre clé.
 - `.font-data` = `tabular-nums` pour notes, chronomètres, points, montants GNF.
+
+### Le grand titre en contraste (`titre-contraste`)
+
+La phrase en **400**, les mots qui comptent en **`<strong>` 700**, éventuellement
+un mot en mandarine `nimba-600` :
+
+```tsx
+<h1 className="titre-contraste text-vitrine">
+  Un soir, quinze minutes, <strong>et je sais <span className="text-nimba-600 dark:text-nimba-400">où j'en suis.</span></strong>
+</h1>
+<h1 className="titre-contraste text-titre-ecran-large">Bonjour, <strong>Aïssatou</strong></h1>
+```
+
+Réservé aux titres d'écran, de héros et de section (≥ 24 px). Les titres de
+carte restent en 600 uniformes.
 
 ### Échelle (px)
 
-`12` méta · `13` aide · `14` interface · `16` titre de carte · `17` lecture ·
-`22` titre d'écran mobile · `28` titre d'écran desktop · `40` chiffre héros
-(jauge, note sur 20) · `40 → 60` titre de vitrine (36-40 mobile, 52 tablette,
-60 desktop, approche `-0.035em`)
-
-Le grand titre ne se crée **que** sur la vitrine, la connexion et les appels
-finaux. Ailleurs, un écran s'ouvre sur un titre de 22/28 px précédé d'une
-ligne méta (date, matière, provenance) en 13 px `ink-500`.
+`12` méta · `13` aide · `14` interface · `15-16` titre de carte · `17` lecture ·
+`24` titre d'écran mobile · `28-32` titre d'écran desktop · `28` chiffre de
+carte · `36-44` chiffre héros (jauge) · `40 → 64` titre de vitrine
+(42 mobile, 56 tablette, 64 desktop) · `32-40` titre de section de vitrine
 
 ---
 
 ## 4. Formes, espace, profondeur
 
-- **Rayons** : contrôles **10 px**, cartes **16 px**, surfaces d'expression et
-  dialogues **20 px**, panneaux de marque **28 px**, feuilles mobiles **24 px**
-  en haut, badges en **pilule**.
+- **Rayons** : champs **12 px** (`rounded-controle`), cartes **20 px**
+  (`rounded-carte`), grands panneaux **28 px** (`rounded-panneau`), feuilles
+  24 px en haut, **boutons et badges en pilule**.
 - **Hauteurs** (une seule échelle pour boutons, champs, onglets) :
 
   | Taille | Mobile | ≥ 640 px | Usage |
   |---|---|---|---|
-  | `grande` | 48 | 48 | appel de héros (vitrine, appel final) |
+  | `grande` | 48 | 48 | appel de héros, séance du jour |
   | `normale` | **44** | **40** | défaut : formulaires, actions |
-  | `compacte` | 36 | 36 | barres d'outils, en-têtes, back-office |
-  | `petite` | 32 | 32 | actions dans une ligne de liste |
+  | `compacte` | 36 | 36 | en-têtes, barres d'outils |
+  | `petite` | 32 | 32 | actions dans une ligne |
 
-  **Cible tactile ≥ 44 px** côté élève (WCAG 2.5.5) ; options de QCM ≥ 56 px.
-  Une case à cocher de 18 px s'enveloppe dans son libellé (ligne de 44 px).
-- Icônes Lucide **16 px** dans les boutons et les champs, **18 px** dans la
-  navigation latérale, **20 px** dans la barre d'onglets.
-- Grille 4 px ; marges latérales mobiles 16-20 px ; largeur de lecture ≤ 680 px ;
-  formulaires d'accès ≤ 384 px de large.
-- **Profondeur**, du plus discret au plus fort :
-  `shadow-xs` (contrôles) → `shadow-carte` (cartes, 4 %) → `shadow-releve`
-  (carte survolée, surface d'expression) → `shadow-flottant` (dialogue, feuille,
-  toast, aperçu de téléphone). Bouton plein : `shadow-bouton` (reflet intérieur
-  en haut + ombre de contact). Pas de glassmorphism généralisé : un flou
-  d'arrière-plan seulement sur les barres collantes (en-tête, onglets).
-- **Actif = relief** : l'entrée de navigation active, l'onglet actif et
-  l'option choisie se détachent par un fond `relief` + `ring-1 ring-black/5` +
-  `shadow-xs`, l'icône prenant l'accent — pas par un aplat de couleur.
-- **Une seule action dominante par écran** (bouton plein `nimba-600`, pleine
-  largeur sur mobile, collé en bas de l'écran dans le lecteur d'exercice).
-- **Champs** : fond blanc, filet `ink-400` (≥ 3:1 : le contour désigne le
-  champ), `shadow-xs`, survol `ink-500`, focus = bordure de l'accent + anneau
-  de 4 px à 15 %, invalide = rouge. Les classes sont partagées
-  (`CHAMP_BASE` / `CHAMP_CONTENEUR` de `input.tsx`) : un nouveau champ les
-  réutilise, il ne les réécrit pas.
-- **Bouton `outline`** : filet `contour` discret — c'est le libellé qui
-  identifie un bouton ; le filet, l'ombre et le fond blanc le détachent.
-
----
+  **Cible tactile ≥ 44 px** côté élève ; options de QCM ≥ 56 px ; bouton rond
+  « reprendre » 40 px.
+- Icônes Lucide **16 px** (boutons, champs), **18 px** (navigation, tuiles de
+  ligne), **20 px** (barre d'onglets, pastilles d'atout).
+- **Tuiles d'icône** : carré arrondi teinté de la matière (`MATIERES[cle].tuile`)
+  de 32 à 48 px, ou pastille pleine mandarine (atouts du héros).
+- Grille 4 px ; marges mobiles 16 px ; contenu des espaces connectés ≤ 1152 px
+  (`max-w-6xl`), réglages ≤ 768 px, formulaires d'accès ≤ 384 px, vitrine
+  ≤ 1280 px (`max-w-7xl`).
+- **Profondeur** (ombres chaudes, teintées de brun) : `shadow-xs` (contrôles)
+  → `shadow-carte` → `shadow-releve` (survol, surface d'expression) →
+  `shadow-flottant` (dialogue, feuille, téléphone de l'aperçu). Bouton plein :
+  `shadow-bouton`, avec un halo mandarine sous le bouton.
+- **Actif = relief** : entrée de navigation active et onglet actif en `relief`
+  + anneau + ombre, icône à l'accent.
+- **Une seule action dominante par écran** (bouton plein mandarine). Sur le
+  tableau de bord, c'est « Commencer » dans la séance du jour.
+- **Champs** : fond blanc, filet `ink-400` (≥ 3:1), `shadow-xs`, focus =
+  bordure de l'accent + anneau 4 px ; classes partagées `CHAMP_BASE` /
+  `CHAMP_CONTENEUR` de `input.tsx`.
 
 ## 5. Mouvement et célébration
 
@@ -290,11 +321,35 @@ Le mouvement est **une récompense, pas une décoration**.
 
 ## 6. Les dispositifs — ce qui rend N'karamögö reconnaissable
 
+### 6.0 Le tableau de bord élève (accueil)
+
+La page d'accueil de l'élève, sur le modèle du tableau de bord « Oliver »
+(`resources/js/pages/eleve/accueil.tsx`). Desktop : colonne principale +
+colonne latérale de 320 px ; mobile : une colonne, la séance du jour en
+premier (l'action dominante tient dans 360 × 740).
+
+| Bloc | Contenu | Composant |
+|---|---|---|
+| En-tête | date (méta), « Bonjour, **Prénom** » en contraste, une phrase | `titre-contraste` |
+| Séance du jour | sur `surface-marque` : titre, matières en pastilles, durée, nombre de questions, **« Commencer »** | `SeanceDuJour` |
+| Jauge | l'arc par matière, légende colorée | `JaugePreparation` |
+| Mes matières | une carte par matière : tuile, %, notions maîtrisées, barre en tirets ; rangée qui défile sur mobile | `ProgressionSegments` |
+| Reprendre | leçons en cours : tuile, leçon, matière · chapitre, barre fine, minutes restantes, bouton rond | `ProgressionBarre` |
+| Ma série | nombre de jours, la semaine Lu → Di (fait ✓ mandarine, jour de grâce ★ soleil, aujourd'hui en pointillés, à venir vide), points d'effort | `CarteSerie` |
+| Défi de la semaine | intitulé, tirets, compte | `ProgressionSegments` |
+| Mes réussites | badges mérités avec leurs points | — |
+| Tuteur | sur `surface-encre`, champ d'appel (V1.1 : « bientôt ») | — |
+
+Jusqu'aux lots 2 et 6, les données viennent de
+`App\Support\Demonstration\TableauDeBordExemple` (`est_exemple`, bandeau
+« EXEMPLE — contenu fictif ») ; ensuite les services métier les remplacent sans
+changer la forme. Aucun rang entre élèves (classements opt-in, PLAN M9).
+
 ### 6.1 La jauge de préparation — la signature
 
-Un **arc de cercle** (pas un donut plein) en tête de l'accueil élève, qui porte
-le `<h1>`. Au centre : le pourcentage en chiffre héros (40 px, Geist 600, `font-data`), dessous :
-« prêt pour le BEPC ». Autour de l'arc, une graduation discrète.
+Un **arc de cercle** ouvert vers le bas (`JaugePreparation`). Au centre : le
+pourcentage en chiffre héros (36 px, 700, `font-data`), dessous : « prêt pour le
+BEPC ». Légende des matières dessous, à leur couleur.
 
 - L'arc est segmenté **par matière**, chaque segment à sa teinte de matière,
   sa longueur proportionnelle à son coefficient, son remplissage à sa maîtrise.
@@ -309,9 +364,10 @@ le `<h1>`. Au centre : le pourcentage en chiffre héros (40 px, Geist 600, `font
 
 ### 6.2 La séance du jour
 
-Juste sous la jauge, la **seule carte pleine couleur** de l'écran (fond
-`nimba-600`, texte blanc) : « Ta séance du jour · 15 min · 12 questions ·
-Physique et Maths ». Un bouton : **« Commencer »**. C'est l'action dominante.
+À côté de la jauge (dessus sur mobile), la **seule carte mandarine** de
+l'écran (`surface-marque`, texte blanc) : « Ta séance du jour · 15 min ·
+12 questions », les matières en pastilles. Un bouton blanc : **« Commencer »**.
+C'est l'action dominante.
 
 ### 6.3 La trace (série de jours)
 
@@ -380,8 +436,8 @@ d'écran de démo pour un vrai sujet.
 
 | Habillage | Public | Registre |
 |---|---|---|
-| **Vitrine** | visiteurs, parents, partenaires | Le plus expressif : grand titre Geist avec un mot en Instrument Serif italique, halo et trame de points, **aperçu dessiné de l'application** dans le héros (`ApercuApplication`, puis démo jouable au lot 8), sections généreuses, appel final sur `surface-marque`, illustrations vectorielles originales (pas de photos de banque d'images), compte à rebours national |
-| **Espace élève** | élèves | Barre d'onglets en bas sur mobile (Accueil · Cours · Annales · Examens blancs · Moi ; icône active dans une pilule teintée), barre latérale sur desktop (entrée active en relief, carte de l'élève en bas : initiale sur pastille soleil, jamais de photo). Lumineux, chaleureux ; la séance du jour sur `surface-marque` |
+| **Vitrine** | visiteurs, parents, partenaires | Le plus expressif (BrightPath, DevSkill) : en-tête à navigation en pilules ; **héros à trois colonnes** — grand titre en contraste, visuel (photo détourée fournie par Maurice devant une forme mandarine, sinon `ApercuApplication`), trois atouts en pastilles mandarine ; bandeau de preuves (bloc mandarine, carte blanche, citation) ; examens et matières ; « Comment ça marche » en trois étapes numérotées à l'encre ; FAQ ; double appel final (`surface-marque` élève, `surface-encre` parents et enseignants) ; pied en colonnes. Puis démo jouable et compte à rebours au lot 8 |
+| **Espace élève** | élèves | Canevas crème avec `fond-ambiance` ; barre d'onglets en bas sur mobile (Accueil · Cours · Annales · Examens blancs · Moi ; icône active dans une pilule teintée), barre latérale sur desktop (entrée active en relief, carte de l'élève en bas : initiale sur pastille soleil, jamais de photo). Accueil = tableau de bord complet (§ 6.0) |
 | **Back-office contenu** | rédacteurs, relecteurs | Dense, calme, efficace : chrome claire et achromatique, couleur réservée aux statuts (brouillon, en relecture, publié). Éditeur pleine largeur, aperçu « comme l'élève le verra » côte à côte |
 | **Console plateforme** | superadmin | Barre latérale sombre : on n'est pas « dans » une école, on est au-dessus. Signal permanent, pas un message qu'on ferme |
 
@@ -398,7 +454,14 @@ du texte) · Parcours d'accueil (4 écrans) · Connexion / inscription par tél�
 
 ## 8. Illustrations et iconographie
 
-- Icônes : **Lucide**, trait 2 px, 20 px (24 px dans la barre d'onglets).
+- Icônes : **Lucide**, trait 2 px, 16-20 px (§ 4).
+- **Photo de la vitrine** (décision de Maurice, 2026-10-30) : une photo
+  **fournie par Maurice**, d'une personne **majeure**, avec son **autorisation
+  écrite signée** de diffusion. Déposée en
+  `public/images/vitrine/heros.webp` (`config/vitrine.php`) : WebP à fond
+  transparent (personne détourée), ≈ 900 × 1100 px, ≤ 150 Ko. Tant qu'elle
+  manque, la vitrine affiche l'aperçu de l'application à la même place
+  (`App\Support\PhotoVitrine`). Aucune autre photo de personne.
 - Illustrations : **SVG originaux**, style trait + aplats, palette de la marque,
   scènes du quotidien guinéen (révision à la lumière d'une lampe, cour d'école,
   marché) — à commander à un illustrateur ou à produire en SVG simple.
@@ -447,7 +510,7 @@ jeu de contrôles ne doit survivre au kit de démarrage : ses `PrimaryButton`,
 
 | Composant | Contrat |
 |---|---|
-| `Button` | Deux axes. **`variant`** = intensité : `default` (plein `nimba` + `shadow-bouton`, l'action dominante), `doux` (teinte de l'accent : action secondaire qui reste invitante), `succes` (plein vert : l'action qui conclut, ex. « Terminer l'examen »), `destructive` (plein rouge, toujours confirmé), `outline`, `ghost`. **`ton`** (sur `outline`/`ghost`) = famille : `neutre`, `nimba`, `danger`. Filet d'un `outline` en `contour`, survol en `craie-100`, icône en `currentColor`, 16 px. **`taille`** : `grande` 48, `normale` 44 → 40 px, `compacte` 36, `petite` 32 (§ 4). Graisse 500, texte 14 px. Sur `surface-marque`, le bouton est blanc à texte `nimba-700`. Un bouton dit ce qu'il fait (« Vérifier », « Passer l'examen blanc »), jamais « Soumettre ». Icône seule ⇒ `aria-label` + `aria-hidden` sur l'icône |
+| `Button` | **En pilule.** Deux axes. **`variant`** = intensité : `default` (plein mandarine `nimba-600` + `shadow-bouton`, l'action dominante), `encre` (plein noir : action forte sans couleur, seconde action d'un héros), `doux` (teinte mandarine), `succes` (plein vert : l'action qui conclut), `destructive` (plein framboise, toujours confirmé), `outline` (blanc, filet `contour`), `ghost`. **`ton`** (sur `outline`/`ghost`) : `neutre`, `nimba`, `danger`. **`taille`** : `grande` 48, `normale` 44 → 40, `compacte` 36, `petite` 32 (§ 4). Graisse 600, 14 px, icône 16 px. Sur `surface-marque`, bouton blanc à texte `nimba-700`. Un appel de héros peut porter sa flèche dans une pastille blanche translucide. Un bouton dit ce qu'il fait, jamais « Soumettre ». Icône seule ⇒ `aria-label` + `aria-hidden` sur l'icône |
 | `Input`, `Textarea`, `Label` | Même hauteur que les boutons du même habillage (44 → 40 px ; `compacte` 36) ; classes partagées `CHAMP_BASE` / `CHAMP_CONTENEUR` (§ 4) ; libellé 14 px en 500 toujours visible (pas de libellé-placeholder), 6 px au-dessus du champ ; aide en 13 px `ink-500` ; message d'erreur 13 px rouge avec icône de 14 px, lié par `aria-describedby` |
 | `SearchInput` | La frappe met à jour le champ tout de suite ; `onRecherche` est appelé **350 ms après la dernière frappe** ; **Entrée** lance tout de suite ; **Échap** et la croix vident le champ **et relancent la recherche à vide** (sinon la liste reste filtrée sur un terme effacé) ; une valeur identique ne relance rien. Sans `onRecherche`, simple champ contrôlé. Les navigations de filtre passent en `preserveScroll` + `replace` (pas une entrée d'historique par caractère) |
 | `TelephoneInput` | Indicatif +224 fixe, 9 chiffres groupés à l'affichage (`6xx xx xx xx`), clavier numérique (`inputmode="tel"`), valeur normalisée envoyée au serveur |
@@ -458,10 +521,12 @@ jeu de contrôles ne doit survivre au kit de démarrage : ses `PrimaryButton`,
 | `Feuille` (bottom sheet) | Monte du bas sur mobile (corrigé, filtres), dialogue centré sur desktop ; poignée, fermeture par glissement et par bouton ; focus piégé |
 | `Dialog` + `ConfirmProvider` | Toute confirmation passe par `confirmer({ titre, message, action, ton })` (promesse) : **jamais** `window.confirm()` |
 | `Toaster` | Notifications brèves (Sonner) : succès et erreurs des messages flash. Jamais pour une information qu'on doit retrouver |
-| `Badge` | Statut : pilule de 20 px, texte 12 px en 500, fond en teinte d'opacité, sans contour — forme distincte d'un bouton (rayon 10 px, 40 px de haut) |
+| `Badge` | Statut : pilule de **20 px**, texte 12 px en 500, fond en teinte d'opacité, sans filet ni ombre — distinct d'un bouton (40 px, ombre, graisse 600) |
 | `Tabs`, `Pagination` | Onglets en contrôle segmenté : piste `craie-100` de 12 px de rayon, onglet actif en `relief` + `ring-1` + `shadow-xs`, 36 → 32 px. Pagination en français, construite en composant (jamais de libellés traduits par remplacement dans du HTML injecté) |
 | `ZoneDonnee` | Enveloppe une donnée chargée à part : squelette pendant le chargement, message + « Réessayer » + « Recharger la page » en cas d'échec ; jamais un indicateur qui tourne sans fin |
 | `EtatVide` | Illustration + phrase + **une action** |
+| `ProgressionSegments`, `ProgressionBarre` | Progression en tirets (20 pastilles, une par 5 %, ou une par unité d'un défi) ou en barre fine ; couleur de la matière (`MATIERES[cle].plein`) ou mandarine ; `role="progressbar"` + `aria-label` + `aria-valuenow` |
+| `JaugePreparation` | Arc par matière (§ 6.1), nom accessible complet ; partagée par le tableau de bord et l'aperçu de la vitrine |
 | `Formule` | Rendu KaTeX (MathML accessible) ; défilement horizontal propre si la formule dépasse, jamais de débordement de page |
 | `BandeauExemple` | Hachures + « EXEMPLE — contenu fictif » sur tout contenu `est_exemple` |
 
@@ -663,3 +728,48 @@ ligne comme excuse.
 parcours), axe sans violation sérieuse, aucun débordement à 360 px ;
 captures de référence régénérées dans `tests/visuel/captures/lot0/` ;
 `contrastes.test.ts` étendu aux nouveaux jetons (122 tests Vitest).
+
+### Refonte v3 — adaptation aux références de Maurice (2026-10-30)
+
+*Constat* : la v2 (violet, neutres froids, tout petit, accueil élève vide)
+n'a pas convaincu. Maurice a fourni cinq références (§ 0.1) et tranché :
+**mandarine chaude**, **ses propres photos** pour la vitrine, **titres en
+contraste léger / gras**, **tableau de bord complet en données d'exemple**.
+
+*Correction* :
+1. **Couleurs** : mandarine `nimba` (OKLCH 42 ; vive `500` `#F6641B` pour
+   les surfaces, `600` `#D04904` pour les boutons, `700` `#A63D02` pour le
+   texte), crème et encre chaudes, sombre brun ; rouge « faux » tiré vers le
+   framboise `#C41942` (le rouge orangé se confondait avec la marque) ;
+   monogramme et favicon en mandarine.
+2. **Police** : Plus Jakarta Sans variable (27,3 Ko, contre 51,5 Ko pour
+   Geist + Instrument Serif) ; utilitaire `titre-contraste`.
+3. **Formes** : boutons en pilule, variante `encre`, champs 12 px, cartes
+   20 px, panneaux 28 px, ombres chaudes.
+4. **Tableau de bord élève** (§ 6.0) servi par
+   `App\Http\Controllers\Eleve\AccueilController` depuis
+   `TableauDeBordExemple` (`est_exemple`) ; composants `JaugePreparation`,
+   `ProgressionSegments`, `ProgressionBarre`, helper `annoncerBientot`.
+5. **Vitrine** refaite sur BrightPath / DevSkill (§ 7) ; emplacement photo
+   `config('vitrine.photo_heros')`, servi par `VitrineController` /
+   `PhotoVitrine`.
+
+*Pièges rencontrés* :
+- **Mots collés** : Plus Jakarta est étroite ; `-0.02em` sur les `h1`–`h4`
+  plus `tracking-tight` sur un titre de carte donnait
+  « Majaugedepréparation ». Approche `-0.01em` par défaut, pas de
+  `tracking-tight` sous 20 px, `word-spacing` légèrement ouvert dans
+  `titre-contraste`.
+- **Rangée qui défile** (matières sur mobile) : axe
+  `scrollable-region-focusable` → `tabIndex={0}` + nom accessible.
+- **`ink-500` sur `craie-100`** : 4,4:1 (axe, légende de la citation) → `ink-600`
+  sur ce fond.
+- **En-tête de vitrine à 768 px** : navigation centrale + boutons de compte
+  débordaient d'un pixel → navigation centrale à partir de 1024 px.
+- **Mandarine vive en texte** : 2,9:1 sur crème — refusée même pour un grand
+  titre ; le mot coloré prend `nimba-600` (4,3:1, ≥ 3:1 exigé à 24 px et plus).
+
+*Preuve* : 98 tests Playwright verts (12 écrans × 4 gabarits × 2 thèmes +
+parcours), axe sans violation sérieuse, aucun débordement ; captures de
+référence régénérées ; `contrastes.test.ts` aux valeurs v3 (125 Vitest) ;
+Pest `TableauDeBordEleveTest`, `VitrineTest` (112 Pest).

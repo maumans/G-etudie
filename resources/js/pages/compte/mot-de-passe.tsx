@@ -12,7 +12,7 @@ import { update } from '@/routes/compte/mot-de-passe';
  */
 export default function MotDePasse() {
     return (
-        <div className="grid gap-6">
+        <div className="mx-auto grid w-full max-w-3xl gap-6">
             <EnteteCompte titre="Mot de passe" />
 
             <SectionCompte

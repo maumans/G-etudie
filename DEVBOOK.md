@@ -49,13 +49,17 @@
   « Mon compte » (profil, mot de passe, numéro, affichage, suppression),
   journal des accès sensibles. Écrans de connexion et de réglages du kit
   retirés, passkeys et vérification d'e-mail aussi.
-- **Refonte du design v2 faite** (point 8), à la demande de Maurice avant
-  l'étape 5 : violet `nimba` `#702AED` à la place du bleu roi, neutres sans
-  teinte bleue, Geist + Instrument Serif à la place de Sora + Lexend
-  (51,5 Ko), interface à 14 px, contrôles de 40/44 px, titres en 600,
-  surfaces d'expression, vitrine et connexion refaites. **Avant tout écran :
-  `DESIGN.md` § 0 et la compétence `design-ardoise`** ; `CLAUDE.md` § 3 bis.
-- **Tests** : 103 Pest (MySQL `g_etudie_test`), 122 Vitest, 98 Playwright
+- **Design « Ardoise » v3 fait** (point 9, après la v2 du point 8, refusée) :
+  adaptation complète aux cinq références de Maurice — mandarine chaude,
+  crème et encre, Plus Jakarta Sans (27 Ko), titres en contraste léger / gras,
+  boutons en pilule, **tableau de bord élève complet en données d'exemple**
+  (`TableauDeBordExemple`, bandeau « EXEMPLE »), vitrine refaite sur le
+  modèle BrightPath / DevSkill. **Avant tout écran : `DESIGN.md` § 0 et
+  § 0.1, la compétence `design-ardoise`, `CLAUDE.md` § 3 bis.**
+- **⚠ Photo de la vitrine attendue de Maurice** : personne majeure,
+  autorisation écrite, `public/images/vitrine/heros.webp` (format :
+  `config/vitrine.php`). D'ici là, l'aperçu de l'application en tient lieu.
+- **Tests** : 112 Pest (MySQL `g_etudie_test`), 125 Vitest, 98 Playwright
   (connexion + 12 écrans × 4 gabarits × 2 thèmes + un parcours complet
   inscription → suppression) — verts. `tsc`, `vp check`, Pint, Larastan
   (niveau 7) et `npm run build` passent.
@@ -167,7 +171,7 @@ le soir. Utilisateurs principaux : **des mineurs**.
 | CSS | Tailwind (+ `tailwind.config`) | **tailwindcss 4.3.3** (`@tailwindcss/vite`), configuration **dans `app.css`** (`@theme`, `@source`), **sans `tailwind.config`** | règle « classes seulement dans le JS/TS » maintenue ; jetons Ardoise dans `@theme` ; variante `dark:` redéfinie pour exclure un sous-arbre `.clair` (étape 1) |
 | Bundler | Vite | **Vite+ 1.4.0** (`vite` remplacé par `@voidzero-dev/vite-plus-core` 1.4.0, Rolldown 1.2.16), commandes `vp dev / build / check / test`, `vite.config.ts` | `optimizeDeps.include` à vérifier sous Vite+ ; laravel-vite-plugin 3.2.0 |
 | Primitives UI | shadcn/Radix + CVA + tailwind-merge | shadcn « new-york » (`components.json`), 13 paquets `@radix-ui/react-*`, class-variance-authority 0.7.1, tailwind-merge 3.7.0, clsx, lucide-react 0.475.0, sonner 2.0.8, input-otp 1.4.2 | dossier `resources/js/components/ui/` en **minuscules et kebab-case** (DA7) ; `@radix-ui/react-tabs` 1.2.1 ajouté (étape 1) ; `tailwind-merge` étendu aux jetons Ardoise |
-| Polices | Geist, Instrument Serif, KaTeX auto-hébergées (v2) | Instrument Sans via l'option `fonts` de laravel-vite-plugin : **téléchargée au build et servie depuis `public/build/assets`** (auto-hébergée) | ✅ v2 : `@fontsource-variable/geist` et `@fontsource/instrument-serif` 5.3.0 importés dans `app.css` (Sora et Lexend retirés, point 8) ; option `fonts` du plugin retirée (elle faisait télécharger le WOFF) — `DESIGN.md` § 13 |
+| Polices | Plus Jakarta Sans, KaTeX auto-hébergées (v3) | Instrument Sans via l'option `fonts` de laravel-vite-plugin : **téléchargée au build et servie depuis `public/build/assets`** (auto-hébergée) | ✅ v3 : `@fontsource-variable/plus-jakarta-sans` 5.3.0 importé dans `app.css` (Sora et Lexend retirés au point 8, Geist et Instrument Serif au point 9) ; option `fonts` du plugin retirée (elle faisait télécharger le WOFF) — `DESIGN.md` § 13 |
 | Formules | KaTeX | absent | ✅ `katex` 0.19.1 (types inclus), composant `Formule`, pré-optimisé dans `vite.config.ts` |
 | Hors ligne | SW maison, Dexie, UUID v7 | absent | `dexie` 4.4.7 au lot 0 ; UUID v7 écrit à la main (`lib/hors-ligne/uuid7.ts`) |
 | Graphiques / éditeur | Recharts / TipTap | absents | lots 1 (TipTap) et 6 (Recharts) |
@@ -578,6 +582,55 @@ cette question à sa façon. Elle distingue deux notions :
      verts. Totaux : 103 Pest, 122 Vitest, 98 Playwright.
    - **À l'occasion** : MySQL de Laragon était arrêté (chaque requête
      attendait la base) ; démarré pour la vérification.
+
+9. [x] **Design « Ardoise » v3 — adaptation aux références** (2026-10-30)
+   - **Constat** : la v2 (point 8) ne convenait pas à Maurice. Il a fourni
+     cinq références (tableaux de bord « Oliver » et « Eduvo », vitrines
+     « BrightPath » et « DevSkill ») et demandé une adaptation complète, sans
+     dénaturer le projet. Questions posées ensemble, réponses : mandarine
+     chaude ; ses propres photos sur la vitrine ; titres en contraste léger /
+     gras ; tableau de bord complet en données d'exemple.
+   - **Décision** :
+     - couleurs : mandarine `nimba` (`#F6641B` vive, `#D04904` boutons,
+       `#A63D02` texte), crème et encre chaudes, sombre brun ; rouge « faux »
+       en framboise `#C41942` (le rouge orangé se confondait avec la marque) ;
+       monogramme et favicon en mandarine ;
+     - police : Plus Jakarta Sans variable (27,3 Ko) ; `titre-contraste` ;
+     - formes : boutons en pilule, variante `encre`, champs 12 px, cartes
+       20 px, panneaux 28 px, ombres chaudes, `surface-encre`, `fond-ambiance` ;
+     - **tableau de bord élève** : `Eleve\AccueilController` →
+       `App\Support\Demonstration\TableauDeBordExemple` (`est_exemple`) :
+       séance du jour, jauge par matière, cartes de matière en tirets,
+       leçons à reprendre, série Lu → Di avec jour de grâce, points d'effort,
+       défi, réussites, tuteur (bientôt). Composants `JaugePreparation`,
+       `ProgressionSegments`, `ProgressionBarre`, `lib/bientot.ts` ;
+       `lib/matieres.ts` gagne `trait` et `plein` ;
+     - **vitrine** : héros à trois colonnes, bandeau de preuves, examens et
+       matières, « Comment ça marche », FAQ (réponses tirées du PLAN : D4,
+       M16), double appel final, pied en colonnes ; `VitrineController` +
+       `App\Support\PhotoVitrine` + `config/vitrine.php` pour la photo ;
+     - règles : `DESIGN.md` § 0.1 (références, ce qu'on reprend et ce qu'on
+       ne reprend pas), § 6.0, § 13 ; `CLAUDE.md` § 3 bis ; compétence
+       `design-ardoise` réécrite.
+   - **Écart au plan** : l'accueil élève montre dès le lot 0 la forme
+     complète du tableau de bord en données d'exemple (le plan la prévoyait
+     aux lots 2 et 6). Raison : décision de Maurice ; les données viennent du
+     serveur (`est_exemple`, bandeau), et les services métier les
+     remplaceront sans changer la page. Aucun rang entre élèves (classements
+     opt-in, M9), aucun chiffre de vitrine non sourcé.
+   - **Vu avec Playwright** : 12 écrans × 4 gabarits × 2 thèmes ; corrigé :
+     mots collés dans les titres (Plus Jakarta est étroite → approche
+     `-0.01em`, pas de `tracking-tight` sous 20 px) ; rangée de matières
+     défilante non atteignable au clavier (axe) → `tabIndex` + nom ;
+     `ink-500` sur `craie-100` à 4,4:1 (axe) → `ink-600` ; en-tête de
+     vitrine débordant d'un pixel à 768 px → navigation centrale à partir de
+     1024 px ; cartes de matières empilées trop longues sur mobile → rangée
+     qui défile.
+   - **Preuve** : Pest `TableauDeBordEleveTest` (props, semaine selon le jour,
+     clés de matières connues de l'interface), `VitrineTest` (photo absente,
+     présente, chemin vide ou dossier) ; `contrastes.test.ts` aux valeurs v3 ;
+     captures de référence régénérées. Totaux : 112 Pest, 125 Vitest,
+     98 Playwright ; `tsc`, `vp check`, Pint, build verts.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

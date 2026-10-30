@@ -43,15 +43,13 @@ function PanneauMarque() {
     return (
         <div
             aria-hidden
-            className="relative m-3 hidden overflow-hidden rounded-[28px] surface-marque text-white lg:flex lg:flex-col lg:justify-between lg:p-12"
+            className="relative m-3 hidden overflow-hidden rounded-panneau surface-marque text-white lg:flex lg:flex-col lg:justify-between lg:p-12"
         >
             <div className="pointer-events-none absolute inset-0 [background-image:radial-gradient(rgb(255_255_255/0.08)_1px,transparent_1px)] [mask-image:linear-gradient(to_bottom,black,transparent_75%)] [background-size:22px_22px]" />
 
-            <p className="relative max-w-md text-[2.25rem] leading-[1.1] font-semibold tracking-[-0.03em] text-balance">
-                Un soir, quinze minutes, et{' '}
-                <span className="font-accent font-normal tracking-normal text-soleil-300 italic">
-                    je sais où j'en suis.
-                </span>
+            <p className="relative max-w-md text-[2.5rem] leading-[1.05] titre-contraste text-balance">
+                Un soir, quinze minutes,{' '}
+                <strong>et je sais où j'en suis.</strong>
             </p>
 
             <div className="relative mx-auto grid w-full max-w-sm gap-3">
@@ -110,7 +108,7 @@ export function EnTeteConnexion({
 }) {
     return (
         <div className="grid gap-1.5">
-            <h1 className="text-[1.625rem] leading-tight">{titre}</h1>
+            <h1 className="text-[1.75rem] leading-tight">{titre}</h1>
             {description && <p className="text-ink-600">{description}</p>}
         </div>
     );

@@ -6,18 +6,25 @@ import { Button } from '@/components/ui/button';
 import { home, login, register } from '@/routes';
 import { accueil as accueilEleve } from '@/routes/eleve';
 
+/** Ancres des sections de l'accueil public. */
+const SECTIONS = [
+    { libelle: 'Examens', ancre: '#titre-examens' },
+    { libelle: 'Comment ça marche', ancre: '#titre-etapes' },
+    { libelle: 'Questions', ancre: '#titre-questions' },
+];
+
 /**
  * Habillage public (DESIGN.md § 7) : le plus expressif, vouvoiement.
- * Version de socle : la vitrine finale (démo jouable, compte à rebours,
- * tarifs) arrive au lot 8.
+ * Navigation en pilules au centre (Eduvo), compte à droite. La vitrine
+ * finale (démo jouable, compte à rebours, tarifs) arrive au lot 8.
  */
 export default function VitrineLayout({ children }: { children: ReactNode }) {
     const { auth } = usePage().props;
 
     return (
         <div className="flex min-h-dvh flex-col bg-background">
-            <header className="sticky top-0 z-40 border-b border-transparent bg-background/80 backdrop-blur-md supports-[backdrop-filter]:border-border/60">
-                <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
+            <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-md">
+                <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:h-20 lg:px-8">
                     <Link
                         href={home()}
                         className="rounded-controle outline-none focus-visible:outline-2 focus-visible:outline-ring"
@@ -25,6 +32,20 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
                         <Marque />
                         <span className="sr-only">Accueil</span>
                     </Link>
+                    <nav
+                        aria-label="Sections"
+                        className="hidden items-center gap-1 rounded-full border bg-card/70 p-1 shadow-xs lg:flex"
+                    >
+                        {SECTIONS.map((section) => (
+                            <a
+                                key={section.ancre}
+                                href={section.ancre}
+                                className="rounded-full px-4 py-1.5 text-interface font-medium text-ink-600 transition-colors outline-none hover:bg-craie-100 hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring"
+                            >
+                                {section.libelle}
+                            </a>
+                        ))}
+                    </nav>
                     <nav
                         aria-label="Compte"
                         className="flex items-center gap-1.5"
@@ -64,16 +85,55 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
 
             <main className="flex-1">{children}</main>
 
-            <footer className="border-t">
-                <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-6">
-                    <div className="grid gap-3">
+            <footer className="border-t bg-card">
+                <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[minmax(0,1.4fr)_repeat(2,minmax(0,1fr))] lg:px-8">
+                    <div className="grid content-start gap-3">
                         <Marque />
                         <p className="max-w-xs text-aide text-ink-600">
                             Réviser le CEE, le BEPC et le Baccalauréat unique,
                             un soir après l'autre.
                         </p>
                     </div>
-                    <p className="text-meta text-ink-500">
+                    <nav
+                        aria-label="Plateforme"
+                        className="grid content-start gap-2.5"
+                    >
+                        <p className="text-meta font-bold tracking-wider text-ink-900 uppercase">
+                            Plateforme
+                        </p>
+                        {SECTIONS.map((section) => (
+                            <a
+                                key={section.ancre}
+                                href={section.ancre}
+                                className="w-fit text-aide text-ink-600 hover:text-ink-900"
+                            >
+                                {section.libelle}
+                            </a>
+                        ))}
+                    </nav>
+                    <nav
+                        aria-label="Mon compte"
+                        className="grid content-start gap-2.5"
+                    >
+                        <p className="text-meta font-bold tracking-wider text-ink-900 uppercase">
+                            Compte
+                        </p>
+                        <Link
+                            href={register()}
+                            className="w-fit text-aide text-ink-600 hover:text-ink-900"
+                        >
+                            Créer un compte
+                        </Link>
+                        <Link
+                            href={login()}
+                            className="w-fit text-aide text-ink-600 hover:text-ink-900"
+                        >
+                            Se connecter
+                        </Link>
+                    </nav>
+                </div>
+                <div className="border-t">
+                    <p className="mx-auto max-w-7xl px-4 py-5 text-meta text-ink-500 sm:px-6 lg:px-8">
                         VISION FUTURE – ENTREPRISES Sarlu · Kountya (Coyah),
                         Guinée
                     </p>

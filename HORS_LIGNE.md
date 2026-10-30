@@ -735,6 +735,11 @@ hors ligne ; les packs viennent ensuite.
    Serif italique (`DESIGN.md` § 3). Même mécanisme : fichiers dans le
    manifeste du build, WOFF à écarter du précache — Instrument Serif en
    livre aussi. Poids à précacher pour le français : 51,5 Ko.
+5. **2026-10-30 — Polices de la v3.** Geist et Instrument Serif sont
+   remplacées par Plus Jakarta Sans variable (une seule police) : 27,3 Ko à
+   précacher pour le français. La photo de la vitrine
+   (`public/images/vitrine/heros.webp`) n'est pas à précacher : la vitrine
+   n'est pas un écran hors ligne.
 
 ## B.6 Points de vigilance
 

@@ -36,8 +36,8 @@
   3. Parcourir la page en thème clair, puis passer le téléphone en thème
      sombre et la recharger.
   4. Dehors ou près d'une fenêtre, luminosité au maximum puis au minimum.
-- Quoi observer : Geist partout, et l'italique Instrument Serif sur les mots
-  mis en valeur des grands titres (pas une police système) ; rien ne dépasse à droite ; verdicts lisibles (icône + mot) ;
+- Quoi observer : Plus Jakarta Sans partout (pas une police système), mots
+  bien espacés dans les titres ; rien ne dépasse à droite ; verdicts lisibles (icône + mot) ;
   les formules s'affichent (pas de LaTeX brut) ; le défilement reste fluide.
 - En cas d'échec, relever : capture d'écran, modèle du téléphone, version
   d'Android et de Chrome, section concernée du catalogue.
@@ -60,6 +60,21 @@
 - En cas d'échec, relever : vidéo ou capture, modèle et version du système,
   geste exact.
 - État : à faire
+
+### [Lot 0] Photo du héros de la vitrine
+- Pourquoi : la vitrine attend la photo fournie par Maurice (DESIGN.md § 8) ;
+  d'ici là, l'aperçu de l'application en tient lieu.
+- Matériel : la photo d'une personne **majeure**, avec son **autorisation
+  écrite signée** de diffusion (à archiver hors du dépôt).
+- Comment le provoquer : détourer la personne (fond transparent), exporter en
+  WebP ≈ 900 × 1100 px, ≤ 150 Ko, la déposer en
+  `public/images/vitrine/heros.webp`, recharger `/`.
+- Quoi observer : la photo remplace le téléphone, devant la forme mandarine,
+  nette, sans fond blanc autour ; à 360 px, elle reste sous le titre et le
+  bouton « Commencer gratuitement » reste visible sans défiler ; le poids
+  transféré de la page n'augmente que du poids de la photo.
+- En cas d'échec, relever : capture aux trois largeurs, poids du fichier.
+- État : en attente de la photo
 
 ## 2. Installation de l'application (Android, iPhone)
 
