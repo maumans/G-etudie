@@ -4,19 +4,17 @@ import babel from '@rolldown/plugin-babel';
 import tailwindcss from '@tailwindcss/vite';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import laravel from 'laravel-vite-plugin';
-import { bunny } from 'laravel-vite-plugin/fonts';
 import { defineConfig, lazyPlugins } from 'vite-plus';
 
+// Polices : importées depuis Fontsource dans app.css, pas par l'option `fonts`
+// du plugin, qui déclare chaque graisse deux fois (WOFF2 puis WOFF) : la
+// dernière déclaration l'emporte et le navigateur télécharge le WOFF, plus
+// lourd (DESIGN.md § 13).
 export default defineConfig({
     plugins: lazyPlugins(() => [
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.tsx'],
             refresh: true,
-            fonts: [
-                bunny('Instrument Sans', {
-                    weights: [400, 500, 600],
-                }),
-            ],
         }),
         inertia(),
         react(),
@@ -28,6 +26,16 @@ export default defineConfig({
             formVariants: true,
         }),
     ]),
+    // Dépendances importées seulement par des pages chargées à la demande :
+    // les pré-optimiser évite que Vite les découvre en pleine navigation et
+    // recharge l'onglet (CLAUDE.md § 4).
+    optimizeDeps: {
+        include: ['katex'],
+    },
+    test: {
+        environment: 'happy-dom',
+        include: ['tests/js/**/*.test.{ts,tsx}'],
+    },
     server: {
         watch: {
             ignored: [
@@ -64,6 +72,12 @@ export default defineConfig({
         singleAttributePerLine: false,
         htmlWhitespaceSensitivity: 'css',
         ignorePatterns: [
+            // Documents du projet et réglages des agents : rédigés à la main,
+            // jamais reformatés (tableaux, retours à la ligne voulus).
+            '*.md',
+            '.claude/**',
+            '.mcp.json',
+            'boost.json',
             '.github/**',
             'composer.json',
             'resources/js/components/ui/*',

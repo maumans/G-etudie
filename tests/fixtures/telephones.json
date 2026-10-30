@@ -1,0 +1,15 @@
+[
+    { "saisie": "622123456", "normalise": "+224622123456" },
+    { "saisie": "622 12 34 56", "normalise": "+224622123456" },
+    { "saisie": "+224 622 12 34 56", "normalise": "+224622123456" },
+    { "saisie": "+224622123456", "normalise": "+224622123456" },
+    { "saisie": "00224 655-12-34-56", "normalise": "+224655123456" },
+    { "saisie": "224 664 00 11 22", "normalise": "+224664001122" },
+    { "saisie": "6.22.12.34.56", "normalise": "+224622123456" },
+    { "saisie": "62212345", "normalise": null },
+    { "saisie": "6221234567", "normalise": null },
+    { "saisie": "322123456", "normalise": null },
+    { "saisie": "+33 6 12 34 56 78", "normalise": null },
+    { "saisie": "", "normalise": null },
+    { "saisie": "téléphone", "normalise": null }
+]

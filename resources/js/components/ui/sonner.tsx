@@ -2,6 +2,10 @@ import { useFlashToast } from '@/hooks/use-flash-toast';
 import { useAppearance } from '@/hooks/use-appearance';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
 
+/**
+ * Notifications brèves (succès et erreurs des messages flash). Jamais pour
+ * une information qu'on doit retrouver : elle disparaît.
+ */
 function Toaster({ ...props }: ToasterProps) {
     const { appearance } = useAppearance();
 
@@ -11,7 +15,14 @@ function Toaster({ ...props }: ToasterProps) {
         <Sonner
             theme={appearance}
             className="toaster group"
-            position="bottom-right"
+            position="bottom-center"
+            containerAriaLabel="Notifications"
+            toastOptions={{
+                classNames: {
+                    toast: 'font-sans text-interface rounded-controle! shadow-flottant!',
+                    description: 'text-ink-600!',
+                },
+            }}
             style={
                 {
                     '--normal-bg': 'var(--popover)',

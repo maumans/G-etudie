@@ -1,46 +1,246 @@
+/*
+ * Design system « Ardoise » — DESIGN.md.
+ *
+ * - Les palettes fixes (marque, verdicts, matières) vivent dans @theme.
+ * - Les neutres basculent en sombre : ils sont posés en variables sur :root et
+ *   .dark, puis exposés à Tailwind par @theme inline. Un sous-arbre portant la
+ *   classe .dark passe donc en sombre à lui seul (page /dev/composants).
+ * - Les variables shadcn (--primary, --muted…) pointent sur ces jetons : les
+ *   primitives du kit suivent Ardoise sans second jeu de couleurs.
+ * - Contrastes vérifiés par tests/js/contrastes.test.ts, qui relit ce fichier.
+ */
+
 @import 'tailwindcss';
 
 @import 'tw-animate-css';
 
-@source '../views';
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+/* Polices auto-hébergées (Fontsource) : WOFF2 d'abord, latin et latin étendu
+   découpés par unicode-range — seul le sous-ensemble utilisé est téléchargé. */
+@import '@fontsource/sora/600.css';
+@import '@fontsource/sora/700.css';
+@import '@fontsource/lexend/400.css';
+@import '@fontsource/lexend/500.css';
+@import '@fontsource/lexend/600.css';
 
-@custom-variant dark (&:is(.dark *));
+@source '../views';
+
+/* Sombre sous .dark, sauf sous un .clair imbriqué (catalogue côte à côte). */
+@custom-variant dark (&:where(.dark, .dark *):not(:where(.clair, .clair *)));
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
-        'Noto Color Emoji';
+        'Lexend', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-titre: 'Sora', 'Lexend', ui-sans-serif, system-ui, sans-serif;
 
+    /* Échelle typographique (DESIGN.md § 3) */
+    --text-meta: 0.75rem;
+    --text-meta--line-height: 1.4;
+    --text-aide: 0.8125rem;
+    --text-aide--line-height: 1.45;
+    --text-interface: 0.9375rem;
+    --text-interface--line-height: 1.5;
+    --text-titre-carte: 1.25rem;
+    --text-titre-carte--line-height: 1.35;
+    --text-titre-ecran: 1.5rem;
+    --text-titre-ecran--line-height: 1.25;
+    --text-titre-ecran-large: 2rem;
+    --text-titre-ecran-large--line-height: 1.2;
+    --text-heros: 2.75rem;
+    --text-heros--line-height: 1.05;
+    --text-vitrine: 3.5rem;
+    --text-vitrine--line-height: 1.05;
+
+    /* Formes (DESIGN.md § 4) */
+    --radius-controle: 12px;
+    --radius-carte: 16px;
+    --radius-feuille: 24px;
+    --radius-badge: 6px;
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
 
+    --shadow-carte: 0 1px 2px rgb(20 26 46 / 0.06);
+    --shadow-flottant: 0 12px 32px -8px rgb(20 26 46 / 0.28);
+
+    /* La marque (DESIGN.md § 2.2) — 300, 600 et 700 imposées, les autres calculées */
+    --color-nimba-50: #f1f5ff;
+    --color-nimba-100: #dfe8fe;
+    --color-nimba-200: #c3d4fe;
+    --color-nimba-300: #8b9aff;
+    --color-nimba-400: #7089fe;
+    --color-nimba-500: #5579fd;
+    --color-nimba-600: #2537c9;
+    --color-nimba-700: #1f2da6;
+    --color-nimba-800: #253a94;
+    --color-nimba-900: #1a2a6f;
+
+    --color-soleil-50: #fff8e5;
+    --color-soleil-100: #fff0c7;
+    --color-soleil-200: #ffe399;
+    --color-soleil-300: #ffd666;
+    --color-soleil-400: #ffc21a;
+    --color-soleil-500: #e3a80d;
+    --color-soleil-600: #886602;
+    --color-soleil-700: #705303;
+    --color-soleil-800: #584101;
+    --color-soleil-900: #423002;
+
+    /* Les verdicts (DESIGN.md § 2.3) : 600 = texte clair et remplissage,
+       400 = texte en sombre. Jamais la couleur seule : icône + mot + couleur. */
+    --color-juste-400: #4ade80;
+    --color-juste-600: #15803d;
+    --color-juste-700: #116b33;
+    --color-faux-400: #f87171;
+    --color-faux-600: #c42b2b;
+    --color-faux-700: #a32323;
+    --color-indice-400: #f5a524;
+    --color-indice-600: #8a5a00;
+    --color-indice-700: #6f4800;
+
+    /* Matières (DESIGN.md § 2.4) — nuances calculées en OKLCH :
+       600 ≥ 4,5:1 sur blanc, 300 ≥ 4,5:1 sur la carte sombre. */
+    --color-maths-50: #f2f5ff;
+    --color-maths-100: #e1e7fe;
+    --color-maths-200: #c6d2ff;
+    --color-maths-300: #a4b6ff;
+    --color-maths-400: #8399fe;
+    --color-maths-500: #667aeb;
+    --color-maths-600: #4e5ecc;
+    --color-maths-700: #3e4cac;
+    --color-maths-800: #303b88;
+    --color-maths-900: #232c66;
+
+    --color-physique-50: #e9f8ff;
+    --color-physique-100: #caefff;
+    --color-physique-200: #a2dff9;
+    --color-physique-300: #6ac8ee;
+    --color-physique-400: #32b0dd;
+    --color-physique-500: #0893bd;
+    --color-physique-600: #007799;
+    --color-physique-700: #05617d;
+    --color-physique-800: #044c63;
+    --color-physique-900: #03394a;
+
+    --color-chimie-50: #f7f3fe;
+    --color-chimie-100: #eee1ff;
+    --color-chimie-200: #e0c8ff;
+    --color-chimie-300: #cea4fe;
+    --color-chimie-400: #b984f1;
+    --color-chimie-500: #9f66d7;
+    --color-chimie-600: #834bb9;
+    --color-chimie-700: #6d3b9b;
+    --color-chimie-800: #552e7a;
+    --color-chimie-900: #3f215b;
+
+    --color-biologie-50: #e4fbf7;
+    --color-biologie-100: #caf2ec;
+    --color-biologie-200: #a3e3da;
+    --color-biologie-300: #6acfc3;
+    --color-biologie-400: #2fb8ac;
+    --color-biologie-500: #069b90;
+    --color-biologie-600: #057d73;
+    --color-biologie-700: #03665e;
+    --color-biologie-800: #01514a;
+    --color-biologie-900: #003c37;
+
+    --color-francais-50: #fff1f8;
+    --color-francais-100: #ffddee;
+    --color-francais-200: #ffbee0;
+    --color-francais-300: #f995cd;
+    --color-francais-400: #e773b6;
+    --color-francais-500: #cb549b;
+    --color-francais-600: #ac3780;
+    --color-francais-700: #902969;
+    --color-francais-800: #722053;
+    --color-francais-900: #55173d;
+
+    --color-anglais-50: #eff6ff;
+    --color-anglais-100: #d9eafe;
+    --color-anglais-200: #b6d8ff;
+    --color-anglais-300: #87bffe;
+    --color-anglais-400: #60a5f2;
+    --color-anglais-500: #3f89d7;
+    --color-anglais-600: #216db9;
+    --color-anglais-700: #14599b;
+    --color-anglais-800: #10467b;
+    --color-anglais-900: #0b345c;
+
+    --color-histoire-50: #fef3e7;
+    --color-histoire-100: #ffe3c4;
+    --color-histoire-200: #f8cb99;
+    --color-histoire-300: #ecac60;
+    --color-histoire-400: #da8f27;
+    --color-histoire-500: #b97505;
+    --color-histoire-600: #965e04;
+    --color-histoire-700: #7b4c03;
+    --color-histoire-800: #623b01;
+    --color-histoire-900: #492b00;
+
+    --color-philosophie-50: #fef0fe;
+    --color-philosophie-100: #faddfc;
+    --color-philosophie-200: #f0c2f3;
+    --color-philosophie-300: #e1a0e6;
+    --color-philosophie-400: #cd81d3;
+    --color-philosophie-500: #b163b8;
+    --color-philosophie-600: #95489c;
+    --color-philosophie-700: #7b3882;
+    --color-philosophie-800: #612c66;
+    --color-philosophie-900: #48204c;
+
+    --color-economie-50: #f1f5fc;
+    --color-economie-100: #e2e8f4;
+    --color-economie-200: #cbd5e7;
+    --color-economie-300: #adbbd5;
+    --color-economie-400: #92a2c0;
+    --color-economie-500: #7687a5;
+    --color-economie-600: #5c6c89;
+    --color-economie-700: #4a5872;
+    --color-economie-800: #3a4559;
+    --color-economie-900: #2a3342;
+
+    --color-culture-50: #fdf5df;
+    --color-culture-100: #f6e7c1;
+    --color-culture-200: #ebd295;
+    --color-culture-300: #dab658;
+    --color-culture-400: #c69b0e;
+    --color-culture-500: #a58103;
+    --color-culture-600: #866701;
+    --color-culture-700: #6d5402;
+    --color-culture-800: #564202;
+    --color-culture-900: #403002;
+}
+
+@theme inline {
+    /* Neutres Ardoise (basculent en sombre) */
+    --color-craie-50: var(--craie-50);
+    --color-craie-100: var(--craie-100);
+    --color-ink-900: var(--ink-900);
+    --color-ink-600: var(--ink-600);
+    --color-ink-400: var(--ink-400);
+    --color-lien: var(--lien);
+
+    /* Corps de lecture réglable (15 / 17 / 19 px, lot 2) */
+    --text-lecture: var(--taille-lecture);
+    --text-lecture--line-height: 1.6;
+
+    /* Variables shadcn, rebranchées sur Ardoise */
     --color-background: var(--background);
     --color-foreground: var(--foreground);
-
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);
-
     --color-popover: var(--popover);
     --color-popover-foreground: var(--popover-foreground);
-
     --color-primary: var(--primary);
     --color-primary-foreground: var(--primary-foreground);
-
     --color-secondary: var(--secondary);
     --color-secondary-foreground: var(--secondary-foreground);
-
     --color-muted: var(--muted);
     --color-muted-foreground: var(--muted-foreground);
-
     --color-accent: var(--accent);
     --color-accent-foreground: var(--accent-foreground);
-
     --color-destructive: var(--destructive);
     --color-destructive-foreground: var(--destructive-foreground);
-
     --color-border: var(--border);
     --color-input: var(--input);
     --color-ring: var(--ring);
@@ -61,75 +261,105 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
-:root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.87 0 0);
-    --chart-1: oklch(0.646 0.222 41.116);
-    --chart-2: oklch(0.6 0.118 184.704);
-    --chart-3: oklch(0.398 0.07 227.392);
-    --chart-4: oklch(0.828 0.189 84.429);
-    --chart-5: oklch(0.769 0.188 70.08);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+/* Neutres — thème clair (DESIGN.md § 2.1). .clair force le clair dans un
+   sous-arbre sombre. */
+:root,
+.clair {
+    color-scheme: light;
+
+    --craie-50: #f6f7fb;
+    --craie-100: #eceef5;
+    --card: #ffffff;
+    --border: #e1e4ee;
+    --ink-900: #141a2e;
+    --ink-600: #4f5873;
+    --ink-400: #8a92a8;
+    --lien: #2537c9;
+
+    --primary: #2537c9;
+    --primary-foreground: #ffffff;
+    --destructive: #c42b2b;
+    --destructive-foreground: #ffffff;
+    --ring: #2537c9;
+
+    --chart-1: #2537c9;
+    --chart-2: #ffc21a;
+    --chart-3: #0893bd;
+    --chart-4: #9f66d7;
+    --chart-5: #b97505;
+
+    --sidebar-primary: #2537c9;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-ring: #2537c9;
 }
 
+/* Neutres — thème sombre : les élèves révisent le soir. Doit suivre :root. */
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.145 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.145 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.985 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.396 0.141 25.723);
-    --destructive-foreground: oklch(0.637 0.237 25.331);
-    --border: oklch(0.269 0 0);
-    --input: oklch(0.269 0 0);
-    --ring: oklch(0.439 0 0);
-    --chart-1: oklch(0.488 0.243 264.376);
-    --chart-2: oklch(0.696 0.17 162.48);
-    --chart-3: oklch(0.769 0.188 70.08);
-    --chart-4: oklch(0.627 0.265 303.9);
-    --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    color-scheme: dark;
+
+    --craie-50: #0e1220;
+    --craie-100: #1a2034;
+    --card: #161b2e;
+    --border: #262d45;
+    --ink-900: #eef1f8;
+    --ink-600: #a9b1c7;
+    --ink-400: #6b7493;
+    --lien: #8b9aff;
+
+    --destructive: #f87171;
+    --ring: #8b9aff;
+
+    --chart-1: #8b9aff;
+    --chart-3: #6ac8ee;
+    --chart-4: #cea4fe;
+    --chart-5: #ecac60;
+
+    --sidebar-primary: #8b9aff;
+    --sidebar-primary-foreground: #0e1220;
+    --sidebar-ring: #8b9aff;
+}
+
+/* Variables dérivées : redéclarées sur chaque racine de thème. Une variable
+   qui en référence une autre est calculée là où elle est déclarée ; posée
+   seulement sur :root, elle garderait la valeur claire dans un .dark imbriqué. */
+:root,
+.dark,
+.clair {
+    --taille-lecture: 1.0625rem;
+    --radius: 0.75rem;
+
+    --background: var(--craie-50);
+    --foreground: var(--ink-900);
+    --card-foreground: var(--ink-900);
+    --popover: var(--card);
+    --popover-foreground: var(--ink-900);
+    --secondary: var(--craie-100);
+    --secondary-foreground: var(--ink-900);
+    --muted: var(--craie-100);
+    --muted-foreground: var(--ink-600);
+    --accent: var(--craie-100);
+    --accent-foreground: var(--ink-900);
+    --input: var(--ink-400);
+
+    --sidebar: var(--card);
+    --sidebar-foreground: var(--ink-900);
+    --sidebar-accent: var(--craie-100);
+    --sidebar-accent-foreground: var(--ink-900);
+    --sidebar-border: var(--border);
+}
+
+/* Chiffres alignés : notes, chronomètres, points, montants GNF */
+@utility font-data {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Bandeau « EXEMPLE — contenu fictif » (DESIGN.md § 6.7) */
+@utility hachures-exemple {
+    background-image: repeating-linear-gradient(
+        -45deg,
+        rgb(255 194 26 / 0.35) 0 10px,
+        transparent 10px 20px
+    );
 }
 
 @layer base {
@@ -138,6 +368,31 @@
     }
 
     body {
-        @apply bg-background text-foreground;
+        @apply bg-background text-interface text-foreground;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    h1,
+    h2,
+    h3,
+    h4 {
+        font-family: var(--font-titre);
+    }
+
+    /* Focus toujours visible au clavier (DESIGN.md § 10) */
+    :focus-visible {
+        outline: 2px solid var(--ring);
+        outline-offset: 2px;
+    }
+}
+
+/* Mouvement réduit : changements d'état instantanés (DESIGN.md § 5) */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
     }
 }

@@ -19,48 +19,43 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (après l'audit)
+### État au 2026-10-30 (lot 0, étapes 0 et 1 faites)
 
-- **Rien n'est codé pour N'karamögö.** Le projet est le **kit de démarrage
-  officiel Laravel + React** (`laravel/react-starter-kit`) tel que généré :
-  Laravel 13, Inertia 3, React 19 en **TypeScript**, Tailwind 4, **Vite+**,
-  Fortify (connexion par e-mail, 2FA, passkeys), **Pest**. Versions exactes en
-  section 2.
-- **Audit fait** : écarts avec `PLAN_NKARAMOGO.md` § 8 et `CLAUDE.md` relevés,
-  propositions faites, décisions d'audit DA1–DA9 ouvertes (en attente de Maurice).
-- **⚠ La base de développement n'existe pas** : `.env` pointe sur MySQL
-  `g_etudie`, inconnue du serveur MySQL local. Comme les sessions sont en base,
-  **toute page répond 500** (`SQLSTATE[HY000] [1049] Unknown database 'g_etudie'`).
-  Correction : créer la base (`utf8mb4_unicode_ci`) puis `php artisan migrate`.
-- **Playwright MCP opérationnel** (vérifié le 2026-10-30) : page d'accueil
-  ouverte et capturée en 360 × 740 — d'abord l'erreur 500 ci-dessus, puis la
-  page d'accueil du kit (serveur lancé avec `SESSION_DRIVER=file` et
-  `CACHE_STORE=file` en variables d'environnement, sans toucher à `.env`) : pas
-  de débordement horizontal, aucune erreur console. Le serveur MCP n'écrit ses
-  captures que dans le projet (`.playwright-mcp/`, à ignorer dans git).
-  Navigateurs `@playwright/test` installés (chromium-1248).
-- **Pas de dépôt git.** Et le `.gitignore` du kit **exclut `CLAUDE.md`,
-  `AGENTS.md`, `.mcp.json`, `.claude/` et `boost.json`** : à corriger avant le
-  premier commit (DA6).
-- **Tests** : les 40 tests Pest du kit passent (138 assertions), sur SQLite en
-  mémoire (base dédiée, jamais celle de développement). Aucun test N'karamögö.
-  Pas encore de script `test:js` (Vitest 5.0.5 est fourni par Vite+).
-- **Décisions** : D1–D12 et HL-D1–HL-D12 **proposées, non tranchées** ; plan
-  détaillé du lot 0 proposé à Maurice, en attente de son accord.
+- **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
+  lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
+  distant (DA6).
+- **Décisions** : D1–D12, HL-D1–HL-D12 et DA1–DA9 **tranchées** (point 2).
+  Attendus de Maurice : liste des matières phares (D1, avant le lot 1),
+  domaine et hébergement (D11, avant la clôture du lot 0), logo vectoriel.
+- **Étape 0 faite** (point 3) : bases MySQL `g_etudie` et `g_etudie_test`,
+  application en français, tests sur MySQL avec garde « base `_test` »,
+  CI, MCP Playwright figé.
+- **Étape 1 faite** (point 4) : design system Ardoise dans `app.css`, polices
+  Sora et Lexend auto-hébergées, 20 primitives dans `components/ui/`, page
+  `/dev/composants` (404 en production), format `100 000 GNF` en TS et en PHP.
+  Vue avec Playwright : 4 gabarits × 2 thèmes, axe sans violation sérieuse,
+  aucun débordement ; captures de référence dans `tests/visuel/captures/lot0/`.
+- **Tests** : 56 Pest (162 assertions, MySQL `g_etudie_test`), 92 Vitest, 8 Playwright — verts.
+  `tsc`, `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
+- **Pas encore fait dans le lot 0** : garde-fous Inertia (barre de
+  progression, `version()`, `resolve`), habillages, connexion par téléphone et
+  « Mon compte », rôles et permissions, socle hors ligne. Les écrans du kit
+  (connexion par e-mail, tableau de bord, réglages) sont encore en place.
+- **Lancer l'application** : `.claude/launch.json` déclare `laravel`
+  (`php artisan serve`, port 8000) et `vite` (`npm run dev`, port 5173).
+  Les captures de référence se prennent sur le build : arrêter `npm run dev`
+  et vérifier l'absence de `public/hot` avant `npm run test:visuel`.
 
 ### Prochaines étapes, par ordre de priorité
 
-0. **Trancher les décisions** qui bloquent les lots 0 et 1 : D2, D3 (et ses
-   sous-questions), D8, HL-D1, HL-D8, HL-D9, HL-D10, HL-D12, DA1–DA9 ; pour le
-   lot 1 : D1 (liste des matières phares). D11 avant de clore le lot 0 (HTTPS).
-1. **Prérequis du lot 0** : `git init` + `.gitignore` corrigé + commit de l'état
-   du kit ; création de la base `g_etudie` (et `g_etudie_test` si DA3) ;
-   `APP_LOCALE=fr`.
-2. **Lot 0 — Socle**, dans cet ordre, un commit et un point de contrôle par
-   étape : design system Ardoise et page `/dev/composants` (4 gabarits × 2
-   thèmes) → garde-fous Inertia → quatre habillages → authentification par
-   téléphone et « Mon compte » → rôles, permissions, `AccesParRoleTest` → socle
-   hors ligne HL0.
+1. **Lot 0, étape 2 — garde-fous Inertia** (`CLAUDE.md` § 4) : barre de
+   progression maison, `HandleInertiaRequests::version()` à `null` sous
+   `public/hot`, `resolve` maison (échec d'import, `HORS_LIGNE.md` A.3.3),
+   `useDonneeOptionnelle` + `ZoneDonnee`, `prefetch`, pages d'erreur en
+   français, fichiers `lang/fr`.
+2. **Étapes 3 à 6** : quatre habillages → connexion par téléphone et « Mon
+   compte » → rôles, permissions, `AccesParRoleTest` → socle hors ligne HL0.
+   Puis clôture (étape 7).
 3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
@@ -126,8 +121,8 @@ le soir. Utilisateurs principaux : **des mineurs**.
 | Permissions | `spatie/laravel-permission` | **absent** | à ajouter : **^8.3** (8.3.2 accepte `illuminate/* ^12\|^13`, PHP ^8.3) |
 | Files d'attente | réelles (Redis ou base) | `QUEUE_CONNECTION=database` | conforme ; tests en `sync` (phpunit.xml) |
 | Cache / sessions | — | `database` / `database` (120 min) | durée de session : HL-D10 |
-| Base de données | MySQL | MySQL `g_etudie` (`.env`) | base à créer |
-| Langue / fuseau | français | `APP_LOCALE=en`, `faker en_US`, fuseau `UTC` | passer en `fr` / `fr_FR` ; UTC conservé en base (Conakry = UTC+0, sans heure d'été) |
+| Base de données | MySQL | MySQL `g_etudie` (`.env`) | ✅ créée (`utf8mb4_unicode_ci`) et migrée, étape 0 |
+| Langue / fuseau | français | `APP_LOCALE=en`, `faker en_US`, fuseau `UTC` | ✅ `fr` / `fr_FR` (étape 0) ; UTC conservé en base (Conakry = UTC+0, sans heure d'été) |
 | Outillage dev | — | laravel/boost 2.10.4 (MCP + skills), laravel/mcp 1.1.2, laravel/pail 1.2.7, laravel/pao 1.1.5, laravel/chisel 0.1.1, laravel/sail 1.69.0, laravel/tinker 3.0.2, laravel/pint, larastan/larastan 3.13.2 (niveau 7) | — |
 
 ### Interface
@@ -137,11 +132,11 @@ le soir. Utilisateurs principaux : **des mineurs**.
 | React | React | **react / react-dom 19.3.1**, React Compiler (`babel-plugin-react-compiler` 1.0.0) | — |
 | Inertia (client) | Inertia | **@inertiajs/react 3.9.1**, @inertiajs/vite 3.9.1 | le plugin Vite résout les pages lui-même : un `resolve` maison sera nécessaire pour rattraper l'échec d'import (`HORS_LIGNE.md` A.3.3) |
 | Langage | `.js` / `.jsx` (textes de `CLAUDE.md`, `HORS_LIGNE.md`) | **TypeScript 5.9.3** (`.ts` / `.tsx`, `tsc --noEmit` en CI) | DA1 : conserver TypeScript |
-| CSS | Tailwind (+ `tailwind.config`) | **tailwindcss 4.3.3** (`@tailwindcss/vite`), configuration **dans `app.css`** (`@theme`, `@source`), **sans `tailwind.config`** | règle « classes seulement dans le JS/TS » maintenue ; sombre par `@custom-variant dark (&:is(.dark *))` |
+| CSS | Tailwind (+ `tailwind.config`) | **tailwindcss 4.3.3** (`@tailwindcss/vite`), configuration **dans `app.css`** (`@theme`, `@source`), **sans `tailwind.config`** | règle « classes seulement dans le JS/TS » maintenue ; jetons Ardoise dans `@theme` ; variante `dark:` redéfinie pour exclure un sous-arbre `.clair` (étape 1) |
 | Bundler | Vite | **Vite+ 1.4.0** (`vite` remplacé par `@voidzero-dev/vite-plus-core` 1.4.0, Rolldown 1.2.16), commandes `vp dev / build / check / test`, `vite.config.ts` | `optimizeDeps.include` à vérifier sous Vite+ ; laravel-vite-plugin 3.2.0 |
-| Primitives UI | shadcn/Radix + CVA + tailwind-merge | shadcn « new-york » (`components.json`), 13 paquets `@radix-ui/react-*`, class-variance-authority 0.7.1, tailwind-merge 3.7.0, clsx, lucide-react 0.475.0, sonner 2.0.8, input-otp 1.4.2 | dossier `resources/js/components/ui/` en **minuscules et kebab-case** (DESIGN.md dit `Components/ui/`) ; `@radix-ui/react-tabs` absent |
-| Polices | Sora, Lexend, KaTeX auto-hébergées | Instrument Sans via l'option `fonts` de laravel-vite-plugin : **téléchargée au build et servie depuis `public/build/assets`** (auto-hébergée) | remplacer par Sora + Lexend (fournisseur `fontsource`, sous-ensembles latin + latin-ext, WOFF2) |
-| Formules | KaTeX | absent | `katex` 0.19.1 (types inclus) au lot 0 pour le composant `Formule` |
+| Primitives UI | shadcn/Radix + CVA + tailwind-merge | shadcn « new-york » (`components.json`), 13 paquets `@radix-ui/react-*`, class-variance-authority 0.7.1, tailwind-merge 3.7.0, clsx, lucide-react 0.475.0, sonner 2.0.8, input-otp 1.4.2 | dossier `resources/js/components/ui/` en **minuscules et kebab-case** (DA7) ; `@radix-ui/react-tabs` 1.2.1 ajouté (étape 1) ; `tailwind-merge` étendu aux jetons Ardoise |
+| Polices | Sora, Lexend, KaTeX auto-hébergées | Instrument Sans via l'option `fonts` de laravel-vite-plugin : **téléchargée au build et servie depuis `public/build/assets`** (auto-hébergée) | ✅ Sora et Lexend par `@fontsource/sora` et `@fontsource/lexend` 5.3.0 importés dans `app.css` ; option `fonts` du plugin retirée (elle faisait télécharger le WOFF) — `DESIGN.md` § 13 |
+| Formules | KaTeX | absent | ✅ `katex` 0.19.1 (types inclus), composant `Formule`, pré-optimisé dans `vite.config.ts` |
 | Hors ligne | SW maison, Dexie, UUID v7 | absent | `dexie` 4.4.7 au lot 0 ; UUID v7 écrit à la main (`lib/hors-ligne/uuid7.ts`) |
 | Graphiques / éditeur | Recharts / TipTap | absents | lots 1 (TipTap) et 6 (Recharts) |
 
@@ -149,12 +144,12 @@ le soir. Utilisateurs principaux : **des mineurs**.
 
 | Outil | Prévu | Installé | Remarque |
 |---|---|---|---|
-| Tests PHP | PHPUnit | **Pest 5.3.4** sur **PHPUnit 13.4.5**, pest-plugin-laravel 5.0.1 | DA2 ; 40 tests du kit, verts |
-| Base de test | dédiée | **SQLite en mémoire** (`phpunit.xml`) | dédiée, mais ≠ MySQL de production → DA3 |
-| Tests JS | Vitest + fake-indexeddb | **Vitest 5.0.5** (fourni par Vite+), aucun test, pas de script `test:js` | à ajouter : `fake-indexeddb` 6.2.6, `happy-dom`, `@testing-library/react` |
-| Bout en bout / visuel | Playwright + axe | **@playwright/test 1.64.1**, **@axe-core/playwright 4.14.0**, navigateurs installés | `playwright.config.ts` et `tests/visuel/` à créer |
-| MCP Playwright | `@playwright/mcp` | déclaré dans `.mcp.json` en `@latest` (0.0.83 au 2026-10-30), **opérationnel** | figer la version |
-| CI | — | `.github/workflows/tests.yml` : `composer setup` puis `composer ci:check` (oxlint/oxfmt via `vp check`, `tsc`, Pint, Larastan, Pest) | ajouter `test:js` et les tests visuels |
+| Tests PHP | PHPUnit | **Pest 5.3.4** sur **PHPUnit 13.4.5**, pest-plugin-laravel 5.0.1 | DA2 ; `TestCase` appelle `withoutVite()` (un test ne dépend pas d'un build) |
+| Base de test | dédiée | **SQLite en mémoire** (`phpunit.xml`) | ✅ MySQL `g_etudie_test` (DA3) ; `TestCase` refuse toute base sans suffixe `_test` |
+| Tests JS | Vitest + fake-indexeddb | **Vitest 5.0.5** (fourni par Vite+) | ✅ `npm run test:js` (`vp test run`), tests dans `tests/js/`, environnement happy-dom 21, @testing-library/react 16 ; `fake-indexeddb` à l'étape 6 |
+| Bout en bout / visuel | Playwright + axe | **@playwright/test 1.64.1**, **@axe-core/playwright 4.14.0**, navigateurs installés | ✅ `playwright.config.ts`, `tests/visuel/ecrans.spec.ts`, `npm run test:visuel` ; captures de référence prises sous Windows |
+| MCP Playwright | `@playwright/mcp` | déclaré dans `.mcp.json` en `@latest` (0.0.83 au 2026-10-30), **opérationnel** | ✅ figé en 0.0.83 |
+| CI | — | `.github/workflows/tests.yml` : `composer setup` puis `composer ci:check` (oxlint/oxfmt via `vp check`, `tsc`, Pint, Larastan, Pest) | ✅ service MySQL, Node 26, `test:js` ; tests visuels pas encore en CI (captures de référence propres à Windows) |
 
 ### Poids de départ (kit non modifié)
 
@@ -209,7 +204,7 @@ permission s'exerce (section 7).
 
 | Habillage / écran | État |
 |---|---|
-| Page `/dev/composants` (catalogue Ardoise) | ⬜ |
+| Page `/dev/composants` (catalogue Ardoise) | ✅ lot 0, étape 1 (point 4) |
 | Vitrine | ⬜ |
 | Connexion / inscription par téléphone, parcours d'accueil, « Mon compte » | ⬜ |
 | Accueil élève (jauge, séance du jour, trace) | ⬜ |
@@ -307,6 +302,61 @@ cette question à sa façon. Elle distingue deux notions :
        `DESIGN.md` § 11, `HORS_LIGNE.md` B.5 (journal des écarts).
    - **Preuve** : 40 tests Pest du kit verts avant toute modification ;
      captures de l'audit dans `.playwright-mcp/`.
+
+3. [x] **Lot 0, étape 0 — prérequis** (2026-10-30, commit `c0ec836`)
+   - **Constat** : base de développement absente, application en anglais,
+     tests sur SQLite en mémoire, MCP Playwright en `@latest`, CI sans base.
+   - **Décision** : bases MySQL `g_etudie` et `g_etudie_test`
+     (`utf8mb4_unicode_ci`) ; `phpunit.xml` force `g_etudie_test` ;
+     `Tests\TestCase::setUpTraits()` refuse toute base sans suffixe `_test`
+     (le crochet `beforeRefreshingDatabase()` ne convient pas : défini dans
+     `TestCase`, il est masqué par celui, vide, du trait `RefreshDatabase`) ;
+     `.env` en `fr` / `fr_FR`, `APP_NAME` « N'karamögö » ; CI avec service
+     MySQL et Node 26 ; scripts `test:js` et `test:visuel`.
+   - **Preuve** : 40 tests Pest du kit verts sur MySQL ; garde vérifiée en
+     pointant volontairement la suite sur `g_etudie` — refusée, base intacte
+     (10 tables).
+4. [x] **Lot 0, étape 1 — design system Ardoise et `/dev/composants`**
+   (2026-10-30)
+   - **Constat** : thème shadcn neutre du kit ; polices Instrument Sans
+     téléchargées en WOFF ; aucune primitive de `DESIGN.md` § 11.
+   - **Décision** :
+     - jetons dans `resources/css/app.css` : palettes fixes dans `@theme`,
+       neutres qui basculent en sombre sur `:root, .clair` / `.dark`, variables
+       shadcn rebranchées sur Ardoise ; échelle typographique, rayons, ombres ;
+     - polices Sora et Lexend par Fontsource (72,5 Ko en latin) ;
+     - primitives dans `resources/js/components/ui/` : restylées `button`
+       (`variant` × `ton` × `taille`), `input`, `label`, `badge`, `dialog`,
+       `card`, `checkbox`, `skeleton`, `spinner`, `sonner`, `input-otp` ;
+       créées `champ`, `textarea`, `search-input`, `telephone-input`,
+       `code-input`, `date-input`, `number-input`, `choix`, `feuille`,
+       `confirm-provider` (`confirmer()`, monté dans `app.tsx`), `tabs`,
+       `pagination`, `zone-donnee`, `etat-vide`, `formule`, `bandeau-exemple` ;
+     - `lib/utils.ts` : `formaterGnf()`, `formaterNombre()`, `lireNombre()`,
+       `tailwind-merge` étendu ; `App\Support\Gnf` ; `lib/telephone.ts` et
+       `lib/matieres.ts` ;
+     - route `dev.composants` gardée par `SeulementEnDeveloppement` (404 hors
+       `local` / `testing`) ;
+     - les variantes `secondary` et `size` du bouton du kit sont remplacées
+       dans ses écrans (`outline`, `taille`).
+   - **Vu avec Playwright** (captures découpées et relues) et corrigé :
+     texte des boutons pleins effacé par `tailwind-merge` ; options de QCM
+     sans nom accessible ; erreur KaTeX illisible en sombre ; formule
+     défilante inatteignable au clavier ; code à 6 cases qui débordait à
+     360 px puis sur la colonne voisine à 1366 ; onglets et pagination trop
+     larges à 360 px ; « Mathématiques » coupé dans sa tuile ; champs
+     décalés dans une rangée ; bouton « Recharger la page » hors de son cadre.
+     Détail dans `DESIGN.md` § 13.
+   - **Preuve** : 56 tests Pest (dont `DevComposantsTest`, `GnfTest` sur
+     `tests/fixtures/gnf.json`), 92 tests Vitest (`gnf`, `telephone` sur
+     `tests/fixtures/telephones.json`, `contrastes`, `search-input`,
+     `composants`), 8 tests Playwright (4 gabarits × 2 thèmes : pas de
+     débordement de page ni de cadre, axe sans violation sérieuse ou
+     critique, capture de référence). `tsc`, `vp check`, Pint, Larastan et
+     build verts.
+   - **Reste** : `App\Support\Telephone` (jumeau PHP de `lib/telephone.ts`)
+     arrive à l'étape 4 avec la connexion par téléphone ; contrôles sur vrai
+     téléphone inscrits dans `A_TESTER.md`.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

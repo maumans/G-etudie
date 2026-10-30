@@ -30,6 +30,7 @@ yarn-error.log
 /.agents
 /.amp
 /.claude/settings.local.json
+/.claude/launch.json
 /.codex
 /.cursor
 /.factory

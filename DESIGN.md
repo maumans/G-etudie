@@ -425,3 +425,62 @@ construite au lot 0, et la première chose capturée.
 À tenir par Claude Code : chaque ajustement de valeur, chaque piège rencontré,
 avec sa mesure (ratio de contraste, poids en Ko, capture avant/après). Format
 : le constat, la cause, la correction, la preuve.
+
+### Lot 0, étape 1 — première implémentation (2026-10-30)
+
+1. **Polices.** *Constat* : le kit charge ses polices par l'option `fonts` de
+   `laravel-vite-plugin`, qui déclare chaque graisse deux fois (WOFF2, puis
+   WOFF) ; la dernière déclaration l'emporte et le navigateur télécharge le
+   WOFF, plus lourd (requêtes `.woff` dans le journal du serveur à l'audit).
+   *Correction* : Sora et Lexend importées depuis Fontsource dans `app.css`
+   (une seule déclaration, WOFF2 en premier, sous-ensembles par
+   `unicode-range`). *Preuve* : français courant = sous-ensemble latin seul,
+   Sora 600 + 700 = 29,4 Ko, Lexend 400 + 500 + 600 = 43,1 Ko, soit
+   **72,5 Ko** (budget 120 Ko). Les polices KaTeX ne sont chargées que par les
+   pages qui affichent une formule.
+2. **Nuances calculées.** Matières : nuances 50 → 900 calculées en OKLCH à
+   partir des teintes du § 2.4 ; nuance 600 sur blanc de 5,0:1 à 5,8:1, nuance
+   300 sur carte sombre de 8,3:1 à 9,2:1. Ajoutés au nuancier : nimba 50–900
+   (300, 600, 700 imposées), soleil 50–900 (400 imposée), verdicts en 400
+   (texte en sombre) et 700 (survol). **Texte « indice » en sombre** :
+   `indice-400` `#F5A524`, 8,4:1 sur la carte sombre (le § 2.3 ne le donnait
+   pas). *Preuve* : `tests/js/contrastes.test.ts` relit `app.css` et vérifie
+   chaque paire, dans les deux thèmes.
+3. **Bouton plein à texte sombre (vu par axe).** *Cause* : `tailwind-merge`
+   ne connaissait pas nos tailles (`text-interface`…), les prenait pour des
+   couleurs et supprimait le `text-white` qui les précède. *Correction* :
+   `extendTailwindMerge` déclare tailles, rayons, ombres, police `titre` et
+   `font-data` (`resources/js/lib/utils.ts`). *Preuve* : audit axe sans
+   violation `color-contrast`.
+4. **Thème sombre imbriqué.** Une variable qui en référence une autre
+   (`--background: var(--craie-50)`) est calculée là où elle est déclarée :
+   posée sur `:root` seul, elle gardait la valeur claire dans un `.dark`
+   imbriqué. Les variables dérivées sont redéclarées sur `:root, .dark, .clair`.
+   La classe `.clair` force le clair dans un sous-arbre sombre (catalogue côte
+   à côte) ; la variante `dark:` l'exclut.
+5. **Débordements à 360 px et dans les grilles.** Le code à 6 cases (48 px
+   chacune) dépassait la carte à 360 px et la colonne voisine dans une
+   grille à deux colonnes : cases fluides plafonnées à 48 px. Une liste
+   d'onglets défilante élargissait la page : les grilles prennent des
+   colonnes `minmax(0, 1fr)` (`grid-cols-1`). « Mathématiques » était coupé :
+   tuiles de matières sur une colonne sous 400 px. Pagination à 360 px :
+   flèches seules et « Page 3 sur 12 ». Un `Champ` sans aide s'étirait dans
+   sa rangée : `content-start`. *Preuve* : `tests/visuel` vérifie qu'aucun
+   champ, zone de donnée ou état vide ne déborde de son cadre (contrôle
+   validé en provoquant le défaut).
+6. **Formules.** Une option de QCM qui ne contient qu'une formule n'avait pas
+   de nom accessible (le MathML n'en donne pas à un bouton) : `Formule` prend
+   un `libelle` (« P de A inter B égale 0,12 »), obligatoire dans ce cas.
+   Une formule trop large défile dans son cadre, devenu atteignable au
+   clavier. Une erreur de syntaxe s'affiche en `--destructive` (le rouge fixe
+   de KaTeX était illisible en sombre).
+7. **Écarts assumés au texte ci-dessus.**
+   - Champs de saisie à **16 px** (l'interface reste à 15 px) : en dessous,
+     iPhone zoome sur le champ au toucher.
+   - **Badges en teinte d'opacité**, pas en aplat plein : un aplat de statut
+     ne tient pas le contraste dans les deux thèmes ; la forme (rectangle à
+     coins de 6 px, sans contour ni icône) reste distincte d'un bouton.
+   - Voile des dialogues en couleur fixe (`#0E1220` à 60 %) : `ink-900`
+     s'éclaircit en sombre.
+   - Pulsation des squelettes retardée de 400 ms (§ 5 : pas d'animation en
+     boucle pour une attente courte).
