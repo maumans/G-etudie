@@ -2,6 +2,7 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\AiguillageController;
+use App\Http\Controllers\Contenu\TableauDeBordController as ContenuTableauDeBordController;
 use App\Http\Controllers\Eleve\AccueilController as AccueilEleveController;
 use App\Http\Controllers\VitrineController;
 use App\Http\Middleware\SeulementEnDeveloppement;
@@ -24,7 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::get('eleve', AccueilEleveController::class)
         ->can(Permission::EspaceEleve)
         ->name('eleve.accueil');
-    Route::inertia('contenu', 'contenu/accueil')
+    Route::get('contenu', ContenuTableauDeBordController::class)
         ->can(Permission::EspaceContenu)
         ->name('contenu.accueil');
     Route::inertia('console', 'console/accueil')

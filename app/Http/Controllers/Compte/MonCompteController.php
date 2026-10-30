@@ -11,6 +11,7 @@ use App\Support\Telephone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,6 +30,8 @@ class MonCompteController extends Controller
     {
         return Inertia::render('compte/profil', [
             'profil' => $request->user()->only(['prenom', 'pseudo']),
+            // Un compte qui a signé du contenu garde sa signature (lot 1).
+            'suppression_possible' => ! $request->user()->aSigneDuContenu(),
         ]);
     }
 
@@ -142,6 +145,16 @@ class MonCompteController extends Controller
         $request->validate(['password' => ['required', 'string', 'current_password']]);
 
         $user = $request->user();
+
+        // Une leçon signée garde son auteur et son relecteur (traçabilité des
+        // corrigés) : le compte se désactive par un administrateur, il ne
+        // s'efface pas lui-même.
+        if ($user->aSigneDuContenu()) {
+            throw ValidationException::withMessages([
+                'password' => "Votre compte a signé des contenus : demandez à l'administrateur de le désactiver.",
+            ]);
+        }
+
         JournalAcces::consigner('compte.supprime', $user);
 
         Auth::logout();

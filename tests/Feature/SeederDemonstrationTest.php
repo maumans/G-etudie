@@ -1,7 +1,12 @@
 <?php
 
 use App\Enums\Role;
+use App\Models\Chapitre;
+use App\Models\Lecon;
+use App\Models\Notion;
 use App\Models\User;
+use App\Models\VersionContenu;
+use App\Support\BlocsContenu;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Support\Facades\Hash;
@@ -59,4 +64,27 @@ test('en production, db:seed sème les rôles mais aucun compte de démonstratio
     expect(User::count())->toBe(0)
         ->and(ModeleRole::count())->toBe(count(Role::cases()));
     expect(fn () => (new DemoSeeder)->run())->toThrow(RuntimeException::class, 'production');
+});
+
+test('le contenu de démonstration : fictif, valide, à chaque statut, semé une fois', function () {
+    $this->seed(DatabaseSeeder::class);
+    $this->seed(DatabaseSeeder::class);
+
+    $lecons = Lecon::all();
+
+    expect($lecons)->toHaveCount(5)
+        ->and($lecons->every(fn ($lecon) => $lecon->est_exemple))->toBeTrue()
+        ->and(Chapitre::where('est_exemple', false)->count())->toBe(0)
+        ->and(Notion::where('est_exemple', false)->count())->toBe(0)
+        ->and($lecons->pluck('statut')->map->value->unique()->sort()->values()->all())
+        ->toBe(['brouillon', 'en_relecture', 'publie']);
+
+    foreach ($lecons as $lecon) {
+        expect(BlocsContenu::erreur($lecon->brouillon))->toBeNull();
+    }
+
+    // Aucune leçon publiée par son propre auteur.
+    VersionContenu::whereNotNull('decide_par_id')
+        ->where('decision', '!=', 'retiree')
+        ->each(fn ($version) => expect($version->decide_par_id)->not->toBe($version->auteur_id));
 });

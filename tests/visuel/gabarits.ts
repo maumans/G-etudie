@@ -75,6 +75,34 @@ export async function verifierAccessibilite(page: Page): Promise<void> {
  */
 export const SESSIONS = {
     eleve: 'tests/visuel/.auth/eleve.json',
+    /** Rédacteur de démonstration. */
     contenu: 'tests/visuel/.auth/contenu.json',
+    /** Responsable pédagogique : référentiel et relecture (lot 1). */
+    pedagogie: 'tests/visuel/.auth/pedagogie.json',
     console: 'tests/visuel/.auth/console.json',
 } as const;
+
+/**
+ * Vérifie un écran (débordement, axe) puis le compare à sa capture de
+ * référence `captures/<lot>/<ecran>-<gabarit>-<theme>.png`.
+ */
+export async function capturer(
+    page: Page,
+    lot: string,
+    ecran: string,
+    gabarit: string,
+    theme: string,
+): Promise<void> {
+    await page.evaluate(() => document.fonts.ready);
+    await verifierSansDebordement(page);
+    await verifierAccessibilite(page);
+    // Tableau de segments : une chaîne « lot0/… » serait aplatie en « lot0-… ».
+    await expect(page).toHaveScreenshot(
+        [lot, `${ecran}-${gabarit}-${theme}.png`],
+        {
+            fullPage: true,
+            // Heures, durées écoulées : changent à chaque passage.
+            mask: [page.locator('[data-capture="variable"]')],
+        },
+    );
+}

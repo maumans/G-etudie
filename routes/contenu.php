@@ -1,13 +1,39 @@
 <?php
 
 use App\Enums\Permission;
+use App\Http\Controllers\Contenu\LeconController;
 use App\Http\Controllers\Contenu\Referentiel\AnneeScolaireController;
 use App\Http\Controllers\Contenu\Referentiel\MatiereController;
 use App\Http\Controllers\Contenu\Referentiel\OffreController;
 use App\Http\Controllers\Contenu\Referentiel\ProgrammeController;
 use Illuminate\Support\Facades\Route;
 
-// Back-office contenu. Chaque route porte sa permission (AccesParRoleTest).
+// Back-office contenu. Chaque route porte sa permission (AccesParRoleTest) ;
+// une fiche est aussi gardée par LeconPolicy (rattachement à l'auteur).
+
+// Leçons (PLAN M4, M17) : tout le back-office consulte ; rédiger, relire et
+// archiver demandent chacun leur permission.
+Route::middleware('auth')->prefix('contenu')->name('contenu.lecons.')->group(function () {
+    $consulter = 'can:'.Permission::EspaceContenu->value;
+    $rediger = 'can:'.Permission::RedigerContenu->value;
+    $relire = 'can:'.Permission::RelireContenu->value;
+    $administrer = 'can:'.Permission::AdministrerContenu->value;
+
+    Route::get('lecons', [LeconController::class, 'index'])->middleware($consulter)->name('index');
+    Route::get('relecture', [LeconController::class, 'relecture'])->middleware($relire)->name('relecture');
+    Route::get('lecons/creer', [LeconController::class, 'create'])->middleware($rediger)->name('create');
+    Route::post('lecons', [LeconController::class, 'store'])->middleware($rediger)->name('store');
+    Route::get('lecons/{lecon}', [LeconController::class, 'show'])->middleware($consulter)->name('show');
+    Route::get('lecons/{lecon}/edition', [LeconController::class, 'edit'])->middleware($rediger)->name('edit');
+    Route::put('lecons/{lecon}', [LeconController::class, 'update'])->middleware($rediger)->name('update');
+    Route::post('lecons/{lecon}/soumettre', [LeconController::class, 'soumettre'])->middleware($rediger)->name('soumettre');
+    Route::post('lecons/{lecon}/reprendre', [LeconController::class, 'reprendre'])->middleware($rediger)->name('reprendre');
+    Route::post('lecons/{lecon}/modifier', [LeconController::class, 'modifier'])->middleware($rediger)->name('modifier');
+    Route::post('lecons/{lecon}/publier', [LeconController::class, 'publier'])->middleware($relire)->name('publier');
+    Route::post('lecons/{lecon}/renvoyer', [LeconController::class, 'renvoyer'])->middleware($relire)->name('renvoyer');
+    Route::post('lecons/{lecon}/archiver', [LeconController::class, 'archiver'])->middleware($administrer)->name('archiver');
+    Route::post('lecons/{lecon}/restaurer', [LeconController::class, 'restaurer'])->middleware($administrer)->name('restaurer');
+});
 
 // Référentiel (PLAN M3) : responsable pédagogique et administrateur plateforme.
 Route::middleware(['auth', 'can:'.Permission::GererReferentiel->value])
