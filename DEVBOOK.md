@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-10-30, après l'étape 6)
+## 0. Reprise — où en est le projet (mis à jour le 2026-10-30, clôture du lot 0)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,7 +19,7 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (lot 0, étapes 0 à 6 faites)
+### État au 2026-10-30 (lot 0 fait ; clôture en attente de D11)
 
 - **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
   lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
@@ -87,7 +87,9 @@
 - **⚠ Aucun SMS ne part** : le pilote `JournalSms` écrit le code dans
   `storage/logs/laravel.log` (en production, il signale seulement l'absence
   de fournisseur). Fournisseur SMS à choisir avant le lot 8 (D3).
-- **Pas encore fait dans le lot 0** : clôture (étape 7).
+- **Clôture du lot 0** (point 14) : tout le lot est fait et audité ; il ne
+  manque que D11 (domaine, hébergement, HTTPS) et la fusion de `lot-0` dans
+  `main`. Liste de mise en production : section 12.
 - **Comptes sans espace** : parent, enseignant et gestionnaire n'ouvrent que
   « Mon compte » jusqu'au lot 11.
 - **Lancer l'application** : `.claude/launch.json` déclare `laravel`
@@ -103,15 +105,18 @@
 
 ### Prochaines étapes, par ordre de priorité
 
-1. **Lot 0, étape 7 — clôture** : domaine et hébergement (D11) pour HTTPS,
-   préproduction, relecture complète du lot, contrôles de `A_TESTER.md` qui
-   deviennent possibles (installation, mode avion), mise à jour de `main`.
-2. **Lot 1** (après D1, la liste des matières phares) : référentiel et
-   back-office contenu.
-3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+1. **Maurice : D11** (domaine `nkaramogo.*`, hébergement VPS + CDN) ; puis
+   préproduction en HTTPS en suivant la section 12, et contrôles bloqués de
+   `A_TESTER.md` (installation, mode avion, déploiement pendant une coupure,
+   double authentification, session de 12 h).
+2. **Fusion de `lot-0` dans `main`**, sur décision de Maurice.
+3. **Lot 1** (après D1, la liste des matières phares) : référentiel et
+   back-office contenu, sur une branche `lot-1`.
+4. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
-   BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application.
+   BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
+   fournisseur SMS (D3).
 
 ### Règles à ne pas casser (détail dans `CLAUDE.md`)
 
@@ -871,6 +876,44 @@ cette question à sa façon. Elle distingue deux notions :
      téléphone (`A_TESTER.md`) ; séance complète hors ligne (A.14 n° 24,
      lot 3) ; budgets mesurés (n° 25, lot 7).
 
+14. [~] **Lot 0, étape 7 — clôture** (2026-10-30)
+   - **Le lot face au plan** (`PLAN_NKARAMOGO.md` § 12) :
+
+     | Élément du lot 0 | État | Preuve |
+     |---|---|---|
+     | Audit du projet existant, conventions | ✅ | points 2 et 3 |
+     | Design system « Ardoise » (jetons, polices locales, primitives) | ✅ v4 | points 4, 8 à 11 ; `DESIGN.md` § 13 |
+     | Habillages vitrine, élève, back-office, console | ✅ | point 6 ; captures |
+     | Authentification par téléphone, « Mon compte » | ✅ | point 7 |
+     | Rôles et permissions, garde-fou « toute route a une permission » | ✅ | point 12 ; `AccesParRoleTest` |
+     | Socle hors ligne HL0 | 🟡 sauf HTTPS | point 13 ; `HORS_LIGNE.md` B.2 (10 / 12) |
+     | Playwright et captures de référence | ✅ | 125 tests, 15 écrans × 4 gabarits × 2 thèmes |
+     | Catalogue de composants `/dev/composants` | ✅ | point 4 |
+     | **Critère d'acceptation** : page de démonstration de tous les composants, 4 tailles × 2 thèmes, contrastes vérifiés | ✅ | `composants-*.png`, axe sans violation sérieuse, Vitest `contrastes` |
+
+   - **Audit de clôture** :
+     - CI rejouée en local à l'identique (`composer ci:check` : `vp check`,
+       `tsc`, Pint, Larastan, Pest ; puis Vitest) : verte. ⚠ Elle n'a jamais
+       tourné sur GitHub : pas de dépôt distant (DA6).
+     - Production : `php artisan optimize` construit les caches de
+       configuration, routes (51) et vues ; `composer audit` et `npm audit` :
+       aucune vulnérabilité connue.
+     - Corrigé : quatre commentaires restés au futur (« étape 4 », « étape 5 »)
+       dans `telephone.ts`, `telephone.test.ts`, `config/fortify.php`,
+       `libelles.ts` ; `A_TESTER.md` renvoyait encore au compte du
+       `DatabaseSeeder` ; ancienne session Playwright `compte.json` supprimée ;
+       `SESSION_SECURE_COOKIE` ajouté à `.env.example`.
+     - Ajouté : section 9 « Modèles Eloquent » (vide depuis le début du lot) et
+       section 12 « Mise en production » (liste à suivre dès que D11 est
+       fixé).
+   - **Ce qui empêche de cocher la clôture** :
+     - **D11, domaine et hébergement** (Maurice) : sans eux, pas de HTTPS,
+       donc pas de hors ligne ailleurs que sur `localhost`, pas d'installation,
+       et les contrôles de `A_TESTER.md` sur vrai téléphone restent bloqués ;
+     - fusion de `lot-0` dans `main` : à faire sur décision de Maurice.
+   - **Attendus pour le lot 1** : D1 (liste des matières phares).
+   - **Preuve** : 202 Pest, 165 Vitest, 125 Playwright — verts.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -902,7 +945,14 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
 ## 9. Modèles Eloquent
 
-*(à remplir au fil des lots : modèle, table, rattachement, remarque)*
+| Modèle | Table | Rattachement | Remarque |
+|---|---|---|---|
+| `User` | `users` | rôles (`HasRoles`), appareils (`appareil_profils`) | téléphone `+224…` unique, prénom, pseudo unique ; `estPersonnel()`, `adresseDoubleAuthentification()` (pseudo, jamais le numéro) |
+| `CodeSms` | `codes_sms` | numéro | code haché, motif `MotifCode`, 10 min, 5 essais |
+| `EntreeJournalAcces` | `journal_acces_plateforme` | auteur, cible | écrit par `JournalAcces::consigner()` seulement ; jamais modifié |
+| `Appareil` | `appareils` | profils (`appareil_profils`) | jeton haché (SHA-256), révocable (`revoque_le`) |
+| `OperationSynchronisee` | `operations_synchronisees` | auteur, appareil | `uuid` unique global (idempotence) ; `acceptee` ou `rejetee` seulement |
+| `Role`, `Permission` (spatie) | `roles`, `permissions`, `model_has_roles`… | — | recopiés de `App\Enums\Role` et `Permission` par `RolesEtPermissionsSeeder` |
 
 ## 10. Enums
 
@@ -931,3 +981,33 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | Fortify : connexion, inscription, 2FA, confirmation du mot de passe | Fortify ; routes authentifiées en dérogation, activation 2FA gardée au geste | paquet |
 
 Toute exception est justifiée dans `AccesParRoleTest::OUVERTES_A_TOUS`.
+
+## 12. Mise en production — liste à suivre
+
+> Préparée à la clôture du lot 0 ; attend le domaine et l'hébergement (D11).
+> Chaque point se vérifie sur la préproduction avant la production.
+
+1. **HTTPS** sur tout le domaine (certificat valide, redirection du HTTP) :
+   sans lui, pas de service worker, donc ni hors ligne ni installation.
+2. `.env` : `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`,
+   `SESSION_SECURE_COOKIE=true`, `APP_KEY` généré une fois et gardé ;
+   **pas** de `DEMO_MOT_DE_PASSE`. Base MySQL dédiée.
+3. Déploiement, dans l'ordre : `composer install --no-dev --optimize-autoloader`,
+   `npm ci && npm run build` (vérifier l'absence de `public/hot`),
+   `php artisan migrate --force`, **puis** `php artisan db:seed --force`
+   (rôles et permissions seulement : `DemoSeeder` refuse la production),
+   `php artisan optimize`. Vérifié en local : les caches de configuration,
+   de routes et de vues se construisent (51 routes).
+4. Serveur web : `/sw.js` passe par PHP (pas de fichier statique de ce nom),
+   avec ses en-têtes (`Service-Worker-Allowed: /`, `Cache-Control:
+   no-cache`) ; `/build/*` servi avec un cache long (`immutable`), les noms
+   étant hachés ; `/manifest.webmanifest` en `application/manifest+json`.
+5. File d'attente et tâches planifiées : `QUEUE_CONNECTION=database` → un
+   `php artisan queue:work` surveillé (rien n'en dépend encore au lot 0).
+6. SMS : aucun fournisseur (D3) ; en production, `JournalSms` signale
+   seulement l'absence d'envoi — la vérification du numéro et la
+   récupération du mot de passe ne fonctionnent donc pas encore.
+7. Après le premier déploiement : créer le premier administrateur
+   plateforme à la main (`php artisan tinker`, rôle `superadmin`), activer sa
+   double authentification, puis dérouler les contrôles « bloqués tant que
+   le domaine HTTPS n'existe pas » de `A_TESTER.md`.

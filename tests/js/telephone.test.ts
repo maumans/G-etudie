@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { formaterTelephone, normaliserTelephone } from '@/lib/telephone';
 import exemples from '../fixtures/telephones.json';
 
-// Même jeu d'exemples que le futur App\Support\Telephone (lot 0, étape 4).
+// Même jeu d'exemples que App\Support\Telephone (tests/Unit/TelephoneTest.php).
 describe('normaliserTelephone', () => {
     it.each(exemples)('« $saisie » → $normalise', ({ saisie, normalise }) => {
         expect(normaliserTelephone(saisie)).toBe(normalise);
