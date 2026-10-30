@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 460" width="560" height="460">
+  <!-- N'karamögö · G-Étudie — illustration par défaut « un soir de révision »
+       (DESIGN.md § 8) : la fenêtre sur la nuit, la lampe, le cahier ouvert et
+       le téléphone. Dessin original. -->
+  <defs>
+    <linearGradient id="nuit" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#241713"/>
+      <stop offset="1" stop-color="#5B2C18"/>
+    </linearGradient>
+    <linearGradient id="lumiere" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FFD666" stop-opacity=".7"/>
+      <stop offset="1" stop-color="#FFD666" stop-opacity=".12"/>
+    </linearGradient>
+    <clipPath id="vitre">
+      <rect x="64" y="44" width="212" height="226" rx="6"/>
+    </clipPath>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 .25  0 0 0 0 .12  0 0 0 0 .05  0 0 0 .08 0"/>
+    </filter>
+  </defs>
+
+  <rect width="560" height="460" fill="#FBE6D9"/>
+
+  <!-- La fenêtre -->
+  <rect x="52" y="32" width="236" height="250" rx="12" fill="#EDCFBB"/>
+  <g clip-path="url(#vitre)">
+    <rect x="64" y="44" width="212" height="226" fill="url(#nuit)"/>
+    <circle cx="214" cy="96" r="20" fill="#FFF3EA"/>
+    <circle cx="224" cy="88" r="18" fill="#2A1914"/>
+    <g fill="#FFF3EA">
+      <circle cx="104" cy="80" r="1.8"/>
+      <circle cx="150" cy="64" r="1.4"/>
+      <circle cx="132" cy="128" r="1.4"/>
+      <circle cx="252" cy="150" r="1.6"/>
+      <circle cx="90" cy="166" r="1.2"/>
+    </g>
+    <path fill="#3A1D12" d="M64 236C96 222 120 228 150 212C176 198 196 214 222 206C244 200 260 210 276 204V270H64Z"/>
+    <path fill="#21110B" d="M64 254H96C104 254 106 240 114 240H170C178 240 180 254 188 256L276 258V270H64Z"/>
+  </g>
+  <rect x="166" y="44" width="8" height="226" fill="#EDCFBB"/>
+  <rect x="64" y="152" width="212" height="8" fill="#EDCFBB"/>
+  <rect x="40" y="276" width="260" height="12" rx="4" fill="#E2B9A0"/>
+
+  <!-- La lumière de la lampe -->
+  <path d="M346 196L376 222L452 388H156Z" fill="url(#lumiere)"/>
+
+  <!-- La table -->
+  <path d="M0 332H560V388H0Z" fill="#C8713A"/>
+  <path d="M0 388H560V460H0Z" fill="#8F461C"/>
+  <rect y="386" width="560" height="4" fill="#7A3A16" fill-opacity=".5"/>
+  <ellipse cx="290" cy="364" rx="150" ry="20" fill="#FFD666" fill-opacity=".28"/>
+
+  <!-- Le cahier ouvert -->
+  <path d="M168 346L276 340L276 378L156 384Z" fill="#FFFDF8"/>
+  <path d="M276 340L384 346L396 384L276 378Z" fill="#FFF8F1"/>
+  <g stroke="#E8D6C8" stroke-width="1.5">
+    <path d="M172 354L268 349M170 362L268 357M168 370L268 365"/>
+  </g>
+  <g fill="none" stroke="#1E1814" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M290 352c5-5 8 3 13-1s7 3 12 0"/>
+    <path d="M326 352h10M331 347v10"/>
+    <path d="M344 352c4-4 7 3 11 0"/>
+    <path d="M292 366c6-4 9 3 15 0s8 3 14 0 9 3 15 0"/>
+  </g>
+  <path d="M290 372l3 3 6-7" fill="none" stroke="#15803D" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="274" y="340" width="4" height="38" fill="#E8D6C8"/>
+
+  <!-- Le téléphone posé à plat -->
+  <path d="M414 352L486 348L496 376L420 380Z" fill="#1E1814"/>
+  <path d="M420 355L482 351.5L489 372L425 375.5Z" fill="#F6641B"/>
+  <path d="M432 362L470 360" stroke="#FFF3EA" stroke-width="2.4" stroke-linecap="round"/>
+
+  <!-- La tasse -->
+  <rect x="86" y="300" width="46" height="46" rx="7" fill="#FFF3EA"/>
+  <path d="M132 312c14 0 14 22 0 22" fill="none" stroke="#FFF3EA" stroke-width="6"/>
+  <rect x="86" y="300" width="46" height="8" rx="4" fill="#E9CDB9"/>
+  <g fill="none" stroke="#D29A7A" stroke-width="2.5" stroke-linecap="round">
+    <path d="M100 290c-6-8 6-12 0-20"/>
+    <path d="M116 286c-6-8 6-12 0-20"/>
+  </g>
+
+  <!-- La lampe -->
+  <ellipse cx="470" cy="336" rx="36" ry="7" fill="#1E1814"/>
+  <g stroke="#1E1814" stroke-width="7" stroke-linecap="round">
+    <path d="M470 332L494 214"/>
+    <path d="M494 214L404 170"/>
+  </g>
+  <circle cx="494" cy="214" r="8" fill="#1E1814"/>
+  <circle cx="470" cy="332" r="6" fill="#1E1814"/>
+  <path d="M396 156L418 176L378 226L334 190Z" fill="#F6641B"/>
+  <path d="M396 156L418 176L410 184L388 162Z" fill="#D04904"/>
+  <path d="M334 190L378 226" stroke="#FFD666" stroke-width="5" stroke-linecap="round"/>
+
+  <rect width="560" height="460" filter="url(#grain)"/>
+</svg>

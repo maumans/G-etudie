@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 700" width="600" height="700">
+  <!-- N'karamögö · G-Étudie — illustration par défaut du héros (DESIGN.md § 8).
+       Le Nimba et les plateaux du Fouta au crépuscule ; un chemin monte vers
+       le sommet, trois jalons : CEE, BEPC, Baccalauréat. Dessin original. -->
+  <defs>
+    <linearGradient id="ciel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FBE4D6"/>
+      <stop offset=".5" stop-color="#FDCBAE"/>
+      <stop offset="1" stop-color="#FBA77E"/>
+    </linearGradient>
+    <radialGradient id="soleil" cx=".38" cy=".32" r=".75">
+      <stop offset="0" stop-color="#FFB585"/>
+      <stop offset=".55" stop-color="#FB7A3A"/>
+      <stop offset="1" stop-color="#E9580F"/>
+    </radialGradient>
+    <linearGradient id="chemin" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#FFF1E8" stop-opacity=".95"/>
+      <stop offset="1" stop-color="#FFF1E8" stop-opacity=".55"/>
+    </linearGradient>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 .22  0 0 0 0 .1  0 0 0 0 .04  0 0 0 .09 0"/>
+    </filter>
+    <mask id="croissant">
+      <rect width="600" height="700" fill="#fff"/>
+      <circle cx="122" cy="112" r="17" fill="#000"/>
+    </mask>
+  </defs>
+
+  <rect width="600" height="700" fill="url(#ciel)"/>
+
+  <!-- Lune et étoiles, déjà visibles au crépuscule -->
+  <circle cx="112" cy="120" r="18" fill="#FFF6EF" mask="url(#croissant)"/>
+  <g fill="#FFF6EF">
+    <circle cx="190" cy="78" r="2"/>
+    <circle cx="232" cy="150" r="1.5"/>
+    <circle cx="66" cy="210" r="1.5"/>
+    <circle cx="520" cy="96" r="2"/>
+  </g>
+
+  <!-- Le soleil et ses cercles -->
+  <g fill="none" stroke="#FFF6EF">
+    <circle cx="378" cy="360" r="150" stroke-opacity=".42" stroke-width="1.5"/>
+    <circle cx="378" cy="360" r="188" stroke-opacity=".28" stroke-width="1.5"/>
+    <circle cx="378" cy="360" r="230" stroke-opacity=".18" stroke-width="1.5"/>
+    <circle cx="378" cy="360" r="276" stroke-opacity=".1" stroke-width="1.5"/>
+  </g>
+  <circle cx="378" cy="360" r="116" fill="url(#soleil)"/>
+
+  <!-- Oiseaux -->
+  <g fill="none" stroke="#7A2C12" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M168 248q7-7 14 0q7-7 14 0"/>
+    <path d="M206 222q5-5 10 0q5-5 10 0"/>
+  </g>
+
+  <!-- La crête du Nimba, au loin -->
+  <path fill="#F59466" d="M0 452C48 440 86 446 128 428C168 411 196 390 236 396C270 401 288 382 322 374C350 368 372 392 404 384C440 375 456 344 486 350C522 357 548 386 600 380V700H0Z"/>
+  <!-- Les plateaux tabulaires du Fouta -->
+  <path fill="#E2703B" d="M0 506H44C60 506 66 474 86 472L178 468C198 467 204 498 222 502L296 508C314 509 320 460 342 458L478 452C500 451 506 494 528 498L600 502V700H0Z"/>
+  <!-- Collines de latérite -->
+  <path fill="#BC4B1D" d="M0 574C66 552 128 566 196 550C262 534 316 528 384 548C446 566 520 580 600 562V700H0Z"/>
+  <!-- Premier plan -->
+  <path fill="#7C2D12" d="M0 632C84 610 160 640 256 626C350 612 440 592 600 616V700H0Z"/>
+
+  <!-- Le chemin qui monte, de plus en plus étroit -->
+  <path fill="url(#chemin)" d="M232 700C262 664 344 652 352 618C360 586 286 576 288 548C290 520 352 520 380 500C404 483 404 470 414 462L420 462C414 476 412 494 392 512C366 535 314 534 316 552C318 572 392 584 386 620C380 660 312 672 300 700Z"/>
+  <path fill="none" stroke="#FFF1E8" stroke-opacity=".7" stroke-width="2" stroke-linecap="round" stroke-dasharray="1 9" d="M417 458C428 430 438 406 446 384"/>
+
+  <!-- Trois jalons -->
+  <g stroke="#2B140A" stroke-width="2.4" stroke-linecap="round">
+    <line x1="360" y1="640" x2="360" y2="596"/>
+    <line x1="296" y1="548" x2="296" y2="516"/>
+    <line x1="448" y1="382" x2="448" y2="350"/>
+  </g>
+  <path fill="#FFC21A" d="M361 597l24 8-24 8Z"/>
+  <path fill="#FFF6EF" d="M297 517l19 6-19 6Z"/>
+  <path fill="#2B140A" d="M449 351l17 5.5-17 5.5Z"/>
+
+  <!-- Rôniers -->
+  <g fill="#3B160A" transform="translate(600 0) scale(-1 1)">
+    <path d="M78 700C80 662 84 628 92 590L97 591C91 630 88 664 88 700Z"/>
+    <g transform="translate(94 590)">
+      <path d="M0 0C-14-14-34-18-54-12C-34-22-12-18 0 0Z"/>
+      <path d="M0 0C-8-22-26-36-46-38C-24-44-6-28 0 0Z"/>
+      <path d="M0 0C2-24-6-44-20-56C0-50 8-26 0 0Z"/>
+      <path d="M0 0C12-20 30-30 50-30C30-20 14-12 0 0Z"/>
+      <path d="M0 0C16-10 38-8 54 4C34-2 16-2 0 0Z"/>
+      <path d="M0 0C10-22 12-42 4-60C20-42 16-20 0 0Z"/>
+      <path d="M0 0C-16-4-36 4-48 20C-36 0-16-8 0 0Z"/>
+    </g>
+    <path d="M140 700C141 676 144 654 150 632L154 633C150 656 148 678 148 700Z"/>
+    <g transform="translate(152 632) scale(.7)">
+      <path d="M0 0C-14-14-34-18-54-12C-34-22-12-18 0 0Z"/>
+      <path d="M0 0C-8-22-26-36-46-38C-24-44-6-28 0 0Z"/>
+      <path d="M0 0C2-24-6-44-20-56C0-50 8-26 0 0Z"/>
+      <path d="M0 0C12-20 30-30 50-30C30-20 14-12 0 0Z"/>
+      <path d="M0 0C16-10 38-8 54 4C34-2 16-2 0 0Z"/>
+      <path d="M0 0C-16-4-36 4-48 20C-36 0-16-8 0 0Z"/>
+    </g>
+  </g>
+  <path fill="#5A200D" d="M0 676C70 664 150 684 240 676C330 668 470 650 600 664V700H0Z"/>
+
+  <rect width="600" height="700" filter="url(#grain)"/>
+</svg>

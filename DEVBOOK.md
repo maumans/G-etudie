@@ -49,17 +49,20 @@
   « Mon compte » (profil, mot de passe, numéro, affichage, suppression),
   journal des accès sensibles. Écrans de connexion et de réglages du kit
   retirés, passkeys et vérification d'e-mail aussi.
-- **Design « Ardoise » v3 fait** (point 9, après la v2 du point 8, refusée) :
-  adaptation complète aux cinq références de Maurice — mandarine chaude,
-  crème et encre, Plus Jakarta Sans (27 Ko), titres en contraste léger / gras,
-  boutons en pilule, **tableau de bord élève complet en données d'exemple**
-  (`TableauDeBordExemple`, bandeau « EXEMPLE »), vitrine refaite sur le
-  modèle BrightPath / DevSkill. **Avant tout écran : `DESIGN.md` § 0 et
+- **Design « Ardoise » v4 fait** (point 10, après la v3 du point 9 et la v2
+  refusée du point 8) : mandarine chaude, crème et encre, **Bricolage
+  Grotesque** (77 Ko), titres en contraste 350 / 600, **boutons à 10 px**
+  sans halo ni flèche, **tableau de bord élève complet en données
+  d'exemple** (`TableauDeBordExemple`, bandeau « EXEMPLE »), **vitrine
+  illustrée** (cinq dessins par défaut remplaçables dans
+  `config/vitrine.php`). **Avant tout écran : `DESIGN.md` § 0 et
   § 0.1, la compétence `design-ardoise`, `CLAUDE.md` § 3 bis.**
-- **⚠ Photo de la vitrine attendue de Maurice** : personne majeure,
-  autorisation écrite, `public/images/vitrine/heros.webp` (format :
-  `config/vitrine.php`). D'ici là, l'aperçu de l'application en tient lieu.
-- **Tests** : 112 Pest (MySQL `g_etudie_test`), 125 Vitest, 98 Playwright
+- **Images de la vitrine** : dessins par défaut en place ; Maurice peut les
+  remplacer (`config('vitrine.illustrations')`, mêmes proportions) et, s'il le
+  souhaite, ajouter la photo détourée d'une personne majeure avec
+  autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
+  l'illustration du héros.
+- **Tests** : 118 Pest (MySQL `g_etudie_test`), 125 Vitest, 98 Playwright
   (connexion + 12 écrans × 4 gabarits × 2 thèmes + un parcours complet
   inscription → suppression) — verts. `tsc`, `vp check`, Pint, Larastan
   (niveau 7) et `npm run build` passent.
@@ -171,7 +174,7 @@ le soir. Utilisateurs principaux : **des mineurs**.
 | CSS | Tailwind (+ `tailwind.config`) | **tailwindcss 4.3.3** (`@tailwindcss/vite`), configuration **dans `app.css`** (`@theme`, `@source`), **sans `tailwind.config`** | règle « classes seulement dans le JS/TS » maintenue ; jetons Ardoise dans `@theme` ; variante `dark:` redéfinie pour exclure un sous-arbre `.clair` (étape 1) |
 | Bundler | Vite | **Vite+ 1.4.0** (`vite` remplacé par `@voidzero-dev/vite-plus-core` 1.4.0, Rolldown 1.2.16), commandes `vp dev / build / check / test`, `vite.config.ts` | `optimizeDeps.include` à vérifier sous Vite+ ; laravel-vite-plugin 3.2.0 |
 | Primitives UI | shadcn/Radix + CVA + tailwind-merge | shadcn « new-york » (`components.json`), 13 paquets `@radix-ui/react-*`, class-variance-authority 0.7.1, tailwind-merge 3.7.0, clsx, lucide-react 0.475.0, sonner 2.0.8, input-otp 1.4.2 | dossier `resources/js/components/ui/` en **minuscules et kebab-case** (DA7) ; `@radix-ui/react-tabs` 1.2.1 ajouté (étape 1) ; `tailwind-merge` étendu aux jetons Ardoise |
-| Polices | Plus Jakarta Sans, KaTeX auto-hébergées (v3) | Instrument Sans via l'option `fonts` de laravel-vite-plugin : **téléchargée au build et servie depuis `public/build/assets`** (auto-hébergée) | ✅ v3 : `@fontsource-variable/plus-jakarta-sans` 5.3.0 importé dans `app.css` (Sora et Lexend retirés au point 8, Geist et Instrument Serif au point 9) ; option `fonts` du plugin retirée (elle faisait télécharger le WOFF) — `DESIGN.md` § 13 |
+| Polices | Bricolage Grotesque, KaTeX auto-hébergées (v4) | Instrument Sans via l'option `fonts` de laravel-vite-plugin : **téléchargée au build et servie depuis `public/build/assets`** (auto-hébergée) | ✅ v4 : `@fontsource-variable/bricolage-grotesque` 5.3.0 (fichier `opsz`) importé dans `app.css` (Sora et Lexend retirés au point 8, Geist et Instrument Serif au point 9, Plus Jakarta Sans au point 10) ; option `fonts` du plugin retirée (elle faisait télécharger le WOFF) — `DESIGN.md` § 13 |
 | Formules | KaTeX | absent | ✅ `katex` 0.19.1 (types inclus), composant `Formule`, pré-optimisé dans `vite.config.ts` |
 | Hors ligne | SW maison, Dexie, UUID v7 | absent | `dexie` 4.4.7 au lot 0 ; UUID v7 écrit à la main (`lib/hors-ligne/uuid7.ts`) |
 | Graphiques / éditeur | Recharts / TipTap | absents | lots 1 (TipTap) et 6 (Recharts) |
@@ -631,6 +634,52 @@ cette question à sa façon. Elle distingue deux notions :
      présente, chemin vide ou dossier) ; `contrastes.test.ts` aux valeurs v3 ;
      captures de référence régénérées. Totaux : 112 Pest, 125 Vitest,
      98 Playwright ; `tsc`, `vp check`, Pint, build verts.
+
+10. [x] **Design « Ardoise » v4 — plus original, plus professionnel** (2026-10-30)
+   - **Constat** : Maurice valide la direction v3 mais veut « beaucoup
+     mieux » : plus original, plus professionnel ; des **images par défaut**
+     (remplaçables ensuite) ; une police qui fasse « site à 10 000 $ » ; des
+     boutons de vitrine moins gros et moins arrondis (« ça fait IA »). Analyse :
+     la v3 cumulait les tics d'une page générée (pilule partout, pastille de
+     flèche, halo orange sous les boutons, sur-titres en capitales espacées,
+     libellés à points médians, mot du titre en couleur, cartes identiques,
+     trois surfaces fortes).
+   - **Décision** :
+     - police : **Bricolage Grotesque** variable, fichier `opsz` (76,9 Ko en
+       latin, budget 120 Ko), choisie sur spécimen parmi six familles ;
+       Plus Jakarta Sans retirée ; grand titre en 350 / 600, vitrine à 72 px ;
+     - formes : boutons à **10 px**, graisse 500, 44 px au plus, ombre courte
+       sans halo, sans flèche ; cartes 16 px, panneaux 24 px ; onglets,
+       choix, toasts sur `rounded-controle` ;
+     - **illustrations par défaut** : cinq SVG originaux en papier découpé
+       (`public/images/vitrine/defaut/` : héros — le Nimba et le Fouta au
+       crépuscule, un chemin à trois jalons —, CEE, BEPC, Bac, soir ; 17 Ko
+       en tout), servies par `App\Support\ImagesVitrine` (remplace
+       `PhotoVitrine`) et remplaçables dans `config('vitrine.illustrations')` ;
+       un chemin sans fichier retombe sur le dessin par défaut ; la photo de
+       Maurice, si elle vient, se pose devant l'illustration du héros ;
+     - **vitrine recomposée** autour d'un seul moment fort (héros illustré
+       + deux fiches flottantes), preuves et atouts en filets, examens
+       illustrés, « Trois gestes, chaque soir » illustré, section
+       « Tout tient dans le téléphone » avec l'aperçu, FAQ en filets, un seul
+       appel final ; plus de sur-titres en capitales (pied de page compris) ;
+     - règles mises à jour : `DESIGN.md` (§ 0.1, 3, 4, 7, 8, 11, 13),
+       compétence `design-ardoise`, `CLAUDE.md` (polices).
+   - **Vu avec Playwright** : spécimen des polices ; vitrine en 360 / 768 /
+     1366, clair et sombre ; connexion ; tableau de bord élève. Corrigé :
+     héros trop haut à 1366 × 768 (fiche sous la ligne de flottaison → cadre
+     carré dès 1024 px, 5:4 sur mobile) ; halo devenu voile olive en sombre
+     (`dark:opacity-40`) ; illustration du soir écrasante à 768 px
+     (`max-w-xl`) ; étiquette « TA SÉANCE DU JOUR » en capitales sur
+     l'accueil élève → casse normale.
+   - **Incident** : une conversion de fins de ligne lancée trop largement a
+     abîmé les captures PNG de référence ; supprimées puis régénérées
+     (96 PNG relus, tous lisibles).
+   - **Preuve** : `VitrineTest` passe à 7 tests (dessins par défaut,
+     remplacement, repli sur chemin absent, vide, dossier ou nul) ; captures
+     de référence régénérées après relecture. Totaux : 118 Pest, 125 Vitest,
+     98 Playwright (axe sans violation sérieuse) ; `tsc`, `vp check`, Pint,
+     Larastan, build verts.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

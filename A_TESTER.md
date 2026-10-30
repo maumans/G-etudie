@@ -36,7 +36,7 @@
   3. Parcourir la page en thème clair, puis passer le téléphone en thème
      sombre et la recharger.
   4. Dehors ou près d'une fenêtre, luminosité au maximum puis au minimum.
-- Quoi observer : Plus Jakarta Sans partout (pas une police système), mots
+- Quoi observer : Bricolage Grotesque partout (pas une police système), mots
   bien espacés dans les titres ; rien ne dépasse à droite ; verdicts lisibles (icône + mot) ;
   les formules s'affichent (pas de LaTeX brut) ; le défilement reste fluide.
 - En cas d'échec, relever : capture d'écran, modèle du téléphone, version

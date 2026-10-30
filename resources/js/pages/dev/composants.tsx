@@ -251,21 +251,21 @@ function Typographie() {
                     </span>
                 </p>
                 <p className="text-titre-ecran-large font-semibold tracking-tight">
-                    Titre d'écran desktop — Jakarta 32
+                    Titre d'écran desktop — Bricolage 32
                 </p>
                 <p className="text-titre-ecran font-semibold tracking-tight">
-                    Titre d'écran mobile — Jakarta 24
+                    Titre d'écran mobile — Bricolage 24
                 </p>
                 <p className="text-titre-carte font-semibold tracking-tight">
-                    Titre de carte — Jakarta 16
+                    Titre de carte — Bricolage 16
                 </p>
                 <p className="text-lecture">
-                    Corps de lecture — Jakarta 17, interligne 1,65. Au marché de
-                    Madina, un kilo de riz coûte {formaterGnf(12500)}.
+                    Corps de lecture — Bricolage 17, interligne 1,65. Au marché
+                    de Madina, un kilo de riz coûte {formaterGnf(12500)}.
                 </p>
-                <p>Interface — Jakarta 14.</p>
-                <p className="text-aide text-ink-500">Aide — Jakarta 13.</p>
-                <p className="text-meta text-ink-500">Méta — Jakarta 12.</p>
+                <p>Interface — Bricolage 14.</p>
+                <p className="text-aide text-ink-500">Aide — Bricolage 13.</p>
+                <p className="text-meta text-ink-500">Méta — Bricolage 12.</p>
                 <p className="text-titre-carte font-data">
                     13,5 / 20 · {formaterGnf(100000)} · 01:42:07
                 </p>

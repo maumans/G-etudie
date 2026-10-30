@@ -1,4 +1,4 @@
-# DESIGN.md — « Ardoise » v3
+# DESIGN.md — « Ardoise » v4
 
 Design system de N'karamögö · G-Étudie. Le nom vient de l'ardoise de l'écolier :
 l'endroit où l'on s'essaie, où l'on se trompe, où l'on efface et où l'on recommence.
@@ -7,9 +7,12 @@ l'endroit où l'on s'essaie, où l'on se trompe, où l'on efface et où l'on rec
 > (contrastes recalculés par `tests/js/contrastes.test.ts`) ; Claude Code les
 > implémente, les **capture avec Playwright**, et consigne chaque ajustement
 > avec sa raison dans la section 13. **v3 (2026-10-30)** : adaptation complète
-> aux références choisies par Maurice (§ 0.1). La v1 (bleu roi, tout gros,
-> tout gras) puis la v2 (violet, neutre, froide, écrans vides) ont été
-> refusées — § 13.
+> aux références choisies par Maurice (§ 0.1). **v4 (2026-10-30)** : même
+> direction, en plus original et plus professionnel — police Bricolage
+> Grotesque, boutons sobres à angles de 10 px, illustrations par défaut
+> remplaçables, vitrine recomposée autour d'un seul moment fort (§ 13). La v1
+> (bleu roi, tout gros, tout gras) puis la v2 (violet, neutre, froide, écrans
+> vides) ont été refusées — § 13.
 
 ---
 
@@ -37,8 +40,8 @@ ni les photos : on en reprend le langage.
 | **Chaque matière a sa couleur partout** : tuile, barre en tirets, bloc d'emploi du temps | `MATIERES[cle]` : `tuile`, `plein`, `trait` ; `ProgressionSegments` en tirets ; légende de la jauge |
 | **Des écrans pleins d'informations utiles** | Le tableau de bord élève complet (§ 6.0) dès le lot 0, en données d'exemple marquées |
 | **Grands titres en contraste de graisse** : la phrase en léger, les mots clés en gras ou en couleur | Utilitaire `titre-contraste` + `<strong>` (§ 3) |
-| **Vitrine incarnée** : une vraie personne détourée devant une forme orange, atouts en pastilles, bandeau de preuves, FAQ, double appel final | `VisuelHeros` (photo fournie par Maurice, sinon aperçu de l'application), § 7 |
-| **Grands rayons, boutons en pilule, cartes blanches sur fond teinté, icônes fines** | Rayons 12 / 20 / 28 px, `Button` en pilule, `shadow-carte` chaude, Lucide 16-20 px |
+| **Vitrine incarnée** : une vraie personne détourée devant une forme orange, fiches flottantes, bandeau de preuves, FAQ, appel final | `VisuelHeros` : l'illustration du Nimba au crépuscule (dessin par défaut, remplaçable), la photo fournie par Maurice devant si elle existe, deux fiches de l'application qui débordent du cadre ; § 7 et § 8 |
+| **Rayons généreux, cartes blanches sur fond teinté, icônes fines** | Rayons 10 / 16 / 24 px, `shadow-carte` chaude, Lucide 16-20 px. **Pas la pilule partout** : sur nos écrans elle faisait « gabarit généré » (Maurice, v4) ; les boutons ont des angles de 10 px, seuls badges et pastilles restent ronds |
 
 Ce qu'on **ne** reprend **pas**, et pourquoi :
 - **les photos d'élèves mineurs et les photos de banque d'images** : seule la
@@ -219,30 +222,39 @@ l'accent est en nuance **700** (clair) / **300** (sombre), pas 600.
 
 | Usage | Police | Raison |
 |---|---|---|
-| Tout : interface, corps, titres, chiffres | **Plus Jakarta Sans** variable (400 → 800) | Grotesque chaleureuse et contemporaine, la famille des références (Satoshi, General Sans) en libre ; chiffres nets ; un seul fichier pour toutes les graisses (27,3 Ko en latin) |
+| Tout : interface, corps, titres, chiffres | **Bricolage Grotesque** variable (graisse 200 → 800, taille optique 12 → 96) | Une grotesque d'inspiration française et anglaise du XIXᵉ siècle, rare sur les sites d'apprentissage. Sa **taille optique** fait tout le travail : en grand, dessin serré et vif, `j` et `q` caractéristiques — le titre a une voix ; à 14 px, dessin ouvert et calme, pièges à encre qui gardent les lettres nettes sur un écran bas de gamme. Une famille, deux registres, un fichier (76,9 Ko en latin). Comparée en spécimen à Plus Jakarta, Instrument Sans, Schibsted, Familjen et Onest (§ 13) |
 | Formules | **KaTeX** (polices KaTeX locales) | Rendu typographique de qualité « manuel », hors ligne |
 
 - **Auto-hébergée** (Fontsource, importée dans `app.css`), découpée par
   `unicode-range`, `font-display: swap`. Une police distante échoue hors ligne.
-- Budget : **≤ 120 Ko** de polices. Mesure v3 : français = **27,3 Ko**.
+- Budget : **≤ 120 Ko** de polices. Mesure v4 : français = **76,9 Ko** (fichier
+  `opsz` : graisse + taille optique ; le fichier sans taille optique, 41 Ko,
+  perd justement le caractère des titres). Téléchargé une fois, gardé en cache.
 - `html { font-size: 16px }`. **Interface à 14 px**, corps de lecture d'une
   leçon à **17 px** (15 / 17 / 19), interligne 1,65. Champs à 16 px sous 640 px.
-- **Graisses** : 400 texte · 500 libellés · 600 titres de carte, boutons,
-  navigation · **700 chiffres clés et mots en `<strong>` d'un grand titre**.
-- **Approche** : Plus Jakarta est étroite. Titres `h1`–`h4` à `-0.01em` ; ne
-  jamais ajouter `tracking-tight` à un texte de moins de 20 px (les mots se
-  collent : « Majaugedepréparation », vu le 2026-10-30) ; `-0.02em` pour un
-  grand titre, `tracking-tight` pour un chiffre clé.
+- **Graisses** : 400 texte · 500 libellés **et boutons** · 600 titres de
+  carte, navigation active, chiffres clés · grand titre en **350 / 600**
+  (`titre-contraste`). Pas de 700-800 : trop lourd, ça « crie ».
+- **Approche** : titres `h1`–`h4` à `-0.01em` ; ne jamais ajouter
+  `tracking-tight` à un texte de moins de 20 px (les mots se collent :
+  « Majaugedepréparation », vu le 2026-10-30) ; `-0.025em` pour un grand titre
+  (`titre-contraste`), `tracking-tight` pour un chiffre clé.
+- **Pas de sur-titre en capitales espacées** au-dessus des titres, pas de
+  libellé « MOT · MOT · MOT » : ce sont les tics les plus reconnaissables d'une
+  page générée. Un titre se suffit ; s'il faut une précision, une phrase en
+  13 px `ink-500` en casse normale. Seul le bandeau « EXEMPLE — contenu
+  fictif » reste en capitales (c'est un avertissement).
 - `.font-data` = `tabular-nums` pour notes, chronomètres, points, montants GNF.
 
 ### Le grand titre en contraste (`titre-contraste`)
 
-La phrase en **400**, les mots qui comptent en **`<strong>` 700**, éventuellement
-un mot en mandarine `nimba-600` :
+La phrase en **350**, les mots qui comptent en **`<strong>` 600**. Plus de mot
+isolé en couleur (v4) : le contraste de graisse suffit, la couleur en plus
+faisait effet de manche.
 
 ```tsx
 <h1 className="titre-contraste text-vitrine">
-  Un soir, quinze minutes, <strong>et je sais <span className="text-nimba-600 dark:text-nimba-400">où j'en suis.</span></strong>
+  Un soir, quinze minutes, <strong>et je sais où j'en suis.</strong>
 </h1>
 <h1 className="titre-contraste text-titre-ecran-large">Bonjour, <strong>Aïssatou</strong></h1>
 ```
@@ -254,16 +266,19 @@ carte restent en 600 uniformes.
 
 `12` méta · `13` aide · `14` interface · `15-16` titre de carte · `17` lecture ·
 `24` titre d'écran mobile · `28-32` titre d'écran desktop · `28` chiffre de
-carte · `36-44` chiffre héros (jauge) · `40 → 64` titre de vitrine
-(42 mobile, 56 tablette, 64 desktop) · `32-40` titre de section de vitrine
+carte · `36-44` chiffre héros (jauge) · `44 → 72` titre de vitrine
+(44 mobile, 60 tablette, 72 desktop) · `32-44` titre de section de vitrine ·
+`17` chapeau de vitrine
 
 ---
 
 ## 4. Formes, espace, profondeur
 
-- **Rayons** : champs **12 px** (`rounded-controle`), cartes **20 px**
-  (`rounded-carte`), grands panneaux **28 px** (`rounded-panneau`), feuilles
-  24 px en haut, **boutons et badges en pilule**.
+- **Rayons** : boutons et champs **10 px** (`rounded-controle` ; bouton
+  `petite` 8 px, onglet dans une piste 7 px), cartes **16 px**
+  (`rounded-carte`), grands panneaux **24 px** (`rounded-panneau`), feuilles
+  20 px en haut. **Ronds** : seulement les badges, les pastilles (série,
+  étapes) et les boutons-icônes ronds (« reprendre »).
 - **Hauteurs** (une seule échelle pour boutons, champs, onglets) :
 
   | Taille | Mobile | ≥ 640 px | Usage |
@@ -436,7 +451,7 @@ d'écran de démo pour un vrai sujet.
 
 | Habillage | Public | Registre |
 |---|---|---|
-| **Vitrine** | visiteurs, parents, partenaires | Le plus expressif (BrightPath, DevSkill) : en-tête à navigation en pilules ; **héros à trois colonnes** — grand titre en contraste, visuel (photo détourée fournie par Maurice devant une forme mandarine, sinon `ApercuApplication`), trois atouts en pastilles mandarine ; bandeau de preuves (bloc mandarine, carte blanche, citation) ; examens et matières ; « Comment ça marche » en trois étapes numérotées à l'encre ; FAQ ; double appel final (`surface-marque` élève, `surface-encre` parents et enseignants) ; pied en colonnes. Puis démo jouable et compte à rebours au lot 8 |
+| **Vitrine** | visiteurs, parents, partenaires | Le plus expressif (BrightPath, DevSkill), mais **un seul moment fort** : l'illustration du héros. En-tête en texte (pas de pilules), filet discret ; **héros à deux colonnes** — grand titre en contraste, chapeau 17 px, deux boutons de 44 px (plein + contour), examens préparés en étiquettes ; à droite l'illustration du Nimba au crépuscule (photo de Maurice devant si fournie) et deux fiches de l'application qui débordent du cadre (séance du jour, jauge) ; **preuves en filets** (trois colonnes séparées par des traits, pas des cartes) ; examens en cartes illustrées + matières ; « Trois gestes, chaque soir » : illustration du soir + étapes reliées par un trait + principe des corrigés ; « Tout tient dans le téléphone » : atouts en filets + `ApercuApplication` sur cercles concentriques ; FAQ en filets ; **un** appel final `surface-encre` avec le soleil couchant ; pied en colonnes. Puis démo jouable et compte à rebours au lot 8 |
 | **Espace élève** | élèves | Canevas crème avec `fond-ambiance` ; barre d'onglets en bas sur mobile (Accueil · Cours · Annales · Examens blancs · Moi ; icône active dans une pilule teintée), barre latérale sur desktop (entrée active en relief, carte de l'élève en bas : initiale sur pastille soleil, jamais de photo). Accueil = tableau de bord complet (§ 6.0) |
 | **Back-office contenu** | rédacteurs, relecteurs | Dense, calme, efficace : chrome claire et achromatique, couleur réservée aux statuts (brouillon, en relecture, publié). Éditeur pleine largeur, aperçu « comme l'élève le verra » côte à côte |
 | **Console plateforme** | superadmin | Barre latérale sombre : on n'est pas « dans » une école, on est au-dessus. Signal permanent, pas un message qu'on ferme |
@@ -455,17 +470,29 @@ du texte) · Parcours d'accueil (4 écrans) · Connexion / inscription par tél�
 ## 8. Illustrations et iconographie
 
 - Icônes : **Lucide**, trait 2 px, 16-20 px (§ 4).
-- **Photo de la vitrine** (décision de Maurice, 2026-10-30) : une photo
-  **fournie par Maurice**, d'une personne **majeure**, avec son **autorisation
-  écrite signée** de diffusion. Déposée en
-  `public/images/vitrine/heros.webp` (`config/vitrine.php`) : WebP à fond
-  transparent (personne détourée), ≈ 900 × 1100 px, ≤ 150 Ko. Tant qu'elle
-  manque, la vitrine affiche l'aperçu de l'application à la même place
-  (`App\Support\PhotoVitrine`). Aucune autre photo de personne.
-- Illustrations : **SVG originaux**, style trait + aplats, palette de la marque,
-  scènes du quotidien guinéen (révision à la lumière d'une lampe, cour d'école,
-  marché) — à commander à un illustrateur ou à produire en SVG simple.
-  Interdit : personnages ou logos protégés, photos de mineurs réels, photos de
+- **Illustrations par défaut** (v4) : cinq dessins SVG originaux livrés avec
+  l'application dans `public/images/vitrine/defaut/` (17 Ko en tout) — `heros`
+  (le Nimba et les plateaux du Fouta au crépuscule, un chemin qui monte et
+  trois jalons : CEE, BEPC, Bac), `cee` (l'ardoise et le crayon), `bepc` (la
+  pile de manuels aux couleurs des matières, l'équerre), `bac` (la toque et le
+  diplôme), `soir` (la fenêtre sur la nuit, la lampe, le cahier, le
+  téléphone). **Langage** : papier découpé — aplats chauds en couches, pas de
+  contour, cercles concentriques du soleil, grain léger (`feTurbulence`),
+  palette de la marque plus la latérite ; pas de personnage, pas de texte dans
+  l'image. Un nouveau dessin suit ce langage.
+- **Remplacer une illustration** : déposer l'image dans
+  `public/images/vitrine/` et changer son chemin dans
+  `config('vitrine.illustrations')` — mêmes proportions (héros 6:7, examens
+  18:11, soir 28:23), SVG, WebP ou JPEG ≤ 150 Ko. Un chemin qui ne mène à
+  aucun fichier retombe sur le dessin par défaut : la vitrine n'a jamais de
+  trou (`App\Support\ImagesVitrine`, une seule autorité).
+- **Photo de la vitrine** (décision de Maurice, 2026-10-30), facultative : une
+  photo **fournie par Maurice**, d'une personne **majeure**, avec son
+  **autorisation écrite signée** de diffusion. Déposée en
+  `public/images/vitrine/heros.webp` (`config('vitrine.photo_heros')`) : WebP à
+  fond transparent (personne détourée), ≈ 900 × 1100 px, ≤ 150 Ko ; elle se
+  pose **devant** l'illustration du héros. Aucune autre photo de personne.
+- Interdit : personnages ou logos protégés, photos de mineurs réels, photos de
   banque d'images génériques.
 - États vides illustrés et **toujours accompagnés d'une action** (« Aucun examen
   blanc pour l'instant. Passe ton premier : 45 min, Maths BEPC 2022. »).
@@ -510,7 +537,7 @@ jeu de contrôles ne doit survivre au kit de démarrage : ses `PrimaryButton`,
 
 | Composant | Contrat |
 |---|---|
-| `Button` | **En pilule.** Deux axes. **`variant`** = intensité : `default` (plein mandarine `nimba-600` + `shadow-bouton`, l'action dominante), `encre` (plein noir : action forte sans couleur, seconde action d'un héros), `doux` (teinte mandarine), `succes` (plein vert : l'action qui conclut), `destructive` (plein framboise, toujours confirmé), `outline` (blanc, filet `contour`), `ghost`. **`ton`** (sur `outline`/`ghost`) : `neutre`, `nimba`, `danger`. **`taille`** : `grande` 48, `normale` 44 → 40, `compacte` 36, `petite` 32 (§ 4). Graisse 600, 14 px, icône 16 px. Sur `surface-marque`, bouton blanc à texte `nimba-700`. Un appel de héros peut porter sa flèche dans une pastille blanche translucide. Un bouton dit ce qu'il fait, jamais « Soumettre ». Icône seule ⇒ `aria-label` + `aria-hidden` sur l'icône |
+| `Button` | **Angles de 10 px, graisse 500**, ombre courte sans halo, enfoncement d'un pixel au clic. Deux axes. **`variant`** = intensité : `default` (plein mandarine `nimba-600` + `shadow-bouton`, l'action dominante), `encre` (plein noir : action forte sans couleur, seconde action d'un héros), `doux` (teinte mandarine), `succes` (plein vert : l'action qui conclut), `destructive` (plein framboise, toujours confirmé), `outline` (blanc, filet `contour`), `ghost`. **`ton`** (sur `outline`/`ghost`) : `neutre`, `nimba`, `danger`. **`taille`** : `grande` 44, `normale` 44 → 40, `compacte` 36, `petite` 32 (§ 4). 14 px (15 en `grande`), icône 16 px. Sur `surface-marque`, bouton blanc à texte `nimba-700`. **Pas de flèche ajoutée au libellé, pas de pastille de flèche** (v4) : une seconde action est un bouton `outline` ou `ghost`, pas un bouton plus gros. Un bouton dit ce qu'il fait, jamais « Soumettre ». Icône seule ⇒ `aria-label` + `aria-hidden` sur l'icône |
 | `Input`, `Textarea`, `Label` | Même hauteur que les boutons du même habillage (44 → 40 px ; `compacte` 36) ; classes partagées `CHAMP_BASE` / `CHAMP_CONTENEUR` (§ 4) ; libellé 14 px en 500 toujours visible (pas de libellé-placeholder), 6 px au-dessus du champ ; aide en 13 px `ink-500` ; message d'erreur 13 px rouge avec icône de 14 px, lié par `aria-describedby` |
 | `SearchInput` | La frappe met à jour le champ tout de suite ; `onRecherche` est appelé **350 ms après la dernière frappe** ; **Entrée** lance tout de suite ; **Échap** et la croix vident le champ **et relancent la recherche à vide** (sinon la liste reste filtrée sur un terme effacé) ; une valeur identique ne relance rien. Sans `onRecherche`, simple champ contrôlé. Les navigations de filtre passent en `preserveScroll` + `replace` (pas une entrée d'historique par caractère) |
 | `TelephoneInput` | Indicatif +224 fixe, 9 chiffres groupés à l'affichage (`6xx xx xx xx`), clavier numérique (`inputmode="tel"`), valeur normalisée envoyée au serveur |
@@ -773,3 +800,54 @@ contraste léger / gras**, **tableau de bord complet en données d'exemple**.
 parcours), axe sans violation sérieuse, aucun débordement ; captures de
 référence régénérées ; `contrastes.test.ts` aux valeurs v3 (125 Vitest) ;
 Pest `TableauDeBordEleveTest`, `VitrineTest` (112 Pest).
+
+### Refonte v4 — même direction, plus original, plus professionnel (2026-10-30)
+
+*Constat* (Maurice, sur la v3) : « ça ressemble aux références, mais on peut
+faire beaucoup mieux » ; il manque des **images par défaut** (même
+remplaçables) ; la police doit faire « site à 10 000 $ » ; les **boutons de la
+vitrine sont gros et trop arrondis — ça fait IA**. Analyse : la v3 cumulait les
+tics d'une page générée — pilule partout, pastille de flèche dans le bouton,
+halo orange sous chaque bouton plein, sur-titres en capitales espacées,
+« Réviser · S'entraîner · Réussir », un mot du titre en couleur, contenus
+découpés en cartes identiques, trois surfaces fortes concurrentes.
+
+*Correction* :
+1. **Police** : Bricolage Grotesque (fichier `opsz`, 76,9 Ko) à la place de
+   Plus Jakarta Sans, après un spécimen comparatif de six familles
+   (Jakarta, Bricolage en taille optique et en chasse étroite, Instrument
+   Sans, Schibsted, Familjen, Onest) sur le titre réel, une ligne
+   d'interface, un bouton et des chiffres. Retenue pour la taille optique
+   (caractère en grand, calme en petit) et le rendu net à 14 px. Grand titre
+   en 350 / 600, vitrine à 72 px. Écartées : une serif d'affichage (crème +
+   serif + orange = le cliché n° 1 des pages générées), les grotesques trop
+   neutres (Schibsted, Onest : pas de voix), la chasse étroite (trop
+   « affiche »), Familjen (trop excentrique à 14 px).
+2. **Boutons et formes** : angles de 10 px (fini la pilule), graisse 500,
+   44 px au plus, ombre courte sans halo coloré, pas de flèche ;
+   cartes 16 px, panneaux 24 px. Onglets, choix de QCM, toasts alignés sur
+   `rounded-controle`.
+3. **Illustrations** : cinq SVG originaux en papier découpé (§ 8), servis
+   par `ImagesVitrine` et remplaçables dans `config/vitrine.php`.
+4. **Vitrine recomposée** (§ 7) autour d'un seul moment fort : en-tête en
+   texte, héros à deux colonnes avec l'illustration et deux fiches flottantes,
+   preuves et atouts en filets plutôt qu'en cartes, examens illustrés, étapes
+   reliées, un seul appel final. Plus aucun sur-titre en capitales ; le pied
+   de page passe aussi en casse normale.
+5. **Espace élève** : il hérite de la police et des formes ; l'étiquette « Ta
+   séance du jour » passe en casse normale.
+
+*Pièges rencontrés* :
+- **Héros à 1366 × 768** : l'illustration en 6:7 poussait la fiche « Séance du
+  jour » sous la ligne de flottaison → carré à partir de 1024 px, 5:4 sur
+  mobile (recadré sur le chemin, `object-[50%_70%]`).
+- **Halo en sombre** : la lueur soleil devenait un voile olive sur le brun →
+  `dark:opacity-40` ; l'illustration claire est adoucie (`dark:brightness-90`).
+- **Illustration du soir à 768 px** : pleine largeur, elle écrasait la
+  section → `max-w-xl` centrée jusqu'au passage en deux colonnes.
+
+*Preuve* : spécimen et captures 360 / 768 / 1366 en clair et sombre relus ;
+98 tests Playwright verts (axe sans violation sérieuse, captures de
+référence régénérées après relecture) ; 118 Pest (dont 7 dans
+`VitrineTest` : dessins par défaut, remplacement, repli), 125 Vitest ; `tsc`,
+`vp check`, Pint, Larastan et `npm run build` passent.

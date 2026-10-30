@@ -292,7 +292,7 @@ function SeanceDuJour({ seance }: { seance: Tableau['seance'] }) {
                 className="absolute -top-10 -right-10 -z-10 size-40 rounded-full border-[28px] border-white/10"
             />
             <div className="grid gap-2">
-                <p className="flex items-center gap-1.5 text-meta font-semibold tracking-wider text-white/80 uppercase">
+                <p className="flex items-center gap-1.5 text-aide font-medium text-white/85">
                     <Sparkles aria-hidden className="size-3.5" />
                     Ta séance du jour
                 </p>

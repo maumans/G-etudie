@@ -89,8 +89,13 @@ recette. L'essentiel ne se rediscute pas :
 - **Coloré par la matière** (`MATIERES[cle]` : tuile, barre, trait), toujours
   avec le nom et l'icône.
 - **Jetons seulement** (`app.css`) ; un motif répété devient un composant.
-- **Photos** : uniquement celle que Maurice fournit (personne majeure,
-  autorisation écrite), à l'emplacement `config('vitrine.photo_heros')`.
+- **Images** : la vitrine a toujours ses illustrations (dessins par défaut
+  remplaçables, `config('vitrine.illustrations')`, `DESIGN.md` § 8) ; comme
+  photo, uniquement celle que Maurice fournit (personne majeure, autorisation
+  écrite), à l'emplacement `config('vitrine.photo_heros')`.
+- **Sobre, pas générique** : boutons à 10 px sans halo ni flèche, pas de
+  sur-titre en capitales espacées, pas de libellé « A · B · C », un seul
+  moment fort par écran.
 - Avant de déclarer un écran fini, le poser à côté des références : s'il paraît
   plus pauvre, plus froid ou plus vide, il n'est pas fini.
 
@@ -146,8 +151,9 @@ règles ne se rediscutent pas.
   **opacité** (`bg-nimba-600/[0.12] dark:bg-nimba-500/25`), jamais en nuance
   claire fixe (`bg-nimba-50`), qui reste blanche en sombre sous un texte devenu
   clair — blanc sur blanc.
-- **Polices auto-hébergées** : une police distante échoue hors ligne. Plus
-  Jakarta Sans variable, par Fontsource, importée dans `app.css`.
+- **Polices auto-hébergées** : une police distante échoue hors ligne.
+  Bricolage Grotesque variable (fichier `opsz`), par Fontsource, importée dans
+  `app.css`.
 - **Écran qui affiche la date ou l'heure** : figer l'horloge dans sa capture
   (`page.clock.setFixedTime`), sinon la référence change chaque jour.
 - **`public/hot` oublié** après un `npm run dev` arrêté : le build semble cassé

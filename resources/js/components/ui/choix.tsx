@@ -18,7 +18,7 @@ type EtatChoix =
   | "ecartee"
 
 const choixVariants = cva(
-  "group/choix relative flex min-h-14 w-full items-center gap-3 rounded-[12px] border bg-card px-3 py-2.5 text-left text-lecture text-ink-900 shadow-xs transition-[background-color,border-color,box-shadow] duration-150 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default dark:bg-relief/40",
+  "group/choix relative flex min-h-14 w-full items-center gap-3 rounded-controle border bg-card px-3 py-2.5 text-left text-lecture text-ink-900 shadow-xs transition-[background-color,border-color,box-shadow] duration-150 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default dark:bg-relief/40",
   {
     variants: {
       etat: {

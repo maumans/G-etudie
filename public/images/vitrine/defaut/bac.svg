@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 220" width="360" height="220">
+  <!-- N'karamögö · G-Étudie — vignette par défaut du Baccalauréat unique
+       (DESIGN.md § 8) : la toque et le diplôme, au sommet du chemin.
+       Dessin original. -->
+  <defs>
+    <radialGradient id="lueur" cx="1" cy="0" r="1">
+      <stop offset="0" stop-color="#FE8959"/>
+      <stop offset="1" stop-color="#D04904"/>
+    </radialGradient>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" stitchTiles="stitch"/>
+      <feColorMatrix values="0 0 0 0 .2  0 0 0 0 .06  0 0 0 0 .02  0 0 0 .1 0"/>
+    </filter>
+  </defs>
+  <rect width="360" height="220" fill="url(#lueur)"/>
+  <g fill="none" stroke="#FFE3D6" stroke-width="1.5">
+    <circle cx="250" cy="116" r="70" stroke-opacity=".5"/>
+    <circle cx="250" cy="116" r="96" stroke-opacity=".32"/>
+    <circle cx="250" cy="116" r="124" stroke-opacity=".2"/>
+  </g>
+  <g fill="#FFF3EC">
+    <circle cx="40" cy="36" r="2"/>
+    <circle cx="96" cy="22" r="1.5"/>
+    <circle cx="330" cy="30" r="1.5"/>
+  </g>
+
+  <!-- Le diplôme roulé -->
+  <g transform="rotate(-14 130 160)">
+    <rect x="58" y="146" width="150" height="30" rx="15" fill="#FFF3EC"/>
+    <ellipse cx="200" cy="161" rx="8" ry="15" fill="#F2DCCD"/>
+    <ellipse cx="200" cy="161" rx="3" ry="6" fill="#D9BBA6"/>
+    <rect x="118" y="144" width="14" height="34" fill="#1E1814"/>
+    <path d="M122 176l-10 22 9-4 5 8 4-26Z" fill="#1E1814"/>
+    <path d="M128 176l4 26 5-8 9 4-10-22Z" fill="#2E2520"/>
+  </g>
+
+  <!-- La toque -->
+  <g>
+    <path d="M214 120v26c0 12 22 22 46 22s46-10 46-22v-26Z" fill="#2E2520"/>
+    <path d="M260 60l92 38-92 38-92-38Z" fill="#1E1814"/>
+    <path d="M260 60l92 38-92 38-92-38Z" fill="none" stroke="#FFF3EC" stroke-opacity=".12" stroke-width="2"/>
+    <circle cx="260" cy="98" r="5" fill="#FFC21A"/>
+    <path d="M260 98C290 106 320 108 330 112" fill="none" stroke="#FFC21A" stroke-width="3" stroke-linecap="round"/>
+    <path d="M330 112v34" stroke="#FFC21A" stroke-width="3" stroke-linecap="round"/>
+    <path d="M324 144h12l3 22h-18Z" fill="#FFC21A"/>
+  </g>
+
+  <rect width="360" height="220" filter="url(#grain)"/>
+</svg>
