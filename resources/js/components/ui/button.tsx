@@ -5,27 +5,29 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 
 /**
- * Bouton Ardoise (DESIGN.md § 11). Deux axes :
- * - `variant` = intensité : `default` (plein nimba, l'action dominante),
- *   `doux` (teinte nimba : l'action secondaire qui reste invitante),
- *   `succes` (plein vert, l'action qui conclut), `destructive` (plein rouge,
- *   toujours confirmé), `outline`, `ghost` ;
+ * Bouton Ardoise (DESIGN.md § 11), en pilule. Deux axes :
+ * - `variant` = intensité : `default` (plein mandarine, l'action dominante),
+ *   `encre` (plein noir : l'action forte sans couleur, ou la seconde action
+ *   d'un héros), `doux` (teinte mandarine), `succes` (plein vert, l'action
+ *   qui conclut), `destructive` (plein framboise, toujours confirmé),
+ *   `outline` (blanc, filet), `ghost` ;
  * - `ton` (sur `outline` et `ghost`) = famille : `neutre`, `nimba`, `danger`.
  * Hauteurs : 44 px sur mobile, 40 px à partir de 640 px (`normale`) ; 48 px
  * pour un appel de héros (`grande`) ; 36 px en barre d'outils (`compacte`).
  * Icône seule : `aria-label` obligatoire, icône en `aria-hidden`.
  */
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center gap-2 rounded-controle font-medium whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] duration-150 outline-none select-none active:translate-y-px focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap transition-[color,background-color,border-color,box-shadow,transform] duration-150 outline-none select-none active:scale-[0.98] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default:
-          "bg-nimba-600 text-white shadow-bouton hover:bg-nimba-700 dark:hover:bg-nimba-500",
-        doux: "bg-nimba-600/[0.10] text-nimba-700 hover:bg-nimba-600/[0.16] dark:bg-nimba-300/15 dark:text-nimba-300 dark:hover:bg-nimba-300/20",
-        succes: "bg-juste-600 text-white shadow-bouton hover:bg-juste-700",
-        destructive: "bg-faux-600 text-white shadow-bouton hover:bg-faux-700",
-        outline: "border bg-card shadow-xs dark:bg-relief/40",
+        default: "bg-nimba-600 text-white shadow-bouton hover:bg-nimba-700",
+        encre:
+          "bg-ink-900 text-craie-50 shadow-[0_1px_2px_rgb(30_24_20/0.2)] hover:bg-ink-900/85",
+        doux: "bg-nimba-500/[0.12] text-nimba-700 hover:bg-nimba-500/[0.18] dark:bg-nimba-400/15 dark:text-nimba-300 dark:hover:bg-nimba-400/20",
+        succes: "bg-juste-600 text-white shadow-carte hover:bg-juste-700",
+        destructive: "bg-faux-600 text-white shadow-carte hover:bg-faux-700",
+        outline: "border bg-card shadow-xs dark:bg-relief/50",
         ghost: "bg-transparent",
       },
       ton: {
@@ -34,10 +36,10 @@ const buttonVariants = cva(
         danger: "",
       },
       taille: {
-        normale: "h-11 px-4 text-interface sm:h-10",
+        normale: "h-11 px-5 text-interface sm:h-10",
         grande: "h-12 px-6 text-[0.9375rem]",
-        compacte: "h-9 px-3.5 text-interface",
-        petite: "h-8 rounded-[8px] px-3 text-aide",
+        compacte: "h-9 px-4 text-interface",
+        petite: "h-8 px-3 text-aide",
         icone: "size-11 sm:size-10",
         "icone-compacte": "size-9",
       },
@@ -52,7 +54,7 @@ const buttonVariants = cva(
         variant: ["outline", "ghost"],
         ton: "nimba",
         className:
-          "text-nimba-700 hover:bg-nimba-600/[0.08] dark:text-nimba-300 dark:hover:bg-nimba-300/10",
+          "text-nimba-700 hover:bg-nimba-500/[0.08] dark:text-nimba-400 dark:hover:bg-nimba-400/10",
       },
       {
         variant: ["outline", "ghost"],
@@ -60,17 +62,17 @@ const buttonVariants = cva(
         className:
           "text-faux-600 hover:bg-faux-600/[0.08] dark:text-faux-400 dark:hover:bg-faux-400/10",
       },
-      // Bordure d'un outline : discrète. Le libellé identifie le bouton ; la
-      // bordure, l'ombre et le fond blanc le détachent de la page.
+      // Filet d'un outline : discret. Le libellé identifie le bouton ; le
+      // filet, l'ombre et le fond blanc le détachent de la page.
       {
         variant: "outline",
         ton: "neutre",
-        className: "border-contour hover:border-ink-400/60",
+        className: "border-contour hover:border-ink-400/70",
       },
       {
         variant: "outline",
         ton: "nimba",
-        className: "border-nimba-600/35 dark:border-nimba-300/35",
+        className: "border-nimba-500/40 dark:border-nimba-400/40",
       },
       {
         variant: "outline",

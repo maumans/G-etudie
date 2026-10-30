@@ -24,7 +24,7 @@ export default function Numero({
     nouveauNumeroMasque: string | null;
 }) {
     return (
-        <div className="grid gap-6">
+        <div className="mx-auto grid w-full max-w-3xl gap-6">
             <EnteteCompte titre="Numéro" />
 
             <SectionCompte titre="Mon numéro">

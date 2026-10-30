@@ -50,7 +50,7 @@ export function CoquePersonnel({
             <aside
                 className={cn(
                     'sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 border-r px-3 pt-4 pb-3 lg:flex',
-                    sombre ? 'dark bg-[#100e17] text-ink-900' : 'bg-background',
+                    sombre ? 'dark bg-[#16110d] text-ink-900' : 'bg-background',
                 )}
             >
                 <EnTete espace={espace} accueil={accueil} lateral />
@@ -63,7 +63,7 @@ export function CoquePersonnel({
                     className={cn(
                         'sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b px-3 lg:hidden',
                         sombre
-                            ? 'dark bg-[#100e17] text-ink-900'
+                            ? 'dark bg-[#16110d] text-ink-900'
                             : 'bg-background/85 backdrop-blur-md',
                     )}
                 >

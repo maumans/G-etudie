@@ -3,8 +3,8 @@ import { cn } from '@/lib/utils';
 
 /**
  * Monogramme provisoire « N' » (DA8 : en attendant un logo vectoriel).
- * Dessin original : tuile violette éclairée en haut à gauche, « N » blanc
- * (≥ 6,5:1), apostrophe soleil.
+ * Dessin original : tuile mandarine éclairée en haut à gauche, « N » blanc,
+ * apostrophe à l'encre.
  */
 export function Monogramme({ className }: { className?: string }) {
     const degrade = useId();
@@ -17,8 +17,8 @@ export function Monogramme({ className }: { className?: string }) {
         >
             <defs>
                 <linearGradient id={degrade} x1="0" y1="0" x2="1" y2="1">
-                    <stop offset="0" stopColor="#814FFE" />
-                    <stop offset="1" stopColor="#5D1FC8" />
+                    <stop offset="0" stopColor="#FF8A4C" />
+                    <stop offset="1" stopColor="#D04904" />
                 </linearGradient>
             </defs>
             <rect width="40" height="40" rx="11" fill={`url(#${degrade})`} />
@@ -36,7 +36,7 @@ export function Monogramme({ className }: { className?: string }) {
                 d="M11.5 28.5v-17h3.3l8.6 11.6V11.5h3.1v17h-3.2L14.6 16.9v11.6h-3.1Z"
                 fill="#FFFFFF"
             />
-            <path d="M29 11.5h3.4l-1.7 6h-2.4l.7-6Z" fill="#FFC21A" />
+            <path d="M29 11.5h3.4l-1.7 6h-2.4l.7-6Z" fill="#1E1814" />
         </svg>
     );
 }

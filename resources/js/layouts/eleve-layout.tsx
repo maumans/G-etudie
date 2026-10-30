@@ -16,7 +16,7 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
     const accueil = NAVIGATION_ELEVE[0];
 
     return (
-        <div className="min-h-dvh bg-background lg:flex">
+        <div className="min-h-dvh bg-background fond-ambiance lg:flex">
             <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-8 border-r px-4 pt-5 pb-4 lg:flex">
                 <Link
                     href={accueilEleve()}
@@ -48,7 +48,7 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
                     <Initiale />
                 </header>
 
-                <main className="mx-auto w-full max-w-3xl px-4 pt-6 pb-28 sm:px-6 lg:pt-10 lg:pb-12">
+                <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-28 sm:px-6 lg:px-8 lg:pt-10 lg:pb-12">
                     {children}
                 </main>
             </div>

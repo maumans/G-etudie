@@ -27,7 +27,7 @@ export default function Affichage() {
         useReglagesAffichage();
 
     return (
-        <div className="grid gap-6">
+        <div className="mx-auto grid w-full max-w-3xl gap-6">
             <EnteteCompte titre="Affichage" />
 
             <SectionCompte

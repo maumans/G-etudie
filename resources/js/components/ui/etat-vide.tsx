@@ -38,7 +38,7 @@ function EtatVide({
         <Illustration className="size-6" strokeWidth={1.75} />
       </div>
       <div className="grid max-w-sm gap-1">
-        <p className="text-titre-carte font-semibold tracking-tight text-ink-900">
+        <p className="text-titre-carte font-semibold text-ink-900">
           {titre}
         </p>
         {message && <p className="text-interface text-ink-600">{message}</p>}

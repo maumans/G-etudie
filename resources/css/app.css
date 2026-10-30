@@ -1,5 +1,5 @@
 /*
- * Design system « Ardoise » v2 — DESIGN.md.
+ * Design system « Ardoise » v3 — DESIGN.md.
  *
  * - Les palettes fixes (marque, verdicts, matières) vivent dans @theme.
  * - Les neutres basculent en sombre : ils sont posés en variables sur :root et
@@ -14,12 +14,10 @@
 
 @import 'tw-animate-css';
 
-/* Polices auto-hébergées (Fontsource) : WOFF2, découpées par unicode-range —
-   seul le sous-ensemble utilisé est téléchargé. Geist variable (toutes les
-   graisses en un fichier), Instrument Serif italique pour les mots mis en
-   valeur des grands titres. */
-@import '@fontsource-variable/geist/wght.css';
-@import '@fontsource/instrument-serif/400-italic.css';
+/* Police auto-hébergée (Fontsource) : Plus Jakarta Sans variable, toutes les
+   graisses en un fichier WOFF2 par sous-ensemble (unicode-range) — le
+   français ne télécharge que le latin (27 Ko). */
+@import '@fontsource-variable/plus-jakarta-sans/wght.css';
 
 @source '../views';
 
@@ -28,14 +26,14 @@
 
 @theme {
     --font-sans:
-        'Geist Variable', ui-sans-serif, system-ui, sans-serif,
+        'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
-    --font-titre: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
-    --font-accent: 'Instrument Serif', ui-serif, Georgia, serif;
+    --font-titre:
+        'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
 
-    /* Échelle typographique (DESIGN.md § 3) — petite, dosée : la hiérarchie
-       vient de la graisse, de la couleur et de l'espace, pas de la taille. */
+    /* Échelle typographique (DESIGN.md § 3). Les grands titres jouent le
+       contraste de graisse (400 / 700), pas la taille seule. */
     --text-meta: 0.75rem;
     --text-meta--line-height: 1rem;
     --text-aide: 0.8125rem;
@@ -44,51 +42,56 @@
     --text-interface--line-height: 1.375rem;
     --text-titre-carte: 1rem;
     --text-titre-carte--line-height: 1.5rem;
-    --text-titre-ecran: 1.375rem;
-    --text-titre-ecran--line-height: 1.75rem;
-    --text-titre-ecran-large: 1.75rem;
-    --text-titre-ecran-large--line-height: 2.125rem;
-    --text-heros: 2.5rem;
-    --text-heros--line-height: 1.05;
-    --text-vitrine: 3.75rem;
+    --text-titre-ecran: 1.5rem;
+    --text-titre-ecran--line-height: 1.875rem;
+    --text-titre-ecran-large: 2rem;
+    --text-titre-ecran-large--line-height: 2.375rem;
+    --text-heros: 2.75rem;
+    --text-heros--line-height: 1;
+    --text-vitrine: 4rem;
     --text-vitrine--line-height: 1.02;
 
-    /* Formes (DESIGN.md § 4) */
-    --radius-controle: 10px;
-    --radius-carte: 16px;
+    /* Formes (DESIGN.md § 4) : boutons en pilule, champs à 12 px, cartes à
+       20 px, grands panneaux à 28 px. */
+    --radius-controle: 12px;
+    --radius-carte: 20px;
+    --radius-panneau: 28px;
     --radius-feuille: 24px;
     --radius-badge: 9999px;
     --radius-lg: var(--radius);
     --radius-md: calc(var(--radius) - 2px);
     --radius-sm: calc(var(--radius) - 4px);
 
-    /* Profondeur : ombres en couches, très douces ; une vraie ombre seulement
-       pour ce qui flotte. */
-    --shadow-carte: 0 1px 2px 0 rgb(16 16 24 / 0.04);
+    /* Profondeur : ombres chaudes, en couches, très douces ; une vraie ombre
+       seulement pour ce qui flotte. */
+    --shadow-carte:
+        0 1px 2px 0 rgb(56 32 16 / 0.04), 0 1px 1px 0 rgb(56 32 16 / 0.02);
     --shadow-releve:
-        0 1px 2px 0 rgb(16 16 24 / 0.04), 0 6px 16px -4px rgb(16 16 24 / 0.08);
+        0 1px 2px 0 rgb(56 32 16 / 0.04), 0 8px 24px -6px rgb(56 32 16 / 0.1);
     --shadow-bouton:
-        inset 0 1px 0 0 rgb(255 255 255 / 0.16),
-        0 1px 2px 0 rgb(16 16 24 / 0.14);
+        inset 0 1px 0 0 rgb(255 255 255 / 0.2),
+        0 1px 2px 0 rgb(56 32 16 / 0.16), 0 4px 12px -4px rgb(208 73 4 / 0.45);
     --shadow-flottant:
-        0 2px 6px 0 rgb(16 16 24 / 0.06), 0 20px 48px -12px rgb(16 16 24 / 0.28);
+        0 2px 6px 0 rgb(56 32 16 / 0.06), 0 24px 56px -16px rgb(56 32 16 / 0.3);
 
-    /* La marque (DESIGN.md § 2.2) — violet « Nimba », calculé en OKLCH
-       (teinte 290) : franchement violet, à distance du rouge et du vert des
-       verdicts. 600 = l'accent, 300 = l'accent en sombre. */
-    --color-nimba-50: #f5f4ff;
-    --color-nimba-100: #eae8ff;
-    --color-nimba-200: #d8d3ff;
-    --color-nimba-300: #b9aeff;
-    --color-nimba-400: #997fff;
-    --color-nimba-500: #814ffe;
-    --color-nimba-600: #702aed;
-    --color-nimba-700: #5d1fc8;
-    --color-nimba-800: #471f98;
-    --color-nimba-900: #311969;
-    --color-nimba-950: #1c0e40;
+    /* La marque (DESIGN.md § 2.2) — mandarine « Nimba », OKLCH teinte 42.
+       500 = la mandarine vive (surfaces, icônes, progressions, grands
+       chiffres) ; 600 = le remplissage des boutons (blanc dessus 4,5:1) ;
+       700 = liens et libellés sur teinte ; 400 = l'accent en sombre. */
+    --color-nimba-50: #fef4f1;
+    --color-nimba-100: #feeae2;
+    --color-nimba-200: #ffd3c3;
+    --color-nimba-300: #feb295;
+    --color-nimba-400: #fe8959;
+    --color-nimba-500: #f6641b;
+    --color-nimba-600: #d04904;
+    --color-nimba-700: #a63d02;
+    --color-nimba-800: #8a3301;
+    --color-nimba-900: #702905;
+    --color-nimba-950: #481803;
 
-    /* L'énergie : série, points, célébration. Jamais du texte sur blanc. */
+    /* L'énergie secondaire : étoiles, points, jour de grâce. Jamais du texte
+       sur blanc. */
     --color-soleil-50: #fff8e5;
     --color-soleil-100: #fff0c7;
     --color-soleil-200: #ffe399;
@@ -101,13 +104,15 @@
     --color-soleil-900: #423002;
 
     /* Les verdicts (DESIGN.md § 2.3) : 600 = texte clair et remplissage,
-       400 = texte en sombre. Jamais la couleur seule : icône + mot + couleur. */
+       400 = texte en sombre. Jamais la couleur seule : icône + mot + couleur.
+       Le rouge tire vers le framboise : un rouge orangé se confondrait avec
+       la mandarine de la marque. */
     --color-juste-400: #4ade80;
     --color-juste-600: #15803d;
     --color-juste-700: #116b33;
-    --color-faux-400: #f87171;
-    --color-faux-600: #c42b2b;
-    --color-faux-700: #a32323;
+    --color-faux-400: #fc7184;
+    --color-faux-600: #c41942;
+    --color-faux-700: #a31437;
     --color-indice-400: #f5a524;
     --color-indice-600: #8a5a00;
     --color-indice-700: #6f4800;
@@ -278,71 +283,71 @@
     --color-sidebar-ring: var(--sidebar-ring);
 }
 
-/* Neutres — thème clair (DESIGN.md § 2.1) : gris neutres, sans teinte bleue
-   (un canevas gris-bleu fait « logiciel d'administration »). .clair force le
+/* Neutres — thème clair (DESIGN.md § 2.1) : crème et encre chaudes (OKLCH
+   teinte 60) ; cartes blanches posées sur un canevas crème. .clair force le
    clair dans un sous-arbre sombre. */
 :root,
 .clair {
     color-scheme: light;
 
-    --craie-50: #fafafc;
-    --craie-100: #f1f1f5;
+    --craie-50: #fcf7f4;
+    --craie-100: #f5efea;
     --card: #ffffff;
     --relief: #ffffff;
-    --border: #e4e4e8;
-    --contour: #d3d3d9;
-    --ink-900: #18181e;
-    --ink-600: #5a5a64;
-    --ink-500: #72727b;
-    --ink-400: #8b8b93;
-    --lien: #5d1fc8;
-    --trame: rgb(16 16 24 / 0.08);
+    --border: #ece5df;
+    --contour: #ddd4ce;
+    --ink-900: #1e1814;
+    --ink-600: #655c55;
+    --ink-500: #766d66;
+    --ink-400: #988f87;
+    --lien: #a63d02;
+    --trame: rgb(56 32 16 / 0.08);
 
-    --primary: #702aed;
+    --primary: #d04904;
     --primary-foreground: #ffffff;
-    --destructive: #c42b2b;
+    --destructive: #c41942;
     --destructive-foreground: #ffffff;
-    --ring: #702aed;
+    --ring: #d04904;
 
-    --chart-1: #702aed;
+    --chart-1: #f6641b;
     --chart-2: #ffc21a;
     --chart-3: #0893bd;
     --chart-4: #069b90;
     --chart-5: #b97505;
 
-    --sidebar-primary: #702aed;
+    --sidebar-primary: #d04904;
     --sidebar-primary-foreground: #ffffff;
-    --sidebar-ring: #702aed;
+    --sidebar-ring: #d04904;
 }
 
 /* Neutres — thème sombre : les élèves révisent le soir. Doit suivre :root. */
 .dark {
     color-scheme: dark;
 
-    --craie-50: #0b0b0e;
-    --craie-100: #1d1d23;
-    --card: #141418;
-    --relief: #24242b;
-    --border: #28282e;
-    --contour: #37373e;
-    --ink-900: #f5f5f8;
-    --ink-600: #aaaab1;
-    --ink-500: #919199;
-    --ink-400: #71717a;
-    --lien: #b9aeff;
+    --craie-50: #110e0b;
+    --craie-100: #241f1c;
+    --card: #1a1613;
+    --relief: #2b2521;
+    --border: #302a26;
+    --contour: #3f3934;
+    --ink-900: #f8f4f1;
+    --ink-600: #b3ada8;
+    --ink-500: #9b948e;
+    --ink-400: #7b736c;
+    --lien: #fe8959;
     --trame: rgb(255 255 255 / 0.07);
 
-    --destructive: #f87171;
-    --ring: #b9aeff;
+    --destructive: #fc7184;
+    --ring: #fe8959;
 
-    --chart-1: #b9aeff;
+    --chart-1: #fe8959;
     --chart-3: #6ac8ee;
     --chart-4: #6acfc3;
     --chart-5: #ecac60;
 
-    --sidebar-primary: #b9aeff;
-    --sidebar-primary-foreground: #0b0b0e;
-    --sidebar-ring: #b9aeff;
+    --sidebar-primary: #fe8959;
+    --sidebar-primary-foreground: #110e0b;
+    --sidebar-ring: #fe8959;
 }
 
 /* Variables dérivées : redéclarées sur chaque racine de thème. Une variable
@@ -352,7 +357,7 @@
 .dark,
 .clair {
     --taille-lecture: 1.0625rem;
-    --radius: 0.625rem;
+    --radius: 0.75rem;
 
     --background: var(--craie-50);
     --foreground: var(--ink-900);
@@ -379,6 +384,19 @@
     font-variant-numeric: tabular-nums;
 }
 
+/* Grand titre en contraste de graisse (DESIGN.md § 3) : la phrase en 400,
+   les mots qui comptent en <strong> 700. « Tu as terminé <strong>3 modules</strong>
+   cette semaine. » */
+@utility titre-contraste {
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    word-spacing: 0.04em;
+
+    & strong {
+        font-weight: 700;
+    }
+}
+
 /* Bandeau « EXEMPLE — contenu fictif » (DESIGN.md § 6.7) */
 @utility hachures-exemple {
     background-image: repeating-linear-gradient(
@@ -389,19 +407,30 @@
 }
 
 /* Halo de la marque derrière un héros (vitrine, connexion) : dégradés CSS,
-   zéro octet téléchargé. Lumière violette en haut, touche de soleil à droite. */
+   zéro octet téléchargé. Lumière pêche en haut à droite, touche de soleil à
+   gauche — l'ambiance chaude des références. */
 @utility halo-marque {
     background-image:
         radial-gradient(
-            60% 50% at 20% 0%,
-            rgb(112 42 237 / 0.14),
+            55% 60% at 85% 0%,
+            rgb(254 178 149 / 0.45),
             transparent 70%
         ),
         radial-gradient(
-            40% 40% at 90% 10%,
-            rgb(255 194 26 / 0.16),
+            45% 45% at 5% 15%,
+            rgb(255 214 102 / 0.22),
             transparent 70%
         );
+}
+
+/* Ambiance des espaces connectés : une lueur pêche discrète en haut de page. */
+@utility fond-ambiance {
+    background-image: radial-gradient(
+        70% 320px at 75% 0%,
+        rgb(254 178 149 / 0.22),
+        transparent 75%
+    );
+    background-repeat: no-repeat;
 }
 
 /* Trame de points discrète, estompée vers le bas (fonds de héros). */
@@ -412,20 +441,32 @@
 }
 
 /* Surface pleine de la marque (séance du jour, panneau de connexion, appel
-   final de la vitrine) : violet profond, lumière en haut à gauche. */
+   final de la vitrine) : mandarine profonde (nimba-600, blanc 4,5:1 là où se
+   pose le texte), lumière vive en haut à droite, ombre en bas à gauche. */
 @utility surface-marque {
-    background-color: var(--color-nimba-700);
+    background-color: var(--color-nimba-600);
     background-image:
         radial-gradient(
-            80% 70% at 0% 0%,
-            rgb(153 127 255 / 0.55),
-            transparent 60%
+            55% 70% at 100% 0%,
+            rgb(254 137 89 / 0.75),
+            transparent 70%
         ),
         radial-gradient(
-            60% 60% at 100% 100%,
-            rgb(28 14 64 / 0.6),
+            60% 60% at 0% 100%,
+            rgb(112 41 5 / 0.45),
             transparent 70%
         );
+}
+
+/* Panneau noir (Eduvo, Oliver) : l'encre en grand, pour un bloc qui doit
+   peser sans couleur (tuteur, chiffre clé). */
+@utility surface-encre {
+    background-color: #1e1814;
+    background-image: radial-gradient(
+        60% 80% at 100% 0%,
+        rgb(246 100 27 / 0.28),
+        transparent 70%
+    );
 }
 
 /* Barre de progression de navigation (resources/js/lib/barre-navigation.ts).
@@ -485,20 +526,21 @@
         text-rendering: optimizeLegibility;
     }
 
-    /* Titres : demi-gras, approche resserrée. Jamais de gras 700 : la
-       hiérarchie vient de l'espace et du contraste, pas de l'épaisseur. */
+    /* Titres : demi-gras. L'approche ne se resserre que sur les grands
+       titres (utilitaire titre-contraste, tracking explicite) : Plus Jakarta
+       est déjà étroite, un titre de carte resserré colle ses mots. */
     h1,
     h2,
     h3,
     h4 {
         font-family: var(--font-titre);
         font-weight: 600;
-        letter-spacing: -0.02em;
+        letter-spacing: -0.01em;
         text-wrap: balance;
     }
 
     ::selection {
-        background-color: rgb(112 42 237 / 0.2);
+        background-color: rgb(246 100 27 / 0.22);
     }
 
     /* Focus toujours visible au clavier (DESIGN.md § 10) */
