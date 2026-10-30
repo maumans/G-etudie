@@ -2,7 +2,7 @@ import { Head, Link } from '@inertiajs/react';
 import { ListTree } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EtatVide } from '@/components/ui/etat-vide';
-import { edit as monCompte } from '@/routes/profile';
+import { edit as monCompte } from '@/routes/compte/profil';
 
 /**
  * Tableau de bord du back-office, version de socle (lot 0). Référentiel,

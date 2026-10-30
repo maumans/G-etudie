@@ -13,6 +13,8 @@ export type EntreeNavigation = {
     libelle: string;
     icone: LucideIcon;
     href?: string;
+    /** Préfixe d'adresse sous lequel l'entrée reste active (« Moi » → /compte). */
+    actifSous?: string;
 };
 
 const STYLES = {
@@ -91,7 +93,7 @@ export function LienNavigation({
 
     const actif = exact
         ? isCurrentUrl(entree.href)
-        : isCurrentOrParentUrl(entree.href);
+        : isCurrentOrParentUrl(entree.actifSous ?? entree.href);
 
     return (
         <Link

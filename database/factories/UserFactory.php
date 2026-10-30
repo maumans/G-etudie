@@ -18,31 +18,42 @@ class UserFactory extends Factory
     protected static ?string $password;
 
     /**
-     * Define the model's default state.
+     * Un compte comme ceux que crée l'inscription : numéro mobile guinéen
+     * vérifié, prénom, pseudo. Mot de passe : « password ».
      *
      * @return array<string, mixed>
      */
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
-            'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
+            'prenom' => fake()->firstName(),
+            'nom' => null,
+            'pseudo' => 'eleve_'.Str::lower(Str::random(8)),
+            'telephone' => '+2246'.fake()->unique()->numerify('########'),
+            'telephone_verifie_le' => now(),
+            'email' => null,
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            'desactive_le' => null,
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
+    /** Numéro pas encore vérifié par code SMS (la vérification n'est pas bloquante, D3). */
+    public function numeroNonVerifie(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            'telephone_verifie_le' => null,
+        ]);
+    }
+
+    /** Compte désactivé par un administrateur. */
+    public function desactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'desactive_le' => now(),
         ]);
     }
 

@@ -45,9 +45,9 @@ return [
     |
     */
 
-    'username' => 'email',
+    'username' => 'telephone',
 
-    'email' => 'email',
+    'email' => 'telephone',
 
     /*
     |--------------------------------------------------------------------------
@@ -60,7 +60,7 @@ return [
     |
     */
 
-    'lowercase_usernames' => true,
+    'lowercase_usernames' => false,
 
     /*
     |--------------------------------------------------------------------------
@@ -117,7 +117,6 @@ return [
     'limiters' => [
         'login' => 'login',
         'two-factor' => 'two-factor',
-        'passkeys' => 'passkeys',
     ],
 
     /*
@@ -135,22 +134,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Passkeys
-    |--------------------------------------------------------------------------
-    |
-    | These settings configure Fortify's passkey (WebAuthn) support.
-    |
-    */
-
-    'passkeys' => [
-        'relying_party_id' => parse_url(config('app.url'), PHP_URL_HOST),
-        'allowed_origins' => [config('app.url')],
-        'user_handle_secret' => env('PASSKEYS_USER_HANDLE_SECRET', config('app.key')),
-        'timeout' => 60000,
-    ],
-
-    /*
-    |--------------------------------------------------------------------------
     | Features
     |--------------------------------------------------------------------------
     |
@@ -160,16 +143,17 @@ return [
     |
     */
 
+    /*
+     * N'karamögö (D3, DA4) : connexion par téléphone et mot de passe. La
+     * récupération du mot de passe passe par un code SMS (routes
+     * compte.recuperation.*, hors Fortify) ; pas de vérification d'e-mail ni
+     * de passkeys. La 2FA reste disponible : son réglage sera proposé aux
+     * seuls rôles back-office et console (étape 5).
+     */
     'features' => [
         Features::registration(),
-        Features::resetPasswords(),
-        Features::emailVerification(),
         Features::twoFactorAuthentication([
             'confirm' => true,
-            'confirmPassword' => true,
-            // 'window' => 0
-        ]),
-        Features::passkeys([
             'confirmPassword' => true,
         ]),
     ],

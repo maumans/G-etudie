@@ -48,8 +48,13 @@ class HandleInertiaRequests extends Middleware
         return [
             ...parent::share($request),
             'name' => config('app.name'),
+            // Données minimales (PLAN § 10) : chaque page reçoit le prénom, le
+            // pseudo et si le numéro est vérifié — jamais le numéro lui-même.
             'auth' => [
-                'user' => $request->user(),
+                'user' => $request->user() ? [
+                    ...$request->user()->only(['id', 'prenom', 'pseudo']),
+                    'numero_verifie' => $request->user()->telephoneVerifie(),
+                ] : null,
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];

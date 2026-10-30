@@ -131,7 +131,7 @@ function PiedCompte({ className }: { className?: string }) {
                 <p className="truncate px-1 text-aide text-ink-600">
                     Connecté :{' '}
                     <span className="font-medium text-ink-900">
-                        {auth.user.name}
+                        {auth.user.pseudo}
                     </span>
                 </p>
             )}
