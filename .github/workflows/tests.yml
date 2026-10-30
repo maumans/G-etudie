@@ -13,6 +13,30 @@ jobs:
   ci:
     runs-on: ubuntu-latest
 
+    # Tests sur MySQL, comme en production : la base de test porte le suffixe
+    # « _test » exigé par Tests\TestCase.
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: g_etudie_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_CONNECTION: mysql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: g_etudie_test
+      DB_USERNAME: root
+      DB_PASSWORD: ''
+
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -29,10 +53,13 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
-          node-version: '22'
+          node-version: '26'
 
       - name: Setup Application
         run: composer setup
 
       - name: Run CI Checks
         run: composer ci:check
+
+      - name: Run JS Tests
+        run: npm run test:js
