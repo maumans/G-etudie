@@ -1,7 +1,10 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
+import { CloudOff } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { useHorsLigne } from '@/lib/hors-ligne';
+import { estEcranGarde } from '@/lib/hors-ligne/ecrans';
 import { cn } from '@/lib/utils';
 
 /**
@@ -62,6 +65,10 @@ export function LienNavigation({
     exact?: boolean;
 }) {
     const { isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
+    const { reseau } = useHorsLigne();
+    const pages =
+        (usePage().props as { hors_ligne_pages?: string[] } | undefined)
+            ?.hors_ligne_pages ?? [];
     const style = STYLES[variante];
     const Icone = entree.icone;
     const onglet = variante === 'onglet';
@@ -112,6 +119,10 @@ export function LienNavigation({
     const actif = exact
         ? isCurrentUrl(entree.href)
         : isCurrentOrParentUrl(entree.actifSous ?? entree.href);
+    // Hors ligne, un écran sans copie est estompé, toujours cliquable : le
+    // clic ouvre le dialogue qui explique (HORS_LIGNE.md A.3.7).
+    const indisponible =
+        reseau === 'hors_ligne' && !actif && !estEcranGarde(entree.href, pages);
 
     const icone = (
         <Icone
@@ -129,10 +140,16 @@ export function LienNavigation({
             href={entree.href}
             prefetch
             aria-current={actif ? 'page' : undefined}
+            title={
+                indisponible
+                    ? `${entree.libelle} — demande une connexion`
+                    : undefined
+            }
             className={cn(
                 style.base,
                 'transition-colors outline-none focus-visible:outline-2 focus-visible:outline-ring',
                 actif ? style.actif : style.inactif,
+                indisponible && 'opacity-55',
             )}
         >
             {onglet ? (
@@ -147,7 +164,18 @@ export function LienNavigation({
             ) : (
                 icone
             )}
-            <span className="truncate">{entree.libelle}</span>
+            <span className="truncate">
+                {entree.libelle}
+                {indisponible && (
+                    <span className="sr-only"> (demande une connexion)</span>
+                )}
+            </span>
+            {indisponible && !onglet && (
+                <CloudOff
+                    aria-hidden
+                    className="ml-auto size-3.5 shrink-0 text-ink-500"
+                />
+            )}
         </Link>
     );
 }

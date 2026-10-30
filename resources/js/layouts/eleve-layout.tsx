@@ -1,5 +1,11 @@
 import { Link, usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
+import {
+    BandeauCopie,
+    BandeauIphone,
+    BandeauReseau,
+} from '@/components/hors-ligne/bandeaux';
+import { PastilleReseau } from '@/components/hors-ligne/pastille-reseau';
 import { LienNavigation } from '@/components/lien-navigation';
 import { Marque } from '@/components/marque';
 import { NAVIGATION_ELEVE } from '@/lib/navigation';
@@ -34,7 +40,10 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
                         />
                     ))}
                 </nav>
-                <CarteEleve className="mt-auto" />
+                <div className="mt-auto grid gap-3">
+                    <PastilleReseau className="justify-self-start" />
+                    <CarteEleve />
+                </div>
             </aside>
 
             <div className="min-w-0 flex-1">
@@ -45,10 +54,14 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
                     >
                         <Marque signature={false} />
                     </Link>
-                    <Initiale />
+                    <div className="flex items-center gap-2">
+                        <PastilleReseau />
+                        <Initiale />
+                    </div>
                 </header>
 
                 <main className="mx-auto w-full max-w-6xl px-4 pt-6 pb-28 sm:px-6 lg:px-8 lg:pt-10 lg:pb-12">
+                    <BandeauxHorsLigne />
                     {children}
                 </main>
             </div>
@@ -66,6 +79,17 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
                     />
                 ))}
             </nav>
+        </div>
+    );
+}
+
+/** Hors ligne, session expirée, copie datée, notice iPhone : au-dessus du contenu. */
+function BandeauxHorsLigne() {
+    return (
+        <div className="mb-5 grid gap-2 empty:hidden">
+            <BandeauReseau />
+            <BandeauCopie />
+            <BandeauIphone />
         </div>
     );
 }

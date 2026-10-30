@@ -915,3 +915,29 @@ en grille de 3 laissaient une case vide, et le badge d'état écrasait le titre.
 *Preuve* : `compte-securite`, `compte-profil-contenu`, `erreur-403` en
 4 gabarits × 2 thèmes, axe sans violation sérieuse ; parcours d'activation vu
 en 360 clair et 1366 sombre ; 124 Playwright verts.
+
+### Lot 0, étape 6 — le hors ligne visible (2026-10-30)
+
+*Décision* : le hors ligne se voit sans alarmer.
+- **Pastille** dans la barre du haut (mobile) et au pied de la barre
+  latérale : « Tout est envoyé » (vert `juste`), « 12 réponses à envoyer »
+  (mandarine), « Hors ligne » (neutre), « Session expirée » (`indice`) —
+  toujours icône + mot ; un point framboise s'il y a un refus. La toucher
+  ouvre la feuille « Tes réponses » (« À envoyer », « À corriger » avec
+  « Réessayer » / « Abandonner »).
+- **Bandeaux** d'une ligne au-dessus du contenu, coins `rounded-controle`,
+  teintes en opacité : hors ligne (encre 6 %), session expirée (`indice`,
+  bouton encre « Se reconnecter »), copie datée (`craie-100`, « Actualiser »),
+  notice iPhone (mandarine, refermable). Une phrase qui rassure d'abord.
+- **Dialogue** « Cet écran demande une connexion » : tuile 40 px au nuage
+  barré, une phrase, « Compris » ; l'élève reste sur son écran.
+- **Navigation** hors ligne : entrées sans copie estompées (55 %) avec un
+  petit nuage barré, toujours cliquables.
+- **Page de repli** et **filet de démarrage** : autonomes (styles en
+  ligne), crème / encre / mandarine, clair et sombre.
+- « Mon compte › Affichage » : section « Installer l'application » (bouton
+  quand le navigateur le propose, étapes numérotées à l'encre sur iPhone).
+
+*Preuve* : captures 360 clair et 1366 sombre relues (accueil en ligne,
+dialogue, feuille, copie hors ligne) ; références des écrans élève
+régénérées ; 125 Playwright verts, axe sans violation sérieuse.

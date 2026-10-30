@@ -33,3 +33,5 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/compte.php';
+
+require __DIR__.'/hors-ligne.php';

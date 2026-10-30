@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-10-30, après l'étape 5)
+## 0. Reprise — où en est le projet (mis à jour le 2026-10-30, après l'étape 6)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,7 +19,7 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (lot 0, étapes 0 à 5 faites)
+### État au 2026-10-30 (lot 0, étapes 0 à 6 faites)
 
 - **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
   lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
@@ -65,20 +65,29 @@
   rôle ; « Mon compte » dans l'habillage de l'espace ; double
   authentification proposée au personnel (onglet « Sécurité ») ; session de
   12 h pour le personnel.
+- **Étape 6 faite** (point 13) : socle hors ligne HL0 — service worker
+  maison à `/sw.js`, copies des écrans gardés, file d'opérations (Dexie,
+  UUID v7, moteur), `POST /sync/operations` et `GET /sync/etat`, appareils
+  enregistrés, garde de navigation, pastille, bandeaux, page de repli,
+  application installable. **Tout geste élève passe par `enregistrer()`**
+  (`resources/js/lib/hors-ligne`) ; un type d'opération se branche dans
+  `RegistreOperations::TYPES` et `libelles.ts`. Suivi : `HORS_LIGNE.md` B.2.
 - **Images de la vitrine** : dessins par défaut en place ; Maurice peut les
   remplacer (`config('vitrine.illustrations')`, mêmes proportions) et, s'il le
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 167 Pest (MySQL `g_etudie_test`, rôles semés une fois par
-  `TestCase`), 127 Vitest, 124 Playwright (une session par espace + 15
-  écrans × 4 gabarits × 2 thèmes + un parcours complet) — verts. `tsc`,
-  `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
+- **Tests** : 202 Pest (MySQL `g_etudie_test`, rôles semés une fois par
+  `TestCase`), 165 Vitest, 125 Playwright (une session par espace + 15
+  écrans × 4 gabarits × 2 thèmes + un parcours complet + le socle hors
+  ligne) — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
+  `npm run build` passent.
+- **⚠ Pas de HTTPS tant que le domaine n'existe pas** (D11) : hors
+  `localhost`, le service worker ne s'inscrit pas, donc pas de hors ligne.
 - **⚠ Aucun SMS ne part** : le pilote `JournalSms` écrit le code dans
   `storage/logs/laravel.log` (en production, il signale seulement l'absence
   de fournisseur). Fournisseur SMS à choisir avant le lot 8 (D3).
-- **Pas encore fait dans le lot 0** : socle hors ligne HL0 (étape 6),
-  clôture (étape 7).
+- **Pas encore fait dans le lot 0** : clôture (étape 7).
 - **Comptes sans espace** : parent, enseignant et gestionnaire n'ouvrent que
   « Mon compte » jusqu'au lot 11.
 - **Lancer l'application** : `.claude/launch.json` déclare `laravel`
@@ -94,13 +103,11 @@
 
 ### Prochaines étapes, par ordre de priorité
 
-1. **Lot 0, étape 6 — socle hors ligne HL0** (`HORS_LIGNE.md` B.2) :
-   service worker, manifeste et icônes, Dexie, UUID v7, file d'opérations et
-   `POST /sync/operations`, appareils enregistrés à la connexion, garde de
-   navigation et composants hors ligne. Les routes de synchronisation
-   prennent leur `can:` (`AccesParRoleTest`).
-2. **Étape 7 — clôture du lot 0** : domaine et hébergement (D11, HTTPS),
-   relecture complète, captures, `A_TESTER.md`.
+1. **Lot 0, étape 7 — clôture** : domaine et hébergement (D11) pour HTTPS,
+   préproduction, relecture complète du lot, contrôles de `A_TESTER.md` qui
+   deviennent possibles (installation, mode avion), mise à jour de `main`.
+2. **Lot 1** (après D1, la liste des matières phares) : référentiel et
+   back-office contenu.
 3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
@@ -242,7 +249,7 @@ permission s'exerce (section 7).
 | `ExamenBlancService` | passage, note, moyenne pondérée | ⬜ |
 | `MaitriseService` | maîtrise par notion, jauge, révision espacée | ⬜ |
 | `PackService` | génération, empreintes, différentiel, droits | ⬜ |
-| `SynchroService` | file d'opérations (`HORS_LIGNE.md` A.3.6) | ⬜ |
+| `SynchroService` | file d'opérations (`HORS_LIGNE.md` A.3.6) : cinq verdicts, idempotence par la base, `enTantQue`, horloge ; registre vide jusqu'au lot 3 | ✅ étape 6 |
 | `TuteurService` | API Claude, quotas, journal, coûts | ⬜ |
 | `PaiementService` | Orange Money, MTN MoMo, codes prépayés | ⬜ |
 | `PlateformeService` | console : activité, contenu, revenus, impact | ⬜ |
@@ -256,6 +263,7 @@ permission s'exerce (section 7).
 | Vitrine finale (démo jouable, compte à rebours, tarifs) | ⬜ lot 8 |
 | Connexion / inscription par téléphone, vérification du numéro, mot de passe oublié, « Mon compte » | ✅ lot 0, étape 4 (point 7) |
 | « Mon compte » dans l'habillage de chaque espace, onglet « Sécurité » du personnel (double authentification, session, activité), page 403 | ✅ lot 0, étape 5 (point 12) |
+| Socle hors ligne : pastille et feuille « Tes réponses », bandeaux (hors ligne, session expirée, copie datée, iPhone), dialogue « écran indisponible », navigation estompée, installation, page de repli, filet de démarrage | ✅ lot 0, étape 6 (point 13) |
 | Parcours d'accueil (examen, série, établissement, objectif) | ⬜ lot 2 |
 | Accueil élève (jauge, séance du jour, trace) | ⬜ |
 | Leçon, fiche de révision | ⬜ |
@@ -804,6 +812,64 @@ cette question à sa façon. Elle distingue deux notions :
      `SeederDemonstrationTest` réécrit ; Vitest `entete-compte`. Totaux :
      **167 Pest, 127 Vitest, 124 Playwright** — verts ; `tsc`, `vp check`,
      Pint, Larastan (niveau 7), `npm run build` passent.
+
+13. [x] **Lot 0, étape 6 — socle hors ligne HL0** (2026-10-30)
+   - **Constat** : aucun service worker, aucune file d'opérations ; hors
+     ligne, un clic restait sans effet et un rechargement donnait la page
+     d'erreur du navigateur.
+   - **Décision** (détail et écarts n° 7 à 14 : `HORS_LIGNE.md` B.2, B.5) :
+     - serveur : tables `appareils`, `appareil_profils`,
+       `operations_synchronisees` ; `SynchroService` (cinq verdicts, ligne
+       insérée en premier dans la transaction, lecture verrouillante après
+       un conflit d'index, `enTantQue`, horloge suspecte, refus des UUID non
+       v7), `RegistreOperations` (vide au lot 0), `AppareilService`
+       (enregistrement au premier `GET /sync/etat`, jeton haché) ;
+       `POST /sync/operations` et `GET /sync/etat` (≤ 1 Ko) en dérogation
+       dans `AccesParRoleTest` (autorisation par opération) ;
+     - service worker maison (`resources/service-worker/sw.js`, servi par
+       `ServiceWorkerController`) : précache du manifeste Vite sans les
+       pages en ligne, trois versions gardées, fichiers identiques recopiés
+       d'une version à l'autre, copies par compte réseau d'abord (6 s),
+       fusion des rechargements partiels, page de repli autonome ; activation
+       d'une nouvelle version seulement file vide et sans examen en cours ;
+     - `config/hors_ligne.php` : liste blanche (`/eleve`,
+       `/compte/affichage` au lot 0), partagée aux pages
+       (`hors_ligne_pages`) ; même règle dans `sw.js` et `ecrans.ts` ;
+     - appareil : `uuid7.ts`, base Dexie `nkaramogo` (onze tables),
+       `MoteurHorsLigne` (un envoi à la fois, lots de 50 ordonnés, délais
+       croissants, 401 pause / 419 jeton neuf / 409 nouvel appareil,
+       anomalies après 8 échecs, horloge mesurée) ; `enregistrer()` est le
+       seul point d'entrée des gestes élève ;
+     - interface : garde de navigation inscrite avant la barre,
+       `EcranIndisponible` monté à la racine, pastille et feuille « Tes
+       réponses », bandeaux, navigation estompée, déconnexion prévenue
+       (`useDeconnexion`), section « Installer l'application », manifeste et
+       icônes (monogramme provisoire, DA8), filet de démarrage dans
+       `app.blade.php`.
+   - **Dépendances** : `dexie` 4.4.7, `fake-indexeddb` 6.2.7 (tests).
+   - **Vu** : essai réel dans Chromium sur le build (service worker,
+     appareil enregistré, dialogue, rechargement hors ligne, page de repli,
+     retour du réseau), captures relues en 360 clair et 1366 sombre (dialogue,
+     feuille, pastille, bandeaux). Corrigé en chemin : `usePage` dans un
+     composant monté hors des pages (erreur), course sur
+     `registration.waiting`, copies document et Inertia confondues par l'API
+     Cache (JSON brut affiché hors ligne), premier contact retardé de 20 s,
+     actualisation au retour du réseau qui manquait sur un document servi
+     d'après sa copie, page de repli qui restait bloquée, textes
+     d'installation au vouvoiement pour un élève. Références Playwright des
+     écrans élève régénérées (`--update-snapshots=all` : la pastille restait
+     sous le seuil de 1 % et les anciennes références auraient vieilli sans
+     alerte).
+   - **Preuve** : Pest `HorsLigne\SynchroEtatTest`,
+     `SynchroIdempotenteTest`, `SynchroVerdictsTest`,
+     `SynchroEnTantQueLAuteurTest`, `HorlogeTest`, `ServiceWorkerTest`,
+     `DemarrageInterrompuTest` ; Vitest `hors-ligne/moteur`, `ecrans`,
+     `garde-navigation` ; Playwright `hors-ligne.spec.ts` (10 passages
+     stables). Totaux : **202 Pest, 165 Vitest, 125 Playwright** — verts ;
+     `tsc`, `vp check`, Pint, Larastan (niveau 7), `npm run build` passent.
+   - **Pas fait** : HTTPS (D11) ; installation et mode avion sur vrai
+     téléphone (`A_TESTER.md`) ; séance complète hors ligne (A.14 n° 24,
+     lot 3) ; budgets mesurés (n° 25, lot 7).
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

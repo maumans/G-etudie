@@ -1,7 +1,12 @@
 <?php
 
+use App\Models\User;
+use App\Services\HorsLigne\RegistreOperations;
 use App\Services\Sms\EnvoiSms;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Str;
+use Illuminate\Testing\TestResponse;
+use Tests\Doubles\OperationDeTest;
 use Tests\Doubles\SmsEnMemoire;
 use Tests\TestCase;
 
@@ -56,4 +61,60 @@ function smsEnMemoire(): SmsEnMemoire
     app()->instance(EnvoiSms::class, $sms);
 
     return $sms;
+}
+
+/** Hors ligne : inscrit le type d'opération de test et remet son journal à zéro. */
+function brancherOperationDeTest(): void
+{
+    OperationDeTest::$executions = [];
+    app(RegistreOperations::class)->inscrire(OperationDeTest::TYPE, OperationDeTest::class);
+}
+
+/** Connecte le compte et enregistre son appareil comme le fait l'application ; rend le jeton. */
+function appareilDe(User $user, ?string $jeton = null): string
+{
+    $reponse = test()->actingAs($user)
+        ->withHeaders($jeton !== null ? ['X-Appareil' => $jeton] : [])
+        ->getJson(route('sync.etat'))
+        ->assertOk();
+
+    return $reponse->json('appareil') ?? $jeton;
+}
+
+/**
+ * Une opération de la file, telle que l'appareil l'envoie.
+ *
+ * @param  array<string, mixed>  $champs
+ * @return array<string, mixed>
+ */
+function operation(User $auteur, array $champs = []): array
+{
+    return [
+        'uuid' => (string) Str::uuid7(),
+        'type' => OperationDeTest::TYPE,
+        'auteur_id' => $auteur->id,
+        'saisi_le' => now()->toIso8601ZuluString('millisecond'),
+        'depend_de' => null,
+        'charge' => ['valeur' => 12],
+        ...$champs,
+    ];
+}
+
+/**
+ * Envoie un lot ; horloge à l'heure par défaut (décalage nul, mesuré il y a
+ * une minute).
+ *
+ * @param  list<array<string, mixed>>  $operations
+ * @param  array<string, mixed>  $horloge
+ */
+function envoyer(string $jeton, array $operations, array $horloge = []): TestResponse
+{
+    return test()->postJson(route('sync.operations'), [
+        'appareil' => $jeton,
+        'decalage_horloge_ms' => 0,
+        'mesure_le' => now()->subMinute()->toIso8601ZuluString('millisecond'),
+        'envoye_le' => now()->toIso8601ZuluString('millisecond'),
+        'operations' => $operations,
+        ...$horloge,
+    ]);
 }

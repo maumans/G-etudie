@@ -78,7 +78,27 @@
 
 ## 2. Installation de l'application (Android, iPhone)
 
-*(aucune entrée)*
+### [Lot 0] Installer N'karamögö sur Android et sur iPhone
+- Pourquoi : `HORS_LIGNE.md` A.3.2 — installée, l'application s'ouvre depuis
+  l'écran d'accueil ; sur iPhone, sans installation, Safari efface le
+  stockage (réponses gardées, téléchargements) après sept jours sans visite.
+- Matériel : l'Android d'entrée de gamme (Chrome), un iPhone (Safari) ; le
+  site servi en **HTTPS** (préproduction, D11) — sans HTTPS, pas de service
+  worker ni d'installation.
+- Comment le provoquer :
+  1. Android : se connecter avec l'élève de démonstration, « Mon compte » →
+     « Affichage » → « Installer N'karamögö » (ou le menu de Chrome).
+  2. Ouvrir l'icône posée sur l'écran d'accueil.
+  3. iPhone : ouvrir le site dans Safari ; lire le bandeau « Installe
+     N'karamögö… » ; suivre la marche à suivre de « Mon compte » →
+     « Affichage » (Partager → Sur l'écran d'accueil).
+- Quoi observer : icône mandarine au monogramme « N' », bien découpée
+  (Android : forme du lanceur, rien de coupé) ; ouverture en plein écran sur
+  l'accueil élève, sans barre d'adresse ; une fois installée, « Affichage »
+  dit « Installée sur ce téléphone » et le bandeau iPhone ne revient plus.
+- En cas d'échec, relever : modèle, version du système et du navigateur,
+  capture de l'icône et de l'écran d'ouverture.
+- État : à faire (bloqué tant que le domaine HTTPS n'existe pas)
 
 ### [Lot 0] Barre d'onglets de l'espace élève au doigt
 - Pourquoi : la barre d'onglets est collée en bas de l'écran ; sur un vrai
@@ -101,7 +121,46 @@
 
 ## 4. Hors ligne et synchronisation (`HORS_LIGNE.md` A.15)
 
-*(aucune entrée)*
+### [Lot 0] Socle hors ligne en mode avion
+- Pourquoi : A.3.7 à A.3.9 — jamais d'écran blanc ni de clic mort sans
+  réseau. Vérifié dans Chromium par Playwright (`hors-ligne.spec.ts`), mais
+  `setOffline` n'est pas un vrai mode avion.
+- Matériel : l'Android d'entrée de gamme, application installée (entrée
+  précédente), site en HTTPS.
+- Comment le provoquer :
+  1. Avec réseau : ouvrir l'accueil élève, puis « Moi » → « Affichage »,
+     revenir à l'accueil. Attendre 10 s.
+  2. Passer en mode avion. Toucher « Moi ».
+  3. Fermer l'application (la balayer des applications récentes), la
+     rouvrir.
+  4. Toucher la pastille de la barre du haut.
+  5. Couper le mode avion ; attendre 30 s sans rien toucher.
+- Quoi observer : 2. un dialogue « Cet écran demande une connexion », on
+  reste sur l'accueil, la pastille dit « Hors ligne » ; 3. l'accueil
+  s'ouvre, avec « Pas de connexion… » et « Accueil au HH:MM — dernière
+  version gardée sur ce téléphone » ; 4. la feuille « Tes réponses »
+  s'ouvre ; 5. les bandeaux disparaissent, la pastille revient à « Tout est
+  envoyé », l'accueil se met à jour seul une fois.
+- En cas d'échec, relever : capture à chaque étape, texte de la pastille,
+  heure.
+- État : à faire
+
+### [Lot 0] Déploiement pendant une coupure
+- Pourquoi : A.3.1 et A.3.3, A.15 n° 6 et 7 — une nouvelle version ne
+  s'active que file vide ; une coupure juste après un déploiement montre le
+  filet de démarrage, puis la page se recharge seule.
+- Matériel : l'Android, la préproduction, quelqu'un qui peut déployer.
+- Comment le provoquer :
+  1. Ouvrir l'accueil élève avec réseau.
+  2. Déployer une nouvelle version (un changement visible, même minime).
+  3. Recharger la page et, dans la seconde, passer en mode avion.
+  4. Couper le mode avion.
+- Quoi observer : 3. soit l'ancienne version reste affichée normalement
+  (copie, versions gardées), soit le filet « Tes réponses déjà faites sont
+  gardées sur ce téléphone » ; jamais un écran blanc ; 4. la page se
+  recharge seule et montre la nouvelle version.
+- En cas d'échec, relever : capture, heure du déploiement et de la coupure.
+- État : à faire (bloqué tant qu'il n'y a pas de préproduction)
 
 ## 5. Téléphone partagé et profils
 

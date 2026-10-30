@@ -653,7 +653,7 @@ hors ligne ; les packs viennent ensuite.
 | Lot | Intitulé | État | Avancement |
 |---|---|---|---|
 | — | Arbitrage HL-D1 à HL-D12 | ✅ fait (2026-10-30) | 12 / 12 |
-| HL0 | Socle | ⬜ à faire | 0 / 12 |
+| HL0 | Socle | 🟡 fait, sauf HTTPS et contrôles sur vrai téléphone (étape 6 du lot 0) | 10 / 12 |
 | HL1 | Rendu indépendant de la source | ⬜ à faire | 0 / 2 |
 | HL2 | Tentatives et séances | ⬜ à faire | 0 / 4 |
 | HL3 | Examen blanc | ⬜ à faire | 0 / 4 |
@@ -682,22 +682,50 @@ hors ligne ; les packs viennent ensuite.
 
 ## B.2 HL0 — Socle
 
-- [ ] HTTPS vérifié sur l'hébergement de production
-- [ ] Service worker servi à `/sw.js`, précache du manifeste Vite, trois versions gardées (A.3.1)
-- [ ] Caches `pages-u<id>` (copies complètes, fusion des partiels, heure glissée), `polices`
-- [ ] Manifeste et icônes ; installation vérifiée sur Android ; notice iPhone (A.3.2)
-- [~] Échec d'import de page rattrapé ; filet de démarrage dans `app.blade.php` (A.3.3)
-  — fait : `resolve` maison, `resources/js/lib/chargement-page.ts`, test
-  Vitest 19 (lot 0, étape 2) ; `window.__nkaramogoPret` posé par `app.tsx`.
-  Reste : le filet de démarrage dans `app.blade.php`, et « hors ligne » à
-  lire dans `useHorsLigne` au lieu de `navigator.onLine` (étape 6).
-- [ ] Base Dexie `nkaramogo` (A.3.4)
-- [ ] UUID v7 monotone ; refus serveur des autres versions (A.3.5)
-- [ ] `enregistrer()` et moteur : lots, ordre, `depend_de`, délais, 401/419 (A.3.5)
-- [ ] `POST /sync/operations`, `GET /sync/etat`, `operations_synchronisees`, cinq verdicts, `enTantQue`, registre (A.3.6)
-- [ ] Appareil et `appareil_profils` enregistrés à la connexion (A.7)
-- [ ] Garde de navigation, `EcranIndisponible`, navigation signalée hors ligne, page de repli (A.3.7)
-- [ ] `useHorsLigne`, pastille, bandeaux, liste « À envoyer / À corriger », déconnexion prévenue, `BandeauCopie` (A.3.8, A.3.9)
+- [ ] HTTPS vérifié sur l'hébergement de production — attend le domaine et
+  l'hébergement (D11). Sans HTTPS, l'inscription du service worker est
+  sautée et un message le dit en console (`lib/hors-ligne/index.ts`).
+- [x] Service worker servi à `/sw.js`, précache du manifeste Vite, trois
+  versions gardées (A.3.1) — `ServiceWorkerController`,
+  `resources/service-worker/sw.js`, `config/hors_ligne.php` ; script de
+  désinstallation sous `public/hot`. Preuve : `ServiceWorkerTest` (5),
+  Playwright `hors-ligne.spec.ts`.
+- [x] Caches `pages-u<id>` (copies complètes, fusion des partiels, heure
+  glissée) ; polices dans les caches du build (écart n° 10). Preuve :
+  Playwright `hors-ligne.spec.ts` (rechargement hors ligne → copie datée).
+  La fusion d'un rechargement partiel n'a pas encore d'écran qui en fait
+  (props optionnelles au lot 2) : écrite, pas encore exercée.
+- [~] Manifeste et icônes ; installation vérifiée sur Android ; notice
+  iPhone (A.3.2) — fait : `public/manifest.webmanifest`, icônes 192, 512,
+  512 masquable et `apple-touch-icon` tirées du monogramme provisoire (DA8),
+  bouton « Installer » et marche à suivre iPhone dans « Mon compte ›
+  Affichage », bandeau iPhone non installé. Reste : installation sur de vrais
+  téléphones (`A_TESTER.md`).
+- [x] Échec d'import de page rattrapé ; filet de démarrage dans
+  `app.blade.php` (A.3.3) — `chargement-page.ts` lit maintenant l'état du
+  moteur (croisé avec `navigator.onLine`) ; filet en ligne dans le document,
+  refermé par `app.tsx`. Preuve : `DemarrageInterrompuTest`, Vitest 19.
+- [x] Base Dexie `nkaramogo` (A.3.4) — `lib/hors-ligne/base.ts`, les onze
+  tables déclarées.
+- [x] UUID v7 monotone ; refus serveur des autres versions (A.3.5) —
+  `lib/hors-ligne/uuid7.ts`, `App\Support\Uuid7`.
+- [x] `enregistrer()` et moteur : lots, ordre, `depend_de`, délais, 401/419
+  (A.3.5) — `lib/hors-ligne/moteur.ts`, `index.ts` ; `enregistrerEtAttendre`
+  pour l'option `attendreVerdict`.
+- [x] `POST /sync/operations`, `GET /sync/etat`, `operations_synchronisees`,
+  cinq verdicts, `enTantQue`, registre (A.3.6) — `SynchroService`,
+  `SynchroController`, `RegistreOperations` (vide au lot 0 ; le type
+  `test.noter` des tests s'y inscrit).
+- [x] Appareil et `appareil_profils` enregistrés à la connexion (A.7) —
+  `AppareilService`, au premier `GET /sync/etat` du profil (écart n° 7).
+- [x] Garde de navigation, `EcranIndisponible`, navigation signalée hors
+  ligne, page de repli (A.3.7) — `garde-navigation.ts`,
+  `components/hors-ligne/ecran-indisponible.tsx`, `LienNavigation`
+  (estompé + nuage barré), `resources/views/hors-ligne/repli.blade.php`.
+- [x] `useHorsLigne`, pastille, bandeaux, liste « À envoyer / À corriger »,
+  déconnexion prévenue, `BandeauCopie` (A.3.8, A.3.9) —
+  `components/hors-ligne/pastille-reseau.tsx`, `bandeaux.tsx`,
+  `hooks/use-deconnexion.ts`.
 
 ## B.3 HL1 à HL8
 
@@ -707,8 +735,37 @@ hors ligne ; les packs viennent ensuite.
 
 *(cocher les lignes de A.14 au fur et à mesure)*
 
+- [x] 1 — `SynchroIdempotenteTest` (4) : deux fois, dans un même lot, et
+  l'envoi concurrent joué par une seconde connexion MySQL (sa ligne validée
+  l'emporte, lecture verrouillante) ; un identifiant réutilisé par un autre
+  compte ne révèle rien.
+- [x] 2 — `SynchroVerdictsTest` (8) : refus mémorisé avec charge et motif,
+  panne et report jamais mémorisés, dépendance refusée, type inconnu, charge
+  invalide, permission manquante, appareil inconnu (409), lot > 50.
+- [x] 3 — `SynchroEnTantQueLAuteurTest` (4) : deux profils sur un appareil,
+  profil non rattaché → `reporte`, compte désactivé avant / après le geste,
+  utilisateur courant rendu.
+- [x] 4 — v4 refusé, v7 accepté (dans `SynchroVerdictsTest`).
+- [x] 5 — `HorlogeTest` : les quatre cas, l'âge d'une saisie n'est pas un
+  décalage, heure corrigée rangée.
+- [x] 11 — `ServiceWorkerTest` (5), sur un faux manifeste (le test ne dépend
+  pas d'un build).
+- [x] 12 — `DemarrageInterrompuTest` (3), avec le manifeste de l'application.
+- [x] 13 — Vitest : la file survit au redémarrage (`moteur.test.ts`).
+- [x] 14 — Vitest : ordre `[priorite, uuid]` et `depend_de`.
+- [x] 15 — Vitest : 401 = pause sans perte, reprise à la reconnexion ; 419 =
+  jeton rafraîchi puis renvoi.
+- [x] 16 — Vitest : UUID v7 monotones (même milliseconde, horloge qui recule).
+- [x] 17 — Vitest : la fonction de `sw.js` (extraite entre ses marqueurs) et
+  `ecrans.ts` répondent pareil sur 14 adresses, et leur code est identique.
+- [x] 18 — Vitest : garde de navigation (`garde-navigation.test.ts`, 7).
 - [x] 19 — Vitest : échec d'import, rechargement une fois en ligne, jamais
   hors ligne (`tests/js/chargement-page.test.ts`, lot 0 étape 2).
+- [ ] 24 — séance complète hors ligne : attend le premier geste élève (lot 3).
+  En attendant, Playwright `hors-ligne.spec.ts` rejoue le socle dans un vrai
+  navigateur : service worker, appareil enregistré, dialogue, copie datée au
+  rechargement, page de repli, retour du réseau (stable sur 10 passages).
+- [ ] 25 — budgets : lot 7 (HL7). Mesure faite à la main : écart n° 10.
 
 ## B.5 Journal des écarts
 
@@ -750,6 +807,64 @@ hors ligne ; les packs viennent ensuite.
    (`public/images/vitrine/defaut/*.svg`, 17 Ko) ne sont pas à précacher, pour
    la même raison que la photo.
 
+7. **2026-10-30 — Enregistrement de l'appareil au premier contact.** A.7 dit
+   « à la première connexion » : la connexion est un formulaire Inertia qui
+   ne peut pas rendre de jeton au JavaScript. L'appareil est donc créé au
+   premier `GET /sync/etat` d'un profil élève (envoyé dès que l'élève devient
+   le profil actif), qui rend son jeton une seule fois. Jeton haché (SHA-256)
+   en base, en clair dans `meta` sur l'appareil et dans l'en-tête
+   `X-Appareil` du battement.
+8. **2026-10-30 — `envoye_le` dans un lot.** A.3.6 juge l'horloge suspecte
+   si « l'âge de la mesure est négatif » : il faut deux heures lues sur la
+   même horloge. Chaque lot porte aussi `envoye_le` (heure de l'appareil à
+   l'envoi) ; `envoye_le` antérieur à `mesure_le` = horloge reculée.
+9. **2026-10-30 — Un seul profil connecté par appareil au lot 0.** Le serveur
+   n'exécute que les gestes du compte de la session ; ceux d'un autre profil
+   du téléphone sont `reporte` jusqu'à sa connexion (A.7, « jamais attribués
+   à un autre »). Le moteur n'envoie d'ailleurs que ceux du profil actif. Les
+   profils multiples à code local arrivent au lot 7 (HL6).
+10. **2026-10-30 — Précache.** Pas de cache `polices` séparé : les polices
+    font partie du manifeste du build (écarts n° 3 à 6). À l'installation
+    d'une nouvelle version, un fichier identique d'une version précédente est
+    recopié, pas retéléchargé, et le précache passe par le cache HTTP (noms
+    hachés, donc immuables) : l'élève ne paie que les fichiers qu'il n'a pas.
+    Ne sont pas précachées les pages qui ne s'ouvrent qu'en ligne (vitrine,
+    connexion, back-office, console, catalogue). Mesure : 59 fichiers,
+    1 076 Ko bruts, ≈ 585 Ko compressés, dont 254 Ko de polices KaTeX.
+11. **2026-10-30 — Clés des copies.** Les copies d'un écran (document et
+    réponse Inertia) sont distinguées par un préfixe de chemin
+    (`/__copie-document/eleve`, `/__copie-inertia/eleve`), pas par un
+    fragment `#…` : l'API Cache ignore le fragment, et la réponse JSON
+    remplaçait la page (vu à l'essai : un rechargement hors ligne affichait
+    du JSON brut).
+12. **2026-10-30 — Copie servie = hors ligne.** Une page ouverte d'après sa
+    copie met le moteur « hors ligne » ; le premier contact réussi marque
+    donc le retour du réseau, et l'écran de lecture s'actualise seul (une
+    fois). L'actualisation vit dans un écouteur synchrone du moteur
+    (`demarrerHorsLigne`), pas dans un effet React, qui pouvait sauter la
+    transition. La balise `meta` de la copie est lue une fois puis retirée.
+13. **2026-10-30 — Page de repli tenace.** Au retour du réseau, la page de
+    repli vérifie qu'il répond (requête `HEAD`, jamais interceptée) avant de
+    se recharger, puis réessaie toutes les 15 s : le premier essai, juste à
+    l'événement `online`, échoue souvent encore.
+14. **2026-10-30 — Pas de service worker sous `npm run dev`.** L'application
+    ne l'inscrit pas en développement (`import.meta.env.DEV`) ; `/sw.js`
+    reste un script de désinstallation pour un worker resté d'un build.
+
 ## B.6 Points de vigilance
 
-*(pièges rencontrés, données de test laissées en base, limites connues)*
+- **Poids du fragment commun** : `createLucideIcon-*.js` pèse 373 Ko bruts
+  (React, React DOM et les icônes réunis par le découpage de Rolldown). Déjà
+  chargé par la première page, donc pas payé deux fois, mais c'est l'essentiel
+  du budget « coquille < 500 Ko » : à mesurer au lot 7 (HL7).
+- **Test de concurrence** (`SynchroIdempotenteTest`) : une seconde connexion
+  MySQL écrit hors de la transaction du test. Sa ligne est effacée après le
+  retour en arrière du test (`beforeApplicationDestroyed`) ; l'effacer avant
+  bloquait sur le verrou partagé du test (1205), et la ligne restée en base
+  faussait les autres tests.
+- **Essais Playwright hors ligne** : `context.setOffline` ne coupe pas le
+  service worker de la même façon qu'un vrai mode avion ; le contrôle sur
+  téléphone reste dans `A_TESTER.md`.
+- **Copies des écrans** : gardées par compte (`pages-u<id>`), effacées par
+  « Se déconnecter » (message `DECONNEXION`). Une session expirée sans
+  déconnexion les laisse sur le téléphone jusqu'à la prochaine déconnexion.

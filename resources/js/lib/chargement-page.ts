@@ -14,9 +14,11 @@
  * L'écran de secours n'utilise ni layout ni composant du design system :
  * c'est justement leur chargement qui échoue.
  *
- * « Hors ligne » vient pour l'instant de `navigator.onLine` ; il passera par
- * l'état du moteur hors ligne (`useHorsLigne`) à l'étape 6 du lot 0.
+ * « Hors ligne » : `navigator.onLine` croisé avec l'état du moteur hors ligne
+ * (HORS_LIGNE.md A.3.9).
  */
+
+import { moteur } from '@/lib/hors-ligne';
 
 export const CLE_RECHARGEMENT = 'nkaramogo:rechargement-apres-echec-import';
 
@@ -61,7 +63,9 @@ function stockage(): Storage | null {
 }
 
 const environnementNavigateur = (): Environnement => ({
-    enLigne: () => navigator.onLine,
+    // `navigator.onLine` à faux est fiable ; à vrai, il ment souvent : on
+    // croise avec l'état du moteur, décidé par l'échec des requêtes.
+    enLigne: () => navigator.onLine && moteur.etat.reseau !== 'hors_ligne',
     lire: (cle) => stockage()?.getItem(cle) ?? null,
     ecrire: (cle, valeur) => stockage()?.setItem(cle, valeur),
     effacer: (cle) => stockage()?.removeItem(cle),
