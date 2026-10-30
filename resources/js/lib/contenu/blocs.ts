@@ -344,7 +344,8 @@ function latex(noeud: Objet): string | null {
         return 'Une formule est vide.';
     }
 
-    return [...code].length > LONGUEUR_MAX_LATEX
+    // Points de code, comme mb_strlen côté serveur (BlocsContenu).
+    return Array.from(code).length > LONGUEUR_MAX_LATEX
         ? 'Une formule est trop longue (1 000 caractères au plus).'
         : null;
 }

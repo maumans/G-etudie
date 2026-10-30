@@ -470,7 +470,11 @@ function LigneCourte({
                     · {depuis(lecon.modifiee_le)}
                 </p>
             </div>
-            {!compacte && <BadgeStatut statut={lecon.statut} />}
+            {!compacte && (
+                <span className="hidden sm:inline-flex">
+                    <BadgeStatut statut={lecon.statut} />
+                </span>
+            )}
         </li>
     );
 }
@@ -486,20 +490,15 @@ function LigneCouverture({ ligne }: { ligne: Couverture }) {
                 <TuileMatiere teinte={ligne.matiere.teinte} />
                 <div className="grid min-w-0 flex-1 gap-0.5">
                     <p className="truncate font-semibold">
-                        {ligne.matiere.nom}{' '}
-                        <span className="font-normal text-ink-500">
-                            · {ligne.classe}
-                        </span>
+                        {ligne.matiere.nom}
                     </p>
                     <p className="truncate text-meta text-ink-500">
-                        {ligne.examens.join(', ')}
+                        {ligne.classe} · {ligne.examens.join(', ')}
                     </p>
                 </div>
                 <p className="shrink-0 text-right">
                     {ligne.notions === 0 ? (
-                        <span className="text-aide text-ink-500">
-                            Programme à saisir
-                        </span>
+                        <span className="text-aide text-ink-500">À saisir</span>
                     ) : (
                         <>
                             <span className="text-[1.125rem] font-semibold font-data">

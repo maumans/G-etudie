@@ -9,6 +9,12 @@ import { GABARITS, SESSIONS, THEMES, capturer } from './gabarits';
  * `db:seed`, pas son titre.
  */
 
+/**
+ * `php artisan serve` ne sert qu'une requête à la fois et quatre navigateurs
+ * le sollicitent : une navigation peut dépasser les 5 s par défaut.
+ */
+const ATTENTE = { timeout: 20_000 };
+
 /** Un jeudi matin à Conakry (UTC+0). */
 const HORLOGE = new Date('2026-10-29T10:00:00Z');
 
@@ -79,12 +85,16 @@ const ECRANS: Record<'pedagogie' | 'contenu', Ecran[]> = {
 };
 
 async function ouvrir(page: Page, ecran: Ecran): Promise<void> {
+    if (ecran.ecran === 'referentiel-programme') {
+        return ouvrirProgramme(page);
+    }
+
     if (typeof ecran.ouvrir === 'string') {
         const reponse = await page.goto(ecran.ouvrir);
         expect(reponse?.status()).toBe(200);
         await expect(
             page.getByRole('heading', { level: 1, name: ecran.titre }),
-        ).toBeVisible();
+        ).toBeVisible(ATTENTE);
 
         return;
     }
@@ -94,18 +104,38 @@ async function ouvrir(page: Page, ecran: Ecran): Promise<void> {
         .getByRole('link', { name: ecran.ouvrir.lecon, exact: true })
         .click();
     await expect(
-        page.getByRole('heading', { level: 1, name: ecran.titre }),
-    ).toBeVisible();
+        page.getByRole('heading', { level: 1, name: ecran.ouvrir.lecon }),
+    ).toBeVisible(ATTENTE);
 
     if (ecran.ouvrir.edition) {
         await page
             .getByRole('link', { name: 'Continuer la rédaction' })
             .click();
-        await expect(page).toHaveTitle(new RegExp(String(ecran.titre)));
         await expect(
             page.getByRole('textbox', { name: 'Contenu de la leçon' }),
-        ).toBeVisible();
+        ).toBeVisible(ATTENTE);
+        await expect(page).toHaveTitle(new RegExp(`^${String(ecran.titre)}`));
     }
+
+    // Une formule s'affiche avec ses polices KaTeX : attendre qu'elles soient là.
+    await page.evaluate(() => document.fonts.ready);
+}
+
+/** Programme : Physique · Terminale (chapitre d'exemple), par ses liens. */
+async function ouvrirProgramme(page: Page): Promise<void> {
+    await page.goto('/contenu/referentiel/programme');
+    await page.getByRole('link', { name: 'Terminale' }).click();
+    // Attendre la page de Terminale avant de choisir la matière : le lien
+    // « Physique » porte la classe en cours dans son adresse.
+    await expect(page.getByRole('link', { name: 'Terminale' })).toHaveAttribute(
+        'aria-current',
+        'page',
+        ATTENTE,
+    );
+    await page.getByRole('link', { name: /^Physique/ }).click();
+    await expect(
+        page.getByRole('heading', { name: 'Physique · Terminale' }),
+    ).toBeVisible();
 }
 
 for (const gabarit of GABARITS) {
@@ -135,6 +165,9 @@ for (const gabarit of GABARITS) {
                                 ecran.ecran,
                                 gabarit.nom,
                                 theme.nom,
+                                {
+                                    figerVariables: true,
+                                },
                             );
                         });
                     }

@@ -76,6 +76,31 @@
 - En cas d'échec, relever : capture aux trois largeurs, poids du fichier.
 - État : en attente de la photo
 
+### [Lot 1] L'éditeur de leçon sur les postes des rédacteurs
+- Pourquoi : TipTap, le collage et la saisie LaTeX ne se testent ici que
+  dans Chromium ; les rédacteurs travailleront sur leurs propres postes
+  (souvent un portable Windows avec Chrome ou Firefox, parfois une tablette).
+- Matériel : un portable Windows (Chrome, puis Firefox) et, si possible, une
+  tablette Android ; connexion du rédacteur de démonstration (+224 600 00 00 04).
+- Comment le provoquer :
+  1. Back-office › Leçons › « Les identités remarquables » › « Continuer la
+     rédaction ».
+  2. Coller un paragraphe copié depuis Word (gras, italique, souligné, une
+     image, un tableau).
+  3. Insérer une formule dans la ligne et une formule centrée avec les
+     raccourcis du dialogue (fraction, racine, vecteur).
+  4. Ajouter un encadré « Piège fréquent », en changer le genre.
+  5. Attendre « Enregistré à … », fermer l'onglet, rouvrir la leçon.
+  6. Ouvrir la même leçon dans deux onglets, écrire dans les deux.
+- Quoi observer : le collage garde gras et italique, perd souligné, image et
+  tableau sans erreur ; les formules s'affichent pareil à gauche et dans
+  « Comme l'élève la verra » ; rien n'est perdu à la réouverture ; le
+  second onglet affiche « Cette leçon a été enregistrée ailleurs » et
+  propose « Recharger », sans écraser le premier.
+- En cas d'échec, relever : navigateur et version, capture, texte collé,
+  message de l'indicateur d'enregistrement.
+- État : à faire
+
 ## 2. Installation de l'application (Android, iPhone)
 
 ### [Lot 0] Installer N'karamögö sur Android et sur iPhone

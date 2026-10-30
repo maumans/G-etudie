@@ -941,3 +941,66 @@ en 360 clair et 1366 sombre ; 124 Playwright verts.
 *Preuve* : captures 360 clair et 1366 sombre relues (accueil en ligne,
 dialogue, feuille, copie hors ligne) ; références des écrans élève
 régénérées ; 125 Playwright verts, axe sans violation sérieuse.
+
+### Lot 1 — référentiel et back-office contenu (2026-10-31)
+
+*Décision* : le back-office reste dense et calme (§ 7), mais jamais vide.
+- **Tableau de bord** : salutation en `titre-contraste`, quatre compteurs
+  par statut (liens vers la liste filtrée), **un** moment fort
+  `surface-marque` « Votre prochaine action » (relire d'abord, sinon
+  reprendre une leçon renvoyée, sinon écrire), « À relire », **couverture
+  des matières phares** en tirets à la couleur de la matière (part des
+  notions qui ont une leçon publiée), « Renvoyées, à reprendre » (teinte
+  `indice`), « Mes brouillons », le circuit en trois étapes à l'encre.
+- **Statuts** : seule couleur de la chrome — brouillon (neutre, crayon),
+  en relecture (mandarine, horloge), publiée (`juste`, coche), archivée
+  (neutre) ; toujours icône + mot (`BadgeStatut`).
+- **Éditeur** : rédaction à gauche, « Comme l'élève la verra » à droite
+  (le même `ContenuBlocs` que l'espace élève, taille de lecture) ; onglets
+  Rédiger / Aperçu sous 1024 px. Titre de 24 px sans cadre, barre d'outils
+  collante d'icônes 16 px (état actif en encre 7 %), indicateur
+  d'enregistrement discret à côté de l'action dominante « Envoyer en
+  relecture ». Formule : dialogue LaTeX avec rendu en direct et dix
+  raccourcis rendus par KaTeX.
+- **Encadrés** : « À retenir » mandarine, « Méthode » encre sur craie,
+  « Exemple résolu » carte neutre, « Piège fréquent » soleil (pas
+  `faux` : le rouge reste au verdict, § 2.3) ; icône + titre en 13 px 600.
+- **Relecture** : panneau `surface-encre` « À vous de relire » (le moment
+  fort de la fiche), commentaire dans un îlot `clair`, « Publier » plein et
+  « Renvoyer à l'auteur » en filet blanc ; historique en frise numérotée.
+- **Référentiel** : onglets segmentés comme « Mon compte » ; matières en
+  lignes à filets (tuile 40 px, « Phare » en pastille mandarine) ; teinte
+  choisie dans une grille de dix tuiles ; épreuves avec « À saisir »
+  (`indice`) au lieu d'un coefficient inventé, et un panneau encre
+  « Données officielles » qui dit pourquoi ; programme en cartes de
+  chapitres numérotées à l'encre, notions numérotées « 2.1 ».
+
+*Vu et corrigé sur les captures* :
+- **Sombre, panneaux encre** : `text-craie-50` s'inverse en sombre (la
+  craie devient foncée) — titre « À vous de relire », bouton « Renvoyer »
+  et panneau « Données officielles » illisibles. Sur `surface-encre`, le
+  texte est en **blanc fixe** (`text-white`, `/75`, `/60`).
+- **360 px, tableau de bord** : « Tout voir » renvoyé sous le titre de
+  section (`flex-wrap`) → en-tête de `Section` sans retour à la ligne,
+  action `shrink-0` ; titre de leçon tronqué par le badge → badge masqué
+  sous 640 px dans la file « À relire » (la file ne contient que des
+  leçons en relecture) ; nom de matière tronqué par la classe → la classe
+  passe sur la seconde ligne, avec les examens.
+- **Pastilles « Exemple »** jaunes pleines sur chaque ligne : trop fortes
+  pour un écran de travail → neutres ; le bandeau hachuré « EXEMPLE —
+  contenu fictif » reste le signal fort.
+- Corbeilles rouges sur chaque ligne : neutres, rouges au survol.
+- **Éditeur** : barre d'outils sur deux lignes à 1366 px → colonne de
+  rédaction un peu plus large que l'aperçu (1,15 / 1) et outils sans
+  espacement ; titre 20 px sous 640 px (24 px au-delà) pour ne pas couper
+  un titre long.
+- **Épreuves, 360 px** : la rangée défilante des examens élargissait la page
+  (élément de grille à `min-width: auto`) → `min-w-0` sur son conteneur ;
+  la ligne « Coefficient · Durée » passe à la ligne.
+- **Accessibilité** : le bouton qui ouvre une formule dans l'éditeur portait
+  un `aria-label` sans son texte visible (axe, sévère) → texte masqué
+  « Modifier la formule : » suivi du MathML de la formule.
+
+*Preuve* : 12 écrans × 4 gabarits × 2 thèmes dans
+`tests/visuel/captures/lot1/`, axe sans violation sérieuse, aucun
+débordement ; stables sur deux semis de démonstration différents.

@@ -64,7 +64,8 @@ test('un rédacteur écrit une leçon avec une formule, un autre la relit et la 
     await dialogue
         .getByLabel('Code LaTeX')
         .fill('\\cos \\widehat{B} = \\frac{AB}{BC}');
-    await expect(dialogue.locator('math')).toHaveCount(1);
+    // Le rendu en direct (les raccourcis sont aussi des formules).
+    await expect(dialogue.locator('[aria-live="polite"] math')).toHaveCount(1);
     await dialogue.getByRole('button', { name: 'Insérer' }).click();
 
     // L'aperçu « comme l'élève la verra » montre la formule.

@@ -70,12 +70,36 @@ export default function Edition({ lecon, renvoi }: Props) {
     }, [titre, doc, lecon.revision]);
 
     function modifier(changement: { titre?: string; doc?: DocumentBlocs }) {
-        if (changement.titre !== undefined) {
-            setTitre(changement.titre);
+        // Une mise à jour de l'éditeur qui ne change rien (un clic, une
+        // sélection, une formule rééditée à l'identique) n'est pas une
+        // modification : sinon la leçon serait réenregistrée, sa révision
+        // avancerait et elle remonterait dans les listes.
+        const titreChange =
+            changement.titre !== undefined &&
+            changement.titre !== courant.current.titre;
+        const docChange =
+            changement.doc !== undefined &&
+            JSON.stringify(changement.doc) !==
+                JSON.stringify(courant.current.doc);
+
+        if (!titreChange && !docChange) {
+            return;
         }
 
-        if (changement.doc !== undefined) {
-            setDoc(changement.doc);
+        if (titreChange) {
+            setTitre(changement.titre as string);
+            courant.current = {
+                ...courant.current,
+                titre: changement.titre as string,
+            };
+        }
+
+        if (docChange) {
+            setDoc(changement.doc as DocumentBlocs);
+            courant.current = {
+                ...courant.current,
+                doc: changement.doc as DocumentBlocs,
+            };
         }
 
         sale.current = true;
@@ -370,7 +394,7 @@ export default function Edition({ lecon, renvoi }: Props) {
                 ))}
             </div>
 
-            <div className="grid items-start gap-5 lg:grid-cols-2">
+            <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
                 <section
                     aria-label="Rédaction"
                     className={cn(
@@ -390,7 +414,7 @@ export default function Edition({ lecon, renvoi }: Props) {
                             }
                             maxLength={160}
                             placeholder="Titre de la leçon"
-                            className="w-full bg-transparent text-[1.5rem] leading-tight font-semibold tracking-tight text-ink-900 outline-none placeholder:text-ink-500"
+                            className="w-full bg-transparent text-[1.25rem] leading-tight font-semibold tracking-tight text-ink-900 outline-none placeholder:text-ink-500 sm:text-[1.5rem]"
                         />
                     </div>
                     <EditeurLecon

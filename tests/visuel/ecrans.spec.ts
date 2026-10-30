@@ -56,12 +56,8 @@ const CONNECTES: Record<
             statut: 403,
         },
     ],
+    // Tableau de bord du back-office : capturé au lot 1 (ecrans-lot1.spec.ts).
     contenu: [
-        {
-            adresse: '/contenu',
-            ecran: 'contenu-accueil',
-            titre: 'Tableau de bord',
-        },
         {
             adresse: '/compte/profil',
             ecran: 'compte-profil-contenu',

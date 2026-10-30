@@ -32,7 +32,7 @@ export function Section({
                 className,
             )}
         >
-            <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-2 px-5 pt-4">
+            <div className="flex items-start justify-between gap-4 px-5 pt-4">
                 <div className="grid min-w-0 gap-0.5">
                     <h2 id={idTitre} className="text-[0.9375rem] font-semibold">
                         {titre}
@@ -41,7 +41,7 @@ export function Section({
                         <p className="text-aide text-ink-500">{description}</p>
                     )}
                 </div>
-                {action}
+                {action && <div className="shrink-0">{action}</div>}
             </div>
             <div className={cn('px-5 pt-3 pb-4', contenuClassName)}>
                 {children}

@@ -331,7 +331,7 @@ function LigneLecon({ lecon }: { lecon: LeconResume }) {
                             {lecon.titre}
                         </Link>
                         {lecon.est_exemple && (
-                            <Badge variant="soleil">Exemple</Badge>
+                            <Badge variant="neutre">Exemple</Badge>
                         )}
                     </p>
                     <p className="truncate text-aide text-ink-500">

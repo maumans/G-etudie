@@ -41,7 +41,6 @@ export function VueFormule({
                 type="button"
                 contentEditable={false}
                 onClick={editer}
-                aria-label={`Modifier la formule ${latex}`}
                 className={cn(
                     'cursor-pointer rounded-[6px] px-0.5 align-middle transition-colors outline-none hover:bg-nimba-500/[0.08] focus-visible:outline-2 focus-visible:outline-ring',
                     bloc ? 'block w-full py-1' : 'inline-block',
@@ -49,6 +48,9 @@ export function VueFormule({
                         'bg-nimba-500/[0.10] ring-2 ring-nimba-500/60 dark:ring-nimba-400/60',
                 )}
             >
+                {/* Nom lu : « Modifier la formule » puis la formule elle-même
+                    (MathML) — le texte visible fait partie du nom (axe). */}
+                <span className="sr-only">Modifier la formule : </span>
                 {latex.trim() === '' ? (
                     <span className="text-aide text-ink-500">Formule vide</span>
                 ) : (
