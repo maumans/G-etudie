@@ -44,4 +44,5 @@ yarn-error.log
 # ce sont les règles de travail du projet (DEVBOOK.md, point 2).
 /.playwright-mcp
 /test-results
+/tests/visuel/.auth
 /playwright-report

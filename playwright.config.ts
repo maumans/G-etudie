@@ -28,6 +28,14 @@ export default defineConfig({
         locale: 'fr-FR',
         timezoneId: 'Africa/Conakry',
     },
+    projects: [
+        { name: 'connexion', testMatch: /connexion\.setup\.ts/ },
+        {
+            name: 'ecrans',
+            testMatch: /\.spec\.ts/,
+            dependencies: ['connexion'],
+        },
+    ],
     webServer: {
         command: 'php artisan serve --host=127.0.0.1 --port=8000',
         url: 'http://127.0.0.1:8000/up',

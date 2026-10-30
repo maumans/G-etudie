@@ -19,7 +19,7 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (lot 0, étapes 0 à 2 faites)
+### État au 2026-10-30 (lot 0, étapes 0 à 3 faites)
 
 - **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
   lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
@@ -39,29 +39,37 @@
   qui rattrape l'échec d'import, `version()` à `null` sous `public/hot`,
   `useDonneeOptionnelle` et l'outil de test `VerifiePropsOptionnelles`,
   pages d'erreur et messages de validation en français.
-- **Tests** : 69 Pest (216 assertions, MySQL `g_etudie_test`), 112 Vitest,
-  16 Playwright — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
-  `npm run build` passent.
-- **Pas encore fait dans le lot 0** : habillages (avec le `prefetch` des liens
-  de navigation), connexion par téléphone et « Mon compte », rôles et
-  permissions, socle hors ligne. Les écrans du kit (connexion par e-mail,
-  tableau de bord, réglages) sont encore en place.
+- **Étape 3 faite** (point 6) : quatre habillages (vitrine, élève,
+  back-office, console) et leurs pages d'entrée `/`, `/eleve`, `/contenu`,
+  `/console` ; pages `welcome` et `dashboard` du kit retirées ; après
+  connexion, on arrive sur `/eleve`.
+- **Tests** : 75 Pest (252 assertions, MySQL `g_etudie_test`), 114 Vitest,
+  49 Playwright (connexion + 6 écrans × 4 gabarits × 2 thèmes) — verts.
+  `tsc`, `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
+- **⚠ Les trois espaces connectés ne sont gardés que par `auth`** : n'importe
+  quel compte connecté ouvre `/contenu` et `/console`. Les permissions
+  (`can:`) arrivent à l'étape 5, et `AccesParRoleTest` les exigera.
+- **Pas encore fait dans le lot 0** : connexion par téléphone et « Mon
+  compte », rôles et permissions, socle hors ligne. Les écrans de connexion
+  et de réglages du kit (en anglais, par e-mail) sont encore en place ;
+  « Moi » mène à ses réglages.
 - **Lancer l'application** : `.claude/launch.json` déclare `laravel`
   (`php artisan serve`, port 8000) et `vite` (`npm run dev`, port 5173).
   Les captures de référence se prennent sur le build : arrêter `npm run dev`
-  et vérifier l'absence de `public/hot` avant `npm run test:visuel`.
+  et vérifier l'absence de `public/hot` avant `npm run test:visuel`. Les
+  écrans connectés demandent le compte du `DatabaseSeeder` en base de
+  développement (`php artisan db:seed`).
 
 ### Prochaines étapes, par ordre de priorité
 
-1. **Lot 0, étape 3 — les quatre habillages** (vitrine, élève, back-office,
-   console), avec `prefetch` sur leurs liens de navigation, et remplacement
-   des pages `welcome` / `dashboard` du kit.
-2. **Étapes 4 à 6** : connexion par téléphone et « Mon compte » (dont
+1. **Lot 0, étape 4 — connexion par téléphone et « Mon compte »** (dont
    `Password::defaults()` à aligner sur D3 : 8 caractères, sans règle de
    complexité — le kit impose 12 caractères, casse mixte, symboles et une
-   vérification de fuite par appel réseau en production) → rôles,
-   permissions, `AccesParRoleTest` → socle hors ligne HL0. Puis clôture
-   (étape 7).
+   vérification de fuite par appel réseau en production). La connexion des
+   tests visuels (`tests/visuel/connexion.setup.ts`) passe alors au téléphone.
+2. **Étapes 5 et 6** : rôles, permissions, `AccesParRoleTest` (les routes
+   `/eleve`, `/contenu`, `/console` prennent leur `can:` ; redirection après
+   connexion selon le rôle) → socle hors ligne HL0. Puis clôture (étape 7).
 3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
@@ -211,7 +219,8 @@ permission s'exerce (section 7).
 | Habillage / écran | État |
 |---|---|
 | Page `/dev/composants` (catalogue Ardoise) | ✅ lot 0, étape 1 (point 4) |
-| Vitrine | ⬜ |
+| Habillages vitrine, élève, back-office, console (coquilles et pages d'entrée) | ✅ lot 0, étape 3 (point 6) |
+| Vitrine finale (démo jouable, compte à rebours, tarifs) | ⬜ lot 8 |
 | Connexion / inscription par téléphone, parcours d'accueil, « Mon compte » | ⬜ |
 | Accueil élève (jauge, séance du jour, trace) | ⬜ |
 | Leçon, fiche de révision | ⬜ |
@@ -405,6 +414,44 @@ cette question à sa façon. Elle distingue deux notions :
      Totaux : 69 Pest, 112 Vitest, 16 Playwright.
    - **Reste** : `prefetch` sur les liens de navigation, à poser avec les
      habillages (étape 3).
+
+6. [x] **Lot 0, étape 3 — les quatre habillages** (2026-10-30)
+   - **Constat** : un seul habillage du kit (barre latérale anglaise,
+     « Dashboard »), une page d'accueil Laravel, aucun espace par public.
+   - **Décision** :
+     - `components/marque.tsx` (monogramme « N' » provisoire, DA8) ;
+       `components/lien-navigation.tsx` : une entrée, trois variantes
+       (onglet, latéral 48 px, dense 40 px), `prefetch`, `aria-current` ;
+       une entrée d'un lot à venir reste visible avec « bientôt » et, touchée,
+       le dit par une notification (jamais de clic mort) ;
+       `lib/navigation.ts` : les entrées des trois espaces ;
+     - `layouts/vitrine-layout.tsx` (vouvoiement, « Se connecter » / « Créer
+       un compte ») ; `layouts/eleve-layout.tsx` (onglets en bas sur mobile,
+       barre latérale à partir de 1024 px, marge pour la barre et la zone
+       sûre) ; `components/coque-personnel.tsx` commun à
+       `layouts/contenu-layout.tsx` et `layouts/console-layout.tsx` (barre
+       latérale dense, menu en feuille sur mobile, déconnexion qui vide le
+       cache de préchargement) ; console : barre **toujours sombre** ;
+     - routes `home` (`vitrine/accueil`), `eleve.accueil`, `contenu.accueil`,
+       `console.accueil` (sous `auth` seulement jusqu'à l'étape 5) ;
+       `fortify.home` = `/eleve` ; pages `welcome`, `dashboard` et
+       `DashboardTest` du kit retirés, ses autres écrans pointent sur
+       l'accueil élève ;
+     - tests visuels : projet `connexion` (session gardée dans
+       `tests/visuel/.auth/`, ignoré par git) dont dépendent les écrans.
+   - **Vu avec Playwright** et corrigé : à 360 px, « Examens blancs » tient
+     sur deux lignes centrées dans son onglet ; une entrée « bientôt » ne
+     réagissait pas au toucher (clic mort) → notification. Vitrine sans
+     chiffre ni témoignage ; le nom de l'espace s'affiche dans la barre du
+     haut à partir de 400 px.
+   - **Incident évité** : `Set-Content -Encoding utf8` (PowerShell 5.1) a
+     posé un BOM devant `<?php` dans `config/fortify.php` ; retiré aussitôt.
+     Ne modifier un fichier PHP qu'avec les outils d'édition ou `sed`.
+   - **Preuve** : Pest `HabillagesTest` (8 : vitrine ouverte, espaces fermés
+     aux visiteurs, ouverts au compte connecté, retour après connexion) ;
+     Vitest `lien-navigation` (2) ; Playwright : vitrine et les trois
+     espaces en 4 gabarits × 2 thèmes, axe propre, aucun débordement.
+     Totaux : 75 Pest, 114 Vitest, 49 Playwright.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

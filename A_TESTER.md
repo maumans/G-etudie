@@ -65,6 +65,21 @@
 
 *(aucune entrée)*
 
+### [Lot 0] Barre d'onglets de l'espace élève au doigt
+- Pourquoi : la barre d'onglets est collée en bas de l'écran ; sur un vrai
+  téléphone, la barre de gestes d'Android ou d'iPhone peut la recouvrir, et
+  les cibles de 72 px de large à 360 px doivent rester faciles à toucher.
+- Matériel : l'Android d'entrée de gamme, un iPhone récent si disponible.
+- Comment le provoquer : se connecter (compte du `DatabaseSeeder`), ouvrir
+  `/eleve`, toucher chaque onglet, faire défiler la page.
+- Quoi observer : la barre reste visible au-dessus de la barre de gestes ;
+  « Accueil » ouvre l'accueil ; « Cours », « Annales », « Examens blancs »
+  affichent « … arrive bientôt » ; « Moi » ouvre le compte ; le contenu
+  n'est jamais caché sous la barre en bas de page.
+- En cas d'échec, relever : capture, modèle, mode de navigation du
+  téléphone (gestes ou boutons).
+- État : à faire
+
 ## 3. Coupures réelles — réseau, courant, batterie
 
 *(aucune entrée)*
