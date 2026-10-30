@@ -21,8 +21,9 @@
 
 ### État au 2026-10-30 (lot 0 fait ; clôture en attente de D11)
 
-- **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
-  lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
+- **Dépôt git** : `main` porte le lot 0 (branche **`lot-0`** fusionnée le
+  2026-10-30, un commit par étape) ; chaque lot suivant avance sur sa
+  branche (`lot-1`…). Pas de dépôt
   distant (DA6).
 - **Décisions** : D1–D12, HL-D1–HL-D12 et DA1–DA9 **tranchées** (point 2).
   Attendus de Maurice : liste des matières phares (D1, avant le lot 1),
@@ -88,7 +89,7 @@
   `storage/logs/laravel.log` (en production, il signale seulement l'absence
   de fournisseur). Fournisseur SMS à choisir avant le lot 8 (D3).
 - **Clôture du lot 0** (point 14) : tout le lot est fait et audité ; il ne
-  manque que D11 (domaine, hébergement, HTTPS) et la fusion de `lot-0` dans
+  manque que D11 (domaine, hébergement, HTTPS). `lot-0` est fusionné dans
   `main`. Liste de mise en production : section 12.
 - **Comptes sans espace** : parent, enseignant et gestionnaire n'ouvrent que
   « Mon compte » jusqu'au lot 11.
@@ -109,10 +110,9 @@
    préproduction en HTTPS en suivant la section 12, et contrôles bloqués de
    `A_TESTER.md` (installation, mode avion, déploiement pendant une coupure,
    double authentification, session de 12 h).
-2. **Fusion de `lot-0` dans `main`**, sur décision de Maurice.
-3. **Lot 1** (après D1, la liste des matières phares) : référentiel et
+2. **Lot 1** (après D1, la liste des matières phares) : référentiel et
    back-office contenu, sur une branche `lot-1`.
-4. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
    BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
@@ -910,7 +910,8 @@ cette question à sa façon. Elle distingue deux notions :
      - **D11, domaine et hébergement** (Maurice) : sans eux, pas de HTTPS,
        donc pas de hors ligne ailleurs que sur `localhost`, pas d'installation,
        et les contrôles de `A_TESTER.md` sur vrai téléphone restent bloqués ;
-     - fusion de `lot-0` dans `main` : à faire sur décision de Maurice.
+     - ~~fusion de `lot-0` dans `main`~~ : faite le 2026-10-30, en avance
+       rapide (12 commits), sur décision de Maurice.
    - **Attendus pour le lot 1** : D1 (liste des matières phares).
    - **Preuve** : 202 Pest, 165 Vitest, 125 Playwright — verts.
 
