@@ -100,7 +100,7 @@ export default function Offre(props: Props) {
                 <OngletsReferentiel />
             </EnteteEcran>
 
-            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+            <div className="flex min-w-0 flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <nav
                     aria-label="Examen"
                     className="-mx-4 flex [scrollbar-width:none] gap-1.5 overflow-x-auto px-4 md:mx-0 md:px-0"
@@ -226,12 +226,12 @@ export default function Offre(props: Props) {
                 </Section>
 
                 <div className="grid content-start gap-6">
-                    <section className="grid gap-4 rounded-carte surface-encre p-5 text-craie-50 shadow-releve">
+                    <section className="grid gap-4 rounded-carte surface-encre p-5 text-white shadow-releve">
                         <div className="grid gap-1">
                             <h2 className="text-[0.9375rem] font-semibold">
                                 Données officielles
                             </h2>
-                            <p className="text-aide text-craie-50/75">
+                            <p className="text-aide text-white/75">
                                 Coefficients et durées viennent de l'équipe
                                 pédagogique, jamais d'une estimation. Tant
                                 qu'ils manquent, la jauge et l'examen blanc ne
@@ -240,12 +240,12 @@ export default function Offre(props: Props) {
                         </div>
                         <div className="grid gap-2">
                             <p className="flex items-baseline justify-between gap-2">
-                                <span className="text-aide text-craie-50/75">
+                                <span className="text-aide text-white/75">
                                     Saisies pour {choisi?.libelle}
                                 </span>
                                 <span className="text-[1.375rem] leading-none font-semibold font-data">
                                     {formaterNombre(saisies)}
-                                    <span className="text-aide font-medium text-craie-50/60">
+                                    <span className="text-aide font-medium text-white/60">
                                         {' '}
                                         / {formaterNombre(epreuves.length)}
                                     </span>
@@ -336,7 +336,7 @@ function LigneEpreuve({
             >
                 <Pencil aria-hidden />
             </Button>
-            <div className="col-span-2 flex gap-4 pl-11 sm:contents">
+            <div className="col-span-2 flex flex-wrap gap-x-4 gap-y-1 pl-11 sm:contents">
                 <Valeur
                     libelle="Coefficient"
                     valeur={

@@ -333,7 +333,7 @@ function CarteChapitre({
                         <h3 className="flex min-w-0 flex-1 flex-wrap items-center gap-2 font-semibold">
                             <span className="min-w-0">{chapitre.titre}</span>
                             {chapitre.est_exemple && (
-                                <Badge variant="soleil">Exemple</Badge>
+                                <Badge variant="neutre">Exemple</Badge>
                             )}
                         </h3>
                         <Actions
@@ -437,7 +437,7 @@ function LigneNotion({
                     <p className="flex min-w-0 flex-1 flex-wrap items-center gap-x-2 gap-y-0.5">
                         <span className="min-w-0">{notion.titre}</span>
                         {notion.est_exemple && (
-                            <Badge variant="soleil">Exemple</Badge>
+                            <Badge variant="neutre">Exemple</Badge>
                         )}
                         {notion.lecons > 0 && (
                             <span className="text-meta text-ink-500">

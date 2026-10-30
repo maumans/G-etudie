@@ -92,8 +92,23 @@ export async function capturer(
     ecran: string,
     gabarit: string,
     theme: string,
+    { figerVariables = false }: { figerVariables?: boolean } = {},
 ): Promise<void> {
     await page.evaluate(() => document.fonts.ready);
+
+    // Dates relatives (« il y a 4 heures ») : masquées, mais leur longueur
+    // change la mise en page d'un passage à l'autre. On leur donne un texte
+    // de longueur fixe avant de comparer.
+    if (figerVariables) {
+        await page.evaluate(() => {
+            for (const element of document.querySelectorAll(
+                '[data-capture="variable"]',
+            )) {
+                element.textContent = '00 xxx, 00:00';
+            }
+        });
+    }
+
     await verifierSansDebordement(page);
     await verifierAccessibilite(page);
     // Tableau de segments : une chaîne « lot0/… » serait aplatie en « lot0-… ».

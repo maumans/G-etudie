@@ -142,7 +142,7 @@ function BarreOutils({
         <div
             role="toolbar"
             aria-label="Mise en forme"
-            className="sticky top-14 z-10 flex flex-wrap items-center gap-0.5 border-b bg-card/95 px-2 py-1.5 backdrop-blur-sm lg:top-0"
+            className="sticky top-14 z-10 flex flex-wrap items-center gap-y-0.5 border-b bg-card/95 px-2 py-1.5 backdrop-blur-sm lg:top-0"
         >
             <Outil
                 icone={Pilcrow}
@@ -211,7 +211,7 @@ function BarreOutils({
                     onClick={() => encadrer(genre)}
                 />
             ))}
-            <span className="ml-auto flex gap-0.5">
+            <span className="flex border-l border-border pl-1 sm:ml-auto sm:border-0 sm:pl-0">
                 <Outil
                     icone={Undo2}
                     nom="Annuler (Ctrl+Z)"

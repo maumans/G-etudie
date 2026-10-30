@@ -138,7 +138,7 @@ export default function Fiche({ lecon, affichee, versions, droits }: Props) {
                         <div className="flex flex-wrap items-center gap-2">
                             <BadgeStatut statut={lecon.statut} />
                             {lecon.est_exemple && (
-                                <Badge variant="soleil">Exemple</Badge>
+                                <Badge variant="neutre">Exemple</Badge>
                             )}
                             <span className="flex items-center gap-1 text-aide text-ink-500">
                                 <UserRound aria-hidden className="size-3.5" />
@@ -421,7 +421,7 @@ function PanneauRelecture({
     return (
         <section
             aria-labelledby="titre-relecture"
-            className="grid gap-4 rounded-carte surface-encre p-5 text-craie-50 shadow-releve"
+            className="grid gap-4 rounded-carte surface-encre p-5 text-white shadow-releve"
         >
             <div className="grid gap-1">
                 <h2
@@ -430,10 +430,7 @@ function PanneauRelecture({
                 >
                     À vous de relire
                 </h2>
-                <p
-                    className="text-aide text-craie-50/75"
-                    data-capture="variable"
-                >
+                <p className="text-aide text-white/75" data-capture="variable">
                     Version {version.numero}, envoyée par {version.auteur} le{' '}
                     {formaterJourHeure(version.soumise_le)}. Vérifiez
                     l’exactitude, les formules et le niveau de langue de la
@@ -443,12 +440,12 @@ function PanneauRelecture({
             <div className="clair rounded-controle">
                 <Champ
                     libelle={
-                        <span className="text-craie-50">
+                        <span className="text-white">
                             Commentaire pour l’auteur
                         </span>
                     }
                     aide={
-                        <span className="text-craie-50/70">
+                        <span className="text-white/70">
                             Obligatoire pour renvoyer ; facultatif pour publier.
                         </span>
                     }
@@ -474,7 +471,7 @@ function PanneauRelecture({
             <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
                 <Button
                     variant="outline"
-                    className="border-white/25 bg-transparent text-craie-50 hover:bg-white/10"
+                    className="border-white/25 bg-transparent text-white hover:bg-white/10 hover:text-white dark:bg-transparent"
                     disabled={formulaire.processing}
                     onClick={() => void decider('renvoyer')}
                 >

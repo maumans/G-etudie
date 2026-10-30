@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-10-30, clôture du lot 0)
+## 0. Reprise — où en est le projet (mis à jour le 2026-10-31, lot 1)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,15 +19,26 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (lot 0 fait ; clôture en attente de D11)
+### État au 2026-10-31 (lot 1 fait sur la branche `lot-1` ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte le lot 0 (branche **`lot-0`** fusionnée le
-  2026-10-30, un commit par étape) ; chaque lot suivant avance sur sa
-  branche (`lot-1`…). Pas de dépôt
-  distant (DA6).
+- **Dépôt git** : `main` porte le lot 0 ; le lot 1 est sur la branche
+  **`lot-1`** (un commit par étape), **pas encore fusionnée** : la fusion
+  attend l'accord de Maurice. Pas de dépôt distant (DA6).
+- **Lot 1 fait** (point 15) : référentiel pédagogique (matières, épreuves
+  avec coefficient et durée **vides tant que l'équipe ne les a pas
+  saisis**, matières phares D1, programme en chapitres et notions, années
+  scolaires) et back-office contenu (tableau de bord, liste et file de
+  relecture, éditeur TipTap avec formules et encadrés, aperçu « comme
+  l'élève la verra », circuit brouillon → relecture → publication avec
+  renvoi commenté et versions). **Critère d'acceptation tenu** : un
+  rédacteur crée une leçon avec formules, un autre la relit et la publie,
+  l'auteur ne peut pas se relire — `CircuitRelectureTest`,
+  `EcransLeconsTest`, parcours Playwright `parcours-lot1.spec.ts`. Format
+  des blocs et `ContenuBlocs` posés dès ce lot (`HORS_LIGNE.md` B.3, écart
+  n° 15).
 - **Décisions** : D1–D12, HL-D1–HL-D12 et DA1–DA9 **tranchées** (point 2).
-  Attendus de Maurice : liste des matières phares (D1, avant le lot 1),
-  domaine et hébergement (D11, avant la clôture du lot 0), logo vectoriel.
+  Attendus de Maurice : domaine et hébergement (D11), logo vectoriel,
+  confirmation des matières phares (D1, choisies au lot 1 à sa demande).
 - **Étape 0 faite** (point 3) : bases MySQL `g_etudie` et `g_etudie_test`,
   application en français, tests sur MySQL avec garde « base `_test` »,
   CI, MCP Playwright figé.
@@ -78,10 +89,10 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 202 Pest (MySQL `g_etudie_test`, rôles semés une fois par
-  `TestCase`), 165 Vitest, 125 Playwright (une session par espace + 15
-  écrans × 4 gabarits × 2 thèmes + un parcours complet + le socle hors
-  ligne) — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
+- **Tests** : 284 Pest (MySQL `g_etudie_test`, rôles semés une fois par
+  `TestCase`), 204 Vitest, 215 Playwright (sessions par compte, écrans du
+  lot 0 et 12 écrans du lot 1 × 4 gabarits × 2 thèmes, parcours
+  d'inscription, parcours du critère du lot 1, socle hors ligne) — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
   `npm run build` passent.
 - **⚠ Pas de HTTPS tant que le domaine n'existe pas** (D11) : hors
   `localhost`, le service worker ne s'inscrit pas, donc pas de hors ligne.
@@ -110,9 +121,15 @@
    préproduction en HTTPS en suivant la section 12, et contrôles bloqués de
    `A_TESTER.md` (installation, mode avion, déploiement pendant une coupure,
    double authentification, session de 12 h).
-2. **Lot 1** (après D1, la liste des matières phares) : référentiel et
-   back-office contenu, sur une branche `lot-1`.
-3. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+2. **Maurice : relire le lot 1** (captures, comptes de démo 04 rédacteur,
+   05 relectrice, 06 responsable pédagogique) et décider de fusionner
+   `lot-1` dans `main`.
+3. **Lot 2** : cours côté élève, accueil élève, parcours d'accueil ;
+   brancher `ContenuBlocs` sur les props et sur Dexie (HL1, second point).
+4. **Équipe pédagogique** : saisir dans le référentiel le programme
+   (chapitres, notions), les coefficients et les durées des matières
+   phares ; confirmer la liste des phares.
+5. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
    BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
@@ -230,13 +247,13 @@ Détail dans `PLAN_NKARAMOGO.md` § 6.
 
 | Groupe | Tables | État |
 |---|---|---|
-| Référentiel | `annees_scolaires`, `examens`, `filieres`, `series`, `classes`, `matieres`, `epreuves`, `chapitres`, `notions` | ⬜ prévu (lot 1) |
-| Contenu | `lecons`, `versions_contenu`, `questions`, `indices`, `corriges`, `sujets`, `sujet_parties`, `ressources_externes`, `signalements`, `packs_hors_ligne` | ⬜ prévu (lots 1, 3, 4, 7) |
+| Référentiel | `annees_scolaires`, `examens`, `series`, `classes`, `matieres`, `epreuves`, `chapitres`, `notions` (la filière est une énumération, pas une table) | ✅ lot 1 (point 15) |
+| Contenu | `lecons`, `versions_contenu` ✅ lot 1 ; `questions`, `indices`, `corriges`, `sujets`, `sujet_parties`, `ressources_externes`, `signalements`, `packs_hors_ligne` | 🟡 lots 3, 4, 7 |
 | Comptes | `users` (téléphone, prénom, pseudo, nom et e-mail facultatifs, `telephone_verifie_le`, `desactive_le`), `codes_sms` | ✅ lot 0, étape 4 |
 | Élève | `profils_eleves`, `liens_parents`, `tentatives`, `maitrises`, `seances`, `examens_blancs`, `series_jours`, badges, défis | ⬜ prévu (lots 2, 3, 5, 6) |
 | Organisation | `etablissements`, `groupes`, `devoirs`, `abonnements`, `paiements`, `codes_acces`, `conversations_tuteur` | ⬜ prévu (lots 9 à 11) |
 | Audit | `journal_acces_plateforme` (écrit par `App\Support\JournalAcces`) | ✅ lot 0, étape 4 |
-| Hors ligne | `appareils`, `appareil_profils`, `operations_synchronisees` | ⬜ prévu (lot 0, étape 6) |
+| Hors ligne | `appareils`, `appareil_profils`, `operations_synchronisees` | ✅ lot 0, étape 6 |
 
 **Une seule plateforme, pas de multi-entreprise.** Les établissements, groupes
 et liens parent-enfant sont des **rattachements**, qui disent sur quoi une
@@ -246,8 +263,8 @@ permission s'exerce (section 7).
 
 | Service | Rôle | État |
 |---|---|---|
-| `ReferentielService` | examens, séries, épreuves (coefficients, durées) | ⬜ |
-| `ContenuService` + workflow de relecture | brouillon → relecture → publication, versions | ⬜ |
+| `ReferentielService` | slug des matières, suppressions gardées, ordre des chapitres et notions, année courante unique | ✅ lot 1 |
+| `ContenuService` + workflow de relecture | seule porte du statut : brouillon → relecture → publication / renvoi commenté / reprise → archivage ; versions figées ; verrou optimiste ; l'auteur ne se relit jamais | ✅ lot 1 |
 | `ImportAnnaleService` | PDF/scan → sujet structuré (IA) → relecture | ⬜ |
 | `TentativeService` | enregistrement, **correction serveur**, maîtrise | ⬜ |
 | `SeanceService` | séance du jour, séances pré-calculées | ⬜ |
@@ -276,7 +293,7 @@ permission s'exerce (section 7).
 | Annales (liste, fiche, trois modes) | ⬜ |
 | Examen blanc (lancement, passage, résultat, carte de partage) | ⬜ |
 | Progression, profil, téléchargements | ⬜ |
-| Back-office contenu | ⬜ |
+| Back-office contenu : tableau de bord, référentiel (matières, épreuves, programme, années), leçons (liste, relecture, création, éditeur TipTap, fiche, historique) | ✅ lot 1 (point 15) ; questions, annales, signalements aux lots 3, 4, 12 |
 | Console plateforme | ⬜ |
 
 Infrastructure d'interface à construire au lot 0 : primitives de `DESIGN.md`
@@ -289,8 +306,8 @@ composants hors ligne (`HORS_LIGNE.md` A.3.7 à A.3.9), formatage GNF dans
 | Seeder | Rôle | État |
 |---|---|---|
 | `RolesEtPermissionsSeeder` | recopie `App\Enums\Role` et `App\Enums\Permission` en base (`syncPermissions`, permissions inconnues supprimées) ; lancé aussi en production | ✅ étape 5 |
-| `ReferentielSeeder` | structure des examens, séries, classes, matières — **coefficients et durées laissés vides**, à saisir et valider par l'équipe pédagogique | ⬜ |
-| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 08, `DemoSeeder::COMPTES`) ✅ étape 5 ; leçons et questions **`est_exemple = true`** ⬜ lot 1 | 🟡 |
+| `ReferentielSeeder` | examens, séries, classes d'examen (recopiés à chaque passage) ; année 2026-2027, dix matières, épreuves des matières phares (D1) semées **une fois**, sur table vide — **coefficients et durées vides**, programme non semé ; lancé aussi en production | ✅ lot 1 |
+| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 08, `DemoSeeder::COMPTES`) ✅ étape 5 ; puis `DemoContenuSeeder` ✅ lot 1 : chapitres, notions et cinq leçons **fictifs** (`est_exemple`), une par statut, passés par `ContenuService` (vrai historique) ; questions au lot 3 | ✅ |
 
 ⚠ Les permissions ne viennent que des seeders : un déploiement lance `migrate`
 **puis** `db:seed`. Comptes créés en `firstOrCreate` (un re-seed ne réinitialise
@@ -915,13 +932,105 @@ cette question à sa façon. Elle distingue deux notions :
    - **Attendus pour le lot 1** : D1 (liste des matières phares).
    - **Preuve** : 202 Pest, 165 Vitest, 125 Playwright — verts.
 
+15. [x] **Lot 1 — référentiel pédagogique et back-office contenu**
+   (2026-10-31, branche `lot-1`, commits par étape)
+   - **Constat** : back-office vide (état « bientôt ») ; aucune table de
+     référentiel ; liste des matières phares (D1) non fournie — Maurice a
+     demandé à Claude Code de la choisir ; question de savoir si
+     l'administrateur ajoute lui-même les matières.
+   - **Décisions** (plan validé par Maurice le 2026-10-31) :
+     - **Matières phares** (`ReferentielSeeder::PHARES`) : BEPC — Maths,
+       Français, Physique, Biologie-Géologie ; Bac SM — Maths, Physique,
+       Chimie ; Bac SE — Biologie-Géologie, Chimie, Physique, Maths ; Bac SS
+       — Philosophie, Histoire-Géographie, Français, Économie ; CEE aucune
+       (trimestre suivant, D1). Priorité de rédaction, pas une donnée
+       officielle ; case « phare » modifiable.
+     - **Le responsable pédagogique gère le référentiel** (permission
+       `referentiel.gerer`, aussi l'administrateur plateforme) : matières
+       (nom, teinte parmi les dix du design — une nouvelle teinte est une
+       modification du code, sinon Tailwind purge ses classes), épreuves par
+       examen et série, programme, années. Coefficients et durées **vides**
+       (« À saisir ») ; programme jamais semé.
+     - Permissions `contenu.rediger` (rédacteur), `contenu.relire`
+       (relecteur), `contenu.administrer` (responsable pédagogique et
+       administrateur plateforme, qui ont aussi les deux premières).
+     - Tout le back-office consulte tout le catalogue ; on agit sur ce à
+       quoi on est rattaché (`Perimetre::peutRedigerLecon`,
+       `peutRelireLecon`) ; **l'auteur de la leçon ou de la version
+       envoyée ne relit jamais**, même responsable pédagogique.
+     - Une version est figée à chaque envoi en relecture ; une leçon publiée
+       qu'on modifie reste en ligne jusqu'à la publication suivante ;
+       verrou optimiste (`revision`) contre deux onglets ; toute transition
+       passe par `ContenuService`, sous verrou.
+     - Format des blocs avancé du lot 2 (`HORS_LIGNE.md` écart n° 15) ;
+       **TipTap 3.31.4** (la 3.32.2 sortait le jour même) **sans
+       l'extension mathématique officielle** (elle exige KaTeX ≤ 0.18, le
+       projet a la 0.19) : nos nœuds `formule`, `formuleBloc`, `encadre`,
+       rendus par le composant `Formule` existant. L'éditeur (139 Ko
+       compressés) ne vit que dans le fragment de la page d'édition.
+     - Images, tableaux, mini-questions : reportés (points ouverts).
+     - **Suppression de son compte** (point ouvert du lot 0) : refusée à un
+       compte qui a signé du contenu (`User::aSigneDuContenu`) — sans cela,
+       la clé étrangère faisait échouer la suppression en 500 ; « Mon compte »
+       explique pourquoi.
+   - **Écarts au plan** : pas de table `filieres` (énumération `Filiere`) ;
+     chapitres non versionnés par année scolaire (seules les épreuves le
+     sont) ; une leçon se rattache à une **notion** (PLAN M17), pas à un
+     chapitre seul ; `TableauDeBordController` remplace la route
+     `Route::inertia('contenu')`.
+   - **Vu avec Playwright** (12 écrans × 4 gabarits × 2 thèmes, axe sans
+     violation sérieuse) et corrigé : textes illisibles en sombre sur les
+     panneaux `surface-encre` (`craie-50` s'inverse) ; en-têtes de section
+     et lignes tronqués à 360 px ; pastilles « Exemple » trop fortes ;
+     corbeilles rouges partout. Détail : `DESIGN.md` § 13, « Lot 1 ».
+     Éditeur essayé à la main dans le navigateur : saisie, formule par le
+     dialogue, aperçu, enregistrement automatique.
+   - **Corrigé en chemin** : la rangée défilante des examens (Épreuves)
+     élargissait toute la page à 360 px (élément de grille sans `min-w-0`) ;
+     bouton de formule de l'éditeur au nom accessible sans son texte visible
+     (axe, sévère) ; une mise à jour de l'éditeur sans changement
+     déclenchait un enregistrement (révision avancée, leçon remontée dans
+     les listes) — elle est maintenant ignorée ; barre d'outils de
+     l'éditeur sur deux lignes à 1366 px ; dates relatives qui changeaient
+     la mise en page des captures (texte figé avant comparaison).
+   - **Preuve** : **284 Pest** (dont `ReferentielSeederTest` 5,
+     `GestionReferentielTest` 16, `CircuitRelectureTest` 14,
+     `EcransLeconsTest` 10, `BlocsContenuTest` 32, contenu de démonstration,
+     suppression de compte refusée), **204 Vitest** (format des blocs 32,
+     `ContenuBlocs` 3, éditeur 4), **215 Playwright** (96 captures du lot 1,
+     le parcours du critère d'acceptation, le lot 0 inchangé hors
+     `compte-profil-contenu` régénérée volontairement et `contenu-accueil`
+     déplacée au lot 1) — verts ; captures stables sur deux semis
+     différents. `tsc`, `vp check` (sans avertissement), Pint, Larastan
+     niveau 7 et `npm run build` passent.
+   - **Reste** : essai de l'éditeur sur les postes des rédacteurs
+     (`A_TESTER.md`) ; saisie du programme et des coefficients par l'équipe ;
+     un chapitre « TGFYHJ » vide, créé dans la base de développement
+     pendant un essai à la main, est laissé en place (donnée de Maurice) —
+     les captures du programme sont prises sur Physique · Terminale.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
 ### Points ouverts
 
-- **Liste des matières phares** (D1) : attendue de Maurice avant le lot 1.
-- **Domaine et hébergement** (D11) : à fixer avant la clôture du lot 0 (HTTPS).
+- **Matières phares** (D1) : choisies au lot 1 par Claude Code à la demande
+  de Maurice (`ReferentielSeeder::PHARES`, point 15) ; à faire confirmer par
+  l'équipe pédagogique, modifiables dans Référentiel › Épreuves.
+- **Coefficients et durées officiels** et **programme** (chapitres, notions)
+  de chaque matière phare : à saisir par l'équipe pédagogique dans le
+  référentiel. Tant qu'ils manquent, jauge et examen blanc ne peuvent pas les
+  utiliser.
+- **Rattachement rédacteur ↔ matière** (PLAN § 7 : « par matière phare, un
+  rédacteur et un relecteur ») : pas au lot 1 ; tout le personnel du
+  back-office voit tout le catalogue, un rédacteur ne modifie que ses
+  leçons. À décider quand l'équipe sera constituée.
+- **Images, tableaux et mini-questions dans les leçons** : hors du format
+  des blocs au lot 1 (stockage et conversion WebP à décider avec les packs,
+  mini-questions au lot 3).
+- **Désactiver un compte du personnel** : un compte qui a signé du contenu
+  ne se supprime plus lui-même (point 15) ; l'écran administrateur qui le
+  désactive reste à faire (console, lot 13).- **Domaine et hébergement** (D11) : à fixer avant la clôture du lot 0 (HTTPS).
 - **Logo vectoriel** : remplacera le monogramme provisoire des icônes (DA8).
 - **Fournisseur SMS** (D3) : à choisir avant le lot 8 ; d'ici là, aucun SMS
   ne part (codes dans le journal Laravel en développement).
@@ -933,9 +1042,6 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
   comptes n'ouvrent que « Mon compte ». Décider alors si enseignants et
   gestionnaires (qui verront des données d'élèves) prennent la session de
   12 h et la double authentification du personnel.
-- **Suppression de son compte par le personnel** : ouverte comme pour
-  l'élève (DA5) ; à revoir au lot 1, quand un rédacteur aura des contenus
-  signés (garder l'auteur, désactiver plutôt que supprimer ?).
 - **Changement de mot de passe** : les autres sessions ouvertes ne sont pas
   fermées (pas de `AuthenticateSession`) ; à décider avec l'étape 6 (appareils
   enregistrés, révocation).
@@ -954,20 +1060,31 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `Appareil` | `appareils` | profils (`appareil_profils`) | jeton haché (SHA-256), révocable (`revoque_le`) |
 | `OperationSynchronisee` | `operations_synchronisees` | auteur, appareil | `uuid` unique global (idempotence) ; `acceptee` ou `rejetee` seulement |
 | `Role`, `Permission` (spatie) | `roles`, `permissions`, `model_has_roles`… | — | recopiés de `App\Enums\Role` et `Permission` par `RolesEtPermissionsSeeder` |
+| `AnneeScolaire` | `annees_scolaires` | épreuves | une seule `courante` (`ReferentielService::rendreCourante`) |
+| `Examen`, `Serie`, `Classe` | `examens`, `series`, `classes` | classe d'examen → examen | semés par `ReferentielSeeder`, pas d'écran de saisie |
+| `Matiere` | `matieres` | épreuves, chapitres | `teinte` (`TeinteMatiere`) = couleur et icône du design ; ne se supprime pas si utilisée |
+| `Epreuve` | `epreuves` | année, examen, série nulle, matière | **porte coefficient et durée** (vides tant que non saisis), `phare` (D1) ; unicité par `cle_unicite` (série nulle comprise) |
+| `Chapitre`, `Notion` | `chapitres`, `notions` | matière + classe ; chapitre | `ordre`, `est_exemple` |
+| `Lecon` | `lecons` | notion, auteur | `uuid` v7 (clé de route), `brouillon` (blocs), `revision` (verrou), `version_publiee_id` ; statut changé par `ContenuService` seulement |
+| `VersionContenu` | `versions_contenu` (polymorphe, `contenu_type` = `lecon`) | auteur, décideur | figée à l'envoi en relecture ; `decision` (`DecisionRelecture`), `commentaire` |
 
 ## 10. Enums
 
 | Enum | Valeurs | Rôle |
 |---|---|---|
 | `Role` | `eleve`, `parent`, `enseignant`, `redacteur`, `relecteur`, `admin_contenu`, `gestionnaire_etablissement`, `superadmin` | permissions de chaque rôle, `estPersonnel()` |
-| `Permission` | `espace.eleve`, `espace.contenu`, `espace.console`, `compte.double_authentification` | seule liste des permissions |
+| `Permission` | `espace.eleve`, `espace.contenu`, `espace.console`, `referentiel.gerer`, `contenu.rediger`, `contenu.relire`, `contenu.administrer`, `compte.double_authentification` | seule liste des permissions |
 | `Espace` | `console`, `contenu`, `eleve` (ordre de priorité) | où arrive un compte (`accueilDe()`) |
 | `MotifCode` | `verification`, `recuperation`, `changement_numero` | motif d'un code SMS |
+| `CodeExamen` | `CEE`, `BEPC`, `BAC` | `nom()`, `aDesSeries()` |
+| `CodeSerie` | `SM`, `SE`, `SS` | séries du Baccalauréat unique |
+| `Filiere` | `generale`, `franco_arabe` | filière d'une épreuve (D2) |
+| `TeinteMatiere` | les dix clés de `lib/matieres.ts` | même liste en TS, vérifiée par un test |
+| `StatutContenu` | `brouillon`, `en_relecture`, `publie`, `archive` | statut d'une leçon |
+| `DecisionRelecture` | `publiee`, `renvoyee`, `retiree` | issue d'une version envoyée en relecture |
 
-*(prévus : `CodeExamen` (`CEE`, `BEPC`, `BAC`), `CodeSerie` (`SM`, `SE`,
-`SS`), `Filiere` (`general`, `franco_arabe`), `TypeQuestion`, `StatutContenu`
-(`brouillon`, `en_relecture`, `publie`, `archive`), `ModeTentative`
-(`seance`, `entrainement`, `examen_blanc`).)*
+*(prévus : `TypeQuestion`, `ModeTentative` (`seance`, `entrainement`,
+`examen_blanc`).)*
 
 ## 11. Routes
 
@@ -976,6 +1093,12 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `/` vitrine, `/dev/composants` (hors production) | publiques | `routes/web.php` |
 | `/accueil` (aiguillage) | `auth`, dérogation | `routes/web.php` |
 | `/eleve` · `/contenu` · `/console` | `auth` + `can:espace.eleve` · `can:espace.contenu` · `can:espace.console` | `routes/web.php` |
+| `/contenu` (tableau de bord) | `auth` + `can:espace.contenu` | `routes/web.php` |
+| `/contenu/referentiel/*` (matières, épreuves, programme, années) | `auth` + `can:referentiel.gerer` | `routes/contenu.php` |
+| `/contenu/lecons`, `/contenu/lecons/{uuid}` | `auth` + `can:espace.contenu` ; fiche gardée par `LeconPolicy` | `routes/contenu.php` |
+| `/contenu/lecons/creer`, édition, enregistrement, envoi, reprise, modification | `can:contenu.rediger` + `LeconPolicy::rediger` (auteur ou responsable pédagogique) | `routes/contenu.php` |
+| `/contenu/relecture`, publier, renvoyer | `can:contenu.relire` + `LeconPolicy::relire` (jamais l'auteur) | `routes/contenu.php` |
+| archiver, restaurer | `can:contenu.administrer` | `routes/contenu.php` |
 | `/compte/*` (profil, mot de passe, numéro, affichage, vérification, suppression) | `auth`, dérogations « Mon compte » | `routes/compte.php` |
 | `/compte/securite` | `auth` + `can:compte.double_authentification` + `password.confirm` | `routes/compte.php` |
 | `/mot-de-passe-oublie*` | `guest` | `routes/compte.php` |
