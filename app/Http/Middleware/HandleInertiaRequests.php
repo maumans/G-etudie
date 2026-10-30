@@ -21,8 +21,18 @@ class HandleInertiaRequests extends Middleware
      *
      * @see https://inertiajs.com/asset-versioning
      */
+    /**
+     * Sous `npm run dev` (fichier public/hot), le manifeste du build n'a rien à
+     * voir avec ce que charge le navigateur : un `npm run build` lancé en
+     * parallèle ferait repartir chaque navigation en 409. La vérification de
+     * version reste active en production (CLAUDE.md § 4).
+     */
     public function version(Request $request): ?string
     {
+        if (is_file(public_path('hot'))) {
+            return null;
+        }
+
         return parent::version($request);
     }
 

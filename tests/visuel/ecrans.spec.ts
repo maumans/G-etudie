@@ -36,6 +36,22 @@ for (const gabarit of GABARITS) {
                     { fullPage: true },
                 );
             });
+
+            test("lot 0 — page d'erreur 404", async ({ page }) => {
+                const reponse = await page.goto('/adresse-qui-n-existe-pas');
+                expect(reponse?.status()).toBe(404);
+                await expect(
+                    page.getByText('Page introuvable', { exact: true }),
+                ).toBeVisible();
+                await page.evaluate(() => document.fonts.ready);
+
+                await verifierSansDebordement(page);
+                await verifierAccessibilite(page);
+                await expect(page).toHaveScreenshot(
+                    ['lot0', `erreur-404-${gabarit.nom}-${theme.nom}.png`],
+                    { fullPage: true },
+                );
+            });
         });
     }
 }

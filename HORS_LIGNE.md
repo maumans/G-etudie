@@ -683,7 +683,11 @@ hors ligne ; les packs viennent ensuite.
 - [ ] Service worker servi à `/sw.js`, précache du manifeste Vite, trois versions gardées (A.3.1)
 - [ ] Caches `pages-u<id>` (copies complètes, fusion des partiels, heure glissée), `polices`
 - [ ] Manifeste et icônes ; installation vérifiée sur Android ; notice iPhone (A.3.2)
-- [ ] Échec d'import de page rattrapé ; filet de démarrage dans `app.blade.php` (A.3.3)
+- [~] Échec d'import de page rattrapé ; filet de démarrage dans `app.blade.php` (A.3.3)
+  — fait : `resolve` maison, `resources/js/lib/chargement-page.ts`, test
+  Vitest 19 (lot 0, étape 2) ; `window.__nkaramogoPret` posé par `app.tsx`.
+  Reste : le filet de démarrage dans `app.blade.php`, et « hors ligne » à
+  lire dans `useHorsLigne` au lieu de `navigator.onLine` (étape 6).
 - [ ] Base Dexie `nkaramogo` (A.3.4)
 - [ ] UUID v7 monotone ; refus serveur des autres versions (A.3.5)
 - [ ] `enregistrer()` et moteur : lots, ordre, `depend_de`, délais, 401/419 (A.3.5)
@@ -699,6 +703,9 @@ hors ligne ; les packs viennent ensuite.
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
+
+- [x] 19 — Vitest : échec d'import, rechargement une fois en ligne, jamais
+  hors ligne (`tests/js/chargement-page.test.ts`, lot 0 étape 2).
 
 ## B.5 Journal des écarts
 
