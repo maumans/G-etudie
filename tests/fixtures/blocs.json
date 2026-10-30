@@ -1,0 +1,405 @@
+[
+    {
+        "nom": "document vide",
+        "valide": true,
+        "doc": { "type": "doc", "content": [] }
+    },
+    {
+        "nom": "document sans contenu",
+        "valide": true,
+        "doc": { "type": "doc" }
+    },
+    {
+        "nom": "leçon complète",
+        "valide": true,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "heading",
+                    "attrs": { "level": 2 },
+                    "content": [
+                        { "type": "text", "text": "Le théorème de Pythagore" }
+                    ]
+                },
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "Dans un triangle rectangle, "
+                        },
+                        {
+                            "type": "formule",
+                            "attrs": { "latex": "a^2 + b^2 = c^2" }
+                        },
+                        {
+                            "type": "text",
+                            "text": " toujours.",
+                            "marks": [{ "type": "bold" }, { "type": "italic" }]
+                        },
+                        { "type": "hardBreak" },
+                        { "type": "text", "text": "Fin." }
+                    ]
+                },
+                { "type": "formuleBloc", "attrs": { "latex": "\\frac{1}{2}" } },
+                {
+                    "type": "encadre",
+                    "attrs": { "genre": "a_retenir" },
+                    "content": [
+                        {
+                            "type": "paragraph",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": "L'hypoténuse est le plus grand côté."
+                                }
+                            ]
+                        },
+                        { "type": "formuleBloc", "attrs": { "latex": "c > a" } }
+                    ]
+                },
+                {
+                    "type": "orderedList",
+                    "attrs": { "start": 1, "type": null },
+                    "content": [
+                        {
+                            "type": "listItem",
+                            "content": [
+                                {
+                                    "type": "paragraph",
+                                    "content": [
+                                        {
+                                            "type": "text",
+                                            "text": "Repérer l'angle droit"
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "bulletList",
+                                    "content": [
+                                        {
+                                            "type": "listItem",
+                                            "content": [{ "type": "paragraph" }]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                { "type": "paragraph" }
+            ]
+        }
+    },
+    {
+        "nom": "liste numérotée sans attributs",
+        "valide": true,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "orderedList",
+                    "content": [
+                        {
+                            "type": "listItem",
+                            "content": [{ "type": "paragraph" }]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "les quatre genres d'encadré",
+        "valide": true,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "encadre",
+                    "attrs": { "genre": "a_retenir" },
+                    "content": [{ "type": "paragraph" }]
+                },
+                {
+                    "type": "encadre",
+                    "attrs": { "genre": "methode" },
+                    "content": [{ "type": "paragraph" }]
+                },
+                {
+                    "type": "encadre",
+                    "attrs": { "genre": "exemple" },
+                    "content": [{ "type": "paragraph" }]
+                },
+                {
+                    "type": "encadre",
+                    "attrs": { "genre": "piege" },
+                    "content": [{ "type": "paragraph" }]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "pas un document",
+        "valide": false,
+        "doc": { "type": "paragraph" }
+    },
+    { "nom": "une chaîne", "valide": false, "doc": "bonjour" },
+    {
+        "nom": "propriété inconnue sur le document",
+        "valide": false,
+        "doc": { "type": "doc", "content": [], "version": 2 }
+    },
+    {
+        "nom": "bloc inconnu (image)",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [{ "type": "image", "attrs": { "src": "x.png" } }]
+        }
+    },
+    {
+        "nom": "bloc de code refusé",
+        "valide": false,
+        "doc": { "type": "doc", "content": [{ "type": "codeBlock" }] }
+    },
+    {
+        "nom": "texte au niveau du document",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [{ "type": "text", "text": "seul" }]
+        }
+    },
+    {
+        "nom": "titre de niveau 1",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [{ "type": "heading", "attrs": { "level": 1 } }]
+        }
+    },
+    {
+        "nom": "titre sans niveau",
+        "valide": false,
+        "doc": { "type": "doc", "content": [{ "type": "heading" }] }
+    },
+    {
+        "nom": "marque souligné refusée",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "a",
+                            "marks": [{ "type": "underline" }]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "lien refusé",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "a",
+                            "marks": [
+                                {
+                                    "type": "link",
+                                    "attrs": { "href": "https://exemple.org" }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "texte vide",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{ "type": "text", "text": "" }]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "formule vide",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [{ "type": "formuleBloc", "attrs": { "latex": "  " } }]
+        }
+    },
+    {
+        "nom": "formule sans latex",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [{ "type": "formule", "attrs": {} }]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "formule avec un attribut en trop",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "formuleBloc",
+                    "attrs": { "latex": "x", "couleur": "red" }
+                }
+            ]
+        }
+    },
+    {
+        "nom": "formule en bloc dans un paragraphe",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        { "type": "formuleBloc", "attrs": { "latex": "x" } }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "encadré de genre inconnu",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "encadre",
+                    "attrs": { "genre": "attention" },
+                    "content": [{ "type": "paragraph" }]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "encadré vide",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "encadre",
+                    "attrs": { "genre": "methode" },
+                    "content": []
+                }
+            ]
+        }
+    },
+    {
+        "nom": "encadré dans un encadré",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "encadre",
+                    "attrs": { "genre": "methode" },
+                    "content": [
+                        {
+                            "type": "encadre",
+                            "attrs": { "genre": "piege" },
+                            "content": [{ "type": "paragraph" }]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "liste vide",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [{ "type": "bulletList", "content": [] }]
+        }
+    },
+    {
+        "nom": "élément de liste qui ne commence pas par un paragraphe",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "bulletList",
+                    "content": [
+                        {
+                            "type": "listItem",
+                            "content": [{ "type": "bulletList", "content": [] }]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "liste numérotée qui commence à 0",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "orderedList",
+                    "attrs": { "start": 0 },
+                    "content": [
+                        {
+                            "type": "listItem",
+                            "content": [{ "type": "paragraph" }]
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "paragraphe avec un attribut",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                { "type": "paragraph", "attrs": { "textAlign": "left" } }
+            ]
+        }
+    },
+    {
+        "nom": "élément sans type",
+        "valide": false,
+        "doc": { "type": "doc", "content": [{ "text": "a" }] }
+    },
+    {
+        "nom": "contenu qui n'est pas une liste",
+        "valide": false,
+        "doc": { "type": "doc", "content": "texte" }
+    }
+]
