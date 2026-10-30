@@ -2,7 +2,9 @@
 
 namespace App\Support;
 
+use App\Enums\Permission;
 use App\Enums\Role;
+use App\Models\Lecon;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -18,6 +20,11 @@ use Illuminate\Database\Eloquent\Builder;
  * Lot 0 : un élève se voit lui-même ; l'administrateur plateforme consulte
  * tous les élèves sans être rattaché à aucun. Les liens parent ↔ enfant,
  * groupe et établissement s'ajoutent ici au lot 11.
+ *
+ * Lot 1, contenu : tout le personnel du back-office consulte tout le
+ * catalogue ; on n'agit que sur ce à quoi on est rattaché. Une leçon est
+ * rattachée à son auteur (il la rédige) ; le responsable pédagogique agit
+ * sur toutes. Un relecteur n'est jamais rattaché à ce qu'il a écrit.
  */
 class Perimetre
 {
@@ -56,5 +63,33 @@ class Perimetre
     private static function elevesRattaches(User $acteur): array
     {
         return $acteur->hasRole(Role::Eleve) ? [$acteur->getKey()] : [];
+    }
+
+    /** Modifier le brouillon d'une leçon, l'envoyer en relecture, la reprendre. */
+    public static function peutRedigerLecon(User $acteur, Lecon $lecon): bool
+    {
+        if (! $acteur->can(Permission::RedigerContenu->value)) {
+            return false;
+        }
+
+        return $lecon->auteur_id === $acteur->getKey()
+            || $acteur->can(Permission::AdministrerContenu->value);
+    }
+
+    /**
+     * Relire la version en attente : jamais son auteur, ni l'auteur de la
+     * leçon (« rien n'est publié sans relecteur différent de l'auteur »,
+     * PLAN M17), même responsable pédagogique.
+     */
+    public static function peutRelireLecon(User $acteur, Lecon $lecon): bool
+    {
+        return $acteur->can(Permission::RelireContenu->value) && ! self::estAuteurDe($acteur, $lecon);
+    }
+
+    /** A écrit la leçon, ou la version qui attend sa relecture. */
+    public static function estAuteurDe(User $acteur, Lecon $lecon): bool
+    {
+        return $lecon->auteur_id === $acteur->getKey()
+            || $lecon->versionEnRelecture()?->auteur_id === $acteur->getKey();
     }
 }

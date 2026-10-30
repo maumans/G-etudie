@@ -1,8 +1,13 @@
 <?php
 
+use App\Models\Chapitre;
+use App\Models\Classe;
+use App\Models\Matiere;
+use App\Models\Notion;
 use App\Models\User;
 use App\Services\HorsLigne\RegistreOperations;
 use App\Services\Sms\EnvoiSms;
+use Database\Seeders\ReferentielSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Str;
 use Illuminate\Testing\TestResponse;
@@ -117,4 +122,34 @@ function envoyer(string $jeton, array $operations, array $horloge = []): TestRes
         'operations' => $operations,
         ...$horloge,
     ]);
+}
+
+/**
+ * Une notion du programme, comme le responsable pédagogique la saisit :
+ * référentiel semé, chapitre de Maths en 10e année.
+ */
+function notionDeTest(string $titre = 'Le théorème de Pythagore'): Notion
+{
+    test()->seed(ReferentielSeeder::class);
+
+    $chapitre = Chapitre::firstOrCreate([
+        'matiere_id' => Matiere::where('slug', 'maths')->value('id'),
+        'classe_id' => Classe::where('nom', '10e année')->value('id'),
+        'titre' => 'Géométrie du triangle',
+    ], ['ordre' => 1]);
+
+    return Notion::firstOrCreate(['chapitre_id' => $chapitre->id, 'titre' => $titre], ['ordre' => 1]);
+}
+
+/**
+ * Un document de leçon valide (App\Support\BlocsContenu), avec une formule.
+ *
+ * @return array<string, mixed>
+ */
+function blocsDeTest(string $texte = 'Dans un triangle rectangle :'): array
+{
+    return ['type' => 'doc', 'content' => [
+        ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => $texte]]],
+        ['type' => 'formuleBloc', 'attrs' => ['latex' => 'a^2 + b^2 = c^2']],
+    ]];
 }

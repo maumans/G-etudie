@@ -66,7 +66,11 @@ class ReferentielService
         $notion->delete();
     }
 
-    /** Rang suivant dans une liste ordonnée (nouveau chapitre ou nouvelle notion en dernier). */
+    /**
+     * Rang suivant dans une liste ordonnée (nouveau chapitre ou nouvelle notion en dernier).
+     *
+     * @param  Builder<Chapitre>|Builder<Notion>  $freres
+     */
     public function rangSuivant(Builder $freres): int
     {
         return ((int) $freres->max('ordre')) + 1;

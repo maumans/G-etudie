@@ -16,6 +16,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon $debut
  * @property Carbon $fin
  * @property bool $courante
+ * @property-read int $epreuves_count withCount
+ * @property-read int $coefficients_count withCount (épreuves au coefficient saisi)
  */
 #[Fillable(['libelle', 'debut', 'fin', 'courante'])]
 class AnneeScolaire extends Model

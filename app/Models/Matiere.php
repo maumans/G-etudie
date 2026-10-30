@@ -17,6 +17,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $slug
  * @property TeinteMatiere $teinte
  * @property int $ordre
+ * @property-read int $epreuves_count withCount
+ * @property-read int $chapitres_count withCount
+ * @property-read int $phares_count withCount (épreuves phares)
  */
 #[Fillable(['nom', 'slug', 'teinte', 'ordre'])]
 class Matiere extends Model

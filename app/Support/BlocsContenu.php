@@ -34,7 +34,11 @@ class BlocsContenu
 
     private const MARQUES = ['bold', 'italic'];
 
-    /** Document vide, celui d'une leçon qu'on vient de créer. */
+    /**
+     * Document vide, celui d'une leçon qu'on vient de créer.
+     *
+     * @return array{type: string, content: list<array<string, mixed>>}
+     */
     public static function vide(): array
     {
         return ['type' => 'doc', 'content' => []];
@@ -72,6 +76,7 @@ class BlocsContenu
     /**
      * Chiffres d'un document, pour les listes du back-office.
      *
+     * @param  array<string, mixed>  $doc
      * @return array{mots: int, formules: int, encadres: int}
      */
     public static function resume(array $doc): array
