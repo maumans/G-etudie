@@ -29,7 +29,7 @@ export default function Numero({
 
             <SectionCompte titre="Mon numéro">
                 <div className="flex flex-wrap items-center gap-3">
-                    <span className="text-titre-carte font-semibold font-data">
+                    <span className="text-titre-carte font-medium font-data">
                         +224 {numeroMasque}
                     </span>
                     {numeroVerifie ? (

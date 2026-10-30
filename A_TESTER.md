@@ -36,8 +36,8 @@
   3. Parcourir la page en thème clair, puis passer le téléphone en thème
      sombre et la recharger.
   4. Dehors ou près d'une fenêtre, luminosité au maximum puis au minimum.
-- Quoi observer : Sora sur les titres, Lexend sur le texte (pas une police
-  système) ; rien ne dépasse à droite ; verdicts lisibles (icône + mot) ;
+- Quoi observer : Geist partout, et l'italique Instrument Serif sur les mots
+  mis en valeur des grands titres (pas une police système) ; rien ne dépasse à droite ; verdicts lisibles (icône + mot) ;
   les formules s'affichent (pas de LaTeX brut) ; le défilement reste fluide.
 - En cas d'échec, relever : capture d'écran, modèle du téléphone, version
   d'Android et de Chrome, section concernée du catalogue.

@@ -68,7 +68,7 @@ export default function Composants() {
                     <p className="text-aide font-semibold tracking-wide text-nimba-700 uppercase dark:text-nimba-300">
                         N'karamögö · Ardoise
                     </p>
-                    <h1 className="mt-1 text-titre-ecran font-bold sm:text-titre-ecran-large">
+                    <h1 className="mt-1 text-titre-ecran sm:text-titre-ecran-large">
                         Catalogue des composants
                     </h1>
                     <p className="mt-2 max-w-2xl text-ink-600">
@@ -98,7 +98,7 @@ function Panneau({ titre, className }: { titre: string; className?: string }) {
                 className,
             )}
         >
-            <h2 className="text-titre-ecran font-bold">{titre}</h2>
+            <h2 className="text-titre-carte">{titre}</h2>
             <Couleurs />
             <Typographie />
             <Boutons />
@@ -233,25 +233,35 @@ function Typographie() {
     return (
         <Bloc titre="Typographie">
             <div className="grid gap-3">
-                <p className="text-aide font-semibold tracking-wide text-nimba-700 uppercase dark:text-nimba-300">
+                <p className="text-meta font-medium tracking-wide text-nimba-700 uppercase dark:text-nimba-300">
                     J-214 avant le BEPC
                 </p>
-                <p className="font-titre text-heros leading-none font-bold">
-                    <span className="font-data">47</span> %
+                <p className="text-heros leading-none font-semibold tracking-tight">
+                    <span className="font-data">47</span>
+                    <span className="text-titre-ecran text-ink-500"> %</span>
                 </p>
-                <p className="font-titre text-titre-ecran font-semibold">
-                    Titre d'écran mobile — Sora 24
+                <p className="text-vitrine leading-none font-semibold tracking-[-0.035em] max-sm:text-[2.5rem]">
+                    Un soir,{' '}
+                    <span className="font-accent font-normal tracking-normal text-nimba-600 italic dark:text-nimba-300">
+                        quinze minutes.
+                    </span>
                 </p>
-                <p className="font-titre text-titre-carte font-semibold">
-                    Titre de carte — Sora 20
+                <p className="text-titre-ecran-large font-semibold tracking-tight">
+                    Titre d'écran desktop — Geist 28
+                </p>
+                <p className="text-titre-ecran font-semibold tracking-tight">
+                    Titre d'écran mobile — Geist 22
+                </p>
+                <p className="text-titre-carte font-semibold tracking-tight">
+                    Titre de carte — Geist 16
                 </p>
                 <p className="text-lecture">
-                    Corps de lecture — Lexend 17, interligne 1,6. Au marché de
+                    Corps de lecture — Geist 17, interligne 1,65. Au marché de
                     Madina, un kilo de riz coûte {formaterGnf(12500)}.
                 </p>
-                <p>Interface — Lexend 15.</p>
-                <p className="text-aide text-ink-600">Aide — Lexend 13.</p>
-                <p className="text-meta text-ink-600">Méta — Lexend 12.</p>
+                <p>Interface — Geist 14.</p>
+                <p className="text-aide text-ink-500">Aide — Geist 13.</p>
+                <p className="text-meta text-ink-500">Méta — Geist 12.</p>
                 <p className="text-titre-carte font-data">
                     13,5 / 20 · {formaterGnf(100000)} · 01:42:07
                 </p>

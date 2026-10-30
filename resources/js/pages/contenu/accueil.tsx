@@ -13,7 +13,7 @@ export default function Accueil() {
         <>
             <Head title="Back-office contenu" />
             <div className="grid gap-6">
-                <h1 className="text-titre-ecran font-bold">Tableau de bord</h1>
+                <h1 className="text-titre-ecran">Tableau de bord</h1>
                 <EtatVide
                     illustration={ListTree}
                     titre="Le référentiel arrive au lot 1"

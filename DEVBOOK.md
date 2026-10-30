@@ -19,7 +19,7 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-30 (lot 0, étapes 0 à 4 faites)
+### État au 2026-10-30 (lot 0, étapes 0 à 4 faites, puis refonte du design v2)
 
 - **Dépôt git** : `main` porte l'état de départ (kit + documents + audit) ; le
   lot 0 avance sur la branche **`lot-0`**, un commit par étape. Pas de dépôt
@@ -49,7 +49,13 @@
   « Mon compte » (profil, mot de passe, numéro, affichage, suppression),
   journal des accès sensibles. Écrans de connexion et de réglages du kit
   retirés, passkeys et vérification d'e-mail aussi.
-- **Tests** : 103 Pest (MySQL `g_etudie_test`), 117 Vitest, 98 Playwright
+- **Refonte du design v2 faite** (point 8), à la demande de Maurice avant
+  l'étape 5 : violet `nimba` `#702AED` à la place du bleu roi, neutres sans
+  teinte bleue, Geist + Instrument Serif à la place de Sora + Lexend
+  (51,5 Ko), interface à 14 px, contrôles de 40/44 px, titres en 600,
+  surfaces d'expression, vitrine et connexion refaites. **Avant tout écran :
+  `DESIGN.md` § 0 et la compétence `design-ardoise`** ; `CLAUDE.md` § 3 bis.
+- **Tests** : 103 Pest (MySQL `g_etudie_test`), 122 Vitest, 98 Playwright
   (connexion + 12 écrans × 4 gabarits × 2 thèmes + un parcours complet
   inscription → suppression) — verts. `tsc`, `vp check`, Pint, Larastan
   (niveau 7) et `npm run build` passent.
@@ -66,7 +72,9 @@
   (`php artisan serve`, port 8000) et `vite` (`npm run dev`, port 5173).
   Base : `php artisan migrate:fresh` puis `php artisan db:seed` — le seeder
   crée l'élève de démonstration (+224 600 00 00 01) avec le mot de passe
-  `DEMO_MOT_DE_PASSE` de `.env`. Les captures de référence se prennent sur le
+  `DEMO_MOT_DE_PASSE` de `.env`. **MySQL** : celui de Laragon
+  (`D:\Applications\laragon`), à démarrer s'il ne tourne pas — sans lui,
+  chaque requête attend la base puis échoue. Les captures de référence se prennent sur le
   build : arrêter `npm run dev` et vérifier l'absence de `public/hot` avant
   `npm run test:visuel`.
 
@@ -159,7 +167,7 @@ le soir. Utilisateurs principaux : **des mineurs**.
 | CSS | Tailwind (+ `tailwind.config`) | **tailwindcss 4.3.3** (`@tailwindcss/vite`), configuration **dans `app.css`** (`@theme`, `@source`), **sans `tailwind.config`** | règle « classes seulement dans le JS/TS » maintenue ; jetons Ardoise dans `@theme` ; variante `dark:` redéfinie pour exclure un sous-arbre `.clair` (étape 1) |
 | Bundler | Vite | **Vite+ 1.4.0** (`vite` remplacé par `@voidzero-dev/vite-plus-core` 1.4.0, Rolldown 1.2.16), commandes `vp dev / build / check / test`, `vite.config.ts` | `optimizeDeps.include` à vérifier sous Vite+ ; laravel-vite-plugin 3.2.0 |
 | Primitives UI | shadcn/Radix + CVA + tailwind-merge | shadcn « new-york » (`components.json`), 13 paquets `@radix-ui/react-*`, class-variance-authority 0.7.1, tailwind-merge 3.7.0, clsx, lucide-react 0.475.0, sonner 2.0.8, input-otp 1.4.2 | dossier `resources/js/components/ui/` en **minuscules et kebab-case** (DA7) ; `@radix-ui/react-tabs` 1.2.1 ajouté (étape 1) ; `tailwind-merge` étendu aux jetons Ardoise |
-| Polices | Sora, Lexend, KaTeX auto-hébergées | Instrument Sans via l'option `fonts` de laravel-vite-plugin : **téléchargée au build et servie depuis `public/build/assets`** (auto-hébergée) | ✅ Sora et Lexend par `@fontsource/sora` et `@fontsource/lexend` 5.3.0 importés dans `app.css` ; option `fonts` du plugin retirée (elle faisait télécharger le WOFF) — `DESIGN.md` § 13 |
+| Polices | Geist, Instrument Serif, KaTeX auto-hébergées (v2) | Instrument Sans via l'option `fonts` de laravel-vite-plugin : **téléchargée au build et servie depuis `public/build/assets`** (auto-hébergée) | ✅ v2 : `@fontsource-variable/geist` et `@fontsource/instrument-serif` 5.3.0 importés dans `app.css` (Sora et Lexend retirés, point 8) ; option `fonts` du plugin retirée (elle faisait télécharger le WOFF) — `DESIGN.md` § 13 |
 | Formules | KaTeX | absent | ✅ `katex` 0.19.1 (types inclus), composant `Formule`, pré-optimisé dans `vite.config.ts` |
 | Hors ligne | SW maison, Dexie, UUID v7 | absent | `dexie` 4.4.7 au lot 0 ; UUID v7 écrit à la main (`lib/hors-ligne/uuid7.ts`) |
 | Graphiques / éditeur | Recharts / TipTap | absents | lots 1 (TipTap) et 6 (Recharts) |
@@ -526,6 +534,50 @@ cette question à sa façon. Elle distingue deux notions :
      `Unit\TelephoneTest`, `SeederDemonstrationTest` — valeurs relues en
      base ; Vitest `reglages-affichage` ; Playwright `parcours.spec.ts`.
      Totaux : 103 Pest, 117 Vitest, 98 Playwright.
+
+8. [x] **Refonte du design « Ardoise » v2** (2026-10-30, avant l'étape 5)
+   - **Constat** (Maurice) : le bleu faisait « ancien site », rien de vivant ;
+     caractères grands et gras partout ; pages plates et peu modernes ;
+     champs et composants lourds. Exigence : un travail au sommet, élégant,
+     professionnel, facile — et le hors ligne n'est pas une excuse pour une
+     interface pauvre. Mesuré sur les captures v1 : Lexend 15-16 px en
+     500-600, Sora 700 jusque sur les titres de carte, contrôles de 48 px,
+     neutres gris-bleu, vitrine à moitié vide, accueil élève réduit à un
+     rectangle pointillé.
+   - **Décision** :
+     - marque violette `nimba-600` `#702AED` (OKLCH 290, blanc 6,5:1) ;
+       bleu, orange (Orange Guinée) et jaune en aplat (MTN) exclus comme
+       couleur de marque ; monogramme et `public/favicon.svg` redessinés
+       (le favicon était encore le logo Laravel) ;
+     - neutres neutres, nouveaux jetons `ink-500`, `contour`, `relief` ;
+     - Geist variable + Instrument Serif italique (51,5 Ko en français
+       contre 72,5) ; interface 14 px, titres 600, jamais 700 ;
+     - échelle de hauteurs 48 / 44→40 / 36 / 32, icônes 16 px, badges en
+       pilule, onglets segmentés, ombres en couches ; classes de champ
+       partagées (`CHAMP_BASE`, `CHAMP_CONTENEUR`) ; variante de bouton
+       `doux`, taille `grande` ;
+     - surfaces d'expression CSS (`surface-marque`, `halo-marque`,
+       `trame-points`) et aperçu dessiné de l'application
+       (`components/apercu-application.tsx`) ;
+     - écrans refaits : vitrine, connexion en écran partagé, accueil élève,
+       navigations élève et personnel, « Mon compte », erreur, catalogue ;
+     - règles inscrites : `DESIGN.md` § 0 (niveau d'exigence) et § 13,
+       `CLAUDE.md` § 3 bis et § 6, compétence `.claude/skills/design-ardoise`.
+   - **Écart au plan** : cibles tactiles de 44 px (au lieu de 48) côté élève,
+     40 px à la souris ; options de QCM toujours à 56 px. Raison : 48 px
+     partout donnait l'aspect lourd reproché ; 44 px reste la recommandation
+     WCAG 2.5.5.
+   - **Vu avec Playwright** : 12 écrans × 4 gabarits × 2 thèmes ; corrigé :
+     carte blanche du panneau de connexion illisible en sombre (axe,
+     `color-contrast`) → classe `clair` ; colonne « Examens blancs » décalée
+     → `content-start` ; cartes d'examens trop hautes sur mobile → format
+     horizontal. Horloge figée dans `ecrans.spec.ts` (date et salutation de
+     l'accueil).
+   - **Preuve** : `contrastes.test.ts` aux nouvelles valeurs et aux nouveaux
+     jetons ; captures de référence régénérées ; `tsc`, `vp check`, build
+     verts. Totaux : 103 Pest, 122 Vitest, 98 Playwright.
+   - **À l'occasion** : MySQL de Laragon était arrêté (chaque requête
+     attendait la base) ; démarré pour la vérification.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

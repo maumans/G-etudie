@@ -13,7 +13,7 @@ export default function Accueil() {
         <>
             <Head title="Console plateforme" />
             <div className="grid gap-6">
-                <h1 className="text-titre-ecran font-bold">Vue d'ensemble</h1>
+                <h1 className="text-titre-ecran">Vue d'ensemble</h1>
                 <EtatVide
                     illustration={Activity}
                     titre="Aucune activité à montrer pour l'instant"

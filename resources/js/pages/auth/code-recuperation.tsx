@@ -74,7 +74,7 @@ export default function CodeRecuperation({
                 Pas de SMS ?{' '}
                 <Link
                     href={create()}
-                    className="font-medium text-lien underline-offset-4 hover:underline"
+                    className="font-medium text-lien underline-offset-4 transition-colors hover:underline"
                 >
                     Demander un nouveau code
                 </Link>

@@ -52,7 +52,7 @@ export default function Affichage() {
                     valeur={taille}
                     onChoisir={changerTaille}
                 />
-                <p className="rounded-controle bg-craie-100 p-4 text-lecture">
+                <p className="rounded-controle border bg-craie-50 p-4 text-lecture">
                     Au marché de Madina, Fatou achète 3 kg de riz à{' '}
                     {formaterGnf(12500)} le kilo.
                 </p>
@@ -62,7 +62,7 @@ export default function Affichage() {
                 titre="Économie de données"
                 description="Les images lourdes ne se chargent que si tu les demandes, et le poids de chaque téléchargement s'affiche avant."
             >
-                <label className="flex min-h-12 items-center gap-3">
+                <label className="flex min-h-11 items-center gap-2.5">
                     <Checkbox
                         checked={economieDonnees}
                         onCheckedChange={(coche) =>
@@ -73,7 +73,7 @@ export default function Affichage() {
                 </label>
             </SectionCompte>
 
-            <p className="text-aide text-ink-600">
+            <p className="text-aide text-ink-500">
                 Ces réglages ne valent que pour ce téléphone.
             </p>
         </div>
@@ -108,14 +108,14 @@ function Segments<T extends string>({
                         aria-checked={choisi}
                         onClick={() => onChoisir(option.valeur)}
                         className={cn(
-                            'flex h-12 items-center justify-center gap-2 rounded-controle border-2 px-3 font-medium outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring',
+                            'flex h-11 items-center justify-center gap-2 rounded-controle border px-3 font-medium shadow-xs transition-[background-color,border-color,box-shadow] outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:h-10',
                             choisi
-                                ? 'border-nimba-600 bg-nimba-600/[0.12] text-nimba-700 dark:border-nimba-300 dark:bg-nimba-500/25 dark:text-nimba-300'
-                                : 'border-input text-ink-900 hover:bg-nimba-600/[0.06] dark:hover:bg-nimba-500/15',
+                                ? 'border-nimba-600 bg-nimba-600/[0.06] text-nimba-700 ring-1 ring-nimba-600 dark:border-nimba-300 dark:bg-nimba-300/10 dark:text-nimba-300 dark:ring-nimba-300'
+                                : 'border-contour text-ink-900 hover:border-ink-400 hover:bg-craie-50 dark:hover:bg-relief',
                         )}
                     >
                         {option.icone && (
-                            <option.icone aria-hidden className="size-5" />
+                            <option.icone aria-hidden className="size-4" />
                         )}
                         {option.libelle}
                     </button>

@@ -730,6 +730,11 @@ hors ligne ; les packs viennent ensuite.
    ne pas faire payer à l'élève des fichiers inutiles. (Corrige la première
    version de cet écart, écrite quand les polices passaient encore par
    l'option `fonts` du plugin et un `fonts-manifest.json`.)
+4. **2026-10-30 — Polices de la v2.** Sora et Lexend sont remplacées par
+   Geist (variable, une seule police pour toutes les graisses) et Instrument
+   Serif italique (`DESIGN.md` § 3). Même mécanisme : fichiers dans le
+   manifeste du build, WOFF à écarter du précache — Instrument Serif en
+   livre aussi. Poids à précacher pour le français : 51,5 Ko.
 
 ## B.6 Points de vigilance
 

@@ -75,7 +75,7 @@ export default function VerifierNumero({
                 {({ processing, errors }) => (
                     <>
                         {!codeEnvoye && errors.code && (
-                            <p className="text-aide font-medium text-faux-600 dark:text-faux-400">
+                            <p className="text-aide text-faux-600 dark:text-faux-400">
                                 {errors.code}
                             </p>
                         )}

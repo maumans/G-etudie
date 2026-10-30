@@ -12,11 +12,11 @@ function BandeauExemple({ className }: { className?: string }) {
       role="note"
       data-slot="bandeau-exemple"
       className={cn(
-        "hachures-exemple flex items-center gap-2 rounded-controle border-2 border-soleil-400 bg-card px-3 py-2 text-aide font-semibold tracking-wide text-ink-900 uppercase",
+        "hachures-exemple flex items-center gap-2 rounded-controle border border-soleil-500 bg-card px-3 py-1.5 text-meta font-semibold tracking-wider text-ink-900 uppercase",
         className
       )}
     >
-      <FlaskConical aria-hidden className="size-4 shrink-0" />
+      <FlaskConical aria-hidden className="size-3.5 shrink-0" />
       Exemple — contenu fictif
     </div>
   )

@@ -29,8 +29,8 @@ const InputOTPGroup = React.forwardRef<
 InputOTPGroup.displayName = "InputOTPGroup"
 
 /**
- * Une case : 56 px de haut, largeur fluide plafonnée à 48 px (la grille du
- * groupe la règle) ; chiffre en Sora, bordure ink-400 (≥ 3:1). Toucher
+ * Une case : 48 px de haut, largeur fluide plafonnée à 48 px (la grille du
+ * groupe la règle) ; chiffres tabulaires, bordure ink-400 (≥ 3:1). Toucher
  * n'importe quelle case donne le focus au champ unique.
  */
 const InputOTPSlot = React.forwardRef<
@@ -44,9 +44,9 @@ const InputOTPSlot = React.forwardRef<
     <div
       ref={ref}
       className={cn(
-        "relative flex h-14 w-full min-w-0 items-center justify-center rounded-controle border border-input bg-card font-titre text-2xl font-semibold text-ink-900 shadow-carte transition-colors",
+        "relative flex h-12 w-full min-w-0 items-center justify-center rounded-controle border border-input bg-card font-data text-xl font-medium text-ink-900 shadow-xs transition-[border-color,box-shadow] dark:bg-relief/40",
         isActive &&
-          "z-10 border-nimba-600 ring-[3px] ring-nimba-600/25 dark:border-nimba-300 dark:ring-nimba-300/30",
+          "z-10 border-nimba-600 ring-4 ring-nimba-600/15 dark:border-nimba-300 dark:ring-nimba-300/20",
         invalide && "border-faux-600 dark:border-faux-400",
         className
       )}

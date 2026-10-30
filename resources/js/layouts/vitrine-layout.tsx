@@ -1,4 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
+import { ArrowRight } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Marque } from '@/components/marque';
 import { Button } from '@/components/ui/button';
@@ -15,7 +16,7 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
 
     return (
         <div className="flex min-h-dvh flex-col bg-background">
-            <header className="border-b bg-card">
+            <header className="sticky top-0 z-40 border-b border-transparent bg-background/80 backdrop-blur-md supports-[backdrop-filter]:border-border/60">
                 <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
                     <Link
                         href={home()}
@@ -26,12 +27,13 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
                     </Link>
                     <nav
                         aria-label="Compte"
-                        className="flex items-center gap-2"
+                        className="flex items-center gap-1.5"
                     >
                         {auth.user ? (
                             <Button asChild taille="compacte">
                                 <Link href={accueilEleve()} prefetch>
                                     Mon espace
+                                    <ArrowRight aria-hidden />
                                 </Link>
                             </Button>
                         ) : (
@@ -62,12 +64,19 @@ export default function VitrineLayout({ children }: { children: ReactNode }) {
 
             <main className="flex-1">{children}</main>
 
-            <footer className="border-t bg-card">
-                <div className="mx-auto grid max-w-6xl gap-1 px-4 py-6 text-aide text-ink-600 sm:px-6">
-                    <p className="font-medium text-ink-900">
-                        N'karamögö · G-Étudie
+            <footer className="border-t">
+                <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:flex-row sm:items-end sm:justify-between sm:px-6">
+                    <div className="grid gap-3">
+                        <Marque />
+                        <p className="max-w-xs text-aide text-ink-600">
+                            Réviser le CEE, le BEPC et le Baccalauréat unique,
+                            un soir après l'autre.
+                        </p>
+                    </div>
+                    <p className="text-meta text-ink-500">
+                        VISION FUTURE – ENTREPRISES Sarlu · Kountya (Coyah),
+                        Guinée
                     </p>
-                    <p>VISION FUTURE – ENTREPRISES Sarlu, Kountya (Coyah).</p>
                 </div>
             </footer>
         </div>

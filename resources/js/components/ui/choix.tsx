@@ -18,34 +18,34 @@ type EtatChoix =
   | "ecartee"
 
 const choixVariants = cva(
-  "group/choix relative flex min-h-14 w-full items-center gap-3 rounded-controle border-2 bg-card px-3 py-2.5 text-left text-lecture text-ink-900 transition-colors outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default",
+  "group/choix relative flex min-h-14 w-full items-center gap-3 rounded-[12px] border bg-card px-3 py-2.5 text-left text-lecture text-ink-900 shadow-xs transition-[background-color,border-color,box-shadow] duration-150 outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-default dark:bg-relief/40",
   {
     variants: {
       etat: {
         neutre:
-          "border-input hover:bg-nimba-600/[0.06] dark:hover:bg-nimba-500/15",
+          "border-contour hover:border-ink-400 hover:bg-craie-50 dark:hover:bg-relief",
         selectionne:
-          "border-nimba-600 bg-nimba-600/[0.12] dark:border-nimba-300 dark:bg-nimba-500/25",
+          "border-nimba-600 bg-nimba-600/[0.06] ring-1 ring-nimba-600 dark:border-nimba-300 dark:bg-nimba-300/10 dark:ring-nimba-300",
         juste:
-          "border-juste-600 bg-juste-600/[0.10] dark:border-juste-400 dark:bg-juste-400/15",
-        faux: "border-faux-600 bg-faux-600/[0.08] dark:border-faux-400 dark:bg-faux-400/15",
+          "border-juste-600 bg-juste-600/[0.08] ring-1 ring-juste-600 dark:border-juste-400 dark:bg-juste-400/10 dark:ring-juste-400",
+        faux: "border-faux-600 bg-faux-600/[0.06] ring-1 ring-faux-600 dark:border-faux-400 dark:bg-faux-400/10 dark:ring-faux-400",
         bonne_reponse:
-          "border-dashed border-juste-600 dark:border-juste-400",
-        ecartee: "border-border opacity-70",
+          "border-dashed border-juste-600 shadow-none dark:border-juste-400",
+        ecartee: "border-border opacity-60 shadow-none",
       },
     },
   }
 )
 
 const pastilleVariants = cva(
-  "flex size-8 shrink-0 items-center justify-center rounded-full border-2 font-titre text-sm font-semibold",
+  "flex size-7 shrink-0 items-center justify-center rounded-[8px] border text-aide font-semibold transition-colors",
   {
     variants: {
       etat: {
         neutre: "border-ink-400 text-ink-600",
-        selectionne: "border-nimba-600 bg-nimba-600 text-white dark:border-nimba-300 dark:bg-nimba-300 dark:text-[#0e1220]",
-        juste: "border-juste-600 bg-juste-600 text-white dark:border-juste-400 dark:bg-juste-400 dark:text-[#0e1220]",
-        faux: "border-faux-600 bg-faux-600 text-white dark:border-faux-400 dark:bg-faux-400 dark:text-[#0e1220]",
+        selectionne: "border-nimba-600 bg-nimba-600 text-white dark:border-nimba-300 dark:bg-nimba-300 dark:text-[#0b0b0e]",
+        juste: "border-juste-600 bg-juste-600 text-white dark:border-juste-400 dark:bg-juste-400 dark:text-[#0b0b0e]",
+        faux: "border-faux-600 bg-faux-600 text-white dark:border-faux-400 dark:bg-faux-400 dark:text-[#0b0b0e]",
         bonne_reponse: "border-juste-600 text-juste-700 dark:border-juste-400 dark:text-juste-400",
         ecartee: "border-ink-400 text-ink-600",
       },
@@ -126,11 +126,11 @@ function Choix({
         <span
           id={`${id}-verdict`}
           className={cn(
-            "flex shrink-0 items-center gap-1 text-aide font-semibold",
+            "flex shrink-0 items-center gap-1 text-aide font-medium",
             verdict.classe
           )}
         >
-          <verdict.icone aria-hidden className="size-4" strokeWidth={3} />
+          <verdict.icone aria-hidden className="size-3.5" strokeWidth={3} />
           {verdict.mot}
         </span>
       )}
@@ -148,7 +148,7 @@ function GroupeChoix({
     <div
       role={multiple ? "group" : "radiogroup"}
       aria-label={libelle}
-      className={cn("grid gap-3", className)}
+      className={cn("grid gap-2.5", className)}
       {...props}
     />
   )

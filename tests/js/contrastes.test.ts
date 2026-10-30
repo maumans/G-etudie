@@ -91,6 +91,13 @@ describe('thème clair', () => {
         ],
         ['ink-600 sur une carte', clair['ink-600'], clair.card, 4.5],
         [
+            'ink-500 sur une carte (aide, indication)',
+            clair['ink-500'],
+            clair.card,
+            4.5,
+        ],
+        ['ink-500 sur le canevas', clair['ink-500'], clair['craie-50'], 4.5],
+        [
             'bordure de contrôle ink-400 sur une carte',
             clair['ink-400'],
             clair.card,
@@ -153,6 +160,14 @@ describe('thème sombre', () => {
         ['ink-600 sur le canevas', sombre['ink-600'], sombre['craie-50'], 4.5],
         ['ink-600 sur craie-100', sombre['ink-600'], sombre['craie-100'], 4.5],
         ['ink-600 sur une carte', sombre['ink-600'], sombre.card, 4.5],
+        ['ink-500 sur une carte', sombre['ink-500'], sombre.card, 4.5],
+        ['ink-900 sur le relief', sombre['ink-900'], sombre.relief, 4.5],
+        [
+            'blanc sur nimba-500 (survol du bouton principal)',
+            BLANC,
+            couleur('nimba-500'),
+            4.5,
+        ],
         [
             'bordure de contrôle ink-400 sur une carte',
             sombre['ink-400'],
@@ -191,11 +206,11 @@ describe('thème sombre', () => {
 
 describe('valeurs de DESIGN.md § 2', () => {
     it('reprend les valeurs imposées', () => {
-        expect(couleur('nimba-600')).toBe('#2537c9');
-        expect(couleur('nimba-700')).toBe('#1f2da6');
-        expect(couleur('nimba-300')).toBe('#8b9aff');
+        expect(couleur('nimba-600')).toBe('#702aed');
+        expect(couleur('nimba-700')).toBe('#5d1fc8');
+        expect(couleur('nimba-300')).toBe('#b9aeff');
         expect(couleur('soleil-400')).toBe('#ffc21a');
-        expect(clair['ink-900']).toBe('#141a2e');
-        expect(sombre['ink-900']).toBe('#eef1f8');
+        expect(clair['ink-900']).toBe('#18181e');
+        expect(sombre['ink-900']).toBe('#f5f5f8');
     });
 });

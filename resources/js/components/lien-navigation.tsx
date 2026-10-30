@@ -18,28 +18,36 @@ export type EntreeNavigation = {
 };
 
 const STYLES = {
-    // Barre d'onglets en bas de l'espace élève, sur mobile.
+    // Barre d'onglets en bas de l'espace élève, sur mobile : l'icône active
+    // est posée dans une pilule teintée (repère visible d'un coup d'œil).
     onglet: {
-        base: 'flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1 py-1.5 text-center text-meta leading-tight font-medium',
+        base: 'group/onglet flex min-h-16 min-w-0 flex-1 flex-col items-center justify-center gap-1 px-0.5 pt-2 pb-1.5 text-center text-[0.6875rem] leading-tight font-medium',
         actif: 'text-nimba-700 dark:text-nimba-300',
-        inactif: 'text-ink-600 hover:text-ink-900',
-        icone: 'size-6',
-    },
-    // Barre latérale de l'espace élève (48 px, cible tactile).
-    lateral: {
-        base: 'flex h-12 items-center gap-3 rounded-controle px-3 text-interface font-medium',
-        actif: 'bg-nimba-600/[0.12] text-nimba-700 dark:bg-nimba-500/25 dark:text-nimba-300',
-        inactif:
-            'text-ink-600 hover:bg-nimba-600/[0.06] hover:text-ink-900 dark:hover:bg-nimba-500/15',
+        inactif: 'text-ink-500 hover:text-ink-900',
         icone: 'size-5',
+        pastille:
+            'flex h-7 w-12 items-center justify-center rounded-full transition-colors',
+        pastilleActive: 'bg-nimba-600/[0.12] dark:bg-nimba-300/15',
     },
-    // Barres latérales denses du back-office et de la console (40 px).
-    dense: {
-        base: 'flex h-10 items-center gap-2.5 rounded-[10px] px-2.5 text-interface font-medium',
-        actif: 'bg-nimba-600/[0.12] text-nimba-700 dark:bg-nimba-500/25 dark:text-nimba-300',
+    // Barre latérale de l'espace élève (40 px).
+    lateral: {
+        base: 'flex h-10 items-center gap-3 rounded-controle px-3 text-interface font-medium',
+        actif: 'bg-relief text-ink-900 shadow-xs ring-1 ring-black/5 dark:bg-white/[0.06] dark:ring-white/5',
         inactif:
-            'text-ink-600 hover:bg-nimba-600/[0.06] hover:text-ink-900 dark:hover:bg-nimba-500/15',
+            'text-ink-600 hover:bg-ink-900/[0.04] hover:text-ink-900 dark:hover:bg-white/[0.04]',
         icone: 'size-[18px]',
+        pastille: '',
+        pastilleActive: '',
+    },
+    // Barres latérales denses du back-office et de la console (36 px).
+    dense: {
+        base: 'flex h-9 items-center gap-2.5 rounded-[8px] px-2.5 text-interface font-medium',
+        actif: 'bg-relief text-ink-900 shadow-xs ring-1 ring-black/5 dark:bg-white/[0.06] dark:ring-white/5',
+        inactif:
+            'text-ink-600 hover:bg-ink-900/[0.04] hover:text-ink-900 dark:hover:bg-white/[0.04]',
+        icone: 'size-4',
+        pastille: '',
+        pastilleActive: '',
     },
 } as const;
 
@@ -56,6 +64,7 @@ export function LienNavigation({
     const { isCurrentUrl, isCurrentOrParentUrl } = useCurrentUrl();
     const style = STYLES[variante];
     const Icone = entree.icone;
+    const onglet = variante === 'onglet';
 
     if (!entree.href) {
         // Jamais de clic mort : toucher l'entrée explique pourquoi rien ne s'ouvre.
@@ -70,19 +79,28 @@ export function LienNavigation({
                 className={cn(
                     style.base,
                     style.inactif,
-                    'text-left outline-none focus-visible:outline-2 focus-visible:outline-ring',
-                    variante === 'onglet' && 'text-center',
+                    'text-left transition-colors outline-none focus-visible:outline-2 focus-visible:outline-ring',
+                    onglet && 'text-center',
                 )}
             >
-                <Icone aria-hidden className={style.icone} />
-                <span>
+                {onglet ? (
+                    <span className={style.pastille}>
+                        <Icone aria-hidden className={style.icone} />
+                    </span>
+                ) : (
+                    <Icone
+                        aria-hidden
+                        className={cn(style.icone, 'opacity-80')}
+                    />
+                )}
+                <span className={cn(!onglet && 'truncate')}>
                     {entree.libelle}
                     <span className="sr-only"> (bientôt)</span>
                 </span>
-                {variante !== 'onglet' && (
+                {!onglet && (
                     <span
                         aria-hidden
-                        className="ml-auto rounded-badge bg-ink-600/[0.12] px-1.5 py-0.5 text-meta text-ink-600 dark:bg-ink-400/25"
+                        className="ml-auto text-meta font-normal text-ink-500"
                     >
                         bientôt
                     </span>
@@ -95,6 +113,17 @@ export function LienNavigation({
         ? isCurrentUrl(entree.href)
         : isCurrentOrParentUrl(entree.actifSous ?? entree.href);
 
+    const icone = (
+        <Icone
+            aria-hidden
+            className={cn(
+                style.icone,
+                !onglet && actif && 'text-nimba-600 dark:text-nimba-300',
+            )}
+            strokeWidth={actif ? 2.25 : 2}
+        />
+    );
+
     return (
         <Link
             href={entree.href}
@@ -106,11 +135,18 @@ export function LienNavigation({
                 actif ? style.actif : style.inactif,
             )}
         >
-            <Icone
-                aria-hidden
-                className={style.icone}
-                strokeWidth={actif ? 2.25 : 2}
-            />
+            {onglet ? (
+                <span
+                    className={cn(
+                        style.pastille,
+                        actif && style.pastilleActive,
+                    )}
+                >
+                    {icone}
+                </span>
+            ) : (
+                icone
+            )}
             <span className="truncate">{entree.libelle}</span>
         </Link>
     );

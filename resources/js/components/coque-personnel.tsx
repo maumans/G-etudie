@@ -49,8 +49,8 @@ export function CoquePersonnel({
         <div className="min-h-dvh bg-background lg:flex">
             <aside
                 className={cn(
-                    'sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-5 border-r px-3 py-4 lg:flex',
-                    sombre ? 'dark bg-[#0a0d18] text-ink-900' : 'bg-card',
+                    'sticky top-0 hidden h-dvh w-60 shrink-0 flex-col gap-6 border-r px-3 pt-4 pb-3 lg:flex',
+                    sombre ? 'dark bg-[#100e17] text-ink-900' : 'bg-background',
                 )}
             >
                 <EnTete espace={espace} accueil={accueil} lateral />
@@ -62,7 +62,9 @@ export function CoquePersonnel({
                 <header
                     className={cn(
                         'sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b px-3 lg:hidden',
-                        sombre ? 'dark bg-[#0a0d18] text-ink-900' : 'bg-card',
+                        sombre
+                            ? 'dark bg-[#100e17] text-ink-900'
+                            : 'bg-background/85 backdrop-blur-md',
                     )}
                 >
                     <EnTete espace={espace} accueil={accueil} />
@@ -82,7 +84,7 @@ export function CoquePersonnel({
                     </Feuille>
                 </header>
 
-                <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6">
+                <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 lg:py-8">
                     {children}
                 </main>
             </div>
@@ -105,13 +107,15 @@ function EnTete({
             href={accueil.href ?? '/'}
             className={cn(
                 'flex min-w-0 rounded-controle px-1 outline-none focus-visible:outline-2 focus-visible:outline-ring',
-                lateral ? 'flex-col items-start gap-2' : 'items-center gap-2.5',
+                lateral
+                    ? 'flex-col items-start gap-2.5 px-2'
+                    : 'items-center gap-2.5',
             )}
         >
             <Marque signature={false} />
             <span
                 className={cn(
-                    'truncate text-aide font-semibold text-ink-600',
+                    'truncate text-meta font-medium text-ink-500',
                     !lateral &&
                         'sr-only border-l border-border pl-2.5 min-[400px]:not-sr-only',
                 )}
@@ -126,9 +130,9 @@ function PiedCompte({ className }: { className?: string }) {
     const { auth } = usePage().props;
 
     return (
-        <div className={cn('grid gap-2 border-t pt-3', className)}>
+        <div className={cn('grid gap-1 border-t pt-3', className)}>
             {auth.user && (
-                <p className="truncate px-1 text-aide text-ink-600">
+                <p className="truncate px-2.5 pb-1 text-meta text-ink-500">
                     Connecté :{' '}
                     <span className="font-medium text-ink-900">
                         {auth.user.pseudo}

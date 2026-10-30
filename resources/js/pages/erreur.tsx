@@ -69,7 +69,7 @@ export default function Erreur({ statut }: { statut: Statut }) {
             <Head title={contenu.titre} />
             <main className="flex min-h-dvh items-center justify-center bg-background px-4 py-10">
                 <div className="w-full max-w-md">
-                    <p className="mb-4 text-center text-aide font-semibold text-ink-600 font-data">
+                    <p className="mb-4 text-center text-meta font-medium tracking-wide text-ink-500 uppercase font-data">
                         Erreur {statut}
                     </p>
                     <EtatVide
@@ -77,7 +77,7 @@ export default function Erreur({ statut }: { statut: Statut }) {
                         titre={contenu.titre}
                         message={contenu.message}
                         action={
-                            <div className="flex flex-wrap justify-center gap-3">
+                            <div className="flex flex-wrap justify-center gap-2">
                                 {contenu.recharger && (
                                     <Button
                                         onClick={() => window.location.reload()}

@@ -1,29 +1,49 @@
+import { useId } from 'react';
 import { cn } from '@/lib/utils';
 
 /**
  * Monogramme provisoire « N' » (DA8 : en attendant un logo vectoriel).
- * Dessin original, couleur de l'accent ; le texte reste en blanc (8,5:1).
+ * Dessin original : tuile violette éclairée en haut à gauche, « N » blanc
+ * (≥ 6,5:1), apostrophe soleil.
  */
 export function Monogramme({ className }: { className?: string }) {
+    const degrade = useId();
+
     return (
         <svg
             viewBox="0 0 40 40"
             aria-hidden
-            className={cn('size-9 shrink-0', className)}
+            className={cn('size-8 shrink-0', className)}
         >
-            <rect width="40" height="40" rx="11" fill="#2537C9" />
+            <defs>
+                <linearGradient id={degrade} x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0" stopColor="#814FFE" />
+                    <stop offset="1" stopColor="#5D1FC8" />
+                </linearGradient>
+            </defs>
+            <rect width="40" height="40" rx="11" fill={`url(#${degrade})`} />
+            <rect
+                x="0.5"
+                y="0.5"
+                width="39"
+                height="39"
+                rx="10.5"
+                fill="none"
+                stroke="#FFFFFF"
+                strokeOpacity="0.18"
+            />
             <path
-                d="M11 29V11h3.6l9.2 12.4V11H27v18h-3.5L14.2 16.6V29H11Z"
+                d="M11.5 28.5v-17h3.3l8.6 11.6V11.5h3.1v17h-3.2L14.6 16.9v11.6h-3.1Z"
                 fill="#FFFFFF"
             />
-            <path d="M29.5 11h3.5l-1.6 6.2h-2.6L29.5 11Z" fill="#FFC21A" />
+            <path d="M29 11.5h3.4l-1.7 6h-2.4l.7-6Z" fill="#FFC21A" />
         </svg>
     );
 }
 
 /**
- * La marque : monogramme, « N'karamögö » en Sora, et la signature
- * « G-Étudie » quand la place le permet.
+ * La marque : monogramme, « N'karamögö », et la signature « G-Étudie » quand
+ * la place le permet.
  */
 export function Marque({
     signature = true,
@@ -36,11 +56,11 @@ export function Marque({
         <span className={cn('flex items-center gap-2.5', className)}>
             <Monogramme />
             <span className="grid leading-none">
-                <span className="font-titre text-[1.0625rem] font-bold text-ink-900">
+                <span className="text-[0.9375rem] font-semibold tracking-tight text-ink-900">
                     N'karamögö
                 </span>
                 {signature && (
-                    <span className="mt-0.5 text-meta font-medium text-ink-600">
+                    <span className="mt-1 text-meta text-ink-500">
                         G-Étudie
                     </span>
                 )}

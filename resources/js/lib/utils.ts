@@ -23,8 +23,8 @@ const twMerge = extendTailwindMerge({
                 'vitrine',
             ],
             radius: ['controle', 'carte', 'feuille', 'badge'],
-            shadow: ['carte', 'flottant'],
-            font: ['titre'],
+            shadow: ['carte', 'releve', 'bouton', 'flottant'],
+            font: ['titre', 'accent'],
         },
         classGroups: {
             'fvn-spacing': ['font-data'],

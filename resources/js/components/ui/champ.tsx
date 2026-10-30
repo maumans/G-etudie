@@ -41,11 +41,11 @@ function Champ({
   return (
     // content-start : dans une rangée de champs, celui qui n'a pas d'aide ne
     // doit pas étirer son libellé pour s'aligner sur la hauteur du voisin.
-    <div data-slot="champ" className={cn("grid content-start gap-2", className)}>
+    <div data-slot="champ" className={cn("grid content-start gap-1.5", className)}>
       <Label htmlFor={id}>
         {libelle}
         {facultatif && (
-          <span className="ml-1.5 font-normal text-ink-600">(facultatif)</span>
+          <span className="ml-1.5 font-normal text-ink-500">(facultatif)</span>
         )}
       </Label>
       {children({
@@ -54,16 +54,16 @@ function Champ({
         "aria-invalid": erreur ? true : undefined,
       })}
       {aide && (
-        <p id={idAide} className="text-aide text-ink-600">
+        <p id={idAide} className="text-aide text-ink-500">
           {aide}
         </p>
       )}
       {erreur && (
         <p
           id={idErreur}
-          className="flex items-start gap-1.5 text-aide font-medium text-faux-600 dark:text-faux-400"
+          className="flex items-start gap-1.5 text-aide text-faux-600 dark:text-faux-400"
         >
-          <CircleAlert aria-hidden className="mt-px size-4 shrink-0" />
+          <CircleAlert aria-hidden className="mt-0.5 size-3.5 shrink-0" />
           {erreur}
         </p>
       )}
