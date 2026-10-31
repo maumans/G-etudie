@@ -9,6 +9,7 @@ import {
     IndicesQuestion,
 } from '@/components/questions/aides-question';
 import { EnteteQuestion, VerdictQuestion } from '@/components/questions/commun';
+import { SignalerErreur } from '@/components/signaler-erreur';
 import { SaisieQuestion } from '@/components/questions/saisie-question';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
@@ -466,6 +467,11 @@ function BarreAction({
                                     fige={tentative.evaluee}
                                 />
                             )}
+                            <SignalerErreur
+                                cible="question"
+                                uuid={question.uuid}
+                                version={question.version}
+                            />
                         </div>
                     )}
                 </div>

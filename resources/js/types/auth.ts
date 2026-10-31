@@ -29,6 +29,8 @@ export type Permission =
     | 'contenu.rediger'
     | 'contenu.relire'
     | 'contenu.administrer'
+    | 'annales.importer'
+    | 'signalements.traiter'
     | 'compte.double_authentification';
 
 export type Auth = {

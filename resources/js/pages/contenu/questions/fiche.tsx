@@ -313,12 +313,15 @@ function PanneauAction({
                     droits.auteur ? 'En attente d’un relecteur' : 'En relecture'
                 }
                 texte={
-                    droits.auteur
-                        ? 'Un autre enseignant doit la relire : l’auteur ne relit jamais sa propre question. Vous pouvez la reprendre pour la modifier.'
-                        : `Version ${enAttente?.numero ?? ''} envoyée par ${enAttente?.auteur ?? ''}.`
+                    question.annale
+                        ? `Elle se relit avec son annale, « ${question.annale.titre} ».`
+                        : droits.auteur
+                          ? 'Un autre enseignant doit la relire : l’auteur ne relit jamais sa propre question. Vous pouvez la reprendre pour la modifier.'
+                          : `Version ${enAttente?.numero ?? ''} envoyée par ${enAttente?.auteur ?? ''}.`
                 }
                 action={
-                    droits.rediger && (
+                    droits.rediger &&
+                    !question.annale && (
                         <Button
                             variant="outline"
                             taille="compacte"

@@ -81,6 +81,8 @@ export type QuestionEleve = {
     matiere: string;
     matiere_nom: string;
     notion: string;
+    /** « BEPC 2019 » : la session de l'annale d'où vient la question (lot 4). */
+    annale?: string | null;
 };
 
 export type Verdict = 'juste' | 'partiel' | 'faux' | 'a_evaluer';

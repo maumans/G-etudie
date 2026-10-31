@@ -54,6 +54,13 @@ export type QuestionResume = {
     indices: number;
     etapes: number;
     mots: number;
+    /** Question d'une annale (lot 4) : elle se relit avec son sujet. */
+    annale: {
+        uuid: string;
+        titre: string;
+        partie: string;
+        a_verifier: boolean;
+    } | null;
 };
 
 type Props = {
@@ -67,6 +74,7 @@ type Props = {
     compteurs: Record<StatutContenu, number>;
     a_relire: number | null;
     lecons_a_relire: number | null;
+    annales_a_relire: number | null;
     matieres: { id: number; nom: string; teinte: CleMatiere }[];
     types: { valeur: TypeQuestion; libelle: string }[];
 };
@@ -82,6 +90,7 @@ export default function Questions({
     compteurs,
     a_relire,
     lecons_a_relire,
+    annales_a_relire,
     matieres,
     types,
 }: Props) {
@@ -151,6 +160,7 @@ export default function Questions({
                         actif="questions"
                         lecons={lecons_a_relire ?? 0}
                         questions={a_relire ?? 0}
+                        annales={annales_a_relire ?? 0}
                     />
                 ) : (
                     <nav

@@ -1,21 +1,25 @@
 import { Link } from '@inertiajs/react';
-import { FileQuestion, Library } from 'lucide-react';
+import { FileQuestion, FileText, Library } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { relecture as relectureAnnales } from '@/routes/contenu/annales';
 import { relecture as relectureLecons } from '@/routes/contenu/lecons';
 import { relecture as relectureQuestions } from '@/routes/contenu/questions';
 
 /**
- * La file de relecture a deux onglets, leçons et questions : un relecteur
- * voit d'un coup d'œil tout ce qui l'attend.
+ * La file de relecture a trois onglets, leçons, questions et annales : un
+ * relecteur voit d'un coup d'œil tout ce qui l'attend. Les questions d'une
+ * annale se relisent avec elle (onglet « Annales »).
  */
 export function OngletsRelecture({
     actif,
     lecons,
     questions,
+    annales = 0,
 }: {
-    actif: 'lecons' | 'questions';
+    actif: 'lecons' | 'questions' | 'annales';
     lecons: number;
     questions: number;
+    annales?: number;
 }) {
     const onglets = [
         {
@@ -32,12 +36,19 @@ export function OngletsRelecture({
             nombre: questions,
             href: relectureQuestions(),
         },
+        {
+            cle: 'annales' as const,
+            libelle: 'Annales',
+            icone: FileText,
+            nombre: annales,
+            href: relectureAnnales(),
+        },
     ];
 
     return (
         <nav
             aria-label="Ce qui attend une relecture"
-            className="flex w-fit gap-0.5 rounded-controle bg-craie-100 p-1"
+            className="flex w-fit max-w-full [scrollbar-width:none] gap-0.5 overflow-x-auto rounded-controle bg-craie-100 p-1"
         >
             {onglets.map((onglet) => (
                 <Link

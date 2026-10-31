@@ -656,6 +656,7 @@ hors ligne ; les packs viennent ensuite.
 | HL0 | Socle | 🟡 fait, sauf HTTPS et contrôles sur vrai téléphone (étape 6 du lot 0) | 10 / 12 |
 | HL1 | Rendu indépendant de la source | ✅ fait (lots 1 et 2) | 2 / 2 |
 | HL2 | Tentatives et séances | ✅ fait (lots 2 et 3) : neuf types par la file, auto-évaluation, correction contre la version vue (A.9), séance complète en mode avion (A.14 n° 24) | 4 / 4 |
+| — | Lot 4 (sans lot HL) : `signalement.creer`, objet de contenu des annales, liste blanche | ✅ fait (2026-10-31), B.3 « Lot 4 » | 4 / 5 (packs au lot 7) |
 | HL3 | Examen blanc | ⬜ à faire | 0 / 4 |
 | HL4 | Jauge, séances pré-calculées, trace | ⬜ à faire | 0 / 3 |
 | HL5 | Packs | ⬜ à faire | 0 / 7 |
@@ -823,6 +824,38 @@ hors ligne ; les packs viennent ensuite.
   et conversion WebP à décider avec les packs ; mini-question : lot 3). Les
   ajouter, c'est les ajouter **aux deux autorités et au jeu d'exemples** en
   même temps.
+
+### Lot 4 (pas de lot HL propre, A.13) — `signalement.creer` et annales
+
+- [x] **`signalement.creer`** (A.6, priorité 3, libellé « Signalement
+  d'une erreur ») : `SignalementService::creer` — cible visible de
+  l'élève (question, leçon, annale ; `CatalogueEleve`), version vue,
+  motif de `MotifSignalement`, message de 500 caractères au plus ;
+  **10 par jour** au plus, compté au jour de la saisie ; même `uuid`
+  deux fois → un seul signalement. Composant `SignalerErreur`
+  (`components/signaler-erreur.tsx`) sous chaque question (séance,
+  mini-question, annale), leçon et annale : passe par `enregistrer()`,
+  donc part au retour du réseau. Preuve : `SignalementsTest` (8),
+  Vitest `signaler-erreur.test.tsx`.
+- [x] **Objet de contenu `SujetEleve`** (A.4) : `App\Support\PresentationSujet`
+  et `lib/contenu/sujets.ts` — la version publiée de la structure (parties,
+  barèmes, consignes) et la version publiée de chaque question
+  (`PresentationQuestion`) ; une question retirée n'est pas livrée. La
+  fiche `eleve/annale` ne reçoit que lui : le pack du lot 7 le rangera tel
+  quel. Preuve : `AnnalesEleveTest`.
+- [x] **Liste blanche** : `/eleve/annales` (liste et fiches) et
+  `/eleve/signalements$` gardés hors ligne d'après leur copie ; le
+  document original est servi sous `/eleve/documents/annales/…`, **hors**
+  de la liste blanche (le service worker ne copie pas un PDF de plusieurs
+  Mo) ; hors ligne, « Ouvrir le document » ouvre le dialogue « Cet écran
+  demande une connexion ». Preuve : `AnnalesEleveTest` (règle de la liste
+  blanche appliquée à l'adresse du document).
+- [x] Réponses d'entraînement sur une annale : `tentative.enregistrer`
+  sans séance, mode `entrainement`, recorrigées contre la version vue
+  (inchangé depuis HL2). Preuve : `AnnalesEleveTest`.
+- [ ] **Reste au lot 7 (HL5)** : les annales dans les packs (la table
+  `contenus` les attend, comme les leçons) ; aujourd'hui, une annale se
+  relit hors ligne seulement si elle a déjà été ouverte en ligne.
 
 ## B.4 Tests
 
@@ -997,6 +1030,17 @@ hors ligne ; les packs viennent ensuite.
     remise en ordre arrivent mélangés dans l'objet de la question
     (`PresentationQuestion`), d'un ordre stable tiré de l'uuid : aucun
     hasard sur l'appareil, la même présentation en ligne et dans un pack.
+20. **2026-10-31 — Lot 4 sans lot HL, mais pas sans hors ligne.** A.13 ne
+    prévoit rien pour le lot 4 ; `signalement.creer` (A.6) y est livré,
+    avec l'objet de contenu des annales (préparation de HL5) et leurs
+    écrans dans la liste blanche. Le document original des annales reste
+    **en ligne seulement** (niveau C de fait) : trop lourd pour une copie
+    d'écran, il entrera éventuellement dans les packs avec les médias (A.5,
+    option « sans images »).
+21. **2026-10-31 — Réponses aux signalements lues une fois.** La réponse de
+    l'équipe est marquée lue à l'ouverture de « Mes signalements » (une
+    écriture sur un GET, pas un geste de l'élève : pas de file). Hors
+    ligne, la copie de l'écran montre la dernière réponse connue.
 
 ## B.6 Points de vigilance
 

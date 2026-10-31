@@ -13,6 +13,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
 import { ExerciceQuestion } from '@/components/questions/exercice-question';
+import { SignalerErreur } from '@/components/signaler-erreur';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
 import { ProgressionBarre } from '@/components/ui/progression';
@@ -225,6 +226,13 @@ export default function Lecon({ lecon, contexte, progression, source }: Props) {
                         etat={etat}
                         marquer={marquer}
                         className="lg:hidden"
+                    />
+
+                    <SignalerErreur
+                        cible="lecon"
+                        uuid={lecon.uuid}
+                        version={lecon.version}
+                        className="-mt-2"
                     />
 
                     <nav

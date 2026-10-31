@@ -33,7 +33,7 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
-            testIgnore: /parcours-lot[123]\.spec\.ts/,
+            testIgnore: /parcours-lot[1234]\.spec\.ts/,
             dependencies: ['connexion'],
         },
         // Crée puis efface une leçon : après les captures, qu'il ne doit pas
@@ -54,6 +54,13 @@ export default defineConfig({
         // n° 24), puis le supprime. Après les deux autres parcours : trois
         // parcours en même temps sur `php artisan serve` (une requête à la
         // fois) faisaient manquer ses délais au parcours du lot 1.
+        // Importe une annale, la publie et la fait lire (lot 4), puis
+        // l'efface : après les captures, comme le parcours du lot 1.
+        {
+            name: 'parcours-annales',
+            testMatch: /parcours-lot4\.spec\.ts/,
+            dependencies: ['parcours-contenu'],
+        },
         {
             name: 'parcours-hors-ligne',
             testMatch: /parcours-lot3\.spec\.ts/,

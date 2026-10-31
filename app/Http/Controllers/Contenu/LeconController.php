@@ -298,6 +298,7 @@ class LeconController extends Controller
             'compteurs' => collect(StatutContenu::cases())->mapWithKeys(fn (StatutContenu $s) => [$s->value => (int) ($compteurs[$s->value] ?? 0)]),
             'a_relire' => $user->can(Permission::RelireContenu->value) ? self::nombreARelire($user) : null,
             'questions_a_relire' => $user->can(Permission::RelireContenu->value) ? QuestionController::nombreARelire($user) : null,
+            'annales_a_relire' => $user->can(Permission::RelireContenu->value) ? AnnaleController::nombreARelire($user) : null,
             'matieres' => Matiere::query()->orderBy('ordre')->get(['id', 'nom', 'teinte']),
         ]);
     }

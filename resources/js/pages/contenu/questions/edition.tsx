@@ -5,6 +5,7 @@ import {
     ArrowLeft,
     ArrowUp,
     CircleAlert,
+    CircleCheck,
     Eye,
     Lightbulb,
     ListOrdered,
@@ -14,6 +15,7 @@ import {
     RefreshCw,
     RotateCcw,
     Send,
+    Sparkles,
     Trash2,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -45,6 +47,8 @@ import type {
 import { formaterJourHeure } from '@/lib/dates';
 import { MATIERES } from '@/lib/matieres';
 import { cn } from '@/lib/utils';
+import { show as ficheAnnale } from '@/routes/contenu/annales';
+import { verifier } from '@/routes/contenu/annales/questions';
 import { index, show, soumettre, update } from '@/routes/contenu/questions';
 import type { QuestionResume } from './index';
 
@@ -350,10 +354,20 @@ export default function Edition({
                         taille="compacte"
                         className="-ml-2"
                     >
-                        <Link href={index()} prefetch>
-                            <ArrowLeft aria-hidden />
-                            Les questions
-                        </Link>
+                        {question.annale ? (
+                            <Link
+                                href={ficheAnnale(question.annale.uuid)}
+                                prefetch
+                            >
+                                <ArrowLeft aria-hidden />
+                                L’annale
+                            </Link>
+                        ) : (
+                            <Link href={index()} prefetch>
+                                <ArrowLeft aria-hidden />
+                                Les questions
+                            </Link>
+                        )}
                     </Button>
                     <div className="flex flex-wrap items-center gap-2">
                         <IndicateurEnregistrement etat={etat} />
@@ -363,18 +377,39 @@ export default function Edition({
                                 Fiche
                             </Link>
                         </Button>
-                        <Button
-                            taille="compacte"
-                            onClick={() => void envoyerEnRelecture()}
-                            disabled={
-                                envoi ||
-                                etat.cle === 'conflit' ||
-                                (a_completer !== null && !sale.current)
-                            }
-                        >
-                            {envoi ? <Spinner /> : <Send aria-hidden />}
-                            Envoyer en relecture
-                        </Button>
+                        {question.annale ? (
+                            question.annale.a_verifier && (
+                                <Button
+                                    taille="compacte"
+                                    disabled={envoi || etat.cle === 'conflit'}
+                                    onClick={() =>
+                                        enregistrer(() =>
+                                            router.post(
+                                                verifier(question.uuid).url,
+                                                { depuis_saisie: true },
+                                                { preserveScroll: true },
+                                            ),
+                                        )
+                                    }
+                                >
+                                    <CircleCheck aria-hidden />
+                                    J’ai vérifié la réponse
+                                </Button>
+                            )
+                        ) : (
+                            <Button
+                                taille="compacte"
+                                onClick={() => void envoyerEnRelecture()}
+                                disabled={
+                                    envoi ||
+                                    etat.cle === 'conflit' ||
+                                    (a_completer !== null && !sale.current)
+                                }
+                            >
+                                {envoi ? <Spinner /> : <Send aria-hidden />}
+                                Envoyer en relecture
+                            </Button>
+                        )}
                     </div>
                 </div>
 
@@ -413,6 +448,28 @@ export default function Edition({
             </div>
 
             {question.est_exemple && <BandeauExemple />}
+
+            {question.annale && (
+                <div className="flex gap-3 rounded-carte border bg-card p-4 shadow-carte">
+                    <Sparkles
+                        aria-hidden
+                        className="mt-0.5 size-5 shrink-0 text-nimba-600 dark:text-nimba-300"
+                    />
+                    <div className="grid gap-1">
+                        <p className="font-semibold">
+                            {question.annale.titre} ·{' '}
+                            <span className="font-normal text-ink-600">
+                                {question.annale.partie}
+                            </span>
+                        </p>
+                        <p className="text-aide text-ink-600">
+                            {question.annale.a_verifier
+                                ? 'L’énoncé a été transcrit du document ; la réponse attendue et le corrigé sont des propositions de l’IA. Comparez l’énoncé au document original, corrigez ce qui doit l’être, puis confirmez.'
+                                : 'Réponse vérifiée. Cette question partira en relecture avec son annale.'}
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {renvoi && (
                 <div className="flex gap-3 rounded-carte border border-indice-400/45 bg-indice-400/[0.08] p-4 dark:bg-indice-400/[0.06]">

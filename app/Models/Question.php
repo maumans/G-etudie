@@ -26,6 +26,8 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $uuid
  * @property int $notion_id
+ * @property int|null $sujet_partie_id partie d'annale (lot 4), sinon `null`
+ * @property int $ordre_sujet
  * @property int|null $auteur_id
  * @property TypeQuestion $type
  * @property string $extrait le début de l'énoncé, en texte (listes, recherche)
@@ -34,6 +36,7 @@ use Illuminate\Support\Carbon;
  * @property array<string, mixed> $reponse_attendue
  * @property list<array<string, mixed>>|null $indices documents de blocs
  * @property list<array{titre: string, blocs: array<string, mixed>}>|null $corrige étapes
+ * @property bool $reponse_a_verifier réponse et corrigé proposés par l'IA, pas encore vérifiés
  * @property int $difficulte
  * @property string $source
  * @property StatutContenu $statut
@@ -46,8 +49,9 @@ use Illuminate\Support\Carbon;
  * @property-read Notion $notion
  * @property-read User|null $auteur
  * @property-read VersionContenu|null $versionPubliee
+ * @property-read SujetPartie|null $partie
  */
-#[Fillable(['uuid', 'notion_id', 'auteur_id', 'type', 'extrait', 'enonce', 'donnees', 'reponse_attendue', 'indices', 'corrige', 'difficulte', 'source', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
+#[Fillable(['uuid', 'notion_id', 'sujet_partie_id', 'ordre_sujet', 'auteur_id', 'type', 'extrait', 'enonce', 'donnees', 'reponse_attendue', 'indices', 'corrige', 'reponse_a_verifier', 'difficulte', 'source', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
 class Question extends Model implements ContenuRelisable
 {
     use EstRelisable;
@@ -61,6 +65,8 @@ class Question extends Model implements ContenuRelisable
             'reponse_attendue' => 'array',
             'indices' => 'array',
             'corrige' => 'array',
+            'reponse_a_verifier' => 'boolean',
+            'ordre_sujet' => 'integer',
             'difficulte' => 'integer',
             'statut' => StatutContenu::class,
             'revision' => 'integer',
@@ -78,6 +84,12 @@ class Question extends Model implements ContenuRelisable
     public function notion(): BelongsTo
     {
         return $this->belongsTo(Notion::class);
+    }
+
+    /** @return BelongsTo<SujetPartie, $this> */
+    public function partie(): BelongsTo
+    {
+        return $this->belongsTo(SujetPartie::class, 'sujet_partie_id');
     }
 
     public function nomContenu(): string

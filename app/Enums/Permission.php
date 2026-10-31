@@ -32,6 +32,12 @@ enum Permission: string
     /** Modifier le brouillon de n'importe quel auteur, archiver (responsable pédagogique). */
     case AdministrerContenu = 'contenu.administrer';
 
+    /** Téléverser un sujet scanné pour l'import assisté (lot 4, PLAN M17) : l'appel à l'IA a un coût. */
+    case ImporterAnnales = 'annales.importer';
+
+    /** Lire la file des signalements des élèves et y répondre (lot 4, PLAN M17). */
+    case TraiterSignalements = 'signalements.traiter';
+
     /** Activer la double authentification sur son compte (DA4 : personnel seulement). */
     case DoubleAuthentification = 'compte.double_authentification';
 }

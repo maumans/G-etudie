@@ -2,10 +2,13 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import {
     ArrowRight,
     ClipboardCheck,
+    Flag,
     ListTree,
+    LoaderCircle,
     MessageSquareWarning,
     PenLine,
     Plus,
+    Sparkles,
 } from 'lucide-react';
 import { Section } from '@/components/contenu/section';
 import { BadgeStatut, STATUTS } from '@/components/contenu/statut-lecon';
@@ -18,7 +21,12 @@ import { depuis } from '@/lib/dates';
 import { MATIERES } from '@/lib/matieres';
 import type { CleMatiere } from '@/lib/matieres';
 import { cn, formaterNombre, pluriel } from '@/lib/utils';
+import {
+    index as indexAnnales,
+    relecture as relectureAnnales,
+} from '@/routes/contenu/annales';
 import { create, edit, index, relecture, show } from '@/routes/contenu/lecons';
+import { index as indexSignalements } from '@/routes/contenu/signalements';
 import { index as programme } from '@/routes/contenu/referentiel/programme';
 import type { StatutContenu } from '@/types';
 
@@ -50,6 +58,13 @@ type Props = {
     mes_brouillons: LeconCourte[] | null;
     couverture: Couverture[];
     est_exemple: boolean;
+    annales: {
+        a_relire: number | null;
+        a_verifier: number | null;
+        imports_en_cours: number;
+        publiees: number;
+    };
+    signalements_ouverts: number | null;
 };
 
 function salutation(maintenant: Date): string {
@@ -70,6 +85,8 @@ export default function Accueil({
     mes_brouillons,
     couverture,
     est_exemple,
+    annales,
+    signalements_ouverts,
 }: Props) {
     const { auth } = usePage().props;
     const peut = usePeut();
@@ -219,6 +236,74 @@ export default function Accueil({
                     </div>
 
                     <div className="grid content-start gap-6">
+                        <Section
+                            titre="Annales et signalements"
+                            description={`${pluriel(annales.publiees, 'annale publiée', 'annales publiées')}.`}
+                            contenuClassName="px-2 pb-2"
+                        >
+                            <ul className="grid gap-0.5">
+                                {[
+                                    annales.a_verifier !== null && {
+                                        cle: 'verifier',
+                                        icone: Sparkles,
+                                        libelle: 'Réponses de l’IA à vérifier',
+                                        nombre: annales.a_verifier,
+                                        href: indexAnnales({
+                                            query: { vue: 'miennes' },
+                                        }).url,
+                                    },
+                                    annales.imports_en_cours > 0 && {
+                                        cle: 'imports',
+                                        icone: LoaderCircle,
+                                        libelle: 'Imports en cours de lecture',
+                                        nombre: annales.imports_en_cours,
+                                        href: indexAnnales().url,
+                                    },
+                                    annales.a_relire !== null && {
+                                        cle: 'relire',
+                                        icone: ClipboardCheck,
+                                        libelle: 'Annales à relire',
+                                        nombre: annales.a_relire,
+                                        href: relectureAnnales().url,
+                                    },
+                                    signalements_ouverts !== null && {
+                                        cle: 'signalements',
+                                        icone: Flag,
+                                        libelle: 'Signalements à traiter',
+                                        nombre: signalements_ouverts,
+                                        href: indexSignalements().url,
+                                    },
+                                ]
+                                    .filter((e) => e !== false)
+                                    .map((e) => (
+                                        <li key={e.cle}>
+                                            <Link
+                                                href={e.href}
+                                                prefetch
+                                                className="flex items-center gap-3 rounded-controle px-3 py-2.5 outline-none hover:bg-craie-100 focus-visible:outline-2 focus-visible:outline-ring dark:hover:bg-white/[0.04]"
+                                            >
+                                                <e.icone
+                                                    aria-hidden
+                                                    className="size-4 shrink-0 text-ink-500"
+                                                />
+                                                <span className="flex-1 text-interface">
+                                                    {e.libelle}
+                                                </span>
+                                                <span
+                                                    className={cn(
+                                                        'text-interface font-semibold font-data',
+                                                        e.nombre > 0
+                                                            ? 'text-nimba-700 dark:text-nimba-300'
+                                                            : 'text-ink-500',
+                                                    )}
+                                                >
+                                                    {formaterNombre(e.nombre)}
+                                                </span>
+                                            </Link>
+                                        </li>
+                                    ))}
+                            </ul>
+                        </Section>
                         {a_reprendre !== null && a_reprendre.length > 0 && (
                             <Section
                                 titre="Renvoyées, à reprendre"

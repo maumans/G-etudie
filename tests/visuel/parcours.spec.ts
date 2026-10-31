@@ -8,6 +8,9 @@ import { expect, test } from '@playwright/test';
  */
 test.use({ viewport: { width: 360, height: 740 } });
 
+/** Inscription, aiguillage : plusieurs requêtes sur `php artisan serve`. */
+const ATTENTE = { timeout: 20_000 };
+
 test('inscription, vérification proposée sans être imposée, puis suppression du compte', async ({
     page,
 }) => {
@@ -27,7 +30,7 @@ test('inscription, vérification proposée sans être imposée, puis suppression
     await page.getByRole('button', { name: 'Créer mon compte' }).click();
 
     // La vérification du numéro est proposée…
-    await expect(page).toHaveURL(/\/compte\/verification$/);
+    await expect(page).toHaveURL(/\/compte\/verification$/, ATTENTE);
     await expect(
         page.getByRole('heading', { name: 'Vérifie ton numéro' }),
     ).toBeVisible();
@@ -36,7 +39,7 @@ test('inscription, vérification proposée sans être imposée, puis suppression
     // par le parcours d'accueil (lot 2 ; le rappel du numéro attend sur
     // l'accueil, parcours-lot2.spec.ts).
     await page.getByRole('link', { name: 'Plus tard' }).click();
-    await expect(page).toHaveURL(/\/eleve\/bienvenue$/);
+    await expect(page).toHaveURL(/\/eleve\/bienvenue$/, ATTENTE);
     await expect(
         page.getByRole('heading', { name: /^Bienvenue, Mamadou\./ }),
     ).toBeVisible();
@@ -54,7 +57,7 @@ test('inscription, vérification proposée sans être imposée, puis suppression
         .getByRole('button', { name: 'Supprimer définitivement' })
         .click();
 
-    await expect(page).toHaveURL(/\/$/);
+    await expect(page).toHaveURL(/\/$/, ATTENTE);
 
     // Le compte n'existe plus : la connexion échoue.
     await page.goto('/login');

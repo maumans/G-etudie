@@ -53,14 +53,17 @@ enum Role: string
     {
         $permissions = match ($this) {
             self::Eleve => [Permission::EspaceEleve],
-            self::Redacteur => [Permission::EspaceContenu, Permission::RedigerContenu],
-            self::Relecteur => [Permission::EspaceContenu, Permission::RelireContenu],
+            self::Redacteur => [Permission::EspaceContenu, Permission::RedigerContenu, Permission::ImporterAnnales],
+            // Le relecteur juge le contenu signalé ; il répond aux élèves.
+            self::Relecteur => [Permission::EspaceContenu, Permission::RelireContenu, Permission::TraiterSignalements],
             self::AdminContenu, self::Superadmin => [
                 Permission::EspaceContenu,
                 Permission::GererReferentiel,
                 Permission::RedigerContenu,
                 Permission::RelireContenu,
                 Permission::AdministrerContenu,
+                Permission::ImporterAnnales,
+                Permission::TraiterSignalements,
                 ...($this === self::Superadmin ? [Permission::EspaceConsole] : []),
             ],
             // Leurs espaces arrivent au lot 11 : d'ici là, « Mon compte » seulement.

@@ -27,7 +27,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // perdrait son espace, une proposition faite d'une seule formule
         // (texte vide) deviendrait `null` (DEVBOOK point 17). Ces middlewares
         // passent avant le routeur : on reconnaît la requête à son adresse.
-        $documents = fn (Request $request) => $request->isMethod('PUT') && $request->is('contenu/lecons/*', 'contenu/questions/*');
+        $documents = fn (Request $request) => $request->isMethod('PUT') && $request->is('contenu/lecons/*', 'contenu/questions/*', 'contenu/parties/*');
         $middleware->trimStrings(except: [$documents]);
         $middleware->convertEmptyStringsToNull(except: [$documents]);
 

@@ -20,11 +20,11 @@ beforeEach(function () {
     $this->jeton = appareilDe($this->eleve);
 });
 
-test('les gestes des lots 2 et 3 sont inscrits au registre, chacun avec son libellé', function () {
+test('les gestes des lots 2 à 4 sont inscrits au registre, chacun avec son libellé', function () {
     $libelles = (string) file_get_contents(resource_path('js/lib/hors-ligne/libelles.ts'));
 
     expect(array_keys(RegistreOperations::TYPES))
-        ->toBe(['tentative.enregistrer', 'tentative.auto_evaluer', 'seance.terminer', 'lecon.progression']);
+        ->toBe(['tentative.enregistrer', 'tentative.auto_evaluer', 'seance.terminer', 'lecon.progression', 'signalement.creer']);
 
     foreach (array_keys(RegistreOperations::TYPES) as $type) {
         expect($libelles)->toContain("'{$type}':");
