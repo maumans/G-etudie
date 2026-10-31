@@ -91,7 +91,7 @@ class QuestionController extends Controller
     {
         Gate::authorize('view', $question);
 
-        $question->load(['notion.chapitre.matiere', 'notion.chapitre.classe', 'auteur', 'versions.auteur', 'versions.decidePar']);
+        $question->load(['notion.chapitre.matiere', 'notion.chapitre.classe', 'auteur', 'versions.auteur', 'versions.decidePar', 'partie.sujet']);
         $user = $request->user();
         $enRelecture = $question->versionEnRelecture();
 
@@ -123,6 +123,7 @@ class QuestionController extends Controller
             ]),
             'droits' => [
                 'rediger' => Gate::allows('rediger', $question),
+                'soumettre' => Gate::allows('soumettre', $question),
                 'relire' => Gate::allows('relire', $question),
                 'archiver' => Gate::allows('archiver', $question),
                 'auteur' => Perimetre::estAuteurDe($user, $question),
@@ -138,7 +139,7 @@ class QuestionController extends Controller
             return to_route('contenu.questions.show', $question);
         }
 
-        $question->load(['notion.chapitre.matiere', 'notion.chapitre.classe', 'auteur']);
+        $question->load(['notion.chapitre.matiere', 'notion.chapitre.classe', 'auteur', 'partie.sujet']);
 
         return Inertia::render('contenu/questions/edition', [
             'question' => [
@@ -198,7 +199,7 @@ class QuestionController extends Controller
 
     public function soumettre(Request $request, Question $question): RedirectResponse
     {
-        Gate::authorize('rediger', $question);
+        Gate::authorize('soumettre', $question);
         $this->contenu->soumettre($question, $request->user());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Question envoyée en relecture.']);
@@ -293,7 +294,7 @@ class QuestionController extends Controller
             ->pluck('nombre', 'statut');
 
         $requete = (clone $base)
-            ->with(['notion.chapitre.matiere', 'notion.chapitre.classe', 'auteur'])
+            ->with(['notion.chapitre.matiere', 'notion.chapitre.classe', 'auteur', 'partie.sujet'])
             ->when($filtres['statut'], fn (Builder $q, string $statut) => $q->where('statut', $statut))
             ->when($filtres['type'], fn (Builder $q, string $type) => $q->where('type', $type))
             ->when($filtres['matiere'], fn (Builder $q, int $matiere) => $q->whereHas('notion.chapitre', fn (Builder $c) => $c->where('matiere_id', $matiere)));
@@ -314,6 +315,7 @@ class QuestionController extends Controller
             'compteurs' => collect(StatutContenu::cases())->mapWithKeys(fn (StatutContenu $s) => [$s->value => (int) ($compteurs[$s->value] ?? 0)]),
             'a_relire' => $user->can(Permission::RelireContenu->value) ? self::nombreARelire($user) : null,
             'lecons_a_relire' => $user->can(Permission::RelireContenu->value) ? LeconController::nombreARelire($user) : null,
+            'annales_a_relire' => $user->can(Permission::RelireContenu->value) ? AnnaleController::nombreARelire($user) : null,
             'matieres' => Matiere::query()->orderBy('ordre')->get(['id', 'nom', 'teinte']),
             'types' => collect(TypeQuestion::cases())->map(fn (TypeQuestion $t) => ['valeur' => $t->value, 'libelle' => $t->libelle()]),
         ]);
@@ -327,6 +329,8 @@ class QuestionController extends Controller
     private static function aRelirePar(Builder $requete, User $user): void
     {
         $requete->where('statut', StatutContenu::EnRelecture)
+            // Une question d'annale se relit avec son sujet (SujetService).
+            ->whereNull('sujet_partie_id')
             ->where(fn (Builder $q) => $q->whereNull('auteur_id')->orWhere('auteur_id', '!=', $user->id))
             ->whereDoesntHave('versions', fn (Builder $q) => $q->whereNull('decision')->where('auteur_id', $user->id));
     }
@@ -365,6 +369,12 @@ class QuestionController extends Controller
             'indices' => count($question->indices ?? []),
             'etapes' => count($question->corrige ?? []),
             'mots' => BlocsContenu::resume($question->enonce)['mots'],
+            'annale' => $question->partie === null ? null : [
+                'uuid' => $question->partie->sujet->uuid,
+                'titre' => $question->partie->sujet->titre,
+                'partie' => $question->partie->titre,
+                'a_verifier' => $question->reponse_a_verifier,
+            ],
         ];
     }
 }

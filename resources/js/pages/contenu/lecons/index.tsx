@@ -37,6 +37,7 @@ type Props = {
     compteurs: Record<StatutContenu, number>;
     a_relire: number | null;
     questions_a_relire: number | null;
+    annales_a_relire: number | null;
     matieres: { id: number; nom: string; teinte: CleMatiere }[];
 };
 
@@ -50,6 +51,7 @@ export default function Lecons({
     compteurs,
     a_relire,
     questions_a_relire,
+    annales_a_relire,
     matieres,
 }: Props) {
     const peut = usePeut();
@@ -118,6 +120,7 @@ export default function Lecons({
                         actif="lecons"
                         lecons={a_relire ?? 0}
                         questions={questions_a_relire ?? 0}
+                        annales={annales_a_relire ?? 0}
                     />
                 ) : (
                     <nav

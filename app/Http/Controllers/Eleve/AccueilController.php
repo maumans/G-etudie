@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Eleve;
 
 use App\Http\Controllers\Controller;
+use App\Services\SignalementService;
 use App\Services\TableauDeBordEleveService;
 use App\Support\CatalogueEleve;
 use Illuminate\Http\RedirectResponse;
@@ -27,6 +28,8 @@ class AccueilController extends Controller
 
         return Inertia::render('eleve/accueil', [
             'tableau' => $tableau->donnees($request->user(), $profil),
+            // Lot 4 : l'équipe a répondu à un signalement (« Mes signalements »).
+            'reponses_signalements' => SignalementService::reponsesNonLues($request->user()),
         ]);
     }
 }

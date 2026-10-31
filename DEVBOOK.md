@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-10-31, lot 3)
+## 0. Reprise — où en est le projet (mis à jour le 2026-10-31, lot 4)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,11 +19,26 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-31 (lot 3 fait ; lot 0 en attente de D11)
+### État au 2026-10-31 (lot 4 fait ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte les lots 0, 1, 2 et 3. Le lot 3 a été fait
-  **directement sur `main`**, à la demande de Maurice (pas de branche
-  `lot-3`). Pas de dépôt distant (DA6).
+- **Dépôt git** : `main` porte les lots 0 à 4. Les lots 3 et 4 ont été
+  faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
+  distant (DA6).
+- **Lot 4 fait** (point 18) : **annales** (sujets découpés en parties, dont
+  les questions sont des questions ordinaires, `source = annale`) ;
+  **import assisté** : un PDF ou une photo → l'API Claude (Opus 5.5, en
+  file) transcrit l'énoncé et **propose** réponse et corrigé → annale en
+  brouillon, chaque réponse « à vérifier » → le rédacteur vérifie à côté du
+  document original → un autre enseignant publie l'annale **et toutes ses
+  questions** d'un geste ; côté élève : liste par matière et session,
+  **« Exercices par chapitre »**, fiche en deux modes (**Lecture**,
+  **Entraînement** par la file), document original à la demande ;
+  **« Signaler une erreur »** sur chaque question, leçon et annale, par la
+  file (`signalement.creer`), file des signalements au back-office, réponse
+  lue dans « Mes signalements ». **Critère tenu** : `ImportAssisteTest`
+  et le parcours Playwright `parcours-lot4.spec.ts`. ⚠ **Sans clé
+  `ANTHROPIC_API_KEY`, la lecture est simulée** (sujet fictif marqué
+  « Exemple ») : le vrai appel est à essayer (`A_TESTER.md`).
 - **Lot 3 fait** (point 17) : **moteur de questions, neuf types** (QCM à
   une ou plusieurs réponses, vrai/faux, numérique avec tolérance et unité,
   réponse courte, texte à trous, appariement, remise en ordre, question
@@ -112,11 +127,14 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 391 Pest (MySQL `g_etudie_test`, rôles semés une fois par
-  `TestCase`), 291 Vitest, 316 Playwright (sessions par compte, écrans des
-  lots 0 à 3, parcours d'inscription, parcours des critères des lots 1 et
-  2, séance en mode avion du lot 3, socle hors ligne) — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
-  `npm run build` passent.
+- **Tests** : 436 Pest (MySQL `g_etudie_test`, rôles semés une fois par
+  `TestCase`), 296 Vitest, Playwright (sessions par compte, écrans des
+  lots 0 à 4, parcours d'inscription, parcours des critères des lots 1, 2
+  et 4, séance en mode avion du lot 3, socle hors ligne) — verts. `tsc`,
+  `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
+- **File d'attente** : l'import assisté tourne en file (`database`). En
+  développement, lancer aussi `php artisan queue:work` (configuration
+  `file` de `.claude/launch.json`) ; sans lui, un import reste « En file ».
 - **⚠ Pas de HTTPS tant que le domaine n'existe pas** (D11) : hors
   `localhost`, le service worker ne s'inscrit pas, donc pas de hors ligne.
 - **⚠ Aucun SMS ne part** : le pilote `JournalSms` écrit le code dans
@@ -147,21 +165,27 @@
    préproduction en HTTPS en suivant la section 12, et contrôles bloqués de
    `A_TESTER.md` (installation, mode avion, déploiement pendant une coupure,
    double authentification, session de 12 h).
-2. **Maurice : essayer le lot 3** — au back-office (04 rédacteur :
-   « Questions », une question en brouillon à compléter ; 06 responsable
-   pédagogique : « Relecture › Questions », une question à relire), puis
-   côté élève (01 Aïssatou : la leçon « Le cosinus d'un angle aigu » et sa
-   mini-question ; une séance du jour, tous types mêlés).
-3. **Équipe pédagogique** : saisir la **date de la prochaine session** de
-   chaque examen (Référentiel › Épreuves) pour le compte à rebours.
-4. **Lot 4** : annales (modèle, import assisté par IA et relecture, trois
-   modes, filtres par chapitre) ; « Signaler une erreur » sur chaque
-   question (reporté du lot 3, décision de Maurice) et la file des
-   signalements.
-5. **Équipe pédagogique** : saisir dans le référentiel le programme
+2. **Maurice : clé de l'API Claude** — créer une clé sur
+   console.anthropic.com, la mettre dans `.env` (`ANTHROPIC_API_KEY=…`,
+   jamais dans le dépôt), relancer `php artisan queue:work`, puis importer
+   un **vrai** sujet scanné (`A_TESTER.md`, « Import d'un vrai sujet »).
+3. **Maurice : essayer le lot 4** — au back-office (04 rédacteur :
+   « Annales », l'annale BEPC 2022 en brouillon : comparer au document,
+   « J'ai vérifié », envoyer ; « Importer un sujet » ; 05 relectrice ou
+   06 responsable pédagogique : « Relecture › Annales », « Signalements »),
+   puis côté élève (01 Aïssatou : « Annales », BEPC 2024 en lecture et en
+   entraînement, « Exercices par chapitre », « Signaler une erreur »).
+4. **Équipe pédagogique** : saisir la **date de la prochaine session** de
+   chaque examen (Référentiel › Épreuves) pour le compte à rebours ; **la
+   convention D5** avant toute publication publique des annales (le champ
+   « Droits de publication » de chaque annale l'attend).
+5. **Lot 5** : examen blanc chronométré (le mode « Conditions réelles » des
+   annales y arrive), coefficients, moyenne pondérée, sauvegarde continue
+   sur l'appareil (HL3).
+6. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
-6. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+7. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
    BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
@@ -298,7 +322,9 @@ permission s'exerce (section 7).
 |---|---|---|
 | `ReferentielService` | slug des matières, suppressions gardées, ordre des chapitres et notions, année courante unique | ✅ lot 1 |
 | `ContenuService` + workflow de relecture | seule porte du statut, **leçons et questions** (`ContenuRelisable`) : brouillon → relecture → publication / renvoi commenté / reprise → archivage ; versions figées ; verrou optimiste ; l'auteur ne se relit jamais | ✅ lots 1 et 3 |
-| `ImportAnnaleService` | PDF/scan → sujet structuré (IA) → relecture | ⬜ |
+| `Annales\ImportSujetService` + `ExtracteurClaude` / `ExtracteurSimule` | document → lecture en file (job `TraiterImportSujet`) → annale en brouillon, réponses « à vérifier » ; proposition vérifiée (`PropositionEnQuestion`, `TexteEnBlocs`) | ✅ lot 4 |
+| `Annales\SujetService` | parties, questions d'une annale ; circuit du sujet **et** de ses questions en un geste | ✅ lot 4 |
+| `SignalementService` | `signalement.creer` (10 par jour, cible visible, idempotent), réponse de l'équipe, réponses non lues | ✅ lot 4 |
 | `TentativeService` | enregistrement (ajout seulement), **correction serveur contre la version vue**, neuf types, score 0–100, indices comptés, auto-évaluation ; maîtrise au lot 6 | ✅ lot 3 |
 | `SeanceService` | séance du jour minimale (jamais vues, ratées, réussies, matières alternées, ordre stable), fin de séance ; séances pré-calculées au lot 6 | 🟡 lot 2 |
 | `ProfilEleveService` | seule porte du profil d'examen (classe déduite, série exigée au Bac, filière gardée) | ✅ lot 2 |
@@ -327,10 +353,10 @@ permission s'exerce (section 7).
 | Cours : mes cours, matière, leçon, fiche de révision | ✅ lot 2 |
 | Lecteur d'exercice (« l'ardoise ») | ✅ lot 3 : neuf types, indices, verdict (juste / en partie / pas encore / à toi d'évaluer), corrigé pas à pas, auto-évaluation, reprise, bilan |
 | Mini-question dans une leçon | ✅ lot 3 |
-| Annales (liste, fiche, trois modes) | ⬜ |
+| Annales (liste, exercices par chapitre, fiche en lecture et en entraînement, document original), « Mes signalements », « Signaler une erreur » | ✅ lot 4 (« Conditions réelles » au lot 5) |
 | Examen blanc (lancement, passage, résultat, carte de partage) | ⬜ |
 | Progression, profil, téléchargements | ⬜ |
-| Back-office contenu : tableau de bord, référentiel (matières, épreuves, programme, années), leçons (liste, relecture, création, éditeur TipTap, fiche, historique) | ✅ lot 1 (point 15) ; **questions** ✅ lot 3 (liste, création, saisie par type avec aperçu jouable, fiche, relecture) ; annales, signalements aux lots 4, 12 |
+| Back-office contenu : tableau de bord, référentiel (matières, épreuves, programme, années), leçons (liste, relecture, création, éditeur TipTap, fiche, historique) | ✅ lot 1 (point 15) ; **questions** ✅ lot 3 (liste, création, saisie par type avec aperçu jouable, fiche, relecture) ; **annales** (liste, import, fiche à côté du document, relecture) et **signalements** (file, fiche, réponse) ✅ lot 4 |
 | Console plateforme | ⬜ |
 
 Infrastructure d'interface à construire au lot 0 : primitives de `DESIGN.md`
@@ -344,7 +370,7 @@ composants hors ligne (`HORS_LIGNE.md` A.3.7 à A.3.9), formatage GNF dans
 |---|---|---|
 | `RolesEtPermissionsSeeder` | recopie `App\Enums\Role` et `App\Enums\Permission` en base (`syncPermissions`, permissions inconnues supprimées) ; lancé aussi en production | ✅ étape 5 |
 | `ReferentielSeeder` | examens, séries, classes d'examen (recopiés à chaque passage) ; année 2026-2027, dix matières, épreuves des matières phares (D1) semées **une fois**, sur table vide — **coefficients et durées vides**, programme non semé ; lancé aussi en production | ✅ lot 1 |
-| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 09, `DemoSeeder::COMPTES`, deux élèves) ✅ étape 5 ; puis `DemoContenuSeeder` ✅ lot 1 : chapitres, notions et cinq leçons **fictifs** (`est_exemple`), une par statut, passés par `ContenuService` (vrai historique) ; `DemoCoursSeeder` ✅ lots 2 et 3 : neuf leçons publiées (dont une avec mini-question) et 30 questions fictives des neuf types (BEPC, Bac SE), avec indices et corrigés, passées par `ContenuService` — 28 publiées, une en brouillon, une en relecture ; `DemoEleveSeeder` ✅ lot 2 : profils (Aïssatou BEPC avec trois soirs de réponses et deux leçons ouvertes, Ousmane Bac SE sans rien) | ✅ |
+| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 09, `DemoSeeder::COMPTES`, deux élèves) ✅ étape 5 ; puis `DemoContenuSeeder` ✅ lot 1 : chapitres, notions et cinq leçons **fictifs** (`est_exemple`), une par statut, passés par `ContenuService` (vrai historique) ; `DemoCoursSeeder` ✅ lots 2 et 3 : neuf leçons publiées (dont une avec mini-question) et 30 questions fictives des neuf types (BEPC, Bac SE), avec indices et corrigés, passées par `ContenuService` — 28 publiées, une en brouillon, une en relecture ; `DemoEleveSeeder` ✅ lot 2 : profils (Aïssatou BEPC avec trois soirs de réponses et deux leçons ouvertes, Ousmane Bac SE sans rien) ; `DemoAnnalesSeeder` ✅ lot 4 : quatre annales **fictives** passées par le chemin d'un vrai import (BEPC maths 2024 et 2023, Bac SE chimie 2024 publiées ; BEPC 2022 en brouillon, réponses à vérifier, un « [illisible] »), PDF d'exemple, deux signalements d'Aïssatou (un ouvert, un répondu et lu) | ✅ |
 
 ⚠ Les permissions ne viennent que des seeders : un déploiement lance `migrate`
 **puis** `db:seed`. Comptes créés en `firstOrCreate` (un re-seed ne réinitialise
@@ -1237,6 +1263,108 @@ cette question à sa façon. Elle distingue deux notions :
      « Signaler une erreur » (lot 4) ; un hook d'enregistrement commun
      aux deux éditeurs (points ouverts).
 
+18. [x] **Lot 4 — annales, import assisté par IA, « Signaler une erreur »
+   et file des signalements** (2026-10-31, sur `main`, un commit)
+   - **Constat** : aucune annale ; `questions.source` n'avait que
+     `maison` ; « Signaler une erreur » reporté du lot 3 ; les entrées
+     « Annales » (élève, back-office) et « Signalements » de la navigation
+     étaient désactivées.
+   - **Décisions** (plan validé par Maurice le 2026-10-31) :
+     - **Énoncé + brouillon de réponse** : l'IA **transcrit** l'énoncé
+       (jamais inventé, « [illisible] » signalé) et **propose** la réponse
+       attendue et un corrigé pas à pas ; chaque question arrive
+       `reponse_a_verifier` et l'annale ne part pas en relecture tant qu'il
+       en reste (« J'ai vérifié », sur l'annale ou l'écran de saisie).
+     - **Modèle** : Claude Opus 5.5 (`config('annales.modele')`, effort
+       `high`), par le SDK officiel PHP `anthropic-ai/sdk` ^1.3
+       (**dépendance ajoutée**, la seule du lot) : PDF ou image en base64,
+       sortie structurée (`ExtracteurClaude::schema()`, stricte), réponse
+       en flux, repli serveur `fallbacks: default` si le modèle décline.
+       Sans clé, `ExtracteurSimule` (jamais en production : là, l'import
+       échoue avec sa raison). Une tentative par import (`tries = 1`) :
+       chaque lecture coûte ; « Relancer » sur un import en échec.
+     - **Trois modes** : Lecture et Entraînement ; « Conditions réelles »
+       **absent jusqu'au lot 5** (pas de bouton « bientôt »).
+     - **Réponse aux signalements** : visible par l'élève (« Mes
+       signalements », pastille sur l'accueil), une seule fois, pas de
+       fil de discussion ; figée dès que l'élève l'a lue. Dix signalements
+       par jour au plus (jour de la saisie). Traités par le relecteur et
+       le responsable pédagogique (`signalements.traiter`) ; l'import, par
+       le rédacteur et le responsable (`annales.importer`).
+     - **Une annale se relit avec ses questions** (`SujetService`) :
+       envoi, reprise, publication et renvoi s'appliquent au sujet et à
+       ses questions, dans une transaction ; une question d'annale n'a pas
+       de relecture à part (`QuestionPolicy::relire`, `soumettre`). La
+       version du sujet fige la **structure** (parties, barèmes,
+       consignes, ordre des questions) ; chaque question garde la sienne.
+     - **Rattachement** : un sujet porte examen, série, filière, matière
+       et **session** (année), pas une ligne `epreuves` (propre à une année
+       scolaire). Durée et coefficient : **ceux imprimés sur le document**,
+       vides sinon (CLAUDE.md § 5) ; une durée absurde proposée n'est pas
+       reprise.
+     - **Droits (D5)** : champ « Droits de publication » sur chaque
+       annale, non bloquant pendant le test fermé ; signalé « Droits à
+       renseigner » au back-office. Le lot 8 (référencement public) devra
+       l'exiger.
+     - **Catalogue** : une question d'annale n'est proposée que si son
+       annale est en ligne (`CatalogueEleve::questions`, condition groupée) ;
+       elle alimente aussi les séances et dit d'où elle vient (« BEPC
+       2024 », `PresentationQuestion`).
+     - **Hors ligne** : `signalement.creer` (priorité 3) ; la fiche
+       d'annale reçoit un objet de contenu `SujetEleve`
+       (`PresentationSujet`) que le pack du lot 7 rangera tel quel ;
+       `/eleve/annales` et `/eleve/signalements` entrent dans la liste
+       blanche ; le document original (`/eleve/documents/annales/…`) reste
+       **en ligne seulement** (le service worker ne copie pas un PDF).
+   - **Écarts au plan** : `corriges` et `indices` restent des colonnes de
+     la question (écart n° 18 du lot 3) : une annale n'a pas de « corrigé
+     de sujet » à part, ses questions portent le leur. Une question déjà
+     publiée ne se retire pas d'une annale : on l'archive.
+     Le PLAN § 8 parle d'« API Claude derrière un service et une file » :
+     c'est fait, avec le SDK officiel plutôt que le client HTTP de
+     Laravel (recommandation de la documentation de l'API).
+   - **Corrigé en chemin** : `composer require` a fait réécrire
+     `CLAUDE.md` par `boost:update` (197 lignes de consignes en anglais
+     ajoutées) : retiré, `CLAUDE.md` reste celui du projet. À surveiller à
+     chaque `composer update` (point ouvert). Le parcours d'inscription
+     (`parcours.spec.ts`) attendait ses redirections 5 s seulement, quand
+     les autres parcours attendent 20 à 30 s : sur ce poste, chaque requête
+     de `php artisan serve` prend ~1,2 s, et l'inscription en enchaîne
+     plusieurs → délai porté à 20 s (le compte était bien créé). La feuille
+     « Signaler une erreur » se capturait défilée de quelques pixels selon
+     le passage → remise en haut, sans focus, avant la capture.
+   - **Vu avec Playwright** (`ecrans-lot4.spec.ts`, 13 écrans × 3 tailles
+     × 2 thèmes) et corrigé : texte `ink-500` sur la teinte muette des
+     onglets « Lecture / Entraînement » et des types d'import (contraste,
+     axe) → `ink-600` ; énoncés des questions de l'annale réduits à leur
+     extrait (« Calcule … ») → énoncé rendu, formules comprises ; grand
+     cadre vide quand le navigateur n'a pas de lecteur PDF intégré (Android,
+     navigateur sans greffon) → aperçu seulement si
+     `navigator.pdfViewerEnabled`, sinon « Ouvrir » ; quatre boutons pleins
+     « Vérifier l'annale » dans la liste des imports → seuls les imports
+     à suivre (en lecture, en échec, annale en brouillon) ; deux « Signaler
+     une erreur » en entraînement → celui de l'annale en lecture
+     seulement ; titre de la question répété sur la fiche d'un
+     signalement ; listes « Toutes les années » et « Tous les examens »
+     tronquées. Captures des autres lots régénérées volontairement : la
+     navigation (« Annales » et « Signalements » actifs), les onglets de
+     relecture à trois entrées, la section « Annales et signalements » du
+     tableau de bord, « Signaler une erreur » sous les questions et les
+     leçons. Détail : `DESIGN.md` § 13, « Lot 4 ».
+   - **Preuve** : **436 Pest** (dont `ImportAssisteTest` 7 — le critère par
+     les routes réelles —, `CircuitAnnalesTest` 8, `AnnalesEleveTest` 8,
+     `SignalementsTest` 8, `TexteEnBlocsTest` 14 : conversion du texte,
+     chaque type proposé, propositions incohérentes), **296 Vitest** (dont
+     `signaler-erreur.test.tsx` 5), Playwright : **parcours du critère**
+     (`parcours-lot4.spec.ts` : téléversement d'un PDF, lecture en file,
+     vérification, envoi, publication par le responsable pédagogique,
+     l'élève de BEPC l'ouvre et s'y entraîne) et les écrans. `tsc`,
+     `vp check`, Pint, Larastan niveau 7 et `npm run build` passent.
+   - **Reste** : un vrai sujet lu par l'API Claude (clé à créer,
+     `A_TESTER.md`) ; un signalement fait en mode avion sur un vrai
+     téléphone ; la convention D5 ; le mode « Conditions réelles » (lot 5) ;
+     les annales dans les packs (lot 7).
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -1253,6 +1381,14 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
   rédacteur et un relecteur ») : pas au lot 1 ; tout le personnel du
   back-office voit tout le catalogue, un rédacteur ne modifie que ses
   leçons. À décider quand l'équipe sera constituée.
+- **Mise à jour de Composer** : `boost:update` (lancé après `composer
+  require`) réécrit `CLAUDE.md` en y ajoutant ses consignes en anglais.
+  Vérifier `git diff CLAUDE.md` après chaque `composer require/update`
+  (lot 4).
+- **Annales** (lot 4) : la convention D5 (champ « Droits de publication »)
+  ; un vrai sujet lu par l'API Claude ; un import par fichier (un sujet
+  très long peut dépasser une lecture : le découper) ; les annales dans
+  les packs (lot 7).
 - **Images, tableaux et mini-questions dans les leçons** : hors du format
   des blocs au lot 1 (stockage et conversion WebP à décider avec les packs,
   mini-questions au lot 3).
@@ -1313,6 +1449,10 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `ProgressionLecon` | `progressions_lecons` | élève, leçon | `etat` + `etat_saisi_le`, `position` + `position_saisie_le` : la plus récente gagne |
 | `Question` | `questions` | notion, auteur | `uuid` v7, `type` (`TypeQuestion`, fixé à la création), brouillon dans les colonnes (`enonce`, `donnees`, `reponse_attendue`, `indices`, `corrige`, `difficulte`), `extrait` (listes, recherche), `revision`, `version_publiee_id` ; circuit par `ContenuService` ; format : `FormatQuestion` ; vue élève : `PresentationQuestion` |
 | `Seance` | `seances` | élève | `uuid`, `jour`, `questions` (ids ordonnés), `termine_le` |
+| `Sujet` | `sujets` | examen, série nulle, matière, auteur | `uuid` v7, `session`, `type` (`TypeSujet`), durée et coefficient **imprimés** (vides sinon), `droits` (D5), document original (disque privé) ; circuit par `SujetService` ; vue élève : `PresentationSujet` |
+| `SujetPartie` | `sujet_parties` | sujet | `uuid`, `ordre`, `titre`, `bareme`, `consigne` (blocs) |
+| `ImportSujet` | `imports_sujets` | auteur, examen, série, matière, sujet créé | `statut` (`StatutImport`), `extracteur`, `modele`, jetons, `avertissements`, `erreur` |
+| `Signalement` | `signalements` | élève, cible (question, leçon, sujet) | `uuid` = celui de l'opération ; `motif`, `message` (500), `statut`, `reponse` (figée une fois lue), `saisi_le` |
 | `Tentative` | `tentatives` | élève, question, séance nulle | ajout seulement (sauf l'auto-évaluation, une fois) ; `uuid` = celui de l'opération ; `version` = numéro vu ; `score` 0–100 et `correcte` = correction du serveur ; `criteres`, `auto_evaluee_le` |
 
 ## 10. Enums
@@ -1320,7 +1460,7 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | Enum | Valeurs | Rôle |
 |---|---|---|
 | `Role` | `eleve`, `parent`, `enseignant`, `redacteur`, `relecteur`, `admin_contenu`, `gestionnaire_etablissement`, `superadmin` | permissions de chaque rôle, `estPersonnel()` |
-| `Permission` | `espace.eleve`, `espace.contenu`, `espace.console`, `referentiel.gerer`, `contenu.rediger`, `contenu.relire`, `contenu.administrer`, `compte.double_authentification` | seule liste des permissions |
+| `Permission` | `espace.eleve`, `espace.contenu`, `espace.console`, `referentiel.gerer`, `contenu.rediger`, `contenu.relire`, `contenu.administrer`, `compte.double_authentification`, `annales.importer`, `signalements.traiter` (lot 4) | seule liste des permissions |
 | `Espace` | `console`, `contenu`, `eleve` (ordre de priorité) | où arrive un compte (`accueilDe()`) |
 | `MotifCode` | `verification`, `recuperation`, `changement_numero` | motif d'un code SMS |
 | `CodeExamen` | `CEE`, `BEPC`, `BAC` | `nom()`, `aDesSeries()` |
@@ -1333,6 +1473,11 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `ModeTentative` | `seance`, `entrainement` (`examen_blanc` au lot 5) | où la réponse a été donnée |
 | `EtatLecon` | `comprise`, `a_revoir` | ce que l'élève dit d'une leçon |
 | `TypeEtablissement` | `public`, `prive`, `franco_arabe` | type d'un établissement |
+| `TypeSujet` | `officiel`, `blanc_maison` | annale ou sujet maison |
+| `StatutImport` | `en_attente`, `en_cours`, `pret`, `echec` | un import assisté |
+| `CibleSignalement` | `question`, `lecon`, `sujet` | ce qu'on signale |
+| `MotifSignalement` | `enonce`, `corrige`, `reponse_refusee`, `incomprehensible`, `autre` | même liste dans `signaler-erreur.tsx` (testé) |
+| `StatutSignalement` | `ouvert`, `traite`, `rejete` | issue d'un signalement |
 
 ## 11. Routes
 
@@ -1350,6 +1495,9 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `/contenu/relecture`, publier, renvoyer | `can:contenu.relire` + `LeconPolicy::relire` (jamais l'auteur) | `routes/contenu.php` |
 | archiver, restaurer | `can:contenu.administrer` | `routes/contenu.php` |
 | `/contenu/questions` (liste, fiche), `creer`, édition, envoi, reprise, modification ; `/contenu/relecture/questions`, publier, renvoyer ; archiver, restaurer | mêmes gardes que les leçons ; `QuestionPolicy` (circuit commun `PolicyContenuRelisable`) | `routes/contenu.php` |
+| `/eleve/annales`, `/eleve/annales/{uuid}`, `/eleve/documents/annales/{uuid}`, `/eleve/signalements` | `auth` + `can:espace.eleve` ; annale gardée par `SujetPolicy::lire` (404) | `routes/eleve.php` |
+| `/contenu/annales` (liste, fiche, document), `/contenu/relecture/annales` ; importer (`annales/importer`, `annales/imports`, relancer) ; parties, questions d'annale, circuit | `can:espace.contenu` · `can:annales.importer` (+ `throttle:20,60`) · `can:contenu.rediger` / `relire` / `administrer` ; `SujetPolicy` | `routes/contenu.php` |
+| `/contenu/signalements`, fiche, répondre | `can:signalements.traiter` ; `SignalementPolicy` (404) | `routes/contenu.php` |
 | `/compte/*` (profil, mot de passe, numéro, affichage, vérification, suppression) | `auth`, dérogations « Mon compte » | `routes/compte.php` |
 | `/compte/securite` | `auth` + `can:compte.double_authentification` + `password.confirm` | `routes/compte.php` |
 | `/mot-de-passe-oublie*` | `guest` | `routes/compte.php` |
@@ -1378,7 +1526,13 @@ Toute exception est justifiée dans `AccesParRoleTest::OUVERTES_A_TOUS`.
    no-cache`) ; `/build/*` servi avec un cache long (`immutable`), les noms
    étant hachés ; `/manifest.webmanifest` en `application/manifest+json`.
 5. File d'attente et tâches planifiées : `QUEUE_CONNECTION=database` → un
-   `php artisan queue:work` surveillé (rien n'en dépend encore au lot 0).
+   `php artisan queue:work --timeout=900 --tries=1` surveillé (lot 4 :
+   l'import assisté en dépend) et `DB_QUEUE_RETRY_AFTER=960` (au-delà de
+   la durée d'une lecture, sinon un second travailleur reprend le job).
+   `ANTHROPIC_API_KEY` dans `.env` (jamais dans le dépôt) ; sans elle,
+   l'import échoue avec sa raison (pas de lecture simulée en production).
+   Documents originaux sur le disque privé (`storage/app/private/annales`,
+   à sauvegarder avec la base).
 6. SMS : aucun fournisseur (D3) ; en production, `JournalSms` signale
    seulement l'absence d'envoi — la vérification du numéro et la
    récupération du mot de passe ne fonctionnent donc pas encore.

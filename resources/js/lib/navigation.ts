@@ -22,6 +22,9 @@ import { index as indexLecons, relecture } from '@/routes/contenu/lecons';
 import { index as indexQuestions } from '@/routes/contenu/questions';
 import { index as matieresReferentiel } from '@/routes/contenu/referentiel/matieres';
 import { accueil as accueilEleve, cours as coursEleve } from '@/routes/eleve';
+import { index as annalesEleve } from '@/routes/eleve/annales';
+import { index as indexAnnales } from '@/routes/contenu/annales';
+import { index as indexSignalements } from '@/routes/contenu/signalements';
 import { edit as monCompte } from '@/routes/compte/profil';
 
 /**
@@ -40,7 +43,12 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         // Une leçon et une fiche appartiennent aux cours.
         actifAussiSous: ['/eleve/lecons', '/eleve/chapitres'],
     },
-    { libelle: 'Annales', icone: FileText },
+    {
+        libelle: 'Annales',
+        icone: FileText,
+        href: annalesEleve().url,
+        actifSous: '/eleve/annales',
+    },
     { libelle: 'Examens blancs', icone: Timer },
     {
         libelle: 'Moi',
@@ -76,14 +84,25 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
         href: indexQuestions().url,
         actifSous: '/contenu/questions',
     },
-    { libelle: 'Annales', icone: FileText },
+    {
+        libelle: 'Annales',
+        icone: FileText,
+        href: indexAnnales().url,
+        actifSous: '/contenu/annales',
+    },
     {
         libelle: 'Relecture',
         icone: ClipboardCheck,
         href: relecture().url,
         permission: 'contenu.relire',
     },
-    { libelle: 'Signalements', icone: Flag },
+    {
+        libelle: 'Signalements',
+        icone: Flag,
+        href: indexSignalements().url,
+        actifSous: '/contenu/signalements',
+        permission: 'signalements.traiter',
+    },
 ];
 
 /** Compte sans espace (parent, enseignant, gestionnaire avant le lot 11). */

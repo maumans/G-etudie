@@ -4,9 +4,11 @@ import {
     BookOpen,
     CalendarDays,
     Check,
+    ChevronRight,
     Clock,
     Flame,
     GraduationCap,
+    MessageSquareText,
     PencilLine,
     Play,
     ShieldAlert,
@@ -28,7 +30,7 @@ import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import { cn, formaterNombre, pluriel } from '@/lib/utils';
 import { edit as verifierNumero } from '@/routes/compte/verification';
-import { bienvenue, cours } from '@/routes/eleve';
+import { bienvenue, cours, signalements } from '@/routes/eleve';
 import { matiere as pageMatiere } from '@/routes/eleve/cours';
 import { show as pageLecon } from '@/routes/eleve/lecons';
 import { commencer } from '@/routes/eleve/seance';
@@ -93,7 +95,14 @@ function commencerSeance() {
  * Autour : mes matières, reprendre, ma série, mes premiers pas, le tuteur.
  * Tutoiement.
  */
-export default function Accueil({ tableau }: { tableau: Tableau }) {
+export default function Accueil({
+    tableau,
+    reponses_signalements = 0,
+}: {
+    tableau: Tableau;
+    /** Réponses de l'équipe à ses signalements, pas encore lues (lot 4). */
+    reponses_signalements?: number;
+}) {
     const { auth } = usePage().props;
     const maintenant = new Date();
     const date = new Intl.DateTimeFormat('fr-FR', {
@@ -135,6 +144,35 @@ export default function Accueil({ tableau }: { tableau: Tableau }) {
                 </header>
 
                 {tableau.est_exemple && <BandeauExemple />}
+
+                {reponses_signalements > 0 && (
+                    <Link
+                        href={signalements()}
+                        prefetch
+                        className="flex items-center gap-3 rounded-carte border bg-card p-4 shadow-carte outline-none hover:border-ink-400/60 focus-visible:outline-2 focus-visible:outline-ring"
+                    >
+                        <span
+                            aria-hidden
+                            className="flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-nimba-500/[0.12] text-nimba-700 dark:bg-nimba-400/15 dark:text-nimba-300"
+                        >
+                            <MessageSquareText className="size-5" />
+                        </span>
+                        <span className="grid flex-1 gap-0.5">
+                            <span className="font-semibold">
+                                {reponses_signalements > 1
+                                    ? `L’équipe a répondu à ${reponses_signalements} de tes signalements`
+                                    : 'L’équipe a répondu à ton signalement'}
+                            </span>
+                            <span className="text-aide text-ink-600">
+                                Merci de nous aider à corriger les contenus.
+                            </span>
+                        </span>
+                        <ChevronRight
+                            aria-hidden
+                            className="size-4 shrink-0 text-ink-400"
+                        />
+                    </Link>
+                )}
 
                 {auth.user && !auth.user.numero_verifie && (
                     <div className="flex flex-col gap-3 rounded-carte border border-indice-400/45 bg-indice-400/[0.08] p-4 sm:flex-row sm:items-center dark:bg-indice-400/[0.06]">

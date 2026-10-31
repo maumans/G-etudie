@@ -8,6 +8,7 @@ export const LIBELLES: Record<string, string> = {
     'tentative.auto_evaluer': 'Auto-évaluation d’une rédaction',
     'seance.terminer': 'Fin de séance',
     'lecon.progression': 'Progression dans une leçon',
+    'signalement.creer': 'Signalement d’une erreur',
 };
 
 export function libelleOperation(type: string): string {

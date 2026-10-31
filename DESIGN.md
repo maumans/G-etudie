@@ -1113,3 +1113,60 @@ la prolonge sans nouveau composant de base.
   deux lignes → cinq cases égales et le mot dessous ; « Ta réponse » sur la
   fiche de relecture → « Réponse attendue » ; feuille du verdict restée
   défilée après l'auto-évaluation → remise en haut à chaque verdict.
+
+### Lot 4 — annales, import assisté, signalements (2026-10-31)
+
+- **Annales côté élève** : en-tête méta + `titre-contraste` (« Les
+  **annales** de ton examen ») ; colonne principale (onglets « Sujets ·
+  Exercices par chapitre » en contrôle segmenté, puces de matière à
+  l'icône teintée, recherche, année, chapitre ; liste en filets : tuile de
+  la matière, « Mathématiques · BEPC 2024 », questions et durée, barre fine
+  de ce qui est fait) ; colonne de 20 rem : le **seul moment fort**
+  `surface-encre` (« Ton entraînement sur les annales », 0 / 7 en grand),
+  puis « Par chapitre » (trait de la matière, nombre d'exercices).
+- **Fiche d'annale** : titre « Mathématiques · **BEPC 2024** », sous-titre
+  du document, méta (questions, durée, coefficient imprimés) ; choix du
+  mode en deux grandes cases (« Lecture — l'énoncé et le corrigé »,
+  « Entraînement — question par question ») ; en lecture, chaque partie
+  dans une carte, questions numérotées en pastilles d'encre, « Voir le
+  corrigé » (bouton doux) qui ouvre le corrigé pas à pas et marque la
+  bonne option d'un QCM ; en entraînement, l'exercice joué sur place, une
+  question à la fois, flèches précédente / suivante ; à droite,
+  « Ton avancement » (pastilles numérotées aux couleurs du verdict) et
+  « Le sujet original » (PDF, poids annoncé, ouvert à la demande, dialogue
+  « connexion requise » hors ligne).
+- **« Signaler une erreur »** : bouton fantôme discret (drapeau, `ink-500`)
+  sous chaque question, leçon et annale ; feuille (monte du bas sur
+  mobile) : cinq motifs en cases de choix numérotées, précision
+  facultative (« N'écris ni ton nom ni ton numéro »), un seul bouton
+  plein. « Mes signalements » : cartes avec le statut en icône + mot
+  (« En cours de vérification », « Corrigé, merci ! », « Vérifié : le
+  contenu est juste »), la réponse de l'équipe sur fond muet ; la nouvelle
+  réponse porte un liseré mandarine. L'accueil annonce une réponse non lue
+  par une ligne cliquable (tuile mandarine en opacité), pas une surface
+  forte.
+- **Back-office** : « Les annales » (imports à suivre, avec une ligne
+  par import : matière, examen et session, document et poids, « Lecture
+  simulée », points à vérifier ; puis la liste en filets avec statut,
+  « N réponses à vérifier » en couleur indice, « Droits à renseigner »).
+  « Importer un sujet » : formulaire dans une carte (zone de dépôt en
+  tirets, examen, série au Bac, matière, session, type en deux cases) et le
+  moment fort `surface-encre` « Du scan à l'annale publiée » en trois
+  étapes. Fiche d'annale : panneau d'action `surface-encre` (« 2 réponses
+  proposées par l'IA à vérifier » / « Prête pour la relecture » / « À vous
+  de relire »), « Points signalés à la lecture », parties à gauche
+  (énoncés rendus, badge « Proposée par l'IA · à vérifier » en couleur
+  indice, « J'ai vérifié » en bouton doux, ordre, retrait), **document
+  original à droite**, collant sur grand écran (aperçu PDF si le
+  navigateur en a un, surface `clair` : le papier reste blanc en sombre),
+  renseignements et historique dessous. Signalements : file en filets,
+  fiche avec la question telle que l'élève l'a vue (bonne réponse,
+  corrigé) et la réponse dans un panneau `surface-encre`.
+- **Vu et corrigé** (Playwright, 360 / 768 / 1366, clair et sombre) :
+  `ink-500` sur la teinte muette (onglets de mode, types d'import) →
+  `ink-600` (contraste, axe) ; extrait sans formule (« Calcule … ») dans
+  la fiche → énoncé rendu ; grand cadre PDF vide sans lecteur intégré →
+  bouton « Ouvrir » seul ; quatre boutons pleins dans les imports → les
+  imports à suivre seulement ; deux « Signaler une erreur » en
+  entraînement → un par question ; titre répété sur la fiche d'un
+  signalement ; listes déroulantes tronquées (« Toutes les ann… »).

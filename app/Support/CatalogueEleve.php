@@ -10,6 +10,7 @@ use App\Models\Lecon;
 use App\Models\Matiere;
 use App\Models\ProfilEleve;
 use App\Models\Question;
+use App\Models\Sujet;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,7 +26,10 @@ use Illuminate\Database\Eloquent\Collection;
  *    ne sont pas archivées (une leçon publiée qu'on retouche reste en ligne,
  *    DEVBOOK point 15) ;
  *  - ses **questions** : celles de ces chapitres qui ont une version
- *    publiée et ne sont pas archivées (même règle que les leçons, lot 3).
+ *    publiée et ne sont pas archivées (même règle que les leçons, lot 3) ;
+ *    celles d'une annale, seulement si l'annale est en ligne (lot 4) ;
+ *  - ses **annales** : publiées, non archivées, de son examen, sa série et
+ *    sa filière, dans ses matières (lot 4).
  *
  * Les écrans, les policies, la séance du jour et la synchronisation passent
  * tous par ici ; aucun ne refait la requête à sa façon.
@@ -136,7 +140,55 @@ class CatalogueEleve
         return Question::query()
             ->whereNotNull('version_publiee_id')
             ->where('statut', '!=', StatutContenu::Archive->value)
-            ->whereHas('notion', fn (Builder $notion) => $notion->whereIn('chapitre_id', $chapitres));
+            ->whereHas('notion', fn (Builder $notion) => $notion->whereIn('chapitre_id', $chapitres))
+            // Une question d'annale suit son sujet : publié, pas archivé
+            // (groupé : le OU ne doit pas s'unir aux conditions précédentes).
+            ->where(fn (Builder $q) => $q->whereNull('sujet_partie_id')
+                ->orWhereHas('partie.sujet', fn (Builder $sujet) => self::sujetEnLigne($sujet)));
+    }
+
+    /**
+     * Annales que l'élève peut consulter : publiées, non archivées, de son
+     * examen, de sa série (Bac) et de sa filière, dans ses matières.
+     *
+     * @return Builder<Sujet>
+     */
+    public static function sujets(ProfilEleve $profil, ?Matiere $matiere = null): Builder
+    {
+        $matieres = self::matieresIds($profil);
+
+        if ($matiere !== null) {
+            $matieres = in_array($matiere->id, $matieres, true) ? [$matiere->id] : [];
+        }
+
+        $requete = Sujet::query()
+            ->where('examen_id', $profil->examen_id)
+            ->where('filiere', $profil->filiere->value)
+            ->whereIn('matiere_id', $matieres)
+            ->where(fn (Builder $q) => $profil->serie_id === null
+                ? $q->whereNull('serie_id')
+                : $q->where('serie_id', $profil->serie_id));
+
+        return self::sujetEnLigne($requete);
+    }
+
+    public static function peutLireSujet(User $eleve, Sujet $sujet): bool
+    {
+        $profil = self::profil($eleve);
+
+        return $profil !== null && self::sujets($profil)->whereKey($sujet->id)->exists();
+    }
+
+    /**
+     * @template T of Builder<Sujet>
+     *
+     * @param  T  $requete
+     * @return T
+     */
+    private static function sujetEnLigne(Builder $requete): Builder
+    {
+        return $requete->whereNotNull('version_publiee_id')
+            ->where('statut', '!=', StatutContenu::Archive->value);
     }
 
     public static function peutRecevoirQuestion(User $eleve, Question $question): bool

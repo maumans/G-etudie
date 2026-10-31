@@ -22,6 +22,11 @@ return [
         '/eleve/lecons',
         '/eleve/chapitres',
         '/eleve/seances',
+        // Lot 4 : une annale déjà ouverte se relit d'après sa copie (packs au
+        // lot 7) ; le document original (/eleve/documents/…), lui, reste en
+        // ligne seulement.
+        '/eleve/annales',
+        '/eleve/signalements$',
         '/compte/affichage$',
     ],
 

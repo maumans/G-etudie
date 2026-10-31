@@ -10,6 +10,7 @@ use App\Models\Contracts\ContenuRelisable;
 use App\Models\Lecon;
 use App\Models\Notion;
 use App\Models\Question;
+use App\Models\Sujet;
 use App\Models\User;
 use App\Models\VersionContenu;
 use App\Support\BlocsContenu;
@@ -23,7 +24,8 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Le circuit d'un contenu (PLAN M17) — leçons et questions : brouillon →
+ * Le circuit d'un contenu (PLAN M17) — leçons, questions et annales (les
+ * questions d'une annale suivent leur sujet : App\Services\Annales\SujetService) : brouillon →
  * en relecture → publié (→ archivé), renvoi avec commentaire, historique
  * des versions. Seule porte qui change le statut d'un contenu : les
  * contrôleurs et les seeders passent par ici, et chaque transition
@@ -138,6 +140,18 @@ class ContenuService
             'difficulte' => $champs['difficulte'],
             'notion_id' => $notion->id ?? $question->notion_id,
         ]));
+    }
+
+    /**
+     * Enregistre les renseignements d'une annale (titre, durée et coefficient
+     * imprimés, référence des droits), avec le même verrou que les autres
+     * brouillons. Parties et questions : App\Services\Annales\SujetService.
+     *
+     * @param  array{titre: string, session: int, duree_minutes: int|null, coefficient: string|null, droits: string|null}  $champs
+     */
+    public function enregistrerSujet(Sujet $sujet, User $acteur, array $champs, int $revision): Sujet
+    {
+        return $this->ecrireBrouillon($sujet, $acteur, $revision, fn (Sujet $sujet) => $sujet->forceFill($champs));
     }
 
     /**

@@ -2,10 +2,12 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\Eleve\AccueilController;
+use App\Http\Controllers\Eleve\AnnaleController;
 use App\Http\Controllers\Eleve\CoursController;
 use App\Http\Controllers\Eleve\LeconController;
 use App\Http\Controllers\Eleve\ParcoursAccueilController;
 use App\Http\Controllers\Eleve\SeanceController;
+use App\Http\Controllers\Eleve\SignalementController;
 use App\Http\Middleware\ProfilEleveRequis;
 use Illuminate\Support\Facades\Route;
 
@@ -30,5 +32,13 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value])
 
             Route::post('seance', [SeanceController::class, 'commencer'])->name('seance.commencer');
             Route::get('seances/{seance}', [SeanceController::class, 'show'])->name('seances.show');
+
+            // Lot 4 : annales (lecture, entraînement) et « Mes signalements ».
+            Route::get('annales', [AnnaleController::class, 'index'])->name('annales.index');
+            Route::get('annales/{sujet}', [AnnaleController::class, 'show'])->name('annales.show');
+            // Hors du préfixe gardé hors ligne (config/hors_ligne.php) : le
+            // service worker ne copie pas un PDF de plusieurs Mo.
+            Route::get('documents/annales/{sujet}', [AnnaleController::class, 'document'])->name('annales.document');
+            Route::get('signalements', [SignalementController::class, 'index'])->name('signalements');
         });
     });

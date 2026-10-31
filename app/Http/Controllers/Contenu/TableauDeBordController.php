@@ -4,12 +4,18 @@ namespace App\Http\Controllers\Contenu;
 
 use App\Enums\Permission;
 use App\Enums\StatutContenu;
+use App\Enums\StatutImport;
+use App\Enums\StatutSignalement;
 use App\Http\Controllers\Controller;
 use App\Models\AnneeScolaire;
 use App\Models\Chapitre;
 use App\Models\Epreuve;
+use App\Models\ImportSujet;
 use App\Models\Lecon;
 use App\Models\Notion;
+use App\Models\Question;
+use App\Models\Signalement;
+use App\Models\Sujet;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -46,6 +52,16 @@ class TableauDeBordController extends Controller
             ) : null,
             'couverture' => $this->couverture(),
             'est_exemple' => Lecon::query()->where('est_exemple', true)->exists(),
+            // Lot 4 : les annales et les signalements des élèves.
+            'annales' => [
+                'a_relire' => $relit ? AnnaleController::nombreARelire($user) : null,
+                'a_verifier' => $redige ? Question::query()->where('auteur_id', $user->id)->where('reponse_a_verifier', true)->count() : null,
+                'imports_en_cours' => ImportSujet::query()->where('auteur_id', $user->id)->whereIn('statut', [StatutImport::EnAttente->value, StatutImport::EnCours->value])->count(),
+                'publiees' => Sujet::query()->whereNotNull('version_publiee_id')->where('statut', '!=', StatutContenu::Archive->value)->count(),
+            ],
+            'signalements_ouverts' => $user->can(Permission::TraiterSignalements->value)
+                ? Signalement::query()->where('statut', StatutSignalement::Ouvert->value)->count()
+                : null,
         ]);
     }
 

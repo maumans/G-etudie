@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use App\Models\Lecon;
+use App\Models\Sujet;
+use App\Services\Annales\ExtracteurClaude;
+use App\Services\Annales\ExtracteurSimule;
+use App\Services\Annales\ExtracteurSujet;
 use App\Services\HorsLigne\RegistreOperations;
 use App\Services\Sms\EnvoiSms;
 use App\Services\Sms\JournalSms;
@@ -29,6 +33,12 @@ class AppServiceProvider extends ServiceProvider
         // message est écrit dans le journal et rien ne part.
         $this->app->bind(EnvoiSms::class, JournalSms::class);
 
+        // Import assisté des annales (lot 4) : l'API Claude, ou la lecture
+        // simulée hors production (config/annales.php).
+        $this->app->bind(ExtracteurSujet::class, fn () => config('annales.extracteur') === 'claude'
+            ? new ExtracteurClaude
+            : new ExtracteurSimule);
+
         // Une seule liste des types d'opération hors ligne par requête.
         $this->app->singleton(RegistreOperations::class);
     }
@@ -53,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
         // spatie gardent le nom de classe de User dans `model_has_roles`.
         Relation::morphMap([
             'lecon' => Lecon::class,
+            'sujet' => Sujet::class,
         ]);
     }
 

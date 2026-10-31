@@ -81,6 +81,8 @@ class PresentationQuestion
             'matiere' => $matiere->teinte->value,
             'matiere_nom' => $matiere->nom,
             'notion' => $question->notion->titre,
+            // « Tombé au BEPC 2019 » : une question d'annale dit d'où elle vient.
+            'annale' => $question->sujet_partie_id === null ? null : $question->loadMissing('partie.sujet.examen', 'partie.sujet.serie')->partie?->sujet->libelleSession(),
         ];
     }
 

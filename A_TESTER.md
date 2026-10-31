@@ -335,9 +335,53 @@
   qu'affiche « Tes réponses », une capture.
 - État : à faire
 
+### [Lot 4] « Signaler une erreur » en mode avion, sur un vrai téléphone
+- Pourquoi : `signalement.creer` passe par la file (HORS_LIGNE.md A.6) ;
+  Playwright ne coupe pas le service worker comme un vrai mode avion.
+- Matériel : un Android d'entrée de gamme, Chrome, application installée ;
+  le compte 01 (Aïssatou) ou un élève BEPC qui a ouvert une annale en ligne.
+- Comment le provoquer : ouvrir « Annales », puis une annale, en ligne ;
+  passer en mode avion ; mode « Entraînement » ; « Signaler une erreur »
+  sous une question, motif « Le corrigé est faux », un message ; envoyer ;
+  fermer l'application ; remettre le réseau ; rouvrir.
+- Quoi observer : « Merci ! L'équipe va vérifier » tout de suite, même sans
+  réseau ; la pastille annonce un geste à envoyer, puis « Tout est
+  envoyé » ; au back-office (05 ou 06, « Signalements »), **un seul**
+  signalement, avec le message ; une réponse de l'équipe apparaît dans
+  « Mes signalements » et l'accueil l'annonce une fois.
+- En cas d'échec, relever : ce qu'affiche « Tes réponses », l'heure du
+  geste, une capture.
+- État : à faire
+
 ## 7. Paiements réels — Orange Money, MTN MoMo, codes prépayés
 
 *(aucune entrée)*
+
+## 7 bis. Import assisté par l'API Claude (clé réelle)
+
+### [Lot 4] Import d'un vrai sujet scanné
+- Pourquoi : sans clé `ANTHROPIC_API_KEY`, les tests et la démonstration
+  utilisent la lecture **simulée** ; la vraie lecture (Opus 5.5, PDF en
+  base64, sortie structurée, flux, repli serveur) n'a jamais tourné.
+- Matériel : une clé de l'API Claude dans `.env` (jamais dans le dépôt),
+  `php artisan queue:work --timeout=900 --tries=1` lancé ; deux documents
+  réels d'un sujet dont l'équipe a le droit de se servir (test fermé, D5) :
+  un **PDF** net et une **photo** de téléphone (sujet posé à plat, lumière
+  du jour) ; le programme de la matière saisi (Référentiel › Programme).
+- Comment le provoquer : compte 04, « Annales › Importer un sujet »,
+  examen, série, matière, session ; « Lancer la lecture » ; attendre que
+  la ligne passe de « Lecture en cours » à « Vérifier l'annale ».
+- Quoi observer : la durée de lecture ; le nombre de parties et de
+  questions comparé au document ; l'énoncé **mot pour mot** (aucune phrase
+  inventée, formules justes une fois rendues) ; les « [illisible] » et les
+  « Points signalés à la lecture » ; les types choisis (en cas de doute,
+  « question ouverte ») ; les réponses et corrigés proposés (justes ?) ;
+  la notion choisie ; la durée et le coefficient (seulement s'ils sont
+  imprimés) ; le coût (`imports_sujets.jetons_entree` et
+  `jetons_sortie`, à multiplier par le prix d'Opus 5.5).
+- En cas d'échec, relever : le message de l'import en échec, la ligne de
+  `storage/logs/laravel.log`, le document (s'il peut être partagé).
+- État : à faire (clé à créer par Maurice)
 
 ## 8. Vérifications visuelles reportées (Playwright indisponible)
 

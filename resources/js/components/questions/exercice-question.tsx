@@ -1,6 +1,7 @@
 import { CircleHelp } from 'lucide-react';
 import { useRef } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
+import { SignalerErreur } from '@/components/signaler-erreur';
 import { Button } from '@/components/ui/button';
 import { useTentative } from '@/hooks/use-tentative';
 import type { QuestionEleve } from '@/lib/contenu/questions';
@@ -129,22 +130,33 @@ export function ExerciceQuestion({
                 )}
             </div>
 
-            {!tentative.verifiee ? (
-                <Button
-                    className="w-full sm:w-fit"
-                    disabled={!tentative.complete}
-                    onClick={verifier}
-                >
-                    Vérifier
-                </Button>
-            ) : (
-                question.type === 'ouverte' &&
-                !tentative.evaluee && (
-                    <Button className="w-full sm:w-fit" onClick={valider}>
-                        Valider mon auto-évaluation
+            <div className="flex flex-col gap-2 empty:hidden sm:flex-row sm:items-center sm:justify-between">
+                {!tentative.verifiee ? (
+                    <Button
+                        className="w-full sm:w-fit"
+                        disabled={!tentative.complete}
+                        onClick={verifier}
+                    >
+                        Vérifier
                     </Button>
-                )
-            )}
+                ) : (
+                    question.type === 'ouverte' &&
+                    !tentative.evaluee && (
+                        <Button className="w-full sm:w-fit" onClick={valider}>
+                            Valider mon auto-évaluation
+                        </Button>
+                    )
+                )}
+                {/* Signaler une erreur : seulement chez l'élève, pas dans l'aperçu. */}
+                {envoyer && (
+                    <SignalerErreur
+                        cible="question"
+                        uuid={question.uuid}
+                        version={question.version}
+                        className="max-sm:self-center sm:ml-auto"
+                    />
+                )}
+            </div>
         </section>
     );
 }
