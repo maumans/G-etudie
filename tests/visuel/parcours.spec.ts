@@ -32,17 +32,21 @@ test('inscription, vérification proposée sans être imposée, puis suppression
         page.getByRole('heading', { name: 'Vérifie ton numéro' }),
     ).toBeVisible();
 
-    // … mais « Plus tard » ouvre tout de suite l'espace élève, avec un rappel.
+    // … mais « Plus tard » ouvre tout de suite l'espace élève, qui commence
+    // par le parcours d'accueil (lot 2 ; le rappel du numéro attend sur
+    // l'accueil, parcours-lot2.spec.ts).
     await page.getByRole('link', { name: 'Plus tard' }).click();
-    await expect(page).toHaveURL(/\/eleve$/);
+    await expect(page).toHaveURL(/\/eleve\/bienvenue$/);
     await expect(
-        page.getByRole('heading', { name: /^Bon(jour|soir), Mamadou$/ }),
+        page.getByRole('heading', { name: /^Bienvenue, Mamadou\./ }),
     ).toBeVisible();
-    await expect(page.getByText('Vérifie ton numéro.')).toBeVisible();
 
     // Suppression par « Mon compte ».
-    await page.getByRole('link', { name: 'Moi' }).click();
-    await expect(page).toHaveURL(/\/compte\/profil$/);
+    await page.goto('/compte/profil');
+    // Rendu par React : visible = le formulaire est branché (sinon envoi natif).
+    await expect(
+        page.getByRole('heading', { level: 1, name: 'Mon compte' }),
+    ).toBeVisible();
     await page.getByRole('button', { name: 'Supprimer mon compte' }).click();
     const dialogue = page.getByRole('dialog');
     await dialogue.getByLabel('Mot de passe', { exact: true }).fill(motDePasse);

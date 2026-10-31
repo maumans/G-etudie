@@ -75,6 +75,8 @@ export async function verifierAccessibilite(page: Page): Promise<void> {
  */
 export const SESSIONS = {
     eleve: 'tests/visuel/.auth/eleve.json',
+    /** Second élève (Bac SE, rien encore de fait), lot 2. */
+    ousmane: 'tests/visuel/.auth/ousmane.json',
     /** Rédacteur de démonstration. */
     contenu: 'tests/visuel/.auth/contenu.json',
     /** Responsable pédagogique : référentiel et relecture (lot 1). */

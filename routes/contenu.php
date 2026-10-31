@@ -51,6 +51,7 @@ Route::middleware(['auth', 'can:'.Permission::GererReferentiel->value])
         Route::post('epreuves', [OffreController::class, 'store'])->name('epreuves.store');
         Route::put('epreuves/{epreuve}', [OffreController::class, 'update'])->name('epreuves.update');
         Route::delete('epreuves/{epreuve}', [OffreController::class, 'destroy'])->name('epreuves.destroy');
+        Route::put('examens/{examen}/session', [OffreController::class, 'session'])->name('examens.session');
 
         Route::get('programme', [ProgrammeController::class, 'index'])->name('programme.index');
         Route::post('chapitres', [ProgrammeController::class, 'storeChapitre'])->name('chapitres.store');

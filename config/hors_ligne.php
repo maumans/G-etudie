@@ -16,6 +16,12 @@
 return [
     'pages' => [
         '/eleve$',
+        // Lot 2 : les cours se relisent hors ligne d'après leur copie, ou
+        // depuis un pack (lot 7) ; la séance se reprend après un rechargement.
+        '/eleve/cours',
+        '/eleve/lecons',
+        '/eleve/chapitres',
+        '/eleve/seances',
         '/compte/affichage$',
     ],
 

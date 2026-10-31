@@ -125,6 +125,26 @@ class OffreController extends Controller
         return back();
     }
 
+    /**
+     * Date de la prochaine session d'un examen (compte à rebours de l'élève).
+     * Donnée officielle : saisie ici, jamais semée (CLAUDE.md § 5) ; vide =
+     * « pas encore annoncée ».
+     */
+    public function session(Request $request, Examen $examen): RedirectResponse
+    {
+        $donnees = $request->validate([
+            'date_prochaine_session' => ['nullable', 'date_format:Y-m-d', 'after:today'],
+        ], [
+            'date_prochaine_session.after' => 'La date de la session doit être à venir.',
+        ]);
+
+        $examen->update(['date_prochaine_session' => $donnees['date_prochaine_session'] ?? null]);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Date de session enregistrée.']);
+
+        return back();
+    }
+
     public function destroy(Epreuve $epreuve): RedirectResponse
     {
         $epreuve->delete();
@@ -150,7 +170,7 @@ class OffreController extends Controller
     /**
      * Les parcours d'examen : un par examen sans série, un par série du Bac.
      *
-     * @return list<array{cle: string, libelle: string, examen_id: int, serie_id: int|null}>
+     * @return list<array{cle: string, libelle: string, examen_id: int, serie_id: int|null, session: string|null}>
      */
     private function parcours(): array
     {
@@ -158,7 +178,7 @@ class OffreController extends Controller
 
         foreach (Examen::query()->with('series')->orderBy('ordre')->get() as $examen) {
             if ($examen->series->isEmpty()) {
-                $parcours[] = ['cle' => $examen->code->value, 'libelle' => $examen->code->value, 'examen_id' => $examen->id, 'serie_id' => null];
+                $parcours[] = ['cle' => $examen->code->value, 'libelle' => $examen->code->value, 'examen_id' => $examen->id, 'serie_id' => null, 'session' => $examen->date_prochaine_session?->toDateString()];
 
                 continue;
             }
@@ -169,6 +189,7 @@ class OffreController extends Controller
                     'libelle' => 'Bac '.$serie->code->value,
                     'examen_id' => $examen->id,
                     'serie_id' => $serie->id,
+                    'session' => $examen->date_prochaine_session?->toDateString(),
                 ];
             }
         }

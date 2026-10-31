@@ -19,6 +19,8 @@ export type EntreeNavigation = {
     href?: string;
     /** Préfixe d'adresse sous lequel l'entrée reste active (« Moi » → /compte). */
     actifSous?: string;
+    /** Autres préfixes qui la gardent active (« Cours » → une leçon, une fiche). */
+    actifAussiSous?: string[];
     /** Entrée tue pour un compte sans cette permission (la route reste gardée). */
     permission?: Permission;
 };
@@ -121,7 +123,10 @@ export function LienNavigation({
 
     const actif = exact
         ? isCurrentUrl(entree.href)
-        : isCurrentOrParentUrl(entree.actifSous ?? entree.href);
+        : [
+              entree.actifSous ?? entree.href,
+              ...(entree.actifAussiSous ?? []),
+          ].some((prefixe) => isCurrentOrParentUrl(prefixe));
     // Hors ligne, un écran sans copie est estompé, toujours cliquable : le
     // clic ouvre le dialogue qui explique (HORS_LIGNE.md A.3.7).
     const indisponible =

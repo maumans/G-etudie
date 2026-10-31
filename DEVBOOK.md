@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-10-31, lot 1)
+## 0. Reprise — où en est le projet (mis à jour le 2026-10-31, lot 2)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,12 +19,22 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-31 (lot 1 fait et fusionné ; lot 0 en attente de D11)
+### État au 2026-10-31 (lot 2 fait sur `lot-2` ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte les lots 0 et 1 (branche **`lot-1`**
-  fusionnée le 2026-10-31 en avance rapide, sur décision de Maurice, un
-  commit par étape) ; le lot suivant avance sur sa branche (`lot-2`). Pas
-  de dépôt distant (DA6).
+- **Dépôt git** : `main` porte les lots 0 et 1 ; le lot 2 est sur la
+  branche **`lot-2`**, à fusionner sur décision de Maurice. Pas de dépôt
+  distant (DA6).
+- **Lot 2 fait** (point 16) : profil d'examen et **parcours d'accueil**
+  (examen → série → établissement si la liste existe → objectif, puis le
+  premier exercice) ; **cours côté élève** (mes cours, matière, leçon avec
+  « Compris / À revoir » et reprise, fiche de révision imprimable) ;
+  **accueil élève réel** (compte à rebours sur la date saisie par l'équipe,
+  jauge, séance du jour, mes matières, reprendre, série, premiers pas) ;
+  **premiers gestes élève par la file** (`tentative.enregistrer` en QCM,
+  `seance.terminer`, `lecon.progression`), corrigés par le serveur ; HL1
+  terminé (leçon affichable depuis un pack). **Critère tenu** : premier
+  exercice 4 à 7 s après l'inscription (`parcours-lot2.spec.ts`). Qui voit
+  quoi : `App\Support\CatalogueEleve`, seule autorité.
 - **Lot 1 fait** (point 15) : référentiel pédagogique (matières, épreuves
   avec coefficient et durée **vides tant que l'équipe ne les a pas
   saisis**, matières phares D1, programme en chapitres et notions, années
@@ -90,10 +100,10 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 284 Pest (MySQL `g_etudie_test`, rôles semés une fois par
-  `TestCase`), 204 Vitest, 215 Playwright (sessions par compte, écrans du
-  lot 0 et 12 écrans du lot 1 × 4 gabarits × 2 thèmes, parcours
-  d'inscription, parcours du critère du lot 1, socle hors ligne) — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
+- **Tests** : 326 Pest (MySQL `g_etudie_test`, rôles semés une fois par
+  `TestCase`), 216 Vitest, 273 Playwright (sessions par compte, écrans des
+  lots 0 à 2 × 4 gabarits × 2 thèmes, parcours d'inscription, parcours des
+  critères des lots 1 et 2, socle hors ligne) — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
   `npm run build` passent.
 - **⚠ Pas de HTTPS tant que le domaine n'existe pas** (D11) : hors
   `localhost`, le service worker ne s'inscrit pas, donc pas de hors ligne.
@@ -103,13 +113,16 @@
 - **Clôture du lot 0** (point 14) : tout le lot est fait et audité ; il ne
   manque que D11 (domaine, hébergement, HTTPS). `lot-0` est fusionné dans
   `main`. Liste de mise en production : section 12.
+- **Fabrique** : un élève de `User::factory()` a fini son parcours (BEPC,
+  15 min) ; `->sansProfil()` pour un élève qui vient de s'inscrire.
 - **Comptes sans espace** : parent, enseignant et gestionnaire n'ouvrent que
   « Mon compte » jusqu'au lot 11.
 - **Lancer l'application** : `.claude/launch.json` déclare `laravel`
   (`php artisan serve`, port 8000) et `vite` (`npm run dev`, port 5173).
   Base : `php artisan migrate:fresh` puis `php artisan db:seed` — rôles et
   permissions, puis un compte de démonstration par rôle (+224 600 00 00 01
-  élève … 08 administrateur plateforme, `DemoSeeder::COMPTES`) avec le mot
+  élève BEPC … 08 administrateur plateforme, **09 second élève, Bac SE**,
+  `DemoSeeder::COMPTES`) avec le mot
   de passe `DEMO_MOT_DE_PASSE` de `.env`. **MySQL** : celui de Laragon
   (`D:\Applications\laragon`), à démarrer s'il ne tourne pas — sans lui,
   chaque requête attend la base puis échoue. Les captures de référence se prennent sur le
@@ -122,14 +135,18 @@
    préproduction en HTTPS en suivant la section 12, et contrôles bloqués de
    `A_TESTER.md` (installation, mode avion, déploiement pendant une coupure,
    double authentification, session de 12 h).
-2. **Maurice : essayer le lot 1** (comptes de démo 04 rédacteur,
-   05 relectrice, 06 responsable pédagogique).
-3. **Lot 2** : cours côté élève, accueil élève, parcours d'accueil ;
-   brancher `ContenuBlocs` sur les props et sur Dexie (HL1, second point).
-4. **Équipe pédagogique** : saisir dans le référentiel le programme
+2. **Maurice : essayer le lot 2** (01 Aïssatou, BEPC, quelques soirs
+   derrière elle ; 09 Ousmane, Bac SE, rien encore ; ou créer un compte
+   pour vivre le parcours d'accueil) et décider de la fusion de `lot-2`.
+3. **Équipe pédagogique** : saisir la **date de la prochaine session** de
+   chaque examen (Référentiel › Épreuves) pour le compte à rebours.
+4. **Lot 3** : moteur de questions (tous les types), indices, corrigés pas
+   à pas, versions de questions et écran de saisie des questions ; la
+   séance complète hors ligne (A.14 n° 24).
+5. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
-5. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+6. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
    BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
@@ -250,7 +267,8 @@ Détail dans `PLAN_NKARAMOGO.md` § 6.
 | Référentiel | `annees_scolaires`, `examens`, `series`, `classes`, `matieres`, `epreuves`, `chapitres`, `notions` (la filière est une énumération, pas une table) | ✅ lot 1 (point 15) |
 | Contenu | `lecons`, `versions_contenu` ✅ lot 1 ; `questions`, `indices`, `corriges`, `sujets`, `sujet_parties`, `ressources_externes`, `signalements`, `packs_hors_ligne` | 🟡 lots 3, 4, 7 |
 | Comptes | `users` (téléphone, prénom, pseudo, nom et e-mail facultatifs, `telephone_verifie_le`, `desactive_le`), `codes_sms` | ✅ lot 0, étape 4 |
-| Élève | `profils_eleves`, `liens_parents`, `tentatives`, `maitrises`, `seances`, `examens_blancs`, `series_jours`, badges, défis | ⬜ prévu (lots 2, 3, 5, 6) |
+| Élève | `profils_eleves`, `progressions_lecons`, `seances`, `tentatives` ✅ lot 2 ; `liens_parents`, `maitrises`, `examens_blancs`, `series_jours`, badges, défis | 🟡 lots 5, 6, 11 |
+| Contenu (élève) | `questions` (QCM à une réponse au lot 2, conçue pour tous les types), `examens.date_prochaine_session`, `etablissements` (vide) | ✅ lot 2 |
 | Organisation | `etablissements`, `groupes`, `devoirs`, `abonnements`, `paiements`, `codes_acces`, `conversations_tuteur` | ⬜ prévu (lots 9 à 11) |
 | Audit | `journal_acces_plateforme` (écrit par `App\Support\JournalAcces`) | ✅ lot 0, étape 4 |
 | Hors ligne | `appareils`, `appareil_profils`, `operations_synchronisees` | ✅ lot 0, étape 6 |
@@ -266,10 +284,13 @@ permission s'exerce (section 7).
 | `ReferentielService` | slug des matières, suppressions gardées, ordre des chapitres et notions, année courante unique | ✅ lot 1 |
 | `ContenuService` + workflow de relecture | seule porte du statut : brouillon → relecture → publication / renvoi commenté / reprise → archivage ; versions figées ; verrou optimiste ; l'auteur ne se relit jamais | ✅ lot 1 |
 | `ImportAnnaleService` | PDF/scan → sujet structuré (IA) → relecture | ⬜ |
-| `TentativeService` | enregistrement, **correction serveur**, maîtrise | ⬜ |
-| `SeanceService` | séance du jour, séances pré-calculées | ⬜ |
+| `TentativeService` | enregistrement (ajout seulement), **correction serveur** ; maîtrise au lot 6 | 🟡 lot 2 (QCM) |
+| `SeanceService` | séance du jour minimale (jamais vues, ratées, réussies, matières alternées, ordre stable), fin de séance ; séances pré-calculées au lot 6 | 🟡 lot 2 |
+| `ProfilEleveService` | seule porte du profil d'examen (classe déduite, série exigée au Bac, filière gardée) | ✅ lot 2 |
+| `ProgressionService` | « compris / à revoir », position ; la saisie la plus récente gagne | ✅ lot 2 |
+| `TableauDeBordEleveService` | met en forme l'accueil élève depuis les services qui font autorité | ✅ lot 2 |
 | `ExamenBlancService` | passage, note, moyenne pondérée | ⬜ |
-| `MaitriseService` | maîtrise par notion, jauge, révision espacée | ⬜ |
+| `MaitriseService` | jauge (lot 2 : part des questions réussies par matière, pondérée seulement si tous les coefficients sont saisis) ; maîtrise par notion et révision espacée au lot 6 | 🟡 lot 2 |
 | `PackService` | génération, empreintes, différentiel, droits | ⬜ |
 | `SynchroService` | file d'opérations (`HORS_LIGNE.md` A.3.6) : cinq verdicts, idempotence par la base, `enTantQue`, horloge ; registre vide jusqu'au lot 3 | ✅ étape 6 |
 | `TuteurService` | API Claude, quotas, journal, coûts | ⬜ |
@@ -286,10 +307,10 @@ permission s'exerce (section 7).
 | Connexion / inscription par téléphone, vérification du numéro, mot de passe oublié, « Mon compte » | ✅ lot 0, étape 4 (point 7) |
 | « Mon compte » dans l'habillage de chaque espace, onglet « Sécurité » du personnel (double authentification, session, activité), page 403 | ✅ lot 0, étape 5 (point 12) |
 | Socle hors ligne : pastille et feuille « Tes réponses », bandeaux (hors ligne, session expirée, copie datée, iPhone), dialogue « écran indisponible », navigation estompée, installation, page de repli, filet de démarrage | ✅ lot 0, étape 6 (point 13) |
-| Parcours d'accueil (examen, série, établissement, objectif) | ⬜ lot 2 |
-| Accueil élève (jauge, séance du jour, trace) | ⬜ |
-| Leçon, fiche de révision | ⬜ |
-| Lecteur d'exercice (« l'ardoise ») | ⬜ |
+| Parcours d'accueil (examen, série, établissement, objectif) | ✅ lot 2 |
+| Accueil élève (compte à rebours, jauge, séance du jour, matières, reprendre, série, premiers pas) | ✅ lot 2 |
+| Cours : mes cours, matière, leçon, fiche de révision | ✅ lot 2 |
+| Lecteur d'exercice (« l'ardoise ») | 🟡 lot 2 : QCM à une réponse, verdict, explication, bilan ; indices et corrigé pas à pas au lot 3 |
 | Annales (liste, fiche, trois modes) | ⬜ |
 | Examen blanc (lancement, passage, résultat, carte de partage) | ⬜ |
 | Progression, profil, téléchargements | ⬜ |
@@ -307,7 +328,7 @@ composants hors ligne (`HORS_LIGNE.md` A.3.7 à A.3.9), formatage GNF dans
 |---|---|---|
 | `RolesEtPermissionsSeeder` | recopie `App\Enums\Role` et `App\Enums\Permission` en base (`syncPermissions`, permissions inconnues supprimées) ; lancé aussi en production | ✅ étape 5 |
 | `ReferentielSeeder` | examens, séries, classes d'examen (recopiés à chaque passage) ; année 2026-2027, dix matières, épreuves des matières phares (D1) semées **une fois**, sur table vide — **coefficients et durées vides**, programme non semé ; lancé aussi en production | ✅ lot 1 |
-| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 08, `DemoSeeder::COMPTES`) ✅ étape 5 ; puis `DemoContenuSeeder` ✅ lot 1 : chapitres, notions et cinq leçons **fictifs** (`est_exemple`), une par statut, passés par `ContenuService` (vrai historique) ; questions au lot 3 | ✅ |
+| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 09, `DemoSeeder::COMPTES`, deux élèves) ✅ étape 5 ; puis `DemoContenuSeeder` ✅ lot 1 : chapitres, notions et cinq leçons **fictifs** (`est_exemple`), une par statut, passés par `ContenuService` (vrai historique) ; `DemoCoursSeeder` ✅ lot 2 : neuf leçons publiées et 18 QCM fictifs (BEPC, Bac SE), vérifiés par `FormatQuestion` ; `DemoEleveSeeder` ✅ lot 2 : profils (Aïssatou BEPC avec trois soirs de réponses et deux leçons ouvertes, Ousmane Bac SE sans rien) | ✅ |
 
 ⚠ Les permissions ne viennent que des seeders : un déploiement lance `migrate`
 **puis** `db:seed`. Comptes créés en `firstOrCreate` (un re-seed ne réinitialise
@@ -317,8 +338,7 @@ Comptes de démo (mot de passe `DEMO_MOT_DE_PASSE` du `.env` de développement,
 jamais en production — `DatabaseSeeder` n'appelle `DemoSeeder` que hors
 production) : 01 élève (Aïssatou), 02 parent, 03 enseignante, 04 rédacteur,
 05 relectrice, 06 responsable pédagogique, 07 gestionnaire d'établissement,
-08 administrateur plateforme. Un second élève (Bac SE) viendra avec les
-profils d'examen (lot 2).
+08 administrateur plateforme, 09 Ousmane (second élève, Bac SE, lot 2).
 
 ## 7. Rôles et périmètres
 
@@ -1036,6 +1056,75 @@ cette question à sa façon. Elle distingue deux notions :
      de jour en jour (vendredi marqué le 30, samedi le 31). À régler quand
      le lot 2 remplace ces données d'exemple.
 
+16. [x] **Lot 2 — cours côté élève, accueil élève, parcours d'accueil ;
+   HL1** (2026-10-31, branche `lot-2`, un commit)
+   - **Constat** : l'accueil élève montrait un tableau de bord d'exemple
+     (`TableauDeBordExemple`) ; aucun profil d'examen, aucun écran de
+     cours, aucun geste élève ; le critère du lot (« premier exercice en
+     moins de 60 s après l'inscription ») demandait un exercice, alors que
+     le moteur de questions est au lot 3.
+   - **Décisions** (plan validé par Maurice le 2026-10-31, choix
+     recommandés) :
+     - **QCM minimal avancé du lot 3** : table `questions` conçue pour tous
+       les types, QCM à une réponse seulement ; lecteur « ardoise » ;
+       réponse par la file (`tentative.enregistrer`) **recorrigée par le
+       serveur** (`HORS_LIGNE.md` écart n° 16). Pas encore d'écran de
+       saisie des questions : 18 QCM de démonstration (`est_exemple`).
+     - **Établissement** : table créée vide ; l'étape du parcours est
+       sautée tant que la liste n'existe pas (3 écrans au lieu de 4).
+     - **Filière** : « générale » enregistrée, pas demandée (contenu
+       franco-arabe en V2, D2) ; une filière déjà posée est gardée.
+     - **Défi et réussites** (lot 6) remplacés par « Mes premiers pas »
+       (profil, premier exercice, première leçon, première séance) et
+       « Mon examen ».
+     - **Date d'examen** : `examens.date_prochaine_session`, saisie par le
+       responsable pédagogique (Référentiel › Épreuves), jamais semée ;
+       sans elle, « Date du BEPC pas encore annoncée ».
+     - **Une autorité** : `App\Support\CatalogueEleve` répond à « quels
+       contenus cet élève voit-il ? » (épreuves de l'année courante pour
+       son examen, sa série et sa filière ; chapitres de sa classe ;
+       leçons à version publiée non archivées ; questions publiées).
+       Écrans, policy (`LeconPolicy::lire`, 404), séance, synchronisation
+       passent tous par elle.
+     - **Jauge** (`MaitriseService`, version du lot 2) : part des questions
+       réussies au moins une fois, par matière ; pondérée seulement si
+       **tous** les coefficients sont saisis. Écart au plan, qui disait
+       « jauge vide » : une jauge qui reste à 0 % après un exercice réussi
+       mentirait à l'élève (« elle se remplit à chaque exercice réussi »).
+     - **Séance du jour** : 5, 8 ou 15 questions selon l'objectif ; jamais
+       vues, puis ratées, puis réussies, matières alternées, **ordre
+       stable** (sans hasard). Révision espacée au lot 6.
+     - **Série** : un jour compte dès une réponse ou une leçon ouverte (au
+       jour du geste) ; points et jour de grâce au lot 6.
+     - **Fabrique** : un élève a un profil (CLAUDE.md § 4, décor réaliste) ;
+       `sansProfil()` pour un élève juste inscrit.
+   - **Écarts au plan** : jauge non vide (ci-dessus) ; QCM avancé du
+     lot 3 ; `TableauDeBordExemple` supprimé (l'accueil est réel).
+   - **Corrigé en chemin** : la synchronisation et « Mon compte »
+     partageaient le même compteur de limite de débit (`throttle:120,1`
+     sans nom) : après une séance, supprimer son compte répondait 429.
+     Limiteur `synchro` propre (`HORS_LIGNE.md` écart n° 17,
+     `LimiteSynchroTest`).
+   - **Vu avec Playwright** : 7 écrans × 4 gabarits × 2 thèmes
+     (`ecrans-lot2.spec.ts`) et 5 écrans du parcours × 3 tailles × 2 thèmes
+     (`parcours-lot2.spec.ts`), axe sans violation sérieuse ; accueil
+     d'Aïssatou (lot 0), épreuves, tableau de bord et liste des leçons du
+     lot 1 régénérés volontairement. Corrigé : page élargie à 398 px sur
+     une matière (`grid-cols-1`, `min-w-0`), contraste « / 3 » sur craie,
+     matières à 4 colonnes trop étroites, carte seule sur une ligne.
+     Détail : `DESIGN.md` § 13, « Lot 2 ».
+   - **Preuve** : **326 Pest** (dont `ParcoursAccueilTest` 7,
+     `CatalogueEleveTest` 6, `EcransCoursTest` 6, `GestesEleveTest` 11,
+     `TableauDeBordEleveTest` 7, `SessionExamenTest` 4, `FormatQuestionTest`
+     3, `LimiteSynchroTest` 2), **216 Vitest** (`questions.test.ts`,
+     `source.test.ts`), **273 Playwright** dont le parcours du critère
+     (premier exercice 4 à 7 s après « Créer mon compte ») — verts. `tsc`,
+     `vp check`, Pint, Larastan niveau 7 et `npm run build` passent.
+   - **Reste** : premier exercice et séance en mode avion sur vrai
+     téléphone (`A_TESTER.md`) ; dates des sessions à saisir par l'équipe ;
+     liste des établissements ; packs (lot 7) pour remplir la table
+     `contenus`.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -1055,6 +1144,12 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 - **Images, tableaux et mini-questions dans les leçons** : hors du format
   des blocs au lot 1 (stockage et conversion WebP à décider avec les packs,
   mini-questions au lot 3).
+- **Dates des sessions d'examen** (lot 2) : à saisir par l'équipe
+  pédagogique dans Référentiel › Épreuves ; sans elles, pas de compte à
+  rebours.
+- **Questions** : pas encore d'écran de saisie (lot 3) ; les 18 QCM sont
+  des exemples. Une question n'a qu'une version tant que l'historique
+  n'existe pas (A.9, lot 3).
 - **Désactiver un compte du personnel** : un compte qui a signé du contenu
   ne se supprime plus lui-même (point 15) ; l'écran administrateur qui le
   désactive reste à faire (console, lot 13).- **Domaine et hébergement** (D11) : à fixer avant la clôture du lot 0 (HTTPS).
@@ -1094,6 +1189,12 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `Chapitre`, `Notion` | `chapitres`, `notions` | matière + classe ; chapitre | `ordre`, `est_exemple` |
 | `Lecon` | `lecons` | notion, auteur | `uuid` v7 (clé de route), `brouillon` (blocs), `revision` (verrou), `version_publiee_id` ; statut changé par `ContenuService` seulement |
 | `VersionContenu` | `versions_contenu` (polymorphe, `contenu_type` = `lecon`) | auteur, décideur | figée à l'envoi en relecture ; `decision` (`DecisionRelecture`), `commentaire` |
+| `ProfilEleve` | `profils_eleves` | élève (unique), examen, série nulle, classe, établissement nul | écrit par `ProfilEleveService` seulement ; `objectif_minutes` (10, 15, 30) ; `libelleExamen()` |
+| `Etablissement` | `etablissements` | — | liste à constituer (vide) |
+| `ProgressionLecon` | `progressions_lecons` | élève, leçon | `etat` + `etat_saisi_le`, `position` + `position_saisie_le` : la plus récente gagne |
+| `Question` | `questions` | notion | `uuid` v7, `type` (`TypeQuestion`), `enonce`/`explication` (blocs), `donnees`, `reponse_attendue`, `version`, `statut`, `est_exemple` ; format : `FormatQuestion` |
+| `Seance` | `seances` | élève | `uuid`, `jour`, `questions` (ids ordonnés), `termine_le` |
+| `Tentative` | `tentatives` | élève, question, séance nulle | ajout seulement ; `uuid` = celui de l'opération ; `correcte` = correction du serveur |
 
 ## 10. Enums
 
@@ -1110,8 +1211,10 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `StatutContenu` | `brouillon`, `en_relecture`, `publie`, `archive` | statut d'une leçon |
 | `DecisionRelecture` | `publiee`, `renvoyee`, `retiree` | issue d'une version envoyée en relecture |
 
-*(prévus : `TypeQuestion`, `ModeTentative` (`seance`, `entrainement`,
-`examen_blanc`).)*
+| `TypeQuestion` | `qcm_une` (lot 2) ; les autres au lot 3 | type d'une question |
+| `ModeTentative` | `seance`, `entrainement` (`examen_blanc` au lot 5) | où la réponse a été donnée |
+| `EtatLecon` | `comprise`, `a_revoir` | ce que l'élève dit d'une leçon |
+| `TypeEtablissement` | `public`, `prive`, `franco_arabe` | type d'un établissement |
 
 ## 11. Routes
 
@@ -1119,7 +1222,9 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 |---|---|---|
 | `/` vitrine, `/dev/composants` (hors production) | publiques | `routes/web.php` |
 | `/accueil` (aiguillage) | `auth`, dérogation | `routes/web.php` |
-| `/eleve` · `/contenu` · `/console` | `auth` + `can:espace.eleve` · `can:espace.contenu` · `can:espace.console` | `routes/web.php` |
+| `/eleve` · `/contenu` · `/console` | `auth` + `can:espace.eleve` · `can:espace.contenu` · `can:espace.console` | `routes/eleve.php`, `routes/web.php` |
+| `/eleve/bienvenue` (parcours d'accueil, « Mon examen ») ; `/eleve/cours`, `/eleve/cours/{slug}`, `/eleve/lecons/{uuid}`, `/eleve/chapitres/{id}/fiche`, `POST /eleve/seance`, `/eleve/seances/{uuid}` | `auth` + `can:espace.eleve` ; profil exigé (`ProfilEleveRequis`) ; leçon gardée par `LeconPolicy::lire`, le reste par `CatalogueEleve` (404) | `routes/eleve.php` |
+| `PUT /contenu/referentiel/examens/{examen}/session` | `can:referentiel.gerer` | `routes/contenu.php` |
 | `/contenu` (tableau de bord) | `auth` + `can:espace.contenu` | `routes/web.php` |
 | `/contenu/referentiel/*` (matières, épreuves, programme, années) | `auth` + `can:referentiel.gerer` | `routes/contenu.php` |
 | `/contenu/lecons`, `/contenu/lecons/{uuid}` | `auth` + `can:espace.contenu` ; fiche gardée par `LeconPolicy` | `routes/contenu.php` |

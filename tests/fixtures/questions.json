@@ -1,0 +1,47 @@
+{
+    "_lisezmoi": "Correction des questions : mêmes verdicts attendus de FormatQuestion::corriger (PHP, app/Support) et de corriger() (lib/contenu/questions.ts). La correction de l'appareil n'est qu'un affichage ; celle du serveur fait foi (HORS_LIGNE.md A.6).",
+    "corrections": [
+        {
+            "nom": "bonne option",
+            "type": "qcm_une",
+            "attendue": { "option": "b" },
+            "reponse": { "option": "b" },
+            "correcte": true
+        },
+        {
+            "nom": "autre option",
+            "type": "qcm_une",
+            "attendue": { "option": "b" },
+            "reponse": { "option": "a" },
+            "correcte": false
+        },
+        {
+            "nom": "casse différente",
+            "type": "qcm_une",
+            "attendue": { "option": "b" },
+            "reponse": { "option": "B" },
+            "correcte": false
+        },
+        {
+            "nom": "réponse vide",
+            "type": "qcm_une",
+            "attendue": { "option": "b" },
+            "reponse": {},
+            "correcte": false
+        },
+        {
+            "nom": "option non textuelle",
+            "type": "qcm_une",
+            "attendue": { "option": "b" },
+            "reponse": { "option": ["b"] },
+            "correcte": false
+        },
+        {
+            "nom": "option nulle",
+            "type": "qcm_une",
+            "attendue": { "option": "b" },
+            "reponse": { "option": null },
+            "correcte": false
+        }
+    ]
+}

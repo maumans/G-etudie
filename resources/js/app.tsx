@@ -46,6 +46,10 @@ void createInertiaApp({
         switch (true) {
             case name === 'erreur':
             case name.startsWith('dev/'):
+            // Plein écran, sans navigation : l'ardoise (DESIGN.md § 6.4) et
+            // le parcours d'accueil portent leur propre cadre.
+            case name === 'eleve/seance':
+            case name === 'eleve/bienvenue':
                 return null;
             case name.startsWith('vitrine/'):
                 return VitrineLayout;

@@ -4,9 +4,13 @@ use App\Enums\Role;
 use App\Models\Chapitre;
 use App\Models\Lecon;
 use App\Models\Notion;
+use App\Models\Question;
+use App\Models\Tentative;
 use App\Models\User;
 use App\Models\VersionContenu;
 use App\Support\BlocsContenu;
+use App\Support\CatalogueEleve;
+use App\Support\FormatQuestion;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +24,7 @@ test('un compte de démonstration par rôle, créé une fois, numéro vérifié'
     $this->seed(DatabaseSeeder::class);
     $this->seed(DatabaseSeeder::class);
 
-    expect(User::count())->toBe(count(Role::cases()));
+    expect(User::count())->toBe(count(DemoSeeder::COMPTES));
 
     foreach (DemoSeeder::COMPTES as $compte) {
         $user = User::where('telephone', $compte['telephone'])->sole();
@@ -34,7 +38,8 @@ test('un compte de démonstration par rôle, créé une fois, numéro vérifié'
 test('chaque rôle a son compte de démonstration', function () {
     $roles = array_map(fn (array $compte) => $compte['role'], DemoSeeder::COMPTES);
 
-    expect($roles)->toEqualCanonicalizing(Role::cases());
+    // Deux élèves (BEPC, Bac SE) depuis le lot 2 ; un compte au moins par rôle.
+    expect(array_values(array_unique($roles, SORT_REGULAR)))->toEqualCanonicalizing(Role::cases());
 });
 
 test('un nouveau db:seed ne réinitialise jamais un mot de passe changé', function () {
@@ -72,7 +77,8 @@ test('le contenu de démonstration : fictif, valide, à chaque statut, semé une
 
     $lecons = Lecon::all();
 
-    expect($lecons)->toHaveCount(5)
+    // 5 leçons du back-office (lot 1), 9 publiées pour l'élève (lot 2).
+    expect($lecons)->toHaveCount(14)
         ->and($lecons->every(fn ($lecon) => $lecon->est_exemple))->toBeTrue()
         ->and(Chapitre::where('est_exemple', false)->count())->toBe(0)
         ->and(Notion::where('est_exemple', false)->count())->toBe(0)
@@ -87,4 +93,28 @@ test('le contenu de démonstration : fictif, valide, à chaque statut, semé une
     VersionContenu::whereNotNull('decide_par_id')
         ->where('decision', '!=', 'retiree')
         ->each(fn ($version) => expect($version->decide_par_id)->not->toBe($version->auteur_id));
+});
+
+test('le cours de démonstration côté élève : fictif, QCM valides, deux élèves aux profils différents', function () {
+    $this->seed(DatabaseSeeder::class);
+    $this->seed(DatabaseSeeder::class);
+
+    $questions = Question::all();
+    expect($questions->count())->toBeGreaterThan(10)
+        ->and($questions->every(fn (Question $question) => $question->est_exemple))->toBeTrue();
+
+    foreach ($questions as $question) {
+        expect(FormatQuestion::erreur($question->type, $question->enonce, $question->donnees, $question->reponse_attendue))->toBeNull();
+    }
+
+    $aissatou = User::where('pseudo', 'aissatou_demo')->sole();
+    $ousmane = User::where('pseudo', 'ousmane_demo')->sole();
+
+    expect(CatalogueEleve::profil($aissatou)->libelleExamen())->toBe('BEPC')
+        ->and(CatalogueEleve::profil($ousmane)->libelleExamen())->toBe('Bac SE')
+        ->and(CatalogueEleve::lecons(CatalogueEleve::profil($aissatou))->count())->toBeGreaterThan(3)
+        ->and(CatalogueEleve::questions(CatalogueEleve::profil($ousmane))->count())->toBeGreaterThan(3)
+        // Historique semé une fois : le second passage n'ajoute rien.
+        ->and(Tentative::where('user_id', $aissatou->id)->count())->toBe(6)
+        ->and(Tentative::where('user_id', $ousmane->id)->count())->toBe(0);
 });

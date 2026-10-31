@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Champ } from '@/components/ui/champ';
 import { Checkbox } from '@/components/ui/checkbox';
+import { DateInput } from '@/components/ui/date-input';
 import { useConfirmer } from '@/components/ui/confirm-provider';
 import {
     Dialog,
@@ -32,6 +33,7 @@ import {
     store,
     update,
 } from '@/routes/contenu/referentiel/epreuves';
+import { session as enregistrerSession } from '@/routes/contenu/referentiel/examens';
 import { index as matieresIndex } from '@/routes/contenu/referentiel/matieres';
 
 type Parcours = {
@@ -39,6 +41,8 @@ type Parcours = {
     libelle: string;
     epreuves: number;
     phares: number;
+    examen_id: number;
+    session: string | null;
 };
 
 type Epreuve = {
@@ -263,6 +267,8 @@ export default function Offre(props: Props) {
                         </div>
                     </section>
 
+                    {choisi && <SessionExamen parcours={choisi} />}
+
                     <Section titre="Matières phares">
                         <p className="text-aide text-ink-600">
                             Une matière phare est rédigée en premier : c'est la
@@ -390,6 +396,60 @@ function formaterDuree(minutes: number): string {
     return reste === 0
         ? `${heures} h`
         : `${heures} h ${String(reste).padStart(2, '0')}`;
+}
+
+/**
+ * Date de la prochaine session : elle donne le compte à rebours de l'élève.
+ * Donnée officielle, saisie ici seulement ; vide = « pas encore annoncée ».
+ */
+function SessionExamen({ parcours }: { parcours: Parcours }) {
+    const examen = parcours.libelle.startsWith('Bac')
+        ? 'Bac'
+        : parcours.libelle;
+
+    return (
+        <Section titre={`Prochaine session · ${examen}`}>
+            <Form
+                {...enregistrerSession.form(parcours.examen_id)}
+                key={`${parcours.examen_id}-${parcours.session ?? ''}`}
+                options={{ preserveScroll: true }}
+                className="grid gap-3"
+            >
+                {({ processing, errors }) => (
+                    <>
+                        <p className="text-aide text-ink-600">
+                            La date officielle de l'examen, quand elle est
+                            annoncée. Elle donne aux élèves leur compte à
+                            rebours ; sans elle, ils lisent « date pas encore
+                            annoncée ».
+                        </p>
+                        <Champ
+                            libelle="Date de la session"
+                            erreur={errors.date_prochaine_session}
+                        >
+                            {(attributs) => (
+                                <DateInput
+                                    {...attributs}
+                                    name="date_prochaine_session"
+                                    defaultValue={parcours.session ?? ''}
+                                />
+                            )}
+                        </Champ>
+                        <Button
+                            type="submit"
+                            variant="outline"
+                            taille="compacte"
+                            disabled={processing}
+                            className="justify-self-start"
+                        >
+                            {processing && <Spinner />}
+                            Enregistrer la date
+                        </Button>
+                    </>
+                )}
+            </Form>
+        </Section>
+    );
 }
 
 function DialogueEpreuve({

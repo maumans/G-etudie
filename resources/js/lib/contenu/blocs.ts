@@ -373,3 +373,15 @@ function texte(noeud: Objet): string | null {
 
     return null;
 }
+
+/**
+ * Les encadrés d'un genre, dans l'ordre du document : la fiche de révision
+ * d'un chapitre rassemble les « À retenir » de ses leçons (PLAN M4). Même
+ * fonction pour un document venu du serveur ou d'un pack.
+ */
+export function encadresDe(doc: DocumentBlocs, genre: GenreEncadre): Encadre[] {
+    return (doc.content ?? []).filter(
+        (bloc): bloc is Encadre =>
+            bloc.type === 'encadre' && bloc.attrs.genre === genre,
+    );
+}

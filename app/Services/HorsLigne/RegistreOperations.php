@@ -4,14 +4,18 @@ namespace App\Services\HorsLigne;
 
 /**
  * Les types d'opération que le serveur sait exécuter (HORS_LIGNE.md A.3.6,
- * A.6). Vide au lot 0 : le premier geste élève (`tentative.enregistrer`)
- * arrive au lot 3. Chaque type a aussi son libellé dans
+ * A.6). Les premiers gestes élève arrivent au lot 2 : réponse, fin de
+ * séance, progression dans une leçon. Chaque type a aussi son libellé dans
  * resources/js/lib/hors-ligne/libelles.ts.
  */
 class RegistreOperations
 {
     /** @var array<string, class-string<GestionnaireOperation>> */
-    public const TYPES = [];
+    public const TYPES = [
+        Operations\EnregistrerTentative::TYPE => Operations\EnregistrerTentative::class,
+        Operations\TerminerSeance::TYPE => Operations\TerminerSeance::class,
+        Operations\ProgressionLecon::TYPE => Operations\ProgressionLecon::class,
+    ];
 
     /** @var array<string, class-string<GestionnaireOperation>> */
     private array $types = self::TYPES;

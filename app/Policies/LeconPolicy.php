@@ -6,6 +6,7 @@ use App\Enums\Permission;
 use App\Enums\StatutContenu;
 use App\Models\Lecon;
 use App\Models\User;
+use App\Support\CatalogueEleve;
 use App\Support\Perimetre;
 use Illuminate\Auth\Access\Response;
 
@@ -22,6 +23,17 @@ class LeconPolicy
     public function view(User $user, Lecon $lecon): Response
     {
         return $user->can(Permission::EspaceContenu->value)
+            ? Response::allow()
+            : Response::denyAsNotFound();
+    }
+
+    /**
+     * Lire une leçon dans l'espace élève : publiée et dans son examen
+     * (App\Support\CatalogueEleve), sinon 404.
+     */
+    public function lire(User $user, Lecon $lecon): Response
+    {
+        return $user->can(Permission::EspaceEleve->value) && CatalogueEleve::peutLireLecon($user, $lecon)
             ? Response::allow()
             : Response::denyAsNotFound();
     }

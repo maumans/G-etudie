@@ -1,11 +1,19 @@
 <?php
 
+use App\Enums\Role;
+use App\Enums\TypeQuestion;
 use App\Models\Chapitre;
 use App\Models\Classe;
+use App\Models\Examen;
+use App\Models\Lecon;
 use App\Models\Matiere;
 use App\Models\Notion;
+use App\Models\Question;
+use App\Models\Serie;
 use App\Models\User;
+use App\Services\ContenuService;
 use App\Services\HorsLigne\RegistreOperations;
+use App\Services\ProfilEleveService;
 use App\Services\Sms\EnvoiSms;
 use Database\Seeders\ReferentielSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -152,4 +160,84 @@ function blocsDeTest(string $texte = 'Dans un triangle rectangle :'): array
         ['type' => 'paragraph', 'content' => [['type' => 'text', 'text' => $texte]]],
         ['type' => 'formuleBloc', 'attrs' => ['latex' => 'a^2 + b^2 = c^2']],
     ]];
+}
+
+/**
+ * Un élève qui a fini son parcours d'accueil, comme le fait l'écran :
+ * référentiel semé, profil enregistré par ProfilEleveService.
+ */
+function eleveAvecProfil(string $examen = 'BEPC', ?string $serie = null, int $objectif = 15): User
+{
+    test()->seed(ReferentielSeeder::class);
+
+    $eleve = User::factory()->create();
+    $modele = Examen::where('code', $examen)->sole();
+    $serieId = $serie !== null ? Serie::where('examen_id', $modele->id)->where('code', $serie)->value('id') : null;
+    app(ProfilEleveService::class)->enregistrer($eleve, $modele->id, $serieId, null, $objectif);
+
+    return $eleve->fresh();
+}
+
+/**
+ * Une leçon publiée comme dans la réalité : écrite par un rédacteur, relue
+ * et publiée par un autre (ContenuService).
+ */
+function leconPubliee(Notion $notion, string $titre = 'Le théorème de Pythagore', ?array $blocs = null): Lecon
+{
+    $contenu = app(ContenuService::class);
+    $redacteur = User::factory()->avecRole(Role::Redacteur)->create();
+    $relecteur = User::factory()->avecRole(Role::Relecteur)->create();
+
+    $lecon = $contenu->creerLecon($redacteur, $notion, $titre);
+    $lecon = $contenu->enregistrerBrouillon($lecon, $redacteur, $titre, $blocs ?? blocsDeTest(), 0);
+
+    return $contenu->publier($contenu->soumettre($lecon, $redacteur), $relecteur)->fresh();
+}
+
+/** Une notion d'une autre matière ou classe que celle de notionDeTest(). */
+function notionAilleurs(string $matiere, string $classe, string $titre = 'Notion ailleurs'): Notion
+{
+    test()->seed(ReferentielSeeder::class);
+
+    $chapitre = Chapitre::firstOrCreate([
+        'matiere_id' => Matiere::where('slug', $matiere)->value('id'),
+        'classe_id' => Classe::where('nom', $classe)->value('id'),
+        'titre' => "Chapitre de {$matiere}",
+    ], ['ordre' => 1]);
+
+    return Notion::firstOrCreate(['chapitre_id' => $chapitre->id, 'titre' => $titre], ['ordre' => 1]);
+}
+
+/** Un QCM publié, bonne réponse « b ». */
+function questionDeTest(Notion $notion, string $statut = 'publie'): Question
+{
+    return Question::create([
+        'uuid' => (string) Str::uuid7(),
+        'notion_id' => $notion->id,
+        'type' => TypeQuestion::QcmUne,
+        'enonce' => blocsDeTest('Combien mesure l\'hypoténuse ?'),
+        'donnees' => ['options' => [['id' => 'a', 'texte' => '4 cm'], ['id' => 'b', 'texte' => '5 cm'], ['id' => 'c', 'texte' => '7 cm']]],
+        'reponse_attendue' => ['option' => 'b'],
+        'explication' => blocsDeTest('3² + 4² = 25.'),
+        'statut' => $statut,
+        'version' => 1,
+    ]);
+}
+
+/**
+ * Un geste élève de la file, tel que l'appareil l'envoie.
+ *
+ * @param  array<string, mixed>  $charge
+ * @return array<string, mixed>
+ */
+function geste(User $auteur, string $type, array $charge, ?string $saisiLe = null): array
+{
+    return [
+        'uuid' => (string) Str::uuid7(),
+        'type' => $type,
+        'auteur_id' => $auteur->id,
+        'saisi_le' => $saisiLe ?? now()->toIso8601ZuluString('millisecond'),
+        'depend_de' => null,
+        'charge' => $charge,
+    ];
 }

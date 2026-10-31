@@ -654,8 +654,8 @@ hors ligne ; les packs viennent ensuite.
 |---|---|---|---|
 | — | Arbitrage HL-D1 à HL-D12 | ✅ fait (2026-10-30) | 12 / 12 |
 | HL0 | Socle | 🟡 fait, sauf HTTPS et contrôles sur vrai téléphone (étape 6 du lot 0) | 10 / 12 |
-| HL1 | Rendu indépendant de la source | 🟡 format et composant d'affichage faits au lot 1 (écart n° 15) ; branchement élève et pack au lot 2 | 1 / 2 |
-| HL2 | Tentatives et séances | ⬜ à faire | 0 / 4 |
+| HL1 | Rendu indépendant de la source | ✅ fait (lots 1 et 2) | 2 / 2 |
+| HL2 | Tentatives et séances | 🟡 premiers gestes avancés au lot 2 (écart n° 16) : `tentative.enregistrer` (QCM), `seance.terminer`, correction serveur ; restent les autres types, les versions de questions (A.9), la séance complète hors ligne | 2 / 4 |
 | HL3 | Examen blanc | ⬜ à faire | 0 / 4 |
 | HL4 | Jauge, séances pré-calculées, trace | ⬜ à faire | 0 / 3 |
 | HL5 | Packs | ⬜ à faire | 0 / 7 |
@@ -749,9 +749,51 @@ hors ligne ; les packs viennent ensuite.
   HTML) ; `editeur.test.ts` (l'éditeur ne produit que des documents
   valides, même après un collage HTML). *Fait au lot 1* : l'éditeur du
   back-office écrit déjà ce format (écart n° 15).
-- [ ] Écrans élève (leçon, fiche de révision) qui affichent un contenu
+- [x] Écrans élève (leçon, fiche de révision) qui affichent un contenu
   depuis les props Inertia ou depuis Dexie avec le même `ContenuBlocs` —
-  lot 2, avec les packs au lot 7 (HL5).
+  *lot 2*. La page `eleve/lecon` reçoit un **objet de contenu** (`lecon` :
+  type, uuid, version, titre, blocs, minutes, `est_exemple`) séparé de son
+  contexte de navigation ; `LeconController::contenu()` le fabrique, un
+  pack le rangera tel quel. `lib/contenu/source.ts` : `pageLocaleDe()`
+  reconnaît les écrans qui savent s'afficher depuis la base locale (la
+  leçon), `lirePageLocale()` lit l'élément `lecon:<uuid>` de la table
+  `contenus`. Hors ligne, quand la visite échoue (`networkError`), la garde
+  de navigation essaie d'abord `afficherLocal` : l'écran s'ouvre par une
+  visite côté client (`router.push`, props du pack, `source: 'pack'` →
+  « Lue depuis ton téléchargement ») ; sinon le dialogue « pas encore
+  ouvert ». La fiche extrait ses « À retenir » sur l'appareil
+  (`encadresDe`), d'où qu'elle vienne. Les cours (`/eleve/cours`,
+  `/eleve/lecons`, `/eleve/chapitres`, `/eleve/seances`) rejoignent la
+  liste blanche : une leçon déjà ouverte se relit d'après sa copie.
+  Preuve : Vitest `contenu/source.test.ts` (5 : reconnaissance, lecture,
+  garde qui affiche le pack, dialogue sans élément ou base en panne,
+  écriture jamais servie localement) ; Pest `EcransCoursTest` (objet de
+  contenu, leçon < 50 Ko).
+  **Reste au lot 7 (HL5)** : remplir la table `contenus` (packs). Tant
+  qu'elle est vide, le chemin « pack » n'est exercé que par les tests.
+
+### HL2 — Tentatives et séances (avancé en partie au lot 2, écart n° 16)
+
+- [x] `tentative.enregistrer` : QCM à une réponse, **recorrigé par le
+  serveur** (`TentativeService`, `FormatQuestion::corriger`), même jeu
+  d'exemples que la correction d'affichage de l'appareil
+  (`tests/fixtures/questions.json`) ; question hors de l'examen, inconnue
+  ou hors de la séance → refus avec sa phrase. Preuve : `GestesEleveTest`
+  (A.14 n° 6, partiel), `FormatQuestionTest`, Vitest `questions.test.ts`.
+- [x] `seance.terminer` : déjà terminée → acceptée sans rien rejouer ;
+  séance d'un autre → refus. Séance du jour minimale (`SeanceService`).
+- [ ] Autres types de question, indices, corrigés pas à pas — lot 3.
+- [ ] Correction contre la **version vue** (A.9) : la tentative garde
+  `version`, mais seule la version courante existe au lot 2 — lot 3.
+
+### `lecon.progression` (A.6, lot 2)
+
+- [x] « Compris / à revoir » et position de lecture, chaque champ daté de
+  sa saisie : **la plus récente gagne**, quel que soit l'ordre de
+  réception (`ProgressionService`, table `progressions_lecons`). Un geste
+  à l'ouverture de la leçon, puis un par palier de lecture (25, 50, 75,
+  100 %) : pas une opération par pixel défilé. Preuve : `GestesEleveTest`
+  (A.14 n° 10).
 
   Ce que le lot 1 laisse au lot 2 : les blocs **image**, **tableau** et
   **mini-question** n'existent pas encore dans le format (images : stockage
@@ -789,7 +831,14 @@ hors ligne ; les packs viennent ensuite.
 - [x] 18 — Vitest : garde de navigation (`garde-navigation.test.ts`, 7).
 - [x] 19 — Vitest : échec d'import, rechargement une fois en ligne, jamais
   hors ligne (`tests/js/chargement-page.test.ts`, lot 0 étape 2).
-- [ ] 24 — séance complète hors ligne : attend le premier geste élève (lot 3).
+- [~] 6 — `CorrectionServeurTest` : la recorrection est vérifiée
+  (`GestesEleveTest`, réponse fausse jamais comptée juste, même uuid
+  compté une fois) ; « la version vue fait foi » attend le lot 3.
+- [x] 10 — progression : la saisie la plus récente gagne
+  (`GestesEleveTest`, 3 tests).
+- [ ] 24 — séance complète hors ligne : les gestes existent depuis le
+  lot 2 ; le parcours Playwright en contexte `offline` vient avec HL2
+  complet (lot 3).
   En attendant, Playwright `hors-ligne.spec.ts` rejoue le socle dans un vrai
   navigateur : service worker, appareil enregistré, dialogue, copie datée au
   rechargement, page de repli, retour du réseau (stable sur 10 passages).
@@ -890,6 +939,22 @@ hors ligne ; les packs viennent ensuite.
     télécharge pas l'éditeur : 139 Ko compressés, dans le seul fragment de
     la page d'édition). Le back-office reste un écran **en ligne
     seulement** (niveau C, A.2) : il n'est pas précaché.
+
+16. **2026-10-31 — Premiers gestes élève au lot 2, pas au lot 3.** Le
+    critère du lot 2 (« premier exercice en moins de 60 s après
+    l'inscription ») demande un exercice : `tentative.enregistrer` (QCM à
+    une réponse seulement) et `seance.terminer` sont donc branchés dès ce
+    lot, avec la correction du serveur. Ils passent par `enregistrer()`
+    comme prévu (A.3.5). Mesuré par Playwright : premier exercice 4 à 7 s
+    après la création du compte. Les autres types, les indices et les
+    versions de questions restent au lot 3.
+17. **2026-10-31 — Limite de débit propre à la synchronisation.** La file
+    utilisait `throttle:120,1`, sans nom : Laravel compte alors toutes les
+    routes limitées d'un même utilisateur dans un seul compteur. Après une
+    séance (une requête par réponse), « Supprimer mon compte » ou
+    « Changer de mot de passe » (`throttle:6,1`) répondaient 429. Limiteur
+    nommé `synchro` (120 par minute, clé `synchro|<utilisateur>`).
+    Preuve : `LimiteSynchroTest`.
 
 ## B.6 Points de vigilance
 
