@@ -1010,6 +1010,32 @@ cette question à sa façon. Elle distingue deux notions :
      pendant un essai à la main, est laissé en place (donnée de Maurice) —
      les captures du programme sont prises sur Physique · Terminale.
 
+16. [x] **Bandeau d'exemple redessiné** (2026-10-31)
+   - **Constat** (Maurice : « ce bandeau est moche ») : hachures jaunes sur
+     toute la largeur, filet soleil, capitales espacées en gras — il criait
+     plus fort que le titre de l'écran et ne ressemblait à aucun autre
+     bandeau de l'application.
+   - **Décision** : `BandeauExemple` rejoint la famille des bandeaux
+     (`rounded-controle`, teinte `soleil-400` en opacité, sans filet) ; le
+     signal tient dans un cachet `Badge` soleil plein « Exemple » avec une
+     fiole, suivi de « Contenu fictif, créé pour la démonstration. » en
+     casse normale (« Contenu fictif. » sous 640 px, pour tenir sur une
+     ligne à 360 px). Utilitaire `hachures-exemple` retiré d'`app.css` ;
+     `DESIGN.md` § 3, § 6.7, § 11 et § 13 mis à jour.
+   - **Preuve** : captures relues à 360, 768 et 1366 px en clair et en
+     sombre (accueil élève, tableaux de bord contenu, édition, fiche et
+     relecture d'une leçon, catalogue) ; 56 références régénérées
+     (`lot0/eleve-accueil`, `lot0/composants`, `lot1/contenu-accueil-*`,
+     `lot1/lecon-*`) — chacune ne diffère de l'ancienne que par le bandeau
+     (hauteur + 6 px, contenu identique décalé) ; axe sans violation
+     sérieuse, aucun débordement. 284 Pest, 204 Vitest, `npm run build` :
+     verts.
+   - **Vu en chemin** : la série Lu → Di de l'accueil élève d'exemple suit
+     la date **du serveur** (`TableauDeBordExemple`), que
+     `page.clock.setFixedTime` ne fige pas : la capture de référence change
+     de jour en jour (vendredi marqué le 30, samedi le 31). À régler quand
+     le lot 2 remplace ces données d'exemple.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 

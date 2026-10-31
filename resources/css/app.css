@@ -401,15 +401,6 @@
     }
 }
 
-/* Bandeau « EXEMPLE — contenu fictif » (DESIGN.md § 6.7) */
-@utility hachures-exemple {
-    background-image: repeating-linear-gradient(
-        -45deg,
-        rgb(255 194 26 / 0.35) 0 10px,
-        transparent 10px 20px
-    );
-}
-
 /* Halo de la marque derrière un héros (vitrine, connexion) : dégradés CSS,
    zéro octet téléchargé. Lumière pêche en haut à droite, touche de soleil à
    gauche — l'ambiance chaude des références. */

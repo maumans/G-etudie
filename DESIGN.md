@@ -242,8 +242,8 @@ l'accent est en nuance **700** (clair) / **300** (sombre), pas 600.
 - **Pas de sur-titre en capitales espacées** au-dessus des titres, pas de
   libellé « MOT · MOT · MOT » : ce sont les tics les plus reconnaissables d'une
   page générée. Un titre se suffit ; s'il faut une précision, une phrase en
-  13 px `ink-500` en casse normale. Seul le bandeau « EXEMPLE — contenu
-  fictif » reste en capitales (c'est un avertissement).
+  13 px `ink-500` en casse normale. Le bandeau d'exemple lui-même est en
+  casse normale : c'est le cachet soleil qui avertit (§ 6.7).
 - `.font-data` = `tabular-nums` pour notes, chronomètres, points, montants GNF.
 
 ### Le grand titre en contraste (`titre-contraste`)
@@ -441,9 +441,13 @@ maison. La provenance est toujours visible : c'est ce qui fonde la confiance.
 
 ### 6.7 Le contenu de démonstration
 
-Tant que le vrai contenu n'est pas là, tout exemple porte un **bandeau hachuré**
-« EXEMPLE — contenu fictif ». On ne doit jamais pouvoir prendre une capture
-d'écran de démo pour un vrai sujet.
+Tant que le vrai contenu n'est pas là, tout exemple porte le **bandeau
+d'exemple** (`BandeauExemple`) : une ligne de la famille des bandeaux
+(`rounded-controle`, teinte soleil en opacité), ouverte par un **cachet**
+« Exemple » en soleil plein avec une fiole, puis « Contenu fictif, créé pour
+la démonstration. » en 13 px `ink-600`. On ne doit jamais pouvoir prendre une
+capture d'écran de démo pour un vrai sujet : le cachet jaune se voit sur
+toute capture, sans hachures ni capitales qui crient.
 
 ---
 
@@ -555,7 +559,7 @@ jeu de contrôles ne doit survivre au kit de démarrage : ses `PrimaryButton`,
 | `ProgressionSegments`, `ProgressionBarre` | Progression en tirets (20 pastilles, une par 5 %, ou une par unité d'un défi) ou en barre fine ; couleur de la matière (`MATIERES[cle].plein`) ou mandarine ; `role="progressbar"` + `aria-label` + `aria-valuenow` |
 | `JaugePreparation` | Arc par matière (§ 6.1), nom accessible complet ; partagée par le tableau de bord et l'aperçu de la vitrine |
 | `Formule` | Rendu KaTeX (MathML accessible) ; défilement horizontal propre si la formule dépasse, jamais de débordement de page |
-| `BandeauExemple` | Hachures + « EXEMPLE — contenu fictif » sur tout contenu `est_exemple` |
+| `BandeauExemple` | Cachet soleil « Exemple » + « Contenu fictif, créé pour la démonstration. » sur une teinte soleil, sur tout contenu `est_exemple` (§ 6.7) |
 
 Les composants du mode hors ligne (`EcranIndisponible`, `BandeauCopie`, pastille
 réseau) sont spécifiés dans `HORS_LIGNE.md` A.3.7 à A.3.9.
@@ -1004,3 +1008,23 @@ régénérées ; 125 Playwright verts, axe sans violation sérieuse.
 *Preuve* : 12 écrans × 4 gabarits × 2 thèmes dans
 `tests/visuel/captures/lot1/`, axe sans violation sérieuse, aucun
 débordement ; stables sur deux semis de démonstration différents.
+
+### Bandeau d'exemple redessiné (2026-10-31)
+
+*Constat* (Maurice : « ce bandeau est moche ») : hachures jaunes sur toute la
+largeur, filet soleil, capitales espacées en gras — le bandeau criait plus
+fort que le titre de l'écran, et ressemblait à un ruban de chantier plutôt
+qu'à la famille des bandeaux (hors ligne, copie, iPhone).
+
+*Décision* : une ligne calme de la même famille — `rounded-controle`, teinte
+`soleil-400` en opacité (16 % clair, 9 % sombre), sans filet ; le signal
+tient dans un **cachet** `Badge` soleil plein « Exemple » avec une fiole,
+suivi d'une phrase en casse normale. L'utilitaire `hachures-exemple` est
+retiré d'`app.css`.
+
+*Vu et corrigé sur les captures* : à 360 px, la phrase complète passait sur
+deux lignes à côté du cachet → « Contenu fictif. » seul sous 640 px.
+
+*Preuve* : 56 captures de référence régénérées (accueil élève, catalogue,
+tableaux de bord contenu, leçons), axe sans violation sérieuse, aucun
+débordement.
