@@ -19,11 +19,11 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-31 (lot 2 fait sur `lot-2` ; lot 0 en attente de D11)
+### État au 2026-10-31 (lot 2 fait et fusionné ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte les lots 0 et 1 ; le lot 2 est sur la
-  branche **`lot-2`**, à fusionner sur décision de Maurice. Pas de dépôt
-  distant (DA6).
+- **Dépôt git** : `main` porte les lots 0, 1 et 2 (branche **`lot-2`**
+  fusionnée le 2026-10-31 en avance rapide, sur décision de Maurice) ; le
+  lot suivant avance sur sa branche (`lot-3`). Pas de dépôt distant (DA6).
 - **Lot 2 fait** (point 16) : profil d'examen et **parcours d'accueil**
   (examen → série → établissement si la liste existe → objectif, puis le
   premier exercice) ; **cours côté élève** (mes cours, matière, leçon avec
@@ -137,7 +137,7 @@
    double authentification, session de 12 h).
 2. **Maurice : essayer le lot 2** (01 Aïssatou, BEPC, quelques soirs
    derrière elle ; 09 Ousmane, Bac SE, rien encore ; ou créer un compte
-   pour vivre le parcours d'accueil) et décider de la fusion de `lot-2`.
+   pour vivre le parcours d'accueil).
 3. **Équipe pédagogique** : saisir la **date de la prochaine session** de
    chaque examen (Référentiel › Épreuves) pour le compte à rebours.
 4. **Lot 3** : moteur de questions (tous les types), indices, corrigés pas
