@@ -7,9 +7,12 @@ use App\Services\HorsLigne\RegistreOperations;
 use App\Services\Sms\EnvoiSms;
 use App\Services\Sms\JournalSms;
 use Carbon\CarbonImmutable;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Inertia\ExceptionResponse;
@@ -37,6 +40,13 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configureDefaults();
         $this->configurerPagesErreur();
+
+        // La file d'opérations a son propre compteur. Un `throttle:120,1`
+        // anonyme partageait celui de l'utilisateur avec les autres routes
+        // limitées (`throttle:6,1` de « Mon compte ») : un élève qui venait
+        // de faire sa séance ne pouvait plus supprimer son compte (429).
+        RateLimiter::for('synchro', fn (Request $request) => Limit::perMinute(120)
+            ->by('synchro|'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
 
         // Noms courts et stables dans les colonnes polymorphes
         // (`versions_contenu.contenu_type`). Carte non imposée : les rôles de

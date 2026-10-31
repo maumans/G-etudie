@@ -1,9 +1,13 @@
 /**
  * Ce que l'élève lit dans « À envoyer » et « À corriger » pour chaque type
  * d'opération. Chaque type inscrit dans RegistreOperations::TYPES (serveur)
- * a son libellé ici (HORS_LIGNE.md A.3.6, « brancher un type », point 5). Vide au lot 0.
+ * a son libellé ici (HORS_LIGNE.md A.3.6, « brancher un type », point 5).
  */
-export const LIBELLES: Record<string, string> = {};
+export const LIBELLES: Record<string, string> = {
+    'tentative.enregistrer': 'Réponse à une question',
+    'seance.terminer': 'Fin de séance',
+    'lecon.progression': 'Progression dans une leçon',
+};
 
 export function libelleOperation(type: string): string {
     return LIBELLES[type] ?? 'Réponse';

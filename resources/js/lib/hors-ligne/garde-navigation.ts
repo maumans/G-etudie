@@ -8,8 +8,10 @@ import { estEcranGarde } from '@/lib/hors-ligne/ecrans';
  * - `before` : hors ligne, une visite vers un écran sans copie possible est
  *   annulée et le dialogue s'ouvre ; un préchargement est annulé en silence ;
  *   une écriture est annulée (« rien n'a été enregistré ») ;
- * - `networkError` (la visite est partie quand même) : dialogue selon le
- *   cas, rechargement partiel tu, et « hors ligne » aussitôt.
+ * - `networkError` (la visite est partie quand même) : un écran qui sait
+ *   s'afficher depuis un pack l'est (HORS_LIGNE.md A.4, `afficherLocal`) ;
+ *   sinon dialogue selon le cas, rechargement partiel tu, et « hors ligne »
+ *   aussitôt.
  *
  * On reste sur l'écran ouvert : un dialogue, pas une page vide.
  */
@@ -45,6 +47,8 @@ export type DependancesGarde = {
     pages: () => string[];
     ouvrir: (motif: MotifIndisponible) => void;
     signalerHorsLigne: () => void;
+    /** Affiche l'écran depuis la base locale ; `false` s'il n'y est pas. */
+    afficherLocal?: (url: URL) => Promise<boolean>;
 };
 
 const estPartiel = (visite: VisiteObservee) =>
@@ -97,13 +101,23 @@ export function initialiserGardeNavigation(
 
             // Écran gardé sans copie : « pas encore ouvert ici » ; écran hors
             // liste blanche : il demande une connexion, copie ou pas.
-            dependances.ouvrir(
+            const motif: MotifIndisponible =
                 visite.method.toLowerCase() !== 'get'
                     ? 'ecriture'
                     : estEcranGarde(visite.url.pathname, dependances.pages())
                       ? 'pas_encore_ouvert'
-                      : 'connexion_requise',
-            );
+                      : 'connexion_requise';
+
+            if (motif === 'ecriture' || !dependances.afficherLocal) {
+                dependances.ouvrir(motif);
+
+                return false;
+            }
+
+            void dependances
+                .afficherLocal(visite.url)
+                .catch(() => false)
+                .then((affiche) => affiche || dependances.ouvrir(motif));
 
             return false;
         }),

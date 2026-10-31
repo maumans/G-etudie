@@ -3,7 +3,6 @@
 use App\Enums\Permission;
 use App\Http\Controllers\AiguillageController;
 use App\Http\Controllers\Contenu\TableauDeBordController as ContenuTableauDeBordController;
-use App\Http\Controllers\Eleve\AccueilController as AccueilEleveController;
 use App\Http\Controllers\VitrineController;
 use App\Http\Middleware\SeulementEnDeveloppement;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +21,6 @@ Route::middleware('auth')->group(function () {
     // Après connexion, chaque compte est aiguillé vers son espace (fortify.home).
     Route::get('accueil', AiguillageController::class)->name('accueil');
 
-    Route::get('eleve', AccueilEleveController::class)
-        ->can(Permission::EspaceEleve)
-        ->name('eleve.accueil');
     Route::get('contenu', ContenuTableauDeBordController::class)
         ->can(Permission::EspaceContenu)
         ->name('contenu.accueil');
@@ -32,6 +28,9 @@ Route::middleware('auth')->group(function () {
         ->can(Permission::EspaceConsole)
         ->name('console.accueil');
 });
+
+// Espace élève : routes/eleve.php (accueil, parcours, cours, séance).
+require __DIR__.'/eleve.php';
 
 require __DIR__.'/contenu.php';
 

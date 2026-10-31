@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 /**
  * CEE, BEPC ou Baccalauréat unique. Semés par ReferentielSeeder, jamais
@@ -16,13 +17,17 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CodeExamen $code
  * @property string $nom
  * @property int $ordre
+ * @property Carbon|null $date_prochaine_session saisie par le responsable pédagogique, jamais semée
  */
-#[Fillable(['code', 'nom', 'ordre'])]
+#[Fillable(['code', 'nom', 'ordre', 'date_prochaine_session'])]
 class Examen extends Model
 {
     protected function casts(): array
     {
-        return ['code' => CodeExamen::class];
+        return [
+            'code' => CodeExamen::class,
+            'date_prochaine_session' => 'date',
+        ];
     }
 
     /** @return HasMany<Serie, $this> */

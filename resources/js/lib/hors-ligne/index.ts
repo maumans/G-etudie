@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { lirePageLocale } from '@/lib/contenu/source';
 import { BaseHorsLigne } from '@/lib/hors-ligne/base';
 import { copieDe } from '@/lib/hors-ligne/copies';
 import { initialiserGardeNavigation } from '@/lib/hors-ligne/garde-navigation';
@@ -217,6 +218,11 @@ type RouteurHorsLigne = RouteurGarde & {
         rappel: (evenement: { detail: { page: PageObservee } }) => void,
     ): () => void;
     reload(): void;
+    push(visite: {
+        url: string;
+        component: string;
+        props: (actuelles: Record<string, unknown>) => Record<string, unknown>;
+    }): void;
 };
 
 let pages: string[] = [];
@@ -244,6 +250,27 @@ export function demarrerHorsLigne(routeur: RouteurHorsLigne): void {
         pages: () => pages,
         ouvrir: ouvrirEcranIndisponible,
         signalerHorsLigne: () => moteur.signalerHorsLigne(),
+        // Un contenu téléchargé (pack) s'affiche sans réseau, avec les props
+        // mêmes du serveur (HORS_LIGNE.md A.4).
+        afficherLocal: async (url) => {
+            const page = await lirePageLocale(base, url.pathname);
+
+            if (page === null) {
+                return false;
+            }
+
+            routeur.push({
+                url: url.pathname,
+                component: page.component,
+                props: (actuelles) => ({
+                    ...actuelles,
+                    ...page.props,
+                    source: 'pack',
+                }),
+            });
+
+            return true;
+        },
     });
 
     routeur.on('navigate', (evenement) => {

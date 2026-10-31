@@ -23,7 +23,7 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
 
     return (
         <div className="min-h-dvh bg-background fond-ambiance lg:flex">
-            <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-8 border-r px-4 pt-5 pb-4 lg:flex">
+            <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-8 border-r px-4 pt-5 pb-4 lg:flex print:hidden">
                 <Link
                     href={accueilEleve()}
                     className="self-start rounded-controle px-2 outline-none focus-visible:outline-2 focus-visible:outline-ring"
@@ -47,7 +47,7 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
             </aside>
 
             <div className="min-w-0 flex-1">
-                <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/85 px-4 backdrop-blur-md lg:hidden">
+                <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b bg-background/85 px-4 backdrop-blur-md lg:hidden print:hidden">
                     <Link
                         href={accueilEleve()}
                         className="rounded-controle outline-none focus-visible:outline-2 focus-visible:outline-ring"
@@ -68,7 +68,7 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
 
             <nav
                 aria-label="Espace élève"
-                className="fixed inset-x-0 bottom-0 z-30 flex border-t bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-8px_rgb(16_16_24/0.08)] backdrop-blur-md lg:hidden"
+                className="fixed inset-x-0 bottom-0 z-30 flex border-t bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-8px_rgb(16_16_24/0.08)] backdrop-blur-md lg:hidden print:hidden"
             >
                 {NAVIGATION_ELEVE.map((entree) => (
                     <LienNavigation

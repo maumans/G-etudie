@@ -2,8 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Enums\CodeExamen;
 use App\Enums\Role;
+use App\Models\Examen;
 use App\Models\User;
+use App\Services\ProfilEleveService;
+use Database\Seeders\ReferentielSeeder;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -45,6 +49,8 @@ class UserFactory extends Factory
     /**
      * Comme l'inscription : un compte a toujours un rôle, élève par défaut
      * (un décor sans rôle ne ressemble pas à la réalité, CLAUDE.md § 4).
+     * L'élève a aussi fini son parcours d'accueil (lot 2) : il prépare le
+     * BEPC, objectif 15 minutes. `sansProfil()` : juste inscrit.
      */
     public function configure(): static
     {
@@ -52,13 +58,33 @@ class UserFactory extends Factory
             if ($user->roles()->doesntExist()) {
                 $user->assignRole(Role::Eleve);
             }
+
+            if ($user->hasRole(Role::Eleve) && $user->profilEleve()->doesntExist()) {
+                if (Examen::query()->doesntExist()) {
+                    (new ReferentielSeeder)->run();
+                }
+
+                app(ProfilEleveService::class)->enregistrer($user, Examen::where('code', CodeExamen::Bepc)->value('id'), null, null, 15);
+            }
         });
     }
 
     /** Compte d'un autre rôle (personnel, parent…), à la place de l'élève. */
     public function avecRole(Role $role): static
     {
-        return $this->afterCreating(fn (User $user) => $user->syncRoles([$role]));
+        return $this->afterCreating(function (User $user) use ($role) {
+            $user->syncRoles([$role]);
+
+            if ($role !== Role::Eleve) {
+                $user->profilEleve()->delete();
+            }
+        });
+    }
+
+    /** Élève qui vient de s'inscrire : pas encore de profil d'examen. */
+    public function sansProfil(): static
+    {
+        return $this->afterCreating(fn (User $user) => $user->profilEleve()->delete());
     }
 
     /** Numéro pas encore vérifié par code SMS (la vérification n'est pas bloquante, D3). */

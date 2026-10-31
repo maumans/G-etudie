@@ -101,6 +101,39 @@
   message de l'indicateur d'enregistrement.
 - État : à faire
 
+### [Lot 2] Premier exercice en moins de 60 s, sur un vrai téléphone
+- Pourquoi : critère du lot 2. Mesuré à 4-7 s par Playwright sur
+  l'ordinateur (réseau local) ; reste à le vérifier sur un Android d'entrée
+  de gamme, en 3G/4G réelle, avec un élève qui découvre l'écran.
+- Matériel : un Android 2 Go de RAM, données mobiles, chronomètre ; un
+  numéro de test (6 00 …).
+- Comment le provoquer : ouvrir le site, « Créer un compte », remplir les
+  quatre champs, « Plus tard » sur la vérification, choisir l'examen
+  (et la série au Bac), garder 15 minutes, « Faire mon premier exercice »,
+  répondre, « Vérifier ».
+- Quoi observer : moins de 60 s entre « Créer mon compte » et le verdict ;
+  aucun écran blanc ; chaque écran lisible sans zoom ; le bouton dominant
+  visible sans défiler.
+- En cas d'échec, relever : le temps de chaque étape, l'écran le plus
+  lent, le réseau (barres, 3G/4G).
+- État : à faire
+
+### [Lot 2] Lire une leçon et imprimer une fiche de révision
+- Pourquoi : PLAN M4 — lecture confortable à 360 px, taille du texte
+  réglable, fiche imprimable.
+- Matériel : un Android ; un ordinateur avec imprimante (ou « Enregistrer
+  en PDF »).
+- Comment le provoquer : « Mon compte › Affichage », texte « grand » ;
+  ouvrir une leçon avec formules, la lire jusqu'au bout, toucher
+  « Compris » ; revenir à l'accueil. Sur l'ordinateur : une matière ›
+  « Fiche de révision » › « Imprimer ».
+- Quoi observer : texte agrandi dans la leçon, formules lisibles et
+  défilables si longues ; « Ma lecture » à 100 %, la leçon cochée dans la
+  matière et sortie de « Reprendre » ; à l'impression, ni barre latérale
+  ni onglets, seulement la fiche.
+- En cas d'échec, relever : capture de l'écran, modèle du téléphone.
+- État : à faire
+
 ## 2. Installation de l'application (Android, iPhone)
 
 ### [Lot 0] Installer N'karamögö sur Android et sur iPhone
@@ -169,6 +202,21 @@
 - En cas d'échec, relever : capture à chaque étape, texte de la pastille,
   heure.
 - État : à faire
+
+### [Lot 2] Séance du jour en mode avion
+- Pourquoi : HORS_LIGNE.md A.1 — une réponse donnée sans réseau compte et
+  part toute seule, une seule fois.
+- Matériel : un Android, l'application installée (HTTPS, D11).
+- Comment le provoquer : ouvrir l'accueil en ligne puis « Commencer » ;
+  après deux réponses, passer en mode avion ; répondre à trois autres
+  questions ; fermer l'application ; la rouvrir en mode avion, revenir à
+  la séance ; couper le mode avion.
+- Quoi observer : hors ligne, la pastille dit « N réponses à envoyer » et
+  la séance reprend à la bonne question ; au retour du réseau, « Tout est
+  envoyé » ; sur l'ordinateur (base), cinq réponses, pas dix.
+- En cas d'échec, relever : la pastille, la liste « À envoyer / À
+  corriger », l'heure de la coupure.
+- État : bloqué tant que le domaine HTTPS n'existe pas (D11)
 
 ### [Lot 0] Déploiement pendant une coupure
 - Pourquoi : A.3.1 et A.3.3, A.15 n° 6 et 7 — une nouvelle version ne

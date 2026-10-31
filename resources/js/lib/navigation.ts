@@ -20,7 +20,7 @@ import { accueil as accueilConsole } from '@/routes/console';
 import { accueil as accueilContenu } from '@/routes/contenu';
 import { index as indexLecons, relecture } from '@/routes/contenu/lecons';
 import { index as matieresReferentiel } from '@/routes/contenu/referentiel/matieres';
-import { accueil as accueilEleve } from '@/routes/eleve';
+import { accueil as accueilEleve, cours as coursEleve } from '@/routes/eleve';
 import { edit as monCompte } from '@/routes/compte/profil';
 
 /**
@@ -31,7 +31,14 @@ import { edit as monCompte } from '@/routes/compte/profil';
 /** Espace élève : Accueil · Cours · Annales · Examens blancs · Moi. */
 export const NAVIGATION_ELEVE: EntreeNavigation[] = [
     { libelle: 'Accueil', icone: House, href: accueilEleve().url },
-    { libelle: 'Cours', icone: BookOpen },
+    {
+        libelle: 'Cours',
+        icone: BookOpen,
+        href: coursEleve().url,
+        actifSous: '/eleve/cours',
+        // Une leçon et une fiche appartiennent aux cours.
+        actifAussiSous: ['/eleve/lecons', '/eleve/chapitres'],
+    },
     { libelle: 'Annales', icone: FileText },
     { libelle: 'Examens blancs', icone: Timer },
     {

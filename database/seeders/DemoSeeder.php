@@ -9,7 +9,7 @@ use RuntimeException;
 
 /**
  * Un compte de démonstration par rôle (développement seulement), connexion
- * par téléphone : +224 600 00 00 01 à 08, dans l'ordre de COMPTES.
+ * par téléphone : +224 600 00 00 01 à 09, dans l'ordre de COMPTES.
  *
  * `firstOrCreate` : un nouveau `db:seed` ne réinitialise jamais un mot de
  * passe (CLAUDE.md § 4). Mot de passe lu dans `.env` (DEMO_MOT_DE_PASSE,
@@ -27,6 +27,8 @@ class DemoSeeder extends Seeder
         ['telephone' => '+224600000006', 'prenom' => 'Alpha', 'pseudo' => 'pedagogie_demo', 'role' => Role::AdminContenu],
         ['telephone' => '+224600000007', 'prenom' => 'Mariama', 'pseudo' => 'etablissement_demo', 'role' => Role::GestionnaireEtablissement],
         ['telephone' => '+224600000008', 'prenom' => 'Sékou', 'pseudo' => 'plateforme_demo', 'role' => Role::Superadmin],
+        // Second élève (lot 2) : Bac SE, rien encore de fait.
+        ['telephone' => '+224600000009', 'prenom' => 'Ousmane', 'pseudo' => 'ousmane_demo', 'role' => Role::Eleve],
     ];
 
     public function run(): void
@@ -55,7 +57,8 @@ class DemoSeeder extends Seeder
             $user->syncRoles([$compte['role']]);
         }
 
-        // Leçons fictives, écrites et relues par ces comptes (lot 1).
-        $this->call(DemoContenuSeeder::class);
+        // Leçons fictives, écrites et relues par ces comptes (lot 1), puis le
+        // cours côté élève et les profils d'examen des élèves (lot 2).
+        $this->call([DemoContenuSeeder::class, DemoCoursSeeder::class, DemoEleveSeeder::class]);
     }
 }

@@ -355,10 +355,15 @@ premier (l'action dominante tient dans 360 × 740).
 | Mes réussites | badges mérités avec leurs points | — |
 | Tuteur | sur `surface-encre`, champ d'appel (V1.1 : « bientôt ») | — |
 
-Jusqu'aux lots 2 et 6, les données viennent de
-`App\Support\Demonstration\TableauDeBordExemple` (`est_exemple`, bandeau
-« EXEMPLE — contenu fictif ») ; ensuite les services métier les remplacent sans
-changer la forme. Aucun rang entre élèves (classements opt-in, PLAN M9).
+Depuis le lot 2, les données sont celles de l'élève
+(`App\Services\TableauDeBordEleveService`) : compte à rebours (date saisie
+par l'équipe, sinon « Date du BEPC pas encore annoncée »), jauge (0 % tant que
+rien n'est réussi), séance du jour, mes matières (lien vers la matière),
+reprendre, série. « Défi » et « Réussites » attendent la motivation (lot 6) :
+à leur place, **« Mes premiers pas »** (quatre gestes cochés, la carte
+disparaît quand tout est fait) et **« Mon examen »** (lien « Changer »). Le
+bandeau « EXEMPLE » reste tant que le contenu vu est d'exemple. Aucun rang
+entre élèves (classements opt-in, PLAN M9).
 
 ### 6.1 La jauge de préparation — la signature
 
@@ -1028,3 +1033,52 @@ deux lignes à côté du cachet → « Contenu fictif. » seul sous 640 px.
 *Preuve* : 56 captures de référence régénérées (accueil élève, catalogue,
 tableaux de bord contenu, leçons), axe sans violation sérieuse, aucun
 débordement.
+
+### Lot 2 — cours, accueil et parcours d'accueil de l'élève (2026-10-31)
+
+*Décision* : l'espace élève garde la recette du tableau de bord (§ 6.0) et
+la prolonge sans nouveau composant de base.
+- **Parcours d'accueil** (`eleve/bienvenue`) : plein écran, sans
+  navigation ; une question par écran (examen → série si Bac →
+  établissement si la liste existe → objectif du soir), choix en grandes
+  cartes `radio` (tuile 40 px, coche ronde), segments d'étapes en haut,
+  « Continuer » plein et retour en contour. À partir de 1024 px, le panneau
+  `surface-marque` de la connexion redit les choix en direct (« Je prépare
+  le Bac SE », « 15 minutes chaque soir »). Dernier bouton : « Faire mon
+  premier exercice ».
+- **Ardoise** (`eleve/seance`, § 6.4) : plein écran, ✕ · segments · 3/8 ;
+  matière en tuile + nom + notion ; options `Choix` ; « Vérifier » collé en
+  bas ; après vérification, la barre du bas devient la feuille du verdict
+  (pastille ronde + « Juste ! » / « Pas encore » + explication) et
+  « Continuer ». Bilan : flamme, « Séance terminée. **Bravo.** », score en
+  chiffre héros, segments verts.
+- **Cours** : cartes de matière (tuile, nom, ★ phare, deux chiffres sur
+  craie : leçons comprises, exercices réussis ; tirets à la couleur de la
+  matière), deux colonnes au plus. **Matière** : cartes de chapitre
+  numérotées, une ligne par leçon (pastille d'état : coche `juste`, « À
+  revoir » soleil, lecture en cours), notions sans leçon en pointillés
+  « leçon à venir ». **Leçon** : carte de lecture (≤ 42 rem), « Compris /
+  À revoir » en boutons bascule (`aria-pressed`), colonne « Ma lecture » +
+  « Pour aller plus loin » collante à partir de 1024 px, leçons précédente
+  et suivante en cartes. **Fiche de révision** : les « À retenir » de
+  chaque leçon, numérotés, bouton « Imprimer » (navigation masquée à
+  l'impression).
+- **Accueil** : compte à rebours en carte (« J-227 avant le BEPC ») ou
+  filet pointillé « pas encore annoncée » ; « Mes premiers pas » et « Mon
+  examen » à la place du défi et des réussites.
+
+*Vu et corrigé sur les captures* :
+- **360 px, matière** : page élargie à 398 px — un texte tronqué
+  (`truncate`) dans un élément de grille à `min-width: auto` impose sa
+  largeur → `grid-cols-1` (`minmax(0, 1fr)`) sur les grilles de page et
+  `min-w-0` sur les cartes de chapitre ; numéro et titre du chapitre sur
+  une ligne.
+- **Contraste** : « / 3 » et « % » en `ink-500` sur `craie-100` (axe,
+  sévère) → `ink-600`, comme le veut la règle du remplissage muet.
+- **Accueil 1366 px** : quatre cartes de matière par ligne trop étroites
+  (« Biologie-Géologie » débordait) → deux colonnes ; **Cours 1366 px** :
+  trois colonnes laissaient une carte seule → deux colonnes.
+- Captures : la carte « Ma série » dépend du jour, elle est masquée
+  (`data-capture="variable"`) ; ouvrir une leçon est un geste de la file,
+  simulé dans `ecrans-lot2.spec.ts` pour que l'accueil des élèves de
+  démonstration ne change pas d'un passage à l'autre.

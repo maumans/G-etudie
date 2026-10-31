@@ -104,6 +104,19 @@ class BlocsContenu
     }
 
     /**
+     * Temps de lecture estimé d'un document, en minutes (180 mots par minute
+     * pour un élève, une formule comptée comme dix mots), une minute au moins.
+     *
+     * @param  array<string, mixed>  $doc
+     */
+    public static function minutesDeLecture(array $doc): int
+    {
+        $resume = self::resume($doc);
+
+        return max(1, (int) ceil(($resume['mots'] + 10 * $resume['formules']) / 180));
+    }
+
+    /**
      * @param  list<string>  $permis
      */
     private static function enfants(mixed $contenu, array $permis, int $profondeur, string $parent): ?string

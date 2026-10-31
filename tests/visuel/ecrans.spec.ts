@@ -23,7 +23,7 @@ const HORLOGE = new Date('2026-10-29T10:00:00Z');
  * titre attendu, statut HTTP attendu (200 par défaut).
  */
 const CONNECTES: Record<
-    Exclude<keyof typeof SESSIONS, 'pedagogie'>,
+    Exclude<keyof typeof SESSIONS, 'pedagogie' | 'ousmane'>,
     {
         adresse: string;
         ecran: string;

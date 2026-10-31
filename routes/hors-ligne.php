@@ -10,7 +10,7 @@ Route::get('sw.js', ServiceWorkerController::class)->name('hors-ligne.service-wo
 
 // Synchronisation de la file d'opérations (HORS_LIGNE.md A.3.6) :
 // autorisation par opération, dérogation dans AccesParRoleTest.
-Route::middleware(['auth', 'throttle:120,1'])->prefix('sync')->name('sync.')->group(function () {
+Route::middleware(['auth', 'throttle:synchro'])->prefix('sync')->name('sync.')->group(function () {
     Route::get('etat', [SynchroController::class, 'etat'])->name('etat');
     Route::post('operations', [SynchroController::class, 'operations'])->name('operations');
 });

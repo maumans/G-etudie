@@ -45,6 +45,13 @@ preparation("connexion de l'élève de démonstration", async ({ page }) => {
     await page.context().storageState({ path: SESSIONS.eleve });
 });
 
+preparation('connexion du second élève (Bac SE)', async ({ page }) => {
+    await seConnecter(page, '600000009');
+
+    await expect(page).toHaveURL(/\/eleve$/, ATTENTE);
+    await page.context().storageState({ path: SESSIONS.ousmane });
+});
+
 preparation('connexion du rédacteur de démonstration', async ({ page }) => {
     await seConnecter(page, '600000004');
 

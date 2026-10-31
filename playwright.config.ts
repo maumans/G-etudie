@@ -33,7 +33,7 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
-            testIgnore: /parcours-lot1\.spec\.ts/,
+            testIgnore: /parcours-lot[12]\.spec\.ts/,
             dependencies: ['connexion'],
         },
         // Crée puis efface une leçon : après les captures, qu'il ne doit pas
@@ -41,6 +41,13 @@ export default defineConfig({
         {
             name: 'parcours-contenu',
             testMatch: /parcours-lot1\.spec\.ts/,
+            dependencies: ['ecrans'],
+        },
+        // Crée un élève neuf, du formulaire d'inscription au premier
+        // exercice, puis le supprime : après les captures des élèves de démo.
+        {
+            name: 'parcours-eleve',
+            testMatch: /parcours-lot2\.spec\.ts/,
             dependencies: ['ecrans'],
         },
     ],
