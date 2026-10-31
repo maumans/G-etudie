@@ -9,13 +9,35 @@ use App\Support\FormatQuestion;
  * (tests/js/contenu/questions.test.ts). Le serveur fait foi (HORS_LIGNE.md A.6).
  */
 
-test('la correction du serveur et celle de l\'appareil donnent les mêmes verdicts', function () {
-    $exemples = json_decode((string) file_get_contents(__DIR__.'/../fixtures/questions.json'), true);
+$exemples = fn () => json_decode((string) file_get_contents(__DIR__.'/../fixtures/questions.json'), true);
 
-    foreach ($exemples['corrections'] as $exemple) {
+test("la correction du serveur et celle de l'appareil donnent les mêmes scores", function () use ($exemples) {
+    foreach ($exemples()['corrections'] as $exemple) {
         expect(FormatQuestion::corriger(TypeQuestion::from($exemple['type']), $exemple['attendue'], $exemple['reponse']))
-            ->toBe($exemple['correcte'], $exemple['nom']);
+            ->toBe($exemple['score'], $exemple['nom']);
     }
+});
+
+test("auto-évaluation, normalisation des textes et lecture des nombres : mêmes exemples que l'appareil", function () use ($exemples) {
+    $jeu = $exemples();
+
+    foreach ($jeu['auto_evaluations'] as $exemple) {
+        expect(FormatQuestion::scoreAutoEvaluation($exemple['donnees'], $exemple['criteres']))->toBe($exemple['score'], $exemple['nom']);
+    }
+
+    foreach ($jeu['normalisations'] as [$texte, $attendu]) {
+        expect(FormatQuestion::normaliserTexte($texte))->toBe($attendu, $texte);
+    }
+
+    foreach ($jeu['nombres'] as [$texte, $attendu]) {
+        expect(FormatQuestion::lireNombre($texte))->toBe($attendu === null ? null : (float) $attendu, $texte);
+    }
+});
+
+test("chaque type couvert par le jeu d'exemples", function () use ($exemples) {
+    $types = array_unique(array_column($exemples()['corrections'], 'type'));
+
+    expect(collect(TypeQuestion::cases())->map->value->diff($types)->all())->toBe([]);
 });
 
 test('un QCM valide passe ; chaque défaut a sa raison', function () {

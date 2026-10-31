@@ -22,6 +22,15 @@ return Application::configure(basePath: dirname(__DIR__))
         // inscription) est renvoyé dans son espace.
         $middleware->redirectUsersTo('/accueil');
 
+        // Un document de blocs (leçon, question) garde ses espaces et ses
+        // chaînes vides : « Dans un triangle » + « rectangle » en gras
+        // perdrait son espace, une proposition faite d'une seule formule
+        // (texte vide) deviendrait `null` (DEVBOOK point 17). Ces middlewares
+        // passent avant le routeur : on reconnaît la requête à son adresse.
+        $documents = fn (Request $request) => $request->isMethod('PUT') && $request->is('contenu/lecons/*', 'contenu/questions/*');
+        $middleware->trimStrings(except: [$documents]);
+        $middleware->convertEmptyStringsToNull(except: [$documents]);
+
         $middleware->web(append: [
             SessionCourtePersonnel::class,
             HandleAppearance::class,

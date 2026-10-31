@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-10-31, lot 2)
+## 0. Reprise — où en est le projet (mis à jour le 2026-10-31, lot 3)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,11 +19,23 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-31 (lot 2 fait et fusionné ; lot 0 en attente de D11)
+### État au 2026-10-31 (lot 3 fait ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte les lots 0, 1 et 2 (branche **`lot-2`**
-  fusionnée le 2026-10-31 en avance rapide, sur décision de Maurice) ; le
-  lot suivant avance sur sa branche (`lot-3`). Pas de dépôt distant (DA6).
+- **Dépôt git** : `main` porte les lots 0, 1, 2 et 3. Le lot 3 a été fait
+  **directement sur `main`**, à la demande de Maurice (pas de branche
+  `lot-3`). Pas de dépôt distant (DA6).
+- **Lot 3 fait** (point 17) : **moteur de questions, neuf types** (QCM à
+  une ou plusieurs réponses, vrai/faux, numérique avec tolérance et unité,
+  réponse courte, texte à trous, appariement, remise en ordre, question
+  ouverte auto-évaluée au barème), score de 0 à 100 avec « En partie
+  juste » ; **indices** progressifs (ils ne retirent rien) ; **corrigé pas
+  à pas** ; **versions de questions** (même circuit de relecture que les
+  leçons, la version vue fait foi, `HORS_LIGNE.md` A.9) ; **écran de
+  saisie** des questions au back-office (liste, création, saisie par type
+  avec aperçu jouable, fiche de relecture) ; **mini-questions** dans les
+  leçons ; **séance complète en mode avion** vérifiée (A.14 n° 24). HL2
+  terminé. Format et correction : `App\Support\FormatQuestion` et
+  `lib/contenu/questions.ts`, un même jeu d'exemples.
 - **Lot 2 fait** (point 16) : profil d'examen et **parcours d'accueil**
   (examen → série → établissement si la liste existe → objectif, puis le
   premier exercice) ; **cours côté élève** (mes cours, matière, leçon avec
@@ -100,10 +112,10 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 326 Pest (MySQL `g_etudie_test`, rôles semés une fois par
-  `TestCase`), 216 Vitest, 273 Playwright (sessions par compte, écrans des
-  lots 0 à 2 × 4 gabarits × 2 thèmes, parcours d'inscription, parcours des
-  critères des lots 1 et 2, socle hors ligne) — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
+- **Tests** : 391 Pest (MySQL `g_etudie_test`, rôles semés une fois par
+  `TestCase`), 291 Vitest, 316 Playwright (sessions par compte, écrans des
+  lots 0 à 3, parcours d'inscription, parcours des critères des lots 1 et
+  2, séance en mode avion du lot 3, socle hors ligne) — verts. `tsc`, `vp check`, Pint, Larastan (niveau 7) et
   `npm run build` passent.
 - **⚠ Pas de HTTPS tant que le domaine n'existe pas** (D11) : hors
   `localhost`, le service worker ne s'inscrit pas, donc pas de hors ligne.
@@ -135,14 +147,17 @@
    préproduction en HTTPS en suivant la section 12, et contrôles bloqués de
    `A_TESTER.md` (installation, mode avion, déploiement pendant une coupure,
    double authentification, session de 12 h).
-2. **Maurice : essayer le lot 2** (01 Aïssatou, BEPC, quelques soirs
-   derrière elle ; 09 Ousmane, Bac SE, rien encore ; ou créer un compte
-   pour vivre le parcours d'accueil).
+2. **Maurice : essayer le lot 3** — au back-office (04 rédacteur :
+   « Questions », une question en brouillon à compléter ; 06 responsable
+   pédagogique : « Relecture › Questions », une question à relire), puis
+   côté élève (01 Aïssatou : la leçon « Le cosinus d'un angle aigu » et sa
+   mini-question ; une séance du jour, tous types mêlés).
 3. **Équipe pédagogique** : saisir la **date de la prochaine session** de
    chaque examen (Référentiel › Épreuves) pour le compte à rebours.
-4. **Lot 3** : moteur de questions (tous les types), indices, corrigés pas
-   à pas, versions de questions et écran de saisie des questions ; la
-   séance complète hors ligne (A.14 n° 24).
+4. **Lot 4** : annales (modèle, import assisté par IA et relecture, trois
+   modes, filtres par chapitre) ; « Signaler une erreur » sur chaque
+   question (reporté du lot 3, décision de Maurice) et la file des
+   signalements.
 5. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -282,9 +297,9 @@ permission s'exerce (section 7).
 | Service | Rôle | État |
 |---|---|---|
 | `ReferentielService` | slug des matières, suppressions gardées, ordre des chapitres et notions, année courante unique | ✅ lot 1 |
-| `ContenuService` + workflow de relecture | seule porte du statut : brouillon → relecture → publication / renvoi commenté / reprise → archivage ; versions figées ; verrou optimiste ; l'auteur ne se relit jamais | ✅ lot 1 |
+| `ContenuService` + workflow de relecture | seule porte du statut, **leçons et questions** (`ContenuRelisable`) : brouillon → relecture → publication / renvoi commenté / reprise → archivage ; versions figées ; verrou optimiste ; l'auteur ne se relit jamais | ✅ lots 1 et 3 |
 | `ImportAnnaleService` | PDF/scan → sujet structuré (IA) → relecture | ⬜ |
-| `TentativeService` | enregistrement (ajout seulement), **correction serveur** ; maîtrise au lot 6 | 🟡 lot 2 (QCM) |
+| `TentativeService` | enregistrement (ajout seulement), **correction serveur contre la version vue**, neuf types, score 0–100, indices comptés, auto-évaluation ; maîtrise au lot 6 | ✅ lot 3 |
 | `SeanceService` | séance du jour minimale (jamais vues, ratées, réussies, matières alternées, ordre stable), fin de séance ; séances pré-calculées au lot 6 | 🟡 lot 2 |
 | `ProfilEleveService` | seule porte du profil d'examen (classe déduite, série exigée au Bac, filière gardée) | ✅ lot 2 |
 | `ProgressionService` | « compris / à revoir », position ; la saisie la plus récente gagne | ✅ lot 2 |
@@ -292,7 +307,7 @@ permission s'exerce (section 7).
 | `ExamenBlancService` | passage, note, moyenne pondérée | ⬜ |
 | `MaitriseService` | jauge (lot 2 : part des questions réussies par matière, pondérée seulement si tous les coefficients sont saisis) ; maîtrise par notion et révision espacée au lot 6 | 🟡 lot 2 |
 | `PackService` | génération, empreintes, différentiel, droits | ⬜ |
-| `SynchroService` | file d'opérations (`HORS_LIGNE.md` A.3.6) : cinq verdicts, idempotence par la base, `enTantQue`, horloge ; registre vide jusqu'au lot 3 | ✅ étape 6 |
+| `SynchroService` | file d'opérations (`HORS_LIGNE.md` A.3.6) : cinq verdicts, idempotence par la base, `enTantQue`, horloge ; quatre types d'opération élève au lot 3 | ✅ étape 6 |
 | `TuteurService` | API Claude, quotas, journal, coûts | ⬜ |
 | `PaiementService` | Orange Money, MTN MoMo, codes prépayés | ⬜ |
 | `PlateformeService` | console : activité, contenu, revenus, impact | ⬜ |
@@ -310,11 +325,12 @@ permission s'exerce (section 7).
 | Parcours d'accueil (examen, série, établissement, objectif) | ✅ lot 2 |
 | Accueil élève (compte à rebours, jauge, séance du jour, matières, reprendre, série, premiers pas) | ✅ lot 2 |
 | Cours : mes cours, matière, leçon, fiche de révision | ✅ lot 2 |
-| Lecteur d'exercice (« l'ardoise ») | 🟡 lot 2 : QCM à une réponse, verdict, explication, bilan ; indices et corrigé pas à pas au lot 3 |
+| Lecteur d'exercice (« l'ardoise ») | ✅ lot 3 : neuf types, indices, verdict (juste / en partie / pas encore / à toi d'évaluer), corrigé pas à pas, auto-évaluation, reprise, bilan |
+| Mini-question dans une leçon | ✅ lot 3 |
 | Annales (liste, fiche, trois modes) | ⬜ |
 | Examen blanc (lancement, passage, résultat, carte de partage) | ⬜ |
 | Progression, profil, téléchargements | ⬜ |
-| Back-office contenu : tableau de bord, référentiel (matières, épreuves, programme, années), leçons (liste, relecture, création, éditeur TipTap, fiche, historique) | ✅ lot 1 (point 15) ; questions, annales, signalements aux lots 3, 4, 12 |
+| Back-office contenu : tableau de bord, référentiel (matières, épreuves, programme, années), leçons (liste, relecture, création, éditeur TipTap, fiche, historique) | ✅ lot 1 (point 15) ; **questions** ✅ lot 3 (liste, création, saisie par type avec aperçu jouable, fiche, relecture) ; annales, signalements aux lots 4, 12 |
 | Console plateforme | ⬜ |
 
 Infrastructure d'interface à construire au lot 0 : primitives de `DESIGN.md`
@@ -328,7 +344,7 @@ composants hors ligne (`HORS_LIGNE.md` A.3.7 à A.3.9), formatage GNF dans
 |---|---|---|
 | `RolesEtPermissionsSeeder` | recopie `App\Enums\Role` et `App\Enums\Permission` en base (`syncPermissions`, permissions inconnues supprimées) ; lancé aussi en production | ✅ étape 5 |
 | `ReferentielSeeder` | examens, séries, classes d'examen (recopiés à chaque passage) ; année 2026-2027, dix matières, épreuves des matières phares (D1) semées **une fois**, sur table vide — **coefficients et durées vides**, programme non semé ; lancé aussi en production | ✅ lot 1 |
-| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 09, `DemoSeeder::COMPTES`, deux élèves) ✅ étape 5 ; puis `DemoContenuSeeder` ✅ lot 1 : chapitres, notions et cinq leçons **fictifs** (`est_exemple`), une par statut, passés par `ContenuService` (vrai historique) ; `DemoCoursSeeder` ✅ lot 2 : neuf leçons publiées et 18 QCM fictifs (BEPC, Bac SE), vérifiés par `FormatQuestion` ; `DemoEleveSeeder` ✅ lot 2 : profils (Aïssatou BEPC avec trois soirs de réponses et deux leçons ouvertes, Ousmane Bac SE sans rien) | ✅ |
+| `DemoSeeder` | un compte de démo par rôle (+224 600 00 00 01 à 09, `DemoSeeder::COMPTES`, deux élèves) ✅ étape 5 ; puis `DemoContenuSeeder` ✅ lot 1 : chapitres, notions et cinq leçons **fictifs** (`est_exemple`), une par statut, passés par `ContenuService` (vrai historique) ; `DemoCoursSeeder` ✅ lots 2 et 3 : neuf leçons publiées (dont une avec mini-question) et 30 questions fictives des neuf types (BEPC, Bac SE), avec indices et corrigés, passées par `ContenuService` — 28 publiées, une en brouillon, une en relecture ; `DemoEleveSeeder` ✅ lot 2 : profils (Aïssatou BEPC avec trois soirs de réponses et deux leçons ouvertes, Ousmane Bac SE sans rien) | ✅ |
 
 ⚠ Les permissions ne viennent que des seeders : un déploiement lance `migrate`
 **puis** `db:seed`. Comptes créés en `firstOrCreate` (un re-seed ne réinitialise
@@ -1125,6 +1141,102 @@ cette question à sa façon. Elle distingue deux notions :
      liste des établissements ; packs (lot 7) pour remplir la table
      `contenus`.
 
+17. [x] **Lot 3 — moteur de questions (neuf types), indices, corrigés pas
+   à pas, versions de questions, écran de saisie ; HL2** (2026-10-31,
+   sur `main`, un commit)
+   - **Constat** : au lot 2, un seul type (QCM à une réponse), une seule
+     version par question (`questions.version` = 1), une `explication`
+     d'un bloc, aucun écran de saisie, le circuit de relecture propre aux
+     leçons.
+   - **Décisions** (plan validé par Maurice le 2026-10-31, choix
+     recommandés ; travail sur `main` à sa demande) :
+     - **Score partiel** : 0 à 100, juste seulement à 100 ; les types à
+       plusieurs parties (QCM à plusieurs réponses : bonnes cochées moins
+       fausses cochées ; trous ; appariement ; ordre : rang par rang)
+       donnent « **En partie juste** » (icône demi-cercle, couleur
+       indice) ; « Pas encore », jamais « Faux ».
+     - **Indices** : un à un, trois au plus ; ils ne retirent rien au
+       verdict, leur nombre est gardé (`indices_utilises`, borné) pour la
+       maîtrise du lot 6.
+     - **Mini-question** dans une leçon : bloc `question` (uuid) dans le
+       format des blocs, PHP et TS, avec le jeu d'exemples ; l'objet de
+       contenu de la leçon embarque la question publiée (pack compris) ;
+       une question non publiée n'est pas livrée.
+     - **Signaler une erreur** : reporté au lot 4 (file des signalements).
+     - **Versions** : la question suit le circuit des leçons. Un contrat
+       `ContenuRelisable` (+ trait `EstRelisable`) ; `ContenuService` et
+       `Perimetre::peutRediger/peutRelire/estAuteurDe` sont communs ;
+       `PolicyContenuRelisable` porte les gestes, `LeconPolicy` y ajoute
+       la lecture élève. Une version fige énoncé, données, réponse,
+       indices et corrigé **ensemble** (`versions_contenu.blocs`).
+       `TentativeService` corrige contre **la version vue** (une version
+       renvoyée ou inventée est refusée) ; une question archivée n'est
+       plus proposée, ses tentatives restent.
+     - **Type fixé à la création** : une tentative est toujours corrigée
+       selon le type de la version qu'elle a vue.
+     - **Normalisation des réponses écrites** (courte, trous) : sans
+       accents, sans casse, sans ponctuation, espaces réduits, œ/æ
+       dépliés ; pas d'approximation (une faute de frappe reste fausse).
+       **Nombres** : virgule ou point, espaces de milliers ; l'élève ne
+       tape pas l'unité (affichée) ; tolérance en valeur ou en %.
+     - **Mélange** des éléments (appariement à droite, remise en ordre) :
+       fait par le serveur (`PresentationQuestion`), stable par question,
+       jamais l'ordre de la réponse — identique en ligne et dans un pack.
+     - **Question ouverte** : `tentative.enregistrer` sans score, puis
+       `tentative.auto_evaluer` (`depend_de`), une seule fois.
+     - **Texte à trous au back-office** : saisi en une ligne, crochets
+       pour les trous, `/` entre formes justes, `*` pour une liste de
+       choix (`lib/contenu/trous.ts`, testé).
+     - **Relecture des questions** : sous `/contenu/relecture/questions`,
+       onglets « Leçons · Questions » sur la file de relecture.
+   - **Écarts au plan** : `indices` et `corrige` sont des colonnes de la
+     question (versionnées avec elle), pas des tables `indices` /
+     `corriges` (PLAN § 6) — sinon une correction d'indice modifierait une
+     version déjà vue (`HORS_LIGNE.md` écart n° 18). `questions.version`
+     et `explication` disparaissent (numéro de la version publiée ;
+     l'explication devient la première étape du corrigé).
+   - **Corrigé en chemin** : `TrimStrings` et `ConvertEmptyStringsToNull`
+     s'appliquaient aux documents de blocs envoyés par l'éditeur de leçon :
+     « Dans un triangle » suivi de « rectangle » en gras perdait son
+     espace à l'enregistrement (bug du lot 1, jamais vu car les leçons de
+     démonstration sont semées sans passer par la requête). Désactivés
+     pour `PUT /contenu/lecons/*` et `/contenu/questions/*`
+     (`bootstrap/app.php`, test dans `EcransQuestionsTest`).
+     « Continuer » s'affichait un instant avant « Voir mon bilan » sur la
+     dernière question (le parcours du lot 2 cliquait dedans).
+     Les parcours Playwright tournaient à trois en même temps sur
+     `php artisan serve` (une requête à la fois) : celui du lot 1 manquait
+     ses délais ; le parcours hors ligne passe désormais après les deux
+     autres (`playwright.config.ts`).
+   - **Vu avec Playwright** : 7 écrans × 3 tailles × 2 thèmes
+     (`ecrans-lot3.spec.ts` : banque de questions, création, saisie,
+     fiche, file et fiche de relecture, leçon avec mini-question) et
+     l'ardoise des types nouveaux en mode avion (`parcours-lot3.spec.ts` :
+     texte à trous, question ouverte avant et après l'auto-évaluation),
+     axe sans violation sérieuse, aucun débordement. Corrigé : LaTeX brut
+     dans les listes (formules omises de l'extrait), double « Vérifie que
+     tu as compris », surface blanche dans l'aperçu, difficulté sur deux
+     lignes (cinq cases égales), « Ta réponse » à la relecture (« Réponse
+     attendue »), feuille du verdict restée défilée après
+     l'auto-évaluation. Régénérés volontairement : édition de leçon (outil
+     « Mini-question »), matière et accueil des élèves de démonstration
+     (nouvelles questions), « Sécurité » de la console (journal d'une
+     base resemée). Détail : `DESIGN.md` § 13, « Lot 3 ».
+   - **Preuve** : **391 Pest** (dont `CircuitQuestionsTest` 7,
+     `CorrectionServeurTest` 13 — A.14 n° 6 —, `AutoEvaluationTest` 3,
+     `EcransQuestionsTest` 6, `FormatQuestionTest` 5,
+     `FormatQuestionValidationTest` 29), **291 Vitest** (jeu commun de
+     57 corrections, auto-évaluations, normalisations et nombres ;
+     `exercice-question.test.tsx` 8 ; `trous.test.ts` 3 ; blocs : 5
+     exemples de mini-question), **316 Playwright** dont **A.14 n° 24** :
+     élève neuf, séance de 15 questions en mode avion, rechargement
+     (reprise à la 4ᵉ question), retour du réseau → chaque réponse reçue
+     **une seule fois**, aucune refusée. `tsc`, `vp check`, Pint,
+     Larastan niveau 7 et `npm run build` passent.
+   - **Reste** : séance en mode avion sur vrai téléphone (`A_TESTER.md`) ;
+     « Signaler une erreur » (lot 4) ; un hook d'enregistrement commun
+     aux deux éditeurs (points ouverts).
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -1147,9 +1259,16 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 - **Dates des sessions d'examen** (lot 2) : à saisir par l'équipe
   pédagogique dans Référentiel › Épreuves ; sans elles, pas de compte à
   rebours.
-- **Questions** : pas encore d'écran de saisie (lot 3) ; les 18 QCM sont
-  des exemples. Une question n'a qu'une version tant que l'historique
-  n'existe pas (A.9, lot 3).
+- **Questions** : écran de saisie et versions faits (lot 3) ; les 30
+  questions de démonstration sont des exemples (`est_exemple`), à
+  remplacer par celles de l'équipe pédagogique. « Signaler une erreur »
+  au lot 4.
+- **Enregistrement automatique** : l'écran de saisie des questions reprend
+  la mécanique de l'éditeur de leçon (délai, verrou, Ctrl+S, départ
+  retenu) ; un hook commun aux deux éditeurs serait plus sûr — à faire à
+  la prochaine retouche de l'un des deux.
+- **Images et tableaux dans les leçons et les questions** : toujours hors
+  du format des blocs (stockage et WebP à décider avec les packs).
 - **Désactiver un compte du personnel** : un compte qui a signé du contenu
   ne se supprime plus lui-même (point 15) ; l'écran administrateur qui le
   désactive reste à faire (console, lot 13).- **Domaine et hébergement** (D11) : à fixer avant la clôture du lot 0 (HTTPS).
@@ -1188,13 +1307,13 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `Epreuve` | `epreuves` | année, examen, série nulle, matière | **porte coefficient et durée** (vides tant que non saisis), `phare` (D1) ; unicité par `cle_unicite` (série nulle comprise) |
 | `Chapitre`, `Notion` | `chapitres`, `notions` | matière + classe ; chapitre | `ordre`, `est_exemple` |
 | `Lecon` | `lecons` | notion, auteur | `uuid` v7 (clé de route), `brouillon` (blocs), `revision` (verrou), `version_publiee_id` ; statut changé par `ContenuService` seulement |
-| `VersionContenu` | `versions_contenu` (polymorphe, `contenu_type` = `lecon`) | auteur, décideur | figée à l'envoi en relecture ; `decision` (`DecisionRelecture`), `commentaire` |
+| `VersionContenu` | `versions_contenu` (polymorphe : leçon, question) | auteur, décideur | figée à l'envoi en relecture ; `decision` (`DecisionRelecture`), `commentaire` ; pour une question, `blocs` = énoncé, données, réponse, indices et corrigé ensemble |
 | `ProfilEleve` | `profils_eleves` | élève (unique), examen, série nulle, classe, établissement nul | écrit par `ProfilEleveService` seulement ; `objectif_minutes` (10, 15, 30) ; `libelleExamen()` |
 | `Etablissement` | `etablissements` | — | liste à constituer (vide) |
 | `ProgressionLecon` | `progressions_lecons` | élève, leçon | `etat` + `etat_saisi_le`, `position` + `position_saisie_le` : la plus récente gagne |
-| `Question` | `questions` | notion | `uuid` v7, `type` (`TypeQuestion`), `enonce`/`explication` (blocs), `donnees`, `reponse_attendue`, `version`, `statut`, `est_exemple` ; format : `FormatQuestion` |
+| `Question` | `questions` | notion, auteur | `uuid` v7, `type` (`TypeQuestion`, fixé à la création), brouillon dans les colonnes (`enonce`, `donnees`, `reponse_attendue`, `indices`, `corrige`, `difficulte`), `extrait` (listes, recherche), `revision`, `version_publiee_id` ; circuit par `ContenuService` ; format : `FormatQuestion` ; vue élève : `PresentationQuestion` |
 | `Seance` | `seances` | élève | `uuid`, `jour`, `questions` (ids ordonnés), `termine_le` |
-| `Tentative` | `tentatives` | élève, question, séance nulle | ajout seulement ; `uuid` = celui de l'opération ; `correcte` = correction du serveur |
+| `Tentative` | `tentatives` | élève, question, séance nulle | ajout seulement (sauf l'auto-évaluation, une fois) ; `uuid` = celui de l'opération ; `version` = numéro vu ; `score` 0–100 et `correcte` = correction du serveur ; `criteres`, `auto_evaluee_le` |
 
 ## 10. Enums
 
@@ -1208,10 +1327,9 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `CodeSerie` | `SM`, `SE`, `SS` | séries du Baccalauréat unique |
 | `Filiere` | `generale`, `franco_arabe` | filière d'une épreuve (D2) |
 | `TeinteMatiere` | les dix clés de `lib/matieres.ts` | même liste en TS, vérifiée par un test |
-| `StatutContenu` | `brouillon`, `en_relecture`, `publie`, `archive` | statut d'une leçon |
+| `StatutContenu` | `brouillon`, `en_relecture`, `publie`, `archive` | statut d'une leçon ou d'une question |
 | `DecisionRelecture` | `publiee`, `renvoyee`, `retiree` | issue d'une version envoyée en relecture |
-
-| `TypeQuestion` | `qcm_une` (lot 2) ; les autres au lot 3 | type d'une question |
+| `TypeQuestion` | `qcm_une`, `qcm_plusieurs`, `vrai_faux`, `numerique`, `courte`, `trous`, `appariement`, `ordre`, `ouverte` | type d'une question, `libelle()`, `estAutoEvaluee()` |
 | `ModeTentative` | `seance`, `entrainement` (`examen_blanc` au lot 5) | où la réponse a été donnée |
 | `EtatLecon` | `comprise`, `a_revoir` | ce que l'élève dit d'une leçon |
 | `TypeEtablissement` | `public`, `prive`, `franco_arabe` | type d'un établissement |
@@ -1231,6 +1349,7 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `/contenu/lecons/creer`, édition, enregistrement, envoi, reprise, modification | `can:contenu.rediger` + `LeconPolicy::rediger` (auteur ou responsable pédagogique) | `routes/contenu.php` |
 | `/contenu/relecture`, publier, renvoyer | `can:contenu.relire` + `LeconPolicy::relire` (jamais l'auteur) | `routes/contenu.php` |
 | archiver, restaurer | `can:contenu.administrer` | `routes/contenu.php` |
+| `/contenu/questions` (liste, fiche), `creer`, édition, envoi, reprise, modification ; `/contenu/relecture/questions`, publier, renvoyer ; archiver, restaurer | mêmes gardes que les leçons ; `QuestionPolicy` (circuit commun `PolicyContenuRelisable`) | `routes/contenu.php` |
 | `/compte/*` (profil, mot de passe, numéro, affichage, vérification, suppression) | `auth`, dérogations « Mon compte » | `routes/compte.php` |
 | `/compte/securite` | `auth` + `can:compte.double_authentification` + `password.confirm` | `routes/compte.php` |
 | `/mot-de-passe-oublie*` | `guest` | `routes/compte.php` |

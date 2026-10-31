@@ -21,13 +21,19 @@ import { cn } from '@/lib/utils';
  * (`lib/contenu/blocs.ts`), sans savoir d'où il vient : props Inertia, pack
  * hors ligne ou aperçu de l'éditeur (HORS_LIGNE.md A.4). Ne charge jamais
  * l'éditeur. Texte en taille de lecture (17 px, réglable par l'élève).
+ *
+ * Une mini-question (`question`) n'est rendue que si l'écran fournit
+ * `rendreQuestion` (la leçon de l'élève, l'aperçu du back-office) : la
+ * question vient de l'objet de contenu, pas du document.
  */
 export function ContenuBlocs({
     doc,
     className,
+    rendreQuestion,
 }: {
     doc: DocumentBlocs;
     className?: string;
+    rendreQuestion?: (uuid: string) => ReactNode;
 }) {
     return (
         <div
@@ -38,7 +44,11 @@ export function ContenuBlocs({
             )}
         >
             {(doc.content ?? []).map((bloc, rang) => (
-                <BlocRendu key={rang} bloc={bloc} />
+                <BlocRendu
+                    key={rang}
+                    bloc={bloc}
+                    rendreQuestion={rendreQuestion}
+                />
             ))}
         </div>
     );
@@ -74,8 +84,16 @@ export const ENCADRES: Record<
     },
 };
 
-function BlocRendu({ bloc }: { bloc: Bloc }) {
+function BlocRendu({
+    bloc,
+    rendreQuestion,
+}: {
+    bloc: Bloc;
+    rendreQuestion?: (uuid: string) => ReactNode;
+}) {
     switch (bloc.type) {
+        case 'question':
+            return rendreQuestion?.(bloc.attrs.uuid) ?? null;
         case 'paragraph':
             return (
                 <p className="leading-[1.65]">

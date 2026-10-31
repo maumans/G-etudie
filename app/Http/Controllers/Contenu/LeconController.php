@@ -9,6 +9,7 @@ use App\Models\Chapitre;
 use App\Models\Lecon;
 use App\Models\Matiere;
 use App\Models\Notion;
+use App\Models\Question;
 use App\Models\User;
 use App\Models\VersionContenu;
 use App\Services\ContenuService;
@@ -147,6 +148,21 @@ class LeconController extends Controller
                 'par' => $renvoi->decidePar?->pseudo,
                 'le' => $renvoi->decide_le?->toIso8601String(),
             ] : null,
+            // Mini-questions possibles : les questions publiées du chapitre.
+            'questions_disponibles' => Question::query()
+                ->whereNotNull('version_publiee_id')
+                ->where('statut', '!=', StatutContenu::Archive->value)
+                ->whereHas('notion', fn (Builder $q) => $q->where('chapitre_id', $lecon->notion->chapitre_id))
+                ->with('notion')
+                ->orderBy('notion_id')
+                ->limit(60)
+                ->get()
+                ->map(fn (Question $q) => [
+                    'uuid' => $q->uuid,
+                    'extrait' => $q->extrait,
+                    'type' => $q->type->libelle(),
+                    'notion' => $q->notion->titre,
+                ]),
         ]);
     }
 
@@ -280,12 +296,13 @@ class LeconController extends Controller
             ],
             'filtres' => $filtres,
             'compteurs' => collect(StatutContenu::cases())->mapWithKeys(fn (StatutContenu $s) => [$s->value => (int) ($compteurs[$s->value] ?? 0)]),
-            'a_relire' => $user->can(Permission::RelireContenu->value) ? $this->nombreARelire($user) : null,
+            'a_relire' => $user->can(Permission::RelireContenu->value) ? self::nombreARelire($user) : null,
+            'questions_a_relire' => $user->can(Permission::RelireContenu->value) ? QuestionController::nombreARelire($user) : null,
             'matieres' => Matiere::query()->orderBy('ordre')->get(['id', 'nom', 'teinte']),
         ]);
     }
 
-    private function nombreARelire(User $user): int
+    public static function nombreARelire(User $user): int
     {
         return Lecon::query()
             ->where('statut', StatutContenu::EnRelecture)

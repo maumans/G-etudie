@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\StatutContenu;
 use App\Models\ProfilEleve;
 use App\Models\Question;
 use App\Models\Seance;
@@ -9,6 +10,7 @@ use App\Models\Tentative;
 use App\Models\User;
 use App\Services\HorsLigne\OperationRejetee;
 use App\Support\CatalogueEleve;
+use App\Support\PresentationQuestion;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Str;
 
@@ -160,35 +162,25 @@ class SeanceService
 
     /**
      * Les questions d'une séance, dans l'ordre, telles que l'appareil les
-     * affiche et les corrige (la bonne réponse comprise : la correction de
-     * l'appareil n'est qu'un affichage, A.6).
+     * affiche et les corrige : leur **version publiée** (PresentationQuestion).
+     * Une question retirée depuis n'est plus proposée (A.9).
      *
      * @return list<array<string, mixed>>
      */
     public function questionsDe(Seance $seance): array
     {
         $questions = Question::query()
-            ->with('notion.chapitre.matiere')
+            ->with(['notion.chapitre.matiere', 'versionPubliee'])
             ->whereKey($seance->questions)
+            ->where('statut', '!=', StatutContenu::Archive->value)
             ->get()
             ->keyBy('id');
 
         return array_values(collect($seance->questions)
             ->map(fn (int $id) => $questions->get($id))
             ->filter()
-            ->map(fn (Question $question) => [
-                'uuid' => $question->uuid,
-                'version' => $question->version,
-                'type' => $question->type->value,
-                'enonce' => $question->enonce,
-                'options' => $question->donnees['options'],
-                'attendue' => $question->reponse_attendue,
-                'explication' => $question->explication,
-                'est_exemple' => $question->est_exemple,
-                'matiere' => $question->notion->chapitre->matiere->teinte->value,
-                'matiere_nom' => $question->notion->chapitre->matiere->nom,
-                'notion' => $question->notion->titre,
-            ])
+            ->map(fn (Question $question) => PresentationQuestion::publiee($question))
+            ->filter()
             ->all());
     }
 }

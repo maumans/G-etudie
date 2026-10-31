@@ -24,7 +24,8 @@ use Illuminate\Database\Eloquent\Collection;
  *  - ses **leçons** : celles de ces chapitres qui ont une version publiée et
  *    ne sont pas archivées (une leçon publiée qu'on retouche reste en ligne,
  *    DEVBOOK point 15) ;
- *  - ses **questions** : publiées, sur ces chapitres.
+ *  - ses **questions** : celles de ces chapitres qui ont une version
+ *    publiée et ne sont pas archivées (même règle que les leçons, lot 3).
  *
  * Les écrans, les policies, la séance du jour et la synchronisation passent
  * tous par ici ; aucun ne refait la requête à sa façon.
@@ -133,7 +134,8 @@ class CatalogueEleve
         $chapitres = self::chapitres($profil, $matiere)->select('id');
 
         return Question::query()
-            ->where('statut', StatutContenu::Publie->value)
+            ->whereNotNull('version_publiee_id')
+            ->where('statut', '!=', StatutContenu::Archive->value)
             ->whereHas('notion', fn (Builder $notion) => $notion->whereIn('chapitre_id', $chapitres));
     }
 

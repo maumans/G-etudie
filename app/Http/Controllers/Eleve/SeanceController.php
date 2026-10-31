@@ -56,8 +56,10 @@ class SeanceController extends Controller
                 ->get()
                 ->map(fn (Tentative $tentative) => [
                     'question' => $uuids->get($tentative->question_id),
-                    'option' => $tentative->reponse['option'] ?? null,
-                    'correcte' => $tentative->correcte,
+                    'tentative' => $tentative->uuid,
+                    'reponse' => (object) $tentative->reponse,
+                    'score' => $tentative->score,
+                    'auto_evaluee' => $tentative->auto_evaluee_le !== null,
                 ])
                 ->values(),
         ]);

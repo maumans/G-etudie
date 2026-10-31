@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers\Eleve;
 
+use App\Enums\StatutContenu;
 use App\Http\Controllers\Controller;
 use App\Models\Chapitre;
 use App\Models\Lecon;
 use App\Models\ProgressionLecon;
+use App\Models\Question;
 use App\Support\BlocsContenu;
 use App\Support\CatalogueEleve;
+use App\Support\PresentationQuestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
@@ -83,15 +86,43 @@ class LeconController extends Controller
     {
         $version = $lecon->versionPubliee;
 
+        $blocs = $version->blocs ?? BlocsContenu::vide();
+
         return [
             'type' => 'lecon',
             'uuid' => $lecon->uuid,
             'version' => $version->numero ?? 0,
             'titre' => $version->titre ?? $lecon->titre,
-            'blocs' => $version->blocs ?? BlocsContenu::vide(),
-            'minutes' => BlocsContenu::minutesDeLecture($version->blocs ?? []),
+            'blocs' => $blocs,
+            'minutes' => BlocsContenu::minutesDeLecture($blocs),
             'est_exemple' => $lecon->est_exemple,
+            // Mini-questions : embarquées dans l'objet, pour qu'une leçon
+            // lue depuis un pack les ait aussi. Une question pas (ou plus)
+            // publiée n'est pas livrée ; son bloc ne s'affiche pas.
+            'questions' => (object) self::miniQuestions($blocs),
         ];
+    }
+
+    /**
+     * @param  array<string, mixed>  $blocs
+     * @return array<string, array<string, mixed>> uuid => question publiée
+     */
+    private static function miniQuestions(array $blocs): array
+    {
+        $uuids = BlocsContenu::questionsCitees($blocs);
+
+        if ($uuids === []) {
+            return [];
+        }
+
+        return Question::query()
+            ->with(['notion.chapitre.matiere', 'versionPubliee'])
+            ->whereIn('uuid', $uuids)
+            ->whereNotNull('version_publiee_id')
+            ->where('statut', '!=', StatutContenu::Archive->value)
+            ->get()
+            ->mapWithKeys(fn (Question $question) => [$question->uuid => PresentationQuestion::publiee($question)])
+            ->all();
     }
 
     /** @return array{uuid: string, titre: string} */

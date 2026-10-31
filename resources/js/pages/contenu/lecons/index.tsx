@@ -1,6 +1,7 @@
 import { Link, router } from '@inertiajs/react';
 import { ClipboardCheck, Library, Plus } from 'lucide-react';
 import { EnteteEcran } from '@/components/contenu/entete-ecran';
+import { OngletsRelecture } from '@/components/contenu/onglets-relecture';
 import { BadgeStatut, STATUTS } from '@/components/contenu/statut-lecon';
 import { TuileMatiere } from '@/components/contenu/tuile-matiere';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,7 @@ type Props = {
     filtres: Filtres;
     compteurs: Record<StatutContenu, number>;
     a_relire: number | null;
+    questions_a_relire: number | null;
     matieres: { id: number; nom: string; teinte: CleMatiere }[];
 };
 
@@ -47,6 +49,7 @@ export default function Lecons({
     filtres,
     compteurs,
     a_relire,
+    questions_a_relire,
     matieres,
 }: Props) {
     const peut = usePeut();
@@ -110,45 +113,53 @@ export default function Lecons({
                     )
                 }
             >
-                <nav
-                    aria-label="Vue"
-                    className="flex w-fit gap-0.5 rounded-controle bg-craie-100 p-1"
-                >
-                    {vues.map((vue) => {
-                        const actif = vue.cle === filtres.vue;
-                        const href =
-                            vue.cle === 'a_relire'
-                                ? relecture()
-                                : index({
-                                      query:
-                                          vue.cle === 'toutes'
-                                              ? {}
-                                              : { vue: vue.cle },
-                                  });
+                {relire ? (
+                    <OngletsRelecture
+                        actif="lecons"
+                        lecons={a_relire ?? 0}
+                        questions={questions_a_relire ?? 0}
+                    />
+                ) : (
+                    <nav
+                        aria-label="Vue"
+                        className="flex w-fit gap-0.5 rounded-controle bg-craie-100 p-1"
+                    >
+                        {vues.map((vue) => {
+                            const actif = vue.cle === filtres.vue;
+                            const href =
+                                vue.cle === 'a_relire'
+                                    ? relecture()
+                                    : index({
+                                          query:
+                                              vue.cle === 'toutes'
+                                                  ? {}
+                                                  : { vue: vue.cle },
+                                      });
 
-                        return (
-                            <Link
-                                key={vue.cle}
-                                href={href}
-                                prefetch
-                                aria-current={actif ? 'page' : undefined}
-                                className={cn(
-                                    'flex h-9 items-center gap-1.5 rounded-[7px] px-3 text-interface font-medium whitespace-nowrap outline-none focus-visible:outline-2 focus-visible:outline-ring sm:h-8',
-                                    actif
-                                        ? 'bg-relief text-ink-900 shadow-xs ring-1 ring-black/5 dark:ring-white/5'
-                                        : 'text-ink-600 hover:text-ink-900',
-                                )}
-                            >
-                                {vue.libelle}
-                                {vue.nombre ? (
-                                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-nimba-600 px-1.5 text-meta font-semibold text-white font-data">
-                                        {vue.nombre}
-                                    </span>
-                                ) : null}
-                            </Link>
-                        );
-                    })}
-                </nav>
+                            return (
+                                <Link
+                                    key={vue.cle}
+                                    href={href}
+                                    prefetch
+                                    aria-current={actif ? 'page' : undefined}
+                                    className={cn(
+                                        'flex h-9 items-center gap-1.5 rounded-[7px] px-3 text-interface font-medium whitespace-nowrap outline-none focus-visible:outline-2 focus-visible:outline-ring sm:h-8',
+                                        actif
+                                            ? 'bg-relief text-ink-900 shadow-xs ring-1 ring-black/5 dark:ring-white/5'
+                                            : 'text-ink-600 hover:text-ink-900',
+                                    )}
+                                >
+                                    {vue.libelle}
+                                    {vue.nombre ? (
+                                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-nimba-600 px-1.5 text-meta font-semibold text-white font-data">
+                                            {vue.nombre}
+                                        </span>
+                                    ) : null}
+                                </Link>
+                            );
+                        })}
+                    </nav>
+                )}
             </EnteteEcran>
 
             <section

@@ -43,7 +43,10 @@ export type Encadre = {
     content: BlocSimple[];
 };
 
-export type Bloc = BlocSimple | Encadre;
+/** Mini-question de vérification : une question publiée, par son identifiant. */
+export type BlocQuestion = { type: 'question'; attrs: { uuid: string } };
+
+export type Bloc = BlocSimple | Encadre | BlocQuestion;
 
 export type DocumentBlocs = { type: 'doc'; content?: Bloc[] };
 
@@ -65,6 +68,7 @@ const BLOCS = [
     'orderedList',
     'formuleBloc',
     'encadre',
+    'question',
 ];
 const EN_LIGNE = ['text', 'hardBreak', 'formule'];
 const MARQUES = ['bold', 'italic'];
@@ -237,9 +241,26 @@ function verifierNoeud(noeud: Objet, profondeur: number): string | null {
                 ) ??
                 enfantsNonVides(
                     noeud,
-                    BLOCS.filter((type) => type !== 'encadre'),
+                    BLOCS.filter(
+                        (type) => type !== 'encadre' && type !== 'question',
+                    ),
                     profondeur,
                     'Un encadré',
+                )
+            );
+        case 'question':
+            return (
+                cles(noeud, ['attrs']) ??
+                attributs(
+                    noeud,
+                    {
+                        uuid: (v) =>
+                            typeof v === 'string' &&
+                            /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(
+                                v,
+                            ),
+                    },
+                    'Une mini-question renvoie à une question par son identifiant.',
                 )
             );
         case 'text':

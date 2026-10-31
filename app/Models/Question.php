@@ -4,34 +4,54 @@ namespace App\Models;
 
 use App\Enums\StatutContenu;
 use App\Enums\TypeQuestion;
+use App\Models\Concerns\EstRelisable;
+use App\Models\Contracts\ContenuRelisable;
+use App\Support\BlocsContenu;
+use App\Support\FormatQuestion;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
- * Une question (PLAN M5). Au lot 2, QCM à une réponse seulement (premier
- * exercice, séance du jour minimale) ; format vérifié par
- * App\Support\FormatQuestion. `version` : la version vue par l'élève, que
- * porte chaque tentative (HORS_LIGNE.md A.9 ; l'historique des versions
- * arrive au lot 3).
+ * Une question (PLAN M5), de l'un des neuf types de TypeQuestion ; format
+ * vérifié par App\Support\FormatQuestion.
+ *
+ * Même circuit que les leçons (M17, App\Services\ContenuService) : les
+ * colonnes portent le **brouillon** ; chaque envoi en relecture fige une
+ * version (énoncé, données, réponse, indices et corrigé **ensemble**) ;
+ * l'élève voit `version_publiee_id`. Une tentative garde le numéro de la
+ * version vue, et le serveur la corrige contre celle-là (HORS_LIGNE.md A.9).
  *
  * @property int $id
  * @property string $uuid
  * @property int $notion_id
+ * @property int|null $auteur_id
  * @property TypeQuestion $type
+ * @property string $extrait le début de l'énoncé, en texte (listes, recherche)
  * @property array<string, mixed> $enonce document de blocs
- * @property array{options: list<array{id: string, texte: string, latex?: string}>} $donnees
- * @property array{option: string} $reponse_attendue
- * @property array<string, mixed>|null $explication document de blocs
+ * @property array<string, mixed> $donnees
+ * @property array<string, mixed> $reponse_attendue
+ * @property list<array<string, mixed>>|null $indices documents de blocs
+ * @property list<array{titre: string, blocs: array<string, mixed>}>|null $corrige étapes
  * @property int $difficulte
+ * @property string $source
  * @property StatutContenu $statut
- * @property int $version
+ * @property int $revision
+ * @property int|null $version_publiee_id
+ * @property Carbon|null $publie_le
  * @property bool $est_exemple
+ * @property Carbon $created_at
+ * @property Carbon $updated_at
  * @property-read Notion $notion
+ * @property-read User|null $auteur
+ * @property-read VersionContenu|null $versionPubliee
  */
-#[Fillable(['uuid', 'notion_id', 'type', 'enonce', 'donnees', 'reponse_attendue', 'explication', 'difficulte', 'statut', 'version', 'est_exemple'])]
-class Question extends Model
+#[Fillable(['uuid', 'notion_id', 'auteur_id', 'type', 'extrait', 'enonce', 'donnees', 'reponse_attendue', 'indices', 'corrige', 'difficulte', 'source', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
+class Question extends Model implements ContenuRelisable
 {
+    use EstRelisable;
+
     protected function casts(): array
     {
         return [
@@ -39,10 +59,12 @@ class Question extends Model
             'enonce' => 'array',
             'donnees' => 'array',
             'reponse_attendue' => 'array',
-            'explication' => 'array',
+            'indices' => 'array',
+            'corrige' => 'array',
             'difficulte' => 'integer',
             'statut' => StatutContenu::class,
-            'version' => 'integer',
+            'revision' => 'integer',
+            'publie_le' => 'datetime',
             'est_exemple' => 'boolean',
         ];
     }
@@ -56,5 +78,63 @@ class Question extends Model
     public function notion(): BelongsTo
     {
         return $this->belongsTo(Notion::class);
+    }
+
+    public function nomContenu(): string
+    {
+        return 'question';
+    }
+
+    /**
+     * Le brouillon, sous la forme que fige une version.
+     *
+     * @return array{type: string, enonce: array<string, mixed>, donnees: array<string, mixed>, attendue: array<string, mixed>, indices: list<array<string, mixed>>, corrige: list<array{titre: string, blocs: array<string, mixed>}>, difficulte: int}
+     */
+    public function contenuDuBrouillon(): array
+    {
+        return [
+            'type' => $this->type->value,
+            'enonce' => $this->enonce,
+            'donnees' => $this->donnees,
+            'attendue' => $this->reponse_attendue,
+            'indices' => $this->indices ?? [],
+            'corrige' => $this->corrige ?? [],
+            'difficulte' => $this->difficulte,
+        ];
+    }
+
+    public function instantane(): array
+    {
+        return [
+            'titre' => self::titreDe($this->enonce) ?: 'Question sans texte',
+            'blocs' => $this->contenuDuBrouillon(),
+        ];
+    }
+
+    /**
+     * Ce que montre une liste : le début de l'énoncé.
+     *
+     * @param  array<string, mixed>  $enonce
+     */
+    public static function titreDe(array $enonce): string
+    {
+        return BlocsContenu::extrait($enonce, 160);
+    }
+
+    public function erreurAvantRelecture(): ?string
+    {
+        if (($this->enonce['content'] ?? []) === []) {
+            return 'Une question sans énoncé ne part pas en relecture.';
+        }
+
+        return FormatQuestion::erreur($this->type, $this->enonce, $this->donnees, $this->reponse_attendue)
+            ?? FormatQuestion::erreurAides($this->indices ?? [], $this->corrige ?? [])
+            ?? (($this->corrige ?? []) === [] ? 'Le corrigé pas à pas a au moins une étape.' : null);
+    }
+
+    /** La version publiée : ce que voit l'élève (`null` si jamais publiée). */
+    public function numeroPublie(): ?int
+    {
+        return $this->versionPubliee?->numero;
     }
 }

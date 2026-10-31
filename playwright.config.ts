@@ -33,7 +33,7 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
-            testIgnore: /parcours-lot[12]\.spec\.ts/,
+            testIgnore: /parcours-lot[123]\.spec\.ts/,
             dependencies: ['connexion'],
         },
         // Crée puis efface une leçon : après les captures, qu'il ne doit pas
@@ -49,6 +49,15 @@ export default defineConfig({
             name: 'parcours-eleve',
             testMatch: /parcours-lot2\.spec\.ts/,
             dependencies: ['ecrans'],
+        },
+        // Un élève neuf fait sa séance en mode avion (HORS_LIGNE.md A.14
+        // n° 24), puis le supprime. Après les deux autres parcours : trois
+        // parcours en même temps sur `php artisan serve` (une requête à la
+        // fois) faisaient manquer ses délais au parcours du lot 1.
+        {
+            name: 'parcours-hors-ligne',
+            testMatch: /parcours-lot3\.spec\.ts/,
+            dependencies: ['parcours-contenu', 'parcours-eleve'],
         },
     ],
     webServer: {

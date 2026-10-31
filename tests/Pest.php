@@ -208,20 +208,55 @@ function notionAilleurs(string $matiere, string $classe, string $titre = 'Notion
     return Notion::firstOrCreate(['chapitre_id' => $chapitre->id, 'titre' => $titre], ['ordre' => 1]);
 }
 
-/** Un QCM publié, bonne réponse « b ». */
+/**
+ * Un QCM, bonne réponse « b », passé par le circuit réel (ContenuService) :
+ * écrit par un rédacteur, publié par un relecteur. `brouillon` : jamais
+ * envoyé ; `archive` : publié puis retiré.
+ */
 function questionDeTest(Notion $notion, string $statut = 'publie'): Question
 {
-    return Question::create([
-        'uuid' => (string) Str::uuid7(),
-        'notion_id' => $notion->id,
-        'type' => TypeQuestion::QcmUne,
+    return questionPubliee($notion, TypeQuestion::QcmUne,
+        ['options' => [['id' => 'a', 'texte' => '4 cm'], ['id' => 'b', 'texte' => '5 cm'], ['id' => 'c', 'texte' => '7 cm']]],
+        ['option' => 'b'],
+        statut: $statut,
+    );
+}
+
+/**
+ * Une question de n'importe quel type, passée par le circuit réel.
+ *
+ * @param  array<string, mixed>  $donnees
+ * @param  array<string, mixed>  $attendue
+ * @param  list<array<string, mixed>>  $indices
+ */
+function questionPubliee(Notion $notion, TypeQuestion $type, array $donnees, array $attendue, array $indices = [], string $statut = 'publie', ?User $redacteur = null): Question
+{
+    $contenu = app(ContenuService::class);
+    $redacteur ??= User::factory()->avecRole(Role::Redacteur)->create();
+    $relecteur = User::factory()->avecRole(Role::Relecteur)->create();
+    $pedagogie = User::factory()->avecRole(Role::AdminContenu)->create();
+
+    $question = $contenu->creerQuestion($redacteur, $notion, $type);
+    $question = $contenu->enregistrerQuestion($question, $redacteur, [
         'enonce' => blocsDeTest('Combien mesure l\'hypoténuse ?'),
-        'donnees' => ['options' => [['id' => 'a', 'texte' => '4 cm'], ['id' => 'b', 'texte' => '5 cm'], ['id' => 'c', 'texte' => '7 cm']]],
-        'reponse_attendue' => ['option' => 'b'],
-        'explication' => blocsDeTest('3² + 4² = 25.'),
-        'statut' => $statut,
-        'version' => 1,
-    ]);
+        'donnees' => $donnees,
+        'attendue' => $attendue,
+        'indices' => $indices,
+        'corrige' => [['titre' => 'Calculer', 'blocs' => blocsDeTest('3² + 4² = 25.')]],
+        'difficulte' => 2,
+    ], 0);
+
+    if ($statut === 'brouillon') {
+        return $question->fresh();
+    }
+
+    $question = $contenu->publier($contenu->soumettre($question, $redacteur), $relecteur);
+
+    if ($statut === 'archive') {
+        $question = $contenu->archiver($question, $pedagogie);
+    }
+
+    return $question->fresh();
 }
 
 /**

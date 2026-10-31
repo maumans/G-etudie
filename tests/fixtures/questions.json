@@ -1,47 +1,852 @@
 {
-    "_lisezmoi": "Correction des questions : mêmes verdicts attendus de FormatQuestion::corriger (PHP, app/Support) et de corriger() (lib/contenu/questions.ts). La correction de l'appareil n'est qu'un affichage ; celle du serveur fait foi (HORS_LIGNE.md A.6).",
+    "_lisezmoi": "Questions : mêmes résultats attendus de App\\Support\\FormatQuestion (PHP) et de lib/contenu/questions.ts. Score de 0 à 100, juste seulement à 100 ; null = question ouverte à auto-évaluer. La correction de l'appareil n'est qu'un affichage ; celle du serveur fait foi (HORS_LIGNE.md A.6).",
     "corrections": [
         {
-            "nom": "bonne option",
+            "nom": "QCM : bonne option",
             "type": "qcm_une",
-            "attendue": { "option": "b" },
-            "reponse": { "option": "b" },
-            "correcte": true
+            "attendue": {
+                "option": "b"
+            },
+            "reponse": {
+                "option": "b"
+            },
+            "score": 100
         },
         {
-            "nom": "autre option",
+            "nom": "QCM : autre option",
             "type": "qcm_une",
-            "attendue": { "option": "b" },
-            "reponse": { "option": "a" },
-            "correcte": false
+            "attendue": {
+                "option": "b"
+            },
+            "reponse": {
+                "option": "a"
+            },
+            "score": 0
         },
         {
-            "nom": "casse différente",
+            "nom": "QCM : casse différente",
             "type": "qcm_une",
-            "attendue": { "option": "b" },
-            "reponse": { "option": "B" },
-            "correcte": false
+            "attendue": {
+                "option": "b"
+            },
+            "reponse": {
+                "option": "B"
+            },
+            "score": 0
         },
         {
-            "nom": "réponse vide",
+            "nom": "QCM : réponse vide",
             "type": "qcm_une",
-            "attendue": { "option": "b" },
+            "attendue": {
+                "option": "b"
+            },
             "reponse": {},
-            "correcte": false
+            "score": 0
         },
         {
-            "nom": "option non textuelle",
+            "nom": "QCM : option non textuelle",
             "type": "qcm_une",
-            "attendue": { "option": "b" },
-            "reponse": { "option": ["b"] },
-            "correcte": false
+            "attendue": {
+                "option": "b"
+            },
+            "reponse": {
+                "option": ["b"]
+            },
+            "score": 0
         },
         {
-            "nom": "option nulle",
+            "nom": "QCM : option nulle",
             "type": "qcm_une",
-            "attendue": { "option": "b" },
-            "reponse": { "option": null },
-            "correcte": false
+            "attendue": {
+                "option": "b"
+            },
+            "reponse": {
+                "option": null
+            },
+            "score": 0
+        },
+        {
+            "nom": "QCM multiple : toutes les bonnes",
+            "type": "qcm_plusieurs",
+            "attendue": {
+                "options": ["a", "c", "d"]
+            },
+            "reponse": {
+                "options": ["d", "a", "c"]
+            },
+            "score": 100
+        },
+        {
+            "nom": "QCM multiple : deux sur trois",
+            "type": "qcm_plusieurs",
+            "attendue": {
+                "options": ["a", "c", "d"]
+            },
+            "reponse": {
+                "options": ["a", "c"]
+            },
+            "score": 66
+        },
+        {
+            "nom": "QCM multiple : une bonne, une fausse",
+            "type": "qcm_plusieurs",
+            "attendue": {
+                "options": ["a", "c", "d"]
+            },
+            "reponse": {
+                "options": ["a", "b"]
+            },
+            "score": 0
+        },
+        {
+            "nom": "QCM multiple : toutes, plus une fausse",
+            "type": "qcm_plusieurs",
+            "attendue": {
+                "options": ["a", "c", "d"]
+            },
+            "reponse": {
+                "options": ["a", "b", "c", "d"]
+            },
+            "score": 66
+        },
+        {
+            "nom": "QCM multiple : doublons ignorés",
+            "type": "qcm_plusieurs",
+            "attendue": {
+                "options": ["a", "c", "d"]
+            },
+            "reponse": {
+                "options": ["a", "a", "a"]
+            },
+            "score": 33
+        },
+        {
+            "nom": "QCM multiple : que des fausses",
+            "type": "qcm_plusieurs",
+            "attendue": {
+                "options": ["a", "c", "d"]
+            },
+            "reponse": {
+                "options": ["b", "e", "f"]
+            },
+            "score": 0
+        },
+        {
+            "nom": "QCM multiple : pas une liste",
+            "type": "qcm_plusieurs",
+            "attendue": {
+                "options": ["a", "c", "d"]
+            },
+            "reponse": {
+                "options": "a"
+            },
+            "score": 0
+        },
+        {
+            "nom": "QCM multiple : rien coché",
+            "type": "qcm_plusieurs",
+            "attendue": {
+                "options": ["a", "c", "d"]
+            },
+            "reponse": {
+                "options": []
+            },
+            "score": 0
+        },
+        {
+            "nom": "Vrai/faux : juste",
+            "type": "vrai_faux",
+            "attendue": {
+                "valeur": false
+            },
+            "reponse": {
+                "valeur": false
+            },
+            "score": 100
+        },
+        {
+            "nom": "Vrai/faux : faux",
+            "type": "vrai_faux",
+            "attendue": {
+                "valeur": false
+            },
+            "reponse": {
+                "valeur": true
+            },
+            "score": 0
+        },
+        {
+            "nom": "Vrai/faux : texte au lieu d'un booléen",
+            "type": "vrai_faux",
+            "attendue": {
+                "valeur": false
+            },
+            "reponse": {
+                "valeur": "false"
+            },
+            "score": 0
+        },
+        {
+            "nom": "Numérique : virgule",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 3.14,
+                "tolerance": 0.01,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "3,14"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : dans la tolérance",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 3.14,
+                "tolerance": 0.01,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "3.15"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : hors tolérance",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 3.14,
+                "tolerance": 0.01,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "3,16"
+            },
+            "score": 0
+        },
+        {
+            "nom": "Numérique : nombre envoyé tel quel",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 3.14,
+                "tolerance": 0.01,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": 3.135
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : texte",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 3.14,
+                "tolerance": 0.01,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "trois"
+            },
+            "score": 0
+        },
+        {
+            "nom": "Numérique : unité tapée",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 3.14,
+                "tolerance": 0.01,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "3,14 cm"
+            },
+            "score": 0
+        },
+        {
+            "nom": "Numérique : vide",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 3.14,
+                "tolerance": 0.01,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": ""
+            },
+            "score": 0
+        },
+        {
+            "nom": "Numérique : espaces de milliers",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 12500,
+                "tolerance": 0,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "12 500"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : espace insécable",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 12500,
+                "tolerance": 0,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "12 500"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : tolérance nulle et arrondi",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 0.3,
+                "tolerance": 0,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "0,3"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : signe moins",
+            "type": "numerique",
+            "attendue": {
+                "valeur": -2,
+                "tolerance": 0,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "-2"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : point final",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 5,
+                "tolerance": 0,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "5,"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : relative, dans les 5 %",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 200,
+                "tolerance": 5,
+                "relative": true
+            },
+            "reponse": {
+                "valeur": "209"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Numérique : relative, au-delà",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 200,
+                "tolerance": 5,
+                "relative": true
+            },
+            "reponse": {
+                "valeur": "211"
+            },
+            "score": 0
+        },
+        {
+            "nom": "Numérique : deux virgules",
+            "type": "numerique",
+            "attendue": {
+                "valeur": 3.14,
+                "tolerance": 0.01,
+                "relative": false
+            },
+            "reponse": {
+                "valeur": "3,1,4"
+            },
+            "score": 0
+        },
+        {
+            "nom": "Courte : exacte",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["Conakry", "Konakry"]
+            },
+            "reponse": {
+                "texte": "Conakry"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Courte : casse et espaces",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["Conakry", "Konakry"]
+            },
+            "reponse": {
+                "texte": "  conakry "
+            },
+            "score": 100
+        },
+        {
+            "nom": "Courte : autre forme acceptée",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["Conakry", "Konakry"]
+            },
+            "reponse": {
+                "texte": "KONAKRY"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Courte : faute de frappe",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["Conakry", "Konakry"]
+            },
+            "reponse": {
+                "texte": "Conakri"
+            },
+            "score": 0
+        },
+        {
+            "nom": "Courte : vide",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["Conakry", "Konakry"]
+            },
+            "reponse": {
+                "texte": "   "
+            },
+            "score": 0
+        },
+        {
+            "nom": "Courte : accents et apostrophe typographique",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["l'été"]
+            },
+            "reponse": {
+                "texte": "L’ete"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Courte : ponctuation en trop",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["l'été"]
+            },
+            "reponse": {
+                "texte": "l'été !"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Courte : ligature",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["oeuf"]
+            },
+            "reponse": {
+                "texte": "Œuf"
+            },
+            "score": 100
+        },
+        {
+            "nom": "Courte : pas un texte",
+            "type": "courte",
+            "attendue": {
+                "acceptees": ["Conakry", "Konakry"]
+            },
+            "reponse": {
+                "texte": ["Conakry"]
+            },
+            "score": 0
+        },
+        {
+            "nom": "Trous : tout juste",
+            "type": "trous",
+            "attendue": {
+                "trous": {
+                    "t1": ["photosynthèse"],
+                    "t2": ["oxygène", "dioxygène"]
+                }
+            },
+            "reponse": {
+                "trous": {
+                    "t1": "Photosynthese",
+                    "t2": "dioxygène"
+                }
+            },
+            "score": 100
+        },
+        {
+            "nom": "Trous : un sur deux",
+            "type": "trous",
+            "attendue": {
+                "trous": {
+                    "t1": ["photosynthèse"],
+                    "t2": ["oxygène", "dioxygène"]
+                }
+            },
+            "reponse": {
+                "trous": {
+                    "t1": "respiration",
+                    "t2": "oxygène"
+                }
+            },
+            "score": 50
+        },
+        {
+            "nom": "Trous : rien",
+            "type": "trous",
+            "attendue": {
+                "trous": {
+                    "t1": ["photosynthèse"],
+                    "t2": ["oxygène", "dioxygène"]
+                }
+            },
+            "reponse": {
+                "trous": {}
+            },
+            "score": 0
+        },
+        {
+            "nom": "Trous : mal formé",
+            "type": "trous",
+            "attendue": {
+                "trous": {
+                    "t1": ["photosynthèse"],
+                    "t2": ["oxygène", "dioxygène"]
+                }
+            },
+            "reponse": {
+                "trous": "oxygène"
+            },
+            "score": 0
+        },
+        {
+            "nom": "Trous : un sur trois",
+            "type": "trous",
+            "attendue": {
+                "trous": {
+                    "t1": ["a"],
+                    "t2": ["b"],
+                    "t3": ["c"]
+                }
+            },
+            "reponse": {
+                "trous": {
+                    "t1": "a",
+                    "t2": "x",
+                    "t3": ""
+                }
+            },
+            "score": 33
+        },
+        {
+            "nom": "Appariement : tout juste",
+            "type": "appariement",
+            "attendue": {
+                "paires": {
+                    "g1": "d2",
+                    "g2": "d1",
+                    "g3": "d3"
+                }
+            },
+            "reponse": {
+                "paires": {
+                    "g1": "d2",
+                    "g2": "d1",
+                    "g3": "d3"
+                }
+            },
+            "score": 100
+        },
+        {
+            "nom": "Appariement : deux sur trois",
+            "type": "appariement",
+            "attendue": {
+                "paires": {
+                    "g1": "d2",
+                    "g2": "d1",
+                    "g3": "d3"
+                }
+            },
+            "reponse": {
+                "paires": {
+                    "g1": "d2",
+                    "g2": "d1",
+                    "g3": "d1"
+                }
+            },
+            "score": 66
+        },
+        {
+            "nom": "Appariement : aucune paire",
+            "type": "appariement",
+            "attendue": {
+                "paires": {
+                    "g1": "d2",
+                    "g2": "d1",
+                    "g3": "d3"
+                }
+            },
+            "reponse": {
+                "paires": {}
+            },
+            "score": 0
+        },
+        {
+            "nom": "Appariement : liste au lieu de paires",
+            "type": "appariement",
+            "attendue": {
+                "paires": {
+                    "g1": "d2",
+                    "g2": "d1",
+                    "g3": "d3"
+                }
+            },
+            "reponse": {
+                "paires": ["d2", "d1", "d3"]
+            },
+            "score": 0
+        },
+        {
+            "nom": "Ordre : juste",
+            "type": "ordre",
+            "attendue": {
+                "ordre": ["e3", "e1", "e2", "e4"]
+            },
+            "reponse": {
+                "ordre": ["e3", "e1", "e2", "e4"]
+            },
+            "score": 100
+        },
+        {
+            "nom": "Ordre : deux inversés",
+            "type": "ordre",
+            "attendue": {
+                "ordre": ["e3", "e1", "e2", "e4"]
+            },
+            "reponse": {
+                "ordre": ["e1", "e3", "e2", "e4"]
+            },
+            "score": 50
+        },
+        {
+            "nom": "Ordre : élément manquant",
+            "type": "ordre",
+            "attendue": {
+                "ordre": ["e3", "e1", "e2", "e4"]
+            },
+            "reponse": {
+                "ordre": ["e3", "e1", "e2"]
+            },
+            "score": 0
+        },
+        {
+            "nom": "Ordre : élément répété",
+            "type": "ordre",
+            "attendue": {
+                "ordre": ["e3", "e1", "e2", "e4"]
+            },
+            "reponse": {
+                "ordre": ["e3", "e3", "e2", "e4"]
+            },
+            "score": 0
+        },
+        {
+            "nom": "Ordre : élément inconnu",
+            "type": "ordre",
+            "attendue": {
+                "ordre": ["e3", "e1", "e2", "e4"]
+            },
+            "reponse": {
+                "ordre": ["e3", "e1", "e2", "e9"]
+            },
+            "score": 0
+        },
+        {
+            "nom": "Ordre : identifiants non textuels",
+            "type": "ordre",
+            "attendue": {
+                "ordre": ["e3", "e1", "e2", "e4"]
+            },
+            "reponse": {
+                "ordre": [3, 1, 2, 4]
+            },
+            "score": 0
+        },
+        {
+            "nom": "Ouverte : pas de score avant l'auto-évaluation",
+            "type": "ouverte",
+            "attendue": {},
+            "reponse": {
+                "texte": "Ma rédaction."
+            },
+            "score": null
         }
+    ],
+    "auto_evaluations": [
+        {
+            "nom": "tous les critères",
+            "donnees": {
+                "bareme": [
+                    {
+                        "id": "c1",
+                        "critere": "Introduction qui pose le sujet",
+                        "points": 2
+                    },
+                    {
+                        "id": "c2",
+                        "critere": "Deux arguments",
+                        "points": 4
+                    },
+                    {
+                        "id": "c3",
+                        "critere": "Conclusion",
+                        "points": 2
+                    }
+                ]
+            },
+            "criteres": ["c1", "c2", "c3"],
+            "score": 100
+        },
+        {
+            "nom": "introduction seule",
+            "donnees": {
+                "bareme": [
+                    {
+                        "id": "c1",
+                        "critere": "Introduction qui pose le sujet",
+                        "points": 2
+                    },
+                    {
+                        "id": "c2",
+                        "critere": "Deux arguments",
+                        "points": 4
+                    },
+                    {
+                        "id": "c3",
+                        "critere": "Conclusion",
+                        "points": 2
+                    }
+                ]
+            },
+            "criteres": ["c1"],
+            "score": 25
+        },
+        {
+            "nom": "aucun",
+            "donnees": {
+                "bareme": [
+                    {
+                        "id": "c1",
+                        "critere": "Introduction qui pose le sujet",
+                        "points": 2
+                    },
+                    {
+                        "id": "c2",
+                        "critere": "Deux arguments",
+                        "points": 4
+                    },
+                    {
+                        "id": "c3",
+                        "critere": "Conclusion",
+                        "points": 2
+                    }
+                ]
+            },
+            "criteres": [],
+            "score": 0
+        },
+        {
+            "nom": "critère inconnu ignoré",
+            "donnees": {
+                "bareme": [
+                    {
+                        "id": "c1",
+                        "critere": "Introduction qui pose le sujet",
+                        "points": 2
+                    },
+                    {
+                        "id": "c2",
+                        "critere": "Deux arguments",
+                        "points": 4
+                    },
+                    {
+                        "id": "c3",
+                        "critere": "Conclusion",
+                        "points": 2
+                    }
+                ]
+            },
+            "criteres": ["c2", "c9"],
+            "score": 50
+        },
+        {
+            "nom": "doublon compté une fois",
+            "donnees": {
+                "bareme": [
+                    {
+                        "id": "c1",
+                        "critere": "Introduction qui pose le sujet",
+                        "points": 2
+                    },
+                    {
+                        "id": "c2",
+                        "critere": "Deux arguments",
+                        "points": 4
+                    },
+                    {
+                        "id": "c3",
+                        "critere": "Conclusion",
+                        "points": 2
+                    }
+                ]
+            },
+            "criteres": ["c2", "c2"],
+            "score": 50
+        }
+    ],
+    "normalisations": [
+        ["L’Été !", "l ete"],
+        ["  Conakry  ", "conakry"],
+        ["Œuvre-d'art", "oeuvre d art"],
+        ["CO₂", "co₂"],
+        ["éÈêË", "eeee"],
+        ["1 000", "1 000"],
+        ["", ""]
+    ],
+    "nombres": [
+        ["3,14", 3.14],
+        ["-0,5", -0.5],
+        [".5", 0.5],
+        ["5,", 5],
+        ["1 000", 1000],
+        ["1 000,25", 1000.25],
+        ["abc", null],
+        ["", null],
+        ["1e3", null],
+        ["+2", 2],
+        ["3,1,4", null]
     ]
 }

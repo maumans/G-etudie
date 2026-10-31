@@ -4,7 +4,7 @@ namespace App\Support;
 
 use App\Enums\Permission;
 use App\Enums\Role;
-use App\Models\Lecon;
+use App\Models\Contracts\ContenuRelisable;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -25,6 +25,8 @@ use Illuminate\Database\Eloquent\Builder;
  * catalogue ; on n'agit que sur ce à quoi on est rattaché. Une leçon est
  * rattachée à son auteur (il la rédige) ; le responsable pédagogique agit
  * sur toutes. Un relecteur n'est jamais rattaché à ce qu'il a écrit.
+ *
+ * Lot 3 : les questions suivent la même règle que les leçons.
  */
 class Perimetre
 {
@@ -65,31 +67,34 @@ class Perimetre
         return $acteur->hasRole(Role::Eleve) ? [$acteur->getKey()] : [];
     }
 
-    /** Modifier le brouillon d'une leçon, l'envoyer en relecture, la reprendre. */
-    public static function peutRedigerLecon(User $acteur, Lecon $lecon): bool
+    /**
+     * Modifier le brouillon d'un contenu (leçon, question), l'envoyer en
+     * relecture, le reprendre : son auteur, ou le responsable pédagogique.
+     */
+    public static function peutRediger(User $acteur, ContenuRelisable $contenu): bool
     {
         if (! $acteur->can(Permission::RedigerContenu->value)) {
             return false;
         }
 
-        return $lecon->auteur_id === $acteur->getKey()
+        return $contenu->auteurId() === $acteur->getKey()
             || $acteur->can(Permission::AdministrerContenu->value);
     }
 
     /**
-     * Relire la version en attente : jamais son auteur, ni l'auteur de la
-     * leçon (« rien n'est publié sans relecteur différent de l'auteur »,
+     * Relire la version en attente : jamais son auteur, ni l'auteur du
+     * contenu (« rien n'est publié sans relecteur différent de l'auteur »,
      * PLAN M17), même responsable pédagogique.
      */
-    public static function peutRelireLecon(User $acteur, Lecon $lecon): bool
+    public static function peutRelire(User $acteur, ContenuRelisable $contenu): bool
     {
-        return $acteur->can(Permission::RelireContenu->value) && ! self::estAuteurDe($acteur, $lecon);
+        return $acteur->can(Permission::RelireContenu->value) && ! self::estAuteurDe($acteur, $contenu);
     }
 
-    /** A écrit la leçon, ou la version qui attend sa relecture. */
-    public static function estAuteurDe(User $acteur, Lecon $lecon): bool
+    /** A écrit le contenu, ou la version qui attend sa relecture. */
+    public static function estAuteurDe(User $acteur, ContenuRelisable $contenu): bool
     {
-        return $lecon->auteur_id === $acteur->getKey()
-            || $lecon->versionEnRelecture()?->auteur_id === $acteur->getKey();
+        return $contenu->auteurId() === $acteur->getKey()
+            || $contenu->versionEnRelecture()?->auteur_id === $acteur->getKey();
     }
 }

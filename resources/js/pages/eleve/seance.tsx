@@ -1,48 +1,66 @@
 import { Head, Link } from '@inertiajs/react';
-import { BookOpen, Check, CloudUpload, Flame, House, X } from 'lucide-react';
+import { BookOpen, CloudUpload, Flame, House, X } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
 import { PastilleReseau } from '@/components/hors-ligne/pastille-reseau';
+import {
+    AutoEvaluation,
+    CorrigePasAPas,
+    IndicesQuestion,
+} from '@/components/questions/aides-question';
+import { EnteteQuestion, VerdictQuestion } from '@/components/questions/commun';
+import { SaisieQuestion } from '@/components/questions/saisie-question';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
-import type { EtatChoix } from '@/components/ui/choix';
-import { Choix, GroupeChoix } from '@/components/ui/choix';
-import { Formule } from '@/components/ui/formule';
 import { ProgressionSegments } from '@/components/ui/progression';
-import { corriger } from '@/lib/contenu/questions';
-import type { QuestionSeance } from '@/lib/contenu/questions';
+import type { Reprise, Tentative } from '@/hooks/use-tentative';
+import { useTentative } from '@/hooks/use-tentative';
+import { corriger, scoreAutoEvaluation } from '@/lib/contenu/questions';
+import type { QuestionEleve, ReponseQuestion } from '@/lib/contenu/questions';
 import { base, enregistrer, useHorsLigne } from '@/lib/hors-ligne';
-import type { CleMatiere } from '@/lib/matieres';
-import { MATIERES } from '@/lib/matieres';
-import { cn } from '@/lib/utils';
 import { accueil, cours } from '@/routes/eleve';
 
-type Reponse = { question: string; option: string; correcte: boolean };
+/** Une réponse de la séance : reçue par le serveur, ou encore dans la file. */
+type Reponse = {
+    question: string;
+    /** uuid de la tentative (= celui de son opération dans la file) */
+    tentative: string;
+    reponse: ReponseQuestion;
+    score: number | null;
+    auto_evaluee: boolean;
+};
 
 type Props = {
     seance: { uuid: string; duree_minutes: number; terminee: boolean };
-    questions: QuestionSeance[];
+    questions: QuestionEleve[];
     reponses: Reponse[];
 };
 
-const LETTRES = ['A', 'B', 'C', 'D', 'E', 'F'];
+/** Terminée : corrigée, et auto-évaluée si la question est ouverte. */
+function estTerminee(reponse: Reponse, questions: QuestionEleve[]) {
+    const question = questions.find((q) => q.uuid === reponse.question);
+
+    return question?.type !== 'ouverte' || reponse.auto_evaluee;
+}
 
 /**
  * La séance du jour dans « l'ardoise » (DESIGN.md § 6.4) : plein écran, une
- * question à la fois, « Vérifier » collé en bas, puis le verdict (icône +
- * mot + couleur) et l'explication.
+ * question à la fois — l'un des neuf types —, un indice à la demande,
+ * « Vérifier » collé en bas, puis la feuille du verdict (icône + mot +
+ * couleur) et le corrigé pas à pas. Question ouverte : l'élève compare sa
+ * rédaction au corrigé et coche les critères du barème.
  *
  * **Chaque réponse part par la file d'opérations** (`tentative.enregistrer`,
- * HORS_LIGNE.md A.6), en ligne comme hors ligne : la correction affichée ici
- * est celle de l'appareil, le serveur recorrige. Une séance rouverte reprend
- * à la première question sans réponse, réponses encore en file comprises.
+ * puis `tentative.auto_evaluer` pour une rédaction, HORS_LIGNE.md A.6), en
+ * ligne comme hors ligne : la correction affichée ici est celle de
+ * l'appareil, le serveur recorrige contre la version vue. Une séance
+ * rouverte reprend à la première question pas terminée, réponses encore en
+ * file comprises.
  */
 export default function Seance({ seance, questions, reponses }: Props) {
     const [donnees, setDonnees] = useState<Reponse[]>(reponses);
     const [pretes, setPretes] = useState(false);
-    const [choix, setChoix] = useState<string | null>(null);
-    const [verifiee, setVerifiee] = useState<Reponse | null>(null);
-    const debut = useRef(Date.now());
+    const [enCours, setEnCours] = useState<string | null>(null);
     const finEnvoyee = useRef(seance.terminee);
 
     // Réponses données sur ce téléphone mais pas encore reçues par le serveur.
@@ -56,38 +74,90 @@ export default function Seance({ seance, questions, reponses }: Props) {
                     return;
                 }
 
-                const locales = operations
+                const evaluations = new Map(
+                    operations
+                        .filter((o) => o.type === 'tentative.auto_evaluer')
+                        .map((o) => [
+                            String(o.charge.tentative),
+                            (o.charge.criteres as string[]) ?? [],
+                        ]),
+                );
+                const locales: Reponse[] = operations
                     .filter(
                         (o) =>
                             o.type === 'tentative.enregistrer' &&
                             o.charge.seance === seance.uuid,
                     )
-                    .map((o) => {
+                    .flatMap((o) => {
                         const question = questions.find(
                             (q) => q.uuid === o.charge.question,
                         );
-                        const option = String(
-                            (o.charge.reponse as { option?: string })?.option ??
-                                '',
-                        );
 
-                        return {
-                            question: String(o.charge.question),
-                            option,
-                            correcte: question
-                                ? corriger(question.type, question.attendue, {
-                                      option,
-                                  })
-                                : false,
-                        };
+                        if (!question) {
+                            return [];
+                        }
+
+                        const reponse = (o.charge.reponse ??
+                            {}) as ReponseQuestion;
+                        const criteres = evaluations.get(o.uuid);
+
+                        return [
+                            {
+                                question: question.uuid,
+                                tentative: o.uuid,
+                                reponse,
+                                score:
+                                    criteres !== undefined
+                                        ? scoreAutoEvaluation(
+                                              question.donnees,
+                                              criteres,
+                                          )
+                                        : corriger(
+                                              question.type,
+                                              question.attendue,
+                                              reponse as Record<
+                                                  string,
+                                                  unknown
+                                              >,
+                                          ),
+                                auto_evaluee: criteres !== undefined,
+                            },
+                        ];
                     });
 
-                setDonnees((deja) => [
-                    ...deja,
-                    ...locales.filter(
-                        (l) => !deja.some((d) => d.question === l.question),
-                    ),
-                ]);
+                setDonnees((deja) => {
+                    // Une auto-évaluation encore en file complète une
+                    // rédaction déjà reçue.
+                    const completees = deja.map((d) => {
+                        const criteres = evaluations.get(d.tentative);
+                        const question = questions.find(
+                            (q) => q.uuid === d.question,
+                        );
+
+                        return criteres !== undefined &&
+                            question &&
+                            !d.auto_evaluee
+                            ? {
+                                  ...d,
+                                  auto_evaluee: true,
+                                  score: scoreAutoEvaluation(
+                                      question.donnees,
+                                      criteres,
+                                  ),
+                              }
+                            : d;
+                    });
+
+                    return [
+                        ...completees,
+                        ...locales.filter(
+                            (l) =>
+                                !completees.some(
+                                    (d) => d.question === l.question,
+                                ),
+                        ),
+                    ];
+                });
             })
             .catch(() => undefined)
             .finally(() => actif && setPretes(true));
@@ -97,16 +167,24 @@ export default function Seance({ seance, questions, reponses }: Props) {
         };
     }, [seance.uuid, questions]);
 
-    const repondues = useMemo(
-        () => new Set(donnees.map((d) => d.question)),
-        [donnees],
+    const terminees = useMemo(
+        () =>
+            new Set(
+                donnees
+                    .filter((d) => estTerminee(d, questions))
+                    .map((d) => d.question),
+            ),
+        [donnees, questions],
     );
-    const courante = verifiee
-        ? questions.find((q) => q.uuid === verifiee.question)
-        : questions.find((q) => !repondues.has(q.uuid));
+    const courante = enCours
+        ? questions.find((q) => q.uuid === enCours)
+        : questions.find((q) => !terminees.has(q.uuid));
     const rang = courante ? questions.indexOf(courante) + 1 : questions.length;
     const terminee = pretes && !courante;
-    const justes = donnees.filter((d) => d.correcte).length;
+    const justes = donnees.filter((d) => d.score === 100).length;
+    const enPartie = donnees.filter(
+        (d) => d.score !== null && d.score > 0 && d.score < 100,
+    ).length;
 
     // Fin de séance : un geste de la file, une seule fois.
     useEffect(() => {
@@ -120,45 +198,11 @@ export default function Seance({ seance, questions, reponses }: Props) {
         }
     }, [terminee, seance.uuid]);
 
-    function verifier() {
-        if (!courante || choix === null) {
-            return;
-        }
-
-        const reponse = {
-            question: courante.uuid,
-            option: choix,
-            correcte: corriger(courante.type, courante.attendue, {
-                option: choix,
-            }),
-        };
-
-        setVerifiee(reponse);
-        setDonnees((deja) => [...deja, reponse]);
-        void enregistrer({
-            type: 'tentative.enregistrer',
-            charge: {
-                question: courante.uuid,
-                version: courante.version,
-                reponse: { option: choix },
-                seance: seance.uuid,
-                duree_secondes: Math.min(
-                    65535,
-                    Math.round((Date.now() - debut.current) / 1000),
-                ),
-            },
-            priorite: 1,
-        });
-    }
-
-    function continuer() {
-        setVerifiee(null);
-        setChoix(null);
-        debut.current = Date.now();
-        window.scrollTo({ top: 0 });
-    }
-
     const exemple = questions.some((q) => q.est_exemple);
+    // Rédaction déjà envoyée mais pas encore auto-évaluée : reprise à la feuille.
+    const reprise = courante
+        ? donnees.find((d) => d.question === courante.uuid)
+        : undefined;
 
     return (
         <>
@@ -175,7 +219,7 @@ export default function Seance({ seance, questions, reponses }: Props) {
                         </Link>
                         <ProgressionSegments
                             valeur={
-                                (repondues.size /
+                                (terminees.size /
                                     Math.max(1, questions.length)) *
                                 100
                             }
@@ -191,36 +235,44 @@ export default function Seance({ seance, questions, reponses }: Props) {
                     </div>
                 </header>
 
-                <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 pt-6 pb-6">
-                    {exemple && <BandeauExemple className="mb-5" />}
-                    {!pretes ? null : terminee ? (
+                {!pretes ? null : terminee ? (
+                    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 pt-6 pb-6">
+                        {exemple && <BandeauExemple className="mb-5" />}
                         <Bilan
                             justes={justes}
+                            enPartie={enPartie}
                             total={questions.length}
                             duree={seance.duree_minutes}
                         />
-                    ) : (
-                        courante && (
-                            <Ardoise
-                                key={courante.uuid}
-                                question={courante}
-                                choix={choix}
-                                verifiee={verifiee}
-                                choisir={setChoix}
-                            />
-                        )
-                    )}
-                </main>
-
-                {pretes && !terminee && courante && (
-                    <BarreAction
-                        verifiee={verifiee}
-                        peutVerifier={choix !== null}
-                        verifier={verifier}
-                        continuer={continuer}
-                        derniere={repondues.size >= questions.length}
-                        question={courante}
-                    />
+                    </main>
+                ) : (
+                    courante && (
+                        <Ardoise
+                            key={courante.uuid}
+                            question={courante}
+                            exemple={exemple}
+                            reprise={reprise}
+                            seance={seance.uuid}
+                            derniere={questions.every(
+                                (q) =>
+                                    q.uuid === courante.uuid ||
+                                    terminees.has(q.uuid),
+                            )}
+                            commencer={() => setEnCours(courante.uuid)}
+                            repondre={(reponse) =>
+                                setDonnees((deja) => [
+                                    ...deja.filter(
+                                        (d) => d.question !== reponse.question,
+                                    ),
+                                    reponse,
+                                ])
+                            }
+                            continuer={() => {
+                                setEnCours(null);
+                                window.scrollTo({ top: 0 });
+                            }}
+                        />
+                    )
                 )}
             </div>
         </>
@@ -229,151 +281,213 @@ export default function Seance({ seance, questions, reponses }: Props) {
 
 function Ardoise({
     question,
-    choix,
-    verifiee,
-    choisir,
+    exemple,
+    reprise,
+    seance,
+    derniere,
+    commencer,
+    repondre,
+    continuer,
 }: {
-    question: QuestionSeance;
-    choix: string | null;
-    verifiee: Reponse | null;
-    choisir: (option: string) => void;
+    question: QuestionEleve;
+    exemple: boolean;
+    reprise?: Reponse;
+    seance: string;
+    derniere: boolean;
+    commencer: () => void;
+    repondre: (reponse: Reponse) => void;
+    continuer: () => void;
 }) {
-    const matiere = MATIERES[question.matiere as CleMatiere];
+    const tentative = useTentative(
+        question,
+        reprise
+            ? ({
+                  reponse: reprise.reponse,
+                  score: reprise.score,
+                  auto_evaluee: reprise.auto_evaluee,
+              } satisfies Reprise)
+            : undefined,
+    );
+    const debut = useRef(Date.now());
+    const uuid = useRef<string | null>(reprise?.tentative ?? null);
 
-    function etat(option: string): EtatChoix {
-        if (!verifiee) {
-            return choix === option ? 'selectionne' : 'neutre';
+    async function verifier() {
+        commencer();
+        const score = tentative.verifier();
+        // Le geste est gardé dans la file avant d'être affiché comme répondu ;
+        // s'il ne peut pas l'être (aucun profil actif), la séance avance quand même.
+        const tentativeUuid = await enregistrer({
+            type: 'tentative.enregistrer',
+            charge: {
+                question: question.uuid,
+                version: question.version,
+                reponse: tentative.reponse,
+                seance,
+                duree_secondes: Math.min(
+                    65535,
+                    Math.round((Date.now() - debut.current) / 1000),
+                ),
+                indices_utilises: tentative.indicesVus,
+            },
+            priorite: 1,
+        }).catch(() => '');
+
+        uuid.current = tentativeUuid;
+        repondre({
+            question: question.uuid,
+            tentative: tentativeUuid,
+            reponse: tentative.reponse,
+            score,
+            auto_evaluee: false,
+        });
+    }
+
+    function valider() {
+        commencer();
+        const score = tentative.valider();
+        const tentativeUuid = uuid.current;
+
+        if (tentativeUuid) {
+            void enregistrer({
+                type: 'tentative.auto_evaluer',
+                charge: {
+                    tentative: tentativeUuid,
+                    criteres: tentative.criteres,
+                },
+                priorite: 1,
+                depend_de: tentativeUuid,
+            });
+            repondre({
+                question: question.uuid,
+                tentative: tentativeUuid,
+                reponse: tentative.reponse,
+                score,
+                auto_evaluee: true,
+            });
         }
-
-        if (option === question.attendue.option) {
-            return option === verifiee.option ? 'juste' : 'bonne_reponse';
-        }
-
-        return option === verifiee.option ? 'faux' : 'ecartee';
     }
 
     return (
-        <div className="grid gap-6">
-            <div className="grid gap-3">
-                <p className="flex min-w-0 items-center gap-2 text-aide font-medium">
-                    {matiere && (
-                        <span
-                            aria-hidden
-                            className={cn(
-                                'flex size-6 shrink-0 items-center justify-center rounded-[7px]',
-                                matiere.tuile,
-                            )}
-                        >
-                            <matiere.icone className="size-3.5" />
-                        </span>
-                    )}
-                    <span className={cn('shrink-0', matiere?.texte)}>
-                        {question.matiere_nom}
-                    </span>
-                    <span aria-hidden className="text-ink-400">
-                        ·
-                    </span>
-                    <span className="truncate text-ink-500">
-                        {question.notion}
-                    </span>
-                </p>
-                <ContenuBlocs doc={question.enonce} />
-            </div>
+        <>
+            <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col px-4 pt-6 pb-6">
+                {exemple && <BandeauExemple className="mb-5" />}
+                <div className="grid gap-6">
+                    <div className="grid gap-3">
+                        <EnteteQuestion question={question} />
+                        <ContenuBlocs doc={question.enonce} />
+                    </div>
+                    <SaisieQuestion
+                        question={question}
+                        reponse={tentative.reponse}
+                        changer={tentative.changer}
+                        corrigee={tentative.verifiee}
+                    />
+                    <IndicesQuestion
+                        indices={question.indices}
+                        vus={tentative.indicesVus}
+                        voirSuivant={tentative.voirIndice}
+                        fige={tentative.verifiee}
+                    />
+                </div>
+            </main>
 
-            <GroupeChoix libelle="Réponses proposées">
-                {question.options.map((option, rang) => (
-                    <Choix
-                        key={option.id}
-                        lettre={LETTRES[rang] ?? option.id.toUpperCase()}
-                        etat={etat(option.id)}
-                        onChoisir={() => choisir(option.id)}
-                    >
-                        {option.texte}
-                        {option.latex && (
-                            <Formule
-                                latex={option.latex}
-                                libelle={option.latex}
-                                className={option.texte ? 'ml-1.5' : undefined}
-                            />
-                        )}
-                    </Choix>
-                ))}
-            </GroupeChoix>
-        </div>
+            <BarreAction
+                question={question}
+                tentative={tentative}
+                derniere={derniere}
+                verifier={() => void verifier()}
+                valider={valider}
+                continuer={continuer}
+            />
+        </>
     );
 }
 
 /**
  * Le bas de l'ardoise : « Vérifier », puis la feuille du verdict — icône +
- * mot + couleur, l'explication, « Continuer ». Annoncée aux lecteurs d'écran.
+ * mot + couleur, le corrigé pas à pas, l'auto-évaluation d'une rédaction,
+ * « Continuer ». Annoncée aux lecteurs d'écran.
  */
 function BarreAction({
-    verifiee,
-    peutVerifier,
-    verifier,
-    continuer,
-    derniere,
     question,
+    tentative,
+    derniere,
+    verifier,
+    valider,
+    continuer,
 }: {
-    verifiee: Reponse | null;
-    peutVerifier: boolean;
-    verifier: () => void;
-    continuer: () => void;
+    question: QuestionEleve;
+    tentative: Tentative;
     derniere: boolean;
-    question: QuestionSeance;
+    verifier: () => void;
+    valider: () => void;
+    continuer: () => void;
 }) {
     const bouton = useRef<HTMLButtonElement>(null);
+    const feuille = useRef<HTMLDivElement>(null);
+    const aEvaluer = tentative.verdict === 'a_evaluer';
 
+    // Chaque nouveau verdict se lit depuis le haut de la feuille.
     useEffect(() => {
-        if (verifiee) {
-            bouton.current?.focus();
+        if (tentative.verifiee) {
+            feuille.current?.scrollTo({ top: 0 });
+            bouton.current?.focus({ preventScroll: true });
         }
-    }, [verifiee]);
+    }, [tentative.verifiee, tentative.evaluee]);
 
     return (
         <div className="sticky bottom-0 z-20 border-t bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_-12px_rgb(16_16_24/0.18)] backdrop-blur-md">
             <div className="mx-auto grid w-full max-w-2xl gap-4 px-4 py-4">
                 <div aria-live="polite" className="empty:hidden">
-                    {verifiee && (
-                        <div className="grid gap-3">
-                            <p
-                                className={cn(
-                                    'flex items-center gap-2.5 text-titre-carte font-semibold',
-                                    verifiee.correcte
-                                        ? 'text-juste-700 dark:text-juste-400'
-                                        : 'text-faux-600 dark:text-faux-400',
-                                )}
-                            >
-                                <span
-                                    aria-hidden
-                                    className={cn(
-                                        'flex size-8 items-center justify-center rounded-full text-white',
-                                        verifiee.correcte
-                                            ? 'bg-juste-600 dark:bg-juste-400 dark:text-[#110e0b]'
-                                            : 'bg-faux-600 dark:bg-faux-400 dark:text-[#110e0b]',
-                                    )}
-                                >
-                                    {verifiee.correcte ? (
-                                        <Check
-                                            className="size-4"
-                                            strokeWidth={3}
-                                        />
-                                    ) : (
-                                        <X className="size-4" strokeWidth={3} />
-                                    )}
-                                </span>
-                                {verifiee.correcte ? 'Juste !' : 'Pas encore'}
-                            </p>
-                            {question.explication && (
-                                <ContenuBlocs
-                                    doc={question.explication}
-                                    className="max-h-[35dvh] overflow-y-auto text-interface text-ink-600"
+                    {tentative.verdict && (
+                        <div
+                            ref={feuille}
+                            className="grid max-h-[48dvh] gap-4 overflow-y-auto overscroll-contain"
+                        >
+                            <VerdictQuestion
+                                verdict={tentative.verdict}
+                                score={tentative.score}
+                            />
+                            {aEvaluer && (
+                                <p className="text-interface text-ink-600">
+                                    Lis le corrigé, puis coche ce que ta
+                                    rédaction contient vraiment.
+                                </p>
+                            )}
+                            <CorrigePasAPas
+                                key={question.uuid}
+                                etapes={question.corrige}
+                            />
+                            {question.type === 'ouverte' && (
+                                <AutoEvaluation
+                                    bareme={question.donnees.bareme ?? []}
+                                    criteres={tentative.criteres}
+                                    changer={tentative.setCriteres}
+                                    fige={tentative.evaluee}
                                 />
                             )}
                         </div>
                     )}
                 </div>
-                {verifiee ? (
+                {!tentative.verifiee ? (
+                    <Button
+                        taille="grande"
+                        className="w-full"
+                        disabled={!tentative.complete}
+                        onClick={verifier}
+                    >
+                        Vérifier
+                    </Button>
+                ) : aEvaluer ? (
+                    <Button
+                        ref={bouton}
+                        taille="grande"
+                        className="w-full"
+                        onClick={valider}
+                    >
+                        Valider mon auto-évaluation
+                    </Button>
+                ) : (
                     <Button
                         ref={bouton}
                         taille="grande"
@@ -381,15 +495,6 @@ function BarreAction({
                         onClick={continuer}
                     >
                         {derniere ? 'Voir mon bilan' : 'Continuer'}
-                    </Button>
-                ) : (
-                    <Button
-                        taille="grande"
-                        className="w-full"
-                        disabled={!peutVerifier}
-                        onClick={verifier}
-                    >
-                        Vérifier
                     </Button>
                 )}
             </div>
@@ -399,10 +504,12 @@ function BarreAction({
 
 function Bilan({
     justes,
+    enPartie,
     total,
     duree,
 }: {
     justes: number;
+    enPartie: number;
     total: number;
     duree: number;
 }) {
@@ -425,15 +532,22 @@ function Bilan({
                     Ta séance de {duree} minutes compte pour ta série de jours.
                 </p>
             </div>
-            <p className="flex items-baseline gap-1.5">
-                <span className="text-[3rem] leading-none font-bold font-data">
-                    {justes}
-                </span>
-                <span className="text-lg font-semibold text-ink-500 font-data">
-                    / {total}
-                </span>
-                <span className="sr-only">réponses justes</span>
-            </p>
+            <div className="grid justify-items-center gap-1">
+                <p className="flex items-baseline gap-1.5">
+                    <span className="text-[3rem] leading-none font-bold font-data">
+                        {justes}
+                    </span>
+                    <span className="text-lg font-semibold text-ink-500 font-data">
+                        / {total}
+                    </span>
+                    <span className="sr-only">réponses justes</span>
+                </p>
+                {enPartie > 0 && (
+                    <p className="text-aide text-ink-600">
+                        et {enPartie} en partie juste{enPartie > 1 ? 's' : ''}
+                    </p>
+                )}
+            </div>
             <div className="w-full max-w-xs">
                 <ProgressionSegments
                     valeur={pourcentage}
