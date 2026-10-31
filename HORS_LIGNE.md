@@ -655,7 +655,7 @@ hors ligne ; les packs viennent ensuite.
 | — | Arbitrage HL-D1 à HL-D12 | ✅ fait (2026-10-30) | 12 / 12 |
 | HL0 | Socle | 🟡 fait, sauf HTTPS et contrôles sur vrai téléphone (étape 6 du lot 0) | 10 / 12 |
 | HL1 | Rendu indépendant de la source | ✅ fait (lots 1 et 2) | 2 / 2 |
-| HL2 | Tentatives et séances | 🟡 premiers gestes avancés au lot 2 (écart n° 16) : `tentative.enregistrer` (QCM), `seance.terminer`, correction serveur ; restent les autres types, les versions de questions (A.9), la séance complète hors ligne | 2 / 4 |
+| HL2 | Tentatives et séances | ✅ fait (lots 2 et 3) : neuf types par la file, auto-évaluation, correction contre la version vue (A.9), séance complète en mode avion (A.14 n° 24) | 4 / 4 |
 | HL3 | Examen blanc | ⬜ à faire | 0 / 4 |
 | HL4 | Jauge, séances pré-calculées, trace | ⬜ à faire | 0 / 3 |
 | HL5 | Packs | ⬜ à faire | 0 / 7 |
@@ -782,9 +782,32 @@ hors ligne ; les packs viennent ensuite.
   (A.14 n° 6, partiel), `FormatQuestionTest`, Vitest `questions.test.ts`.
 - [x] `seance.terminer` : déjà terminée → acceptée sans rien rejouer ;
   séance d'un autre → refus. Séance du jour minimale (`SeanceService`).
-- [ ] Autres types de question, indices, corrigés pas à pas — lot 3.
-- [ ] Correction contre la **version vue** (A.9) : la tentative garde
-  `version`, mais seule la version courante existe au lot 2 — lot 3.
+- [x] **Les neuf types** par `tentative.enregistrer` (lot 3) : la charge
+  porte la réponse dans la forme de son type (`FormatQuestion`, clés
+  permises seulement, tailles bornées) ; score de 0 à 100 recalculé par le
+  serveur, juste à 100 seulement ; indices utilisés comptés (bornés par la
+  question). Même jeu d'exemples que l'appareil
+  (`tests/fixtures/questions.json` : 57 corrections, auto-évaluations,
+  normalisations, nombres). Preuve : `CorrectionServeurTest`,
+  `FormatQuestionTest`, `FormatQuestionValidationTest`, Vitest
+  `questions.test.ts`, `exercice-question.test.tsx`.
+- [x] **`tentative.auto_evaluer`** (priorité 1, `depend_de` la tentative,
+  libellé « Auto-évaluation d'une rédaction ») : une seule fois ; refus
+  pour la réponse d'un autre ou une question qui se corrige seule. La
+  séance relit aussi les auto-évaluations encore en file. Preuve :
+  `AutoEvaluationTest` (3).
+- [x] Correction contre la **version vue** (A.9) : une version est figée à
+  chaque envoi en relecture (énoncé, données, réponse, indices, corrigé
+  ensemble) ; la tentative porte le numéro vu ; une version renvoyée ou
+  inventée est refusée ; une nouvelle version ne recorrige rien ; une
+  question retirée n'est plus proposée, ses tentatives restent. Preuve :
+  `CorrectionServeurTest` (A.14 n° 6).
+- [x] L'objet `QuestionEleve` (`App\Support\PresentationQuestion`) : la
+  version publiée, éléments mélangés par le serveur (stable par question,
+  jamais l'ordre de la réponse) ; le même ira dans les packs (lot 7). La
+  leçon embarque ses mini-questions publiées (`lecon.questions`).
+- [x] **Séance complète en mode avion** (A.14 n° 24) : Playwright
+  `parcours-lot3.spec.ts`.
 
 ### `lecon.progression` (A.6, lot 2)
 
@@ -831,17 +854,23 @@ hors ligne ; les packs viennent ensuite.
 - [x] 18 — Vitest : garde de navigation (`garde-navigation.test.ts`, 7).
 - [x] 19 — Vitest : échec d'import, rechargement une fois en ligne, jamais
   hors ligne (`tests/js/chargement-page.test.ts`, lot 0 étape 2).
-- [~] 6 — `CorrectionServeurTest` : la recorrection est vérifiée
-  (`GestesEleveTest`, réponse fausse jamais comptée juste, même uuid
-  compté une fois) ; « la version vue fait foi » attend le lot 3.
+- [x] 6 — `CorrectionServeurTest` (13) : la version vue fait foi (une
+  réponse juste en v1 le reste après la v2), version renvoyée ou
+  inventée refusée, question retirée, chaque type recorrigé (score
+  partiel compris), réponse mal formée à 0, trop grosse refusée, indices
+  bornés, séance livrant la version publiée mélangée.
 - [x] 10 — progression : la saisie la plus récente gagne
   (`GestesEleveTest`, 3 tests).
-- [ ] 24 — séance complète hors ligne : les gestes existent depuis le
-  lot 2 ; le parcours Playwright en contexte `offline` vient avec HL2
-  complet (lot 3).
-  En attendant, Playwright `hors-ligne.spec.ts` rejoue le socle dans un vrai
-  navigateur : service worker, appareil enregistré, dialogue, copie datée au
-  rechargement, page de repli, retour du réseau (stable sur 10 passages).
+- [x] 24 — séance complète hors ligne (`parcours-lot3.spec.ts`, lot 3) :
+  élève neuf (BEPC, 30 min, 15 questions de tous les types), mode avion
+  (`context.setOffline`) dès la première question, trois réponses,
+  **rechargement** (copie de la séance : reprise à la 4ᵉ question, les
+  réponses en file relues), la suite jusqu'au bilan (« gardées sur le
+  téléphone »), aucune réponse reçue par le serveur ; retour du réseau →
+  chaque tentative reçue **une seule fois**, toutes acceptées, aucun
+  doublon. Le contrôle sur vrai téléphone reste dans `A_TESTER.md`
+  (`setOffline` ne coupe pas le service worker comme un mode avion).
+  Playwright `hors-ligne.spec.ts` rejoue toujours le socle.
 - [ ] 25 — budgets : lot 7 (HL7). Mesure faite à la main : écart n° 10.
 
 ## B.5 Journal des écarts
@@ -956,6 +985,19 @@ hors ligne ; les packs viennent ensuite.
     nommé `synchro` (120 par minute, clé `synchro|<utilisateur>`).
     Preuve : `LimiteSynchroTest`.
 
+18. **2026-10-31 — Indices et corrigé dans la question, versionnés avec
+    elle.** PLAN § 6 prévoit des tables `indices` et `corriges`. Au lot 3,
+    les indices et les étapes du corrigé sont des colonnes de la question
+    et entrent dans chaque version figée : une correction d'indice ou de
+    corrigé fait une nouvelle version, et la version vue par l'élève
+    reste entière (A.9). Les corrigés de **sujets** d'annales (lot 4)
+    auront leur propre place. `questions.version` disparaît : le numéro
+    vu est celui de la version publiée (`versions_contenu`).
+19. **2026-10-31 — Mélange des éléments par le serveur.** Appariement et
+    remise en ordre arrivent mélangés dans l'objet de la question
+    (`PresentationQuestion`), d'un ordre stable tiré de l'uuid : aucun
+    hasard sur l'appareil, la même présentation en ligne et dans un pack.
+
 ## B.6 Points de vigilance
 
 - **Poids du fragment commun** : `createLucideIcon-*.js` pèse 373 Ko bruts
@@ -970,6 +1012,9 @@ hors ligne ; les packs viennent ensuite.
 - **Essais Playwright hors ligne** : `context.setOffline` ne coupe pas le
   service worker de la même façon qu'un vrai mode avion ; le contrôle sur
   téléphone reste dans `A_TESTER.md`.
+- **Réponses écrites hors ligne** : une rédaction (question ouverte) peut
+  atteindre 4 000 caractères ; c'est la seule tentative qui dépasse le
+  budget de 2 Ko par geste (A.11). À mesurer avec les budgets (HL7).
 - **Copies des écrans** : gardées par compte (`pages-u<id>`), effacées par
   « Se déconnecter » (message `DECONNEXION`). Une session expirée sans
   déconnexion les laisse sur le téléphone jusqu'à la prochaine déconnexion.

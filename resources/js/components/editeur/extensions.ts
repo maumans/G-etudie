@@ -5,7 +5,7 @@ import type { ComponentType } from 'react';
 import StarterKit from '@tiptap/starter-kit';
 import type { GenreEncadre } from '@/lib/contenu/blocs';
 import { GENRES_ENCADRE } from '@/lib/contenu/blocs';
-import { VueEncadre, VueFormule } from './vues';
+import { VueEncadre, VueFormule, VueMiniQuestion } from './vues';
 
 /**
  * Une demande d'édition de formule, envoyée par la vue d'un nœud à la page
@@ -99,6 +99,46 @@ const Encadre = Node.create({
     ],
 });
 
+/** Ce que l'éditeur sait d'une question qu'on peut glisser dans la leçon. */
+export type QuestionDisponible = {
+    uuid: string;
+    extrait: string;
+    type: string;
+    notion: string;
+};
+
+export type OptionsMiniQuestion = {
+    decrire: (uuid: string) => QuestionDisponible | undefined;
+};
+
+/**
+ * Mini-question de vérification (`question`) : un renvoi à une question
+ * publiée, par son identifiant ; l'élève la reçoit dans l'objet de la leçon.
+ */
+const MiniQuestion = Node.create<OptionsMiniQuestion>({
+    name: 'question',
+    group: 'block',
+    atom: true,
+    selectable: true,
+    draggable: true,
+    addOptions: () => ({ decrire: () => undefined }),
+    addAttributes: () => ({
+        uuid: {
+            default: '',
+            parseHTML: (element: HTMLElement) =>
+                element.getAttribute('data-uuid') ?? '',
+            renderHTML: (attributs: { uuid: string }) => ({
+                'data-uuid': attributs.uuid,
+            }),
+        },
+    }),
+    parseHTML: () => [{ tag: 'div[data-mini-question]' }],
+    renderHTML: ({ HTMLAttributes }) => [
+        'div',
+        mergeAttributes(HTMLAttributes, { 'data-mini-question': '' }),
+    ],
+});
+
 /**
  * Les extensions de l'éditeur de leçon : exactement les nœuds du format des
  * blocs (`lib/contenu/blocs.ts`). Tout ce qui n'y figure pas (souligné,
@@ -110,10 +150,13 @@ export function extensionsLecon({
     ouvrirFormule = () => {},
     vues = true,
     placeholder = 'Écrivez la leçon…',
+    decrireQuestion,
 }: {
     ouvrirFormule?: (demande: DemandeFormule) => void;
     vues?: boolean;
     placeholder?: string;
+    /** Leçon seulement : les mini-questions (jamais dans un énoncé ni un corrigé). */
+    decrireQuestion?: (uuid: string) => QuestionDisponible | undefined;
 } = {}): Extensions {
     const avecVue = <T extends Node<OptionsFormule> | Node>(
         noeud: T,
@@ -142,5 +185,12 @@ export function extensionsLecon({
         }),
         avecVue(FormuleBloc, VueFormule).configure({ ouvrir: ouvrirFormule }),
         avecVue(Encadre, VueEncadre),
+        ...(decrireQuestion
+            ? [
+                  avecVue(MiniQuestion, VueMiniQuestion).configure({
+                      decrire: decrireQuestion,
+                  }),
+              ]
+            : []),
     ];
 }

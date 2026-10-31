@@ -19,6 +19,7 @@ import type { EntreeNavigation } from '@/components/lien-navigation';
 import { accueil as accueilConsole } from '@/routes/console';
 import { accueil as accueilContenu } from '@/routes/contenu';
 import { index as indexLecons, relecture } from '@/routes/contenu/lecons';
+import { index as indexQuestions } from '@/routes/contenu/questions';
 import { index as matieresReferentiel } from '@/routes/contenu/referentiel/matieres';
 import { accueil as accueilEleve, cours as coursEleve } from '@/routes/eleve';
 import { edit as monCompte } from '@/routes/compte/profil';
@@ -69,7 +70,12 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
         href: indexLecons().url,
         actifSous: '/contenu/lecons',
     },
-    { libelle: 'Questions', icone: FileQuestion },
+    {
+        libelle: 'Questions',
+        icone: FileQuestion,
+        href: indexQuestions().url,
+        actifSous: '/contenu/questions',
+    },
     { libelle: 'Annales', icone: FileText },
     {
         libelle: 'Relecture',

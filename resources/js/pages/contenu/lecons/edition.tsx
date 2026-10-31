@@ -2,9 +2,8 @@ import { Head, Link, router } from '@inertiajs/react';
 import {
     ArrowLeft,
     CircleAlert,
-    CircleCheck,
+    CircleHelp,
     Eye,
-    LoaderCircle,
     MessageSquareWarning,
     PenLine,
     RefreshCw,
@@ -12,16 +11,19 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
+import { IndicateurEnregistrement } from '@/components/contenu/indicateur-enregistrement';
+import type { EtatEnregistrement as Etat } from '@/components/contenu/indicateur-enregistrement';
 import { BadgeStatut } from '@/components/contenu/statut-lecon';
 import { TuileMatiere } from '@/components/contenu/tuile-matiere';
 import { EditeurLecon } from '@/components/editeur/editeur-lecon';
+import type { QuestionDisponible } from '@/components/editeur/extensions';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
 import { useConfirmer } from '@/components/ui/confirm-provider';
 import { Spinner } from '@/components/ui/spinner';
 import { erreurBlocs, resumeBlocs } from '@/lib/contenu/blocs';
 import type { DocumentBlocs } from '@/lib/contenu/blocs';
-import { formaterHeure, formaterJourHeure } from '@/lib/dates';
+import { formaterJourHeure } from '@/lib/dates';
 import { cn, pluriel } from '@/lib/utils';
 import { index, show, soumettre, update } from '@/routes/contenu/lecons';
 import type { LeconResume } from '@/types';
@@ -33,14 +35,8 @@ type Props = {
         par: string | null;
         le: string | null;
     } | null;
+    questions_disponibles: QuestionDisponible[];
 };
-
-type Etat =
-    | { cle: 'enregistre'; le: Date | null }
-    | { cle: 'modifie' }
-    | { cle: 'enregistrement' }
-    | { cle: 'conflit'; message: string }
-    | { cle: 'erreur'; message: string };
 
 /** Délai entre la dernière frappe et l'enregistrement automatique. */
 const DELAI_ENREGISTREMENT_MS = 2500;
@@ -51,7 +47,11 @@ const DELAI_ENREGISTREMENT_MS = 2500;
  * brouillon s'enregistre seul ; deux onglets ne s'écrasent jamais (verrou de
  * révision côté serveur).
  */
-export default function Edition({ lecon, renvoi }: Props) {
+export default function Edition({
+    lecon,
+    renvoi,
+    questions_disponibles,
+}: Props) {
     const confirmer = useConfirmer();
     const [titre, setTitre] = useState(lecon.titre);
     const [doc, setDoc] = useState<DocumentBlocs>(lecon.blocs);
@@ -421,6 +421,7 @@ export default function Edition({ lecon, renvoi }: Props) {
                         initial={lecon.blocs}
                         libelle="Contenu de la leçon"
                         onChange={(nouveau) => modifier({ doc: nouveau })}
+                        questions={questions_disponibles}
                     />
                     <p className="border-t px-5 py-2.5 text-meta text-ink-500">
                         {pluriel(resume.mots, 'mot')} ·{' '}
@@ -460,59 +461,35 @@ export default function Edition({ lecon, renvoi }: Props) {
                                 La leçon apparaîtra ici au fil de la rédaction.
                             </p>
                         ) : (
-                            <ContenuBlocs doc={doc} />
+                            <ContenuBlocs
+                                doc={doc}
+                                rendreQuestion={(uuid) => {
+                                    const question = questions_disponibles.find(
+                                        (q) => q.uuid === uuid,
+                                    );
+
+                                    return (
+                                        <p className="flex items-start gap-2.5 rounded-carte border border-nimba-500/35 bg-nimba-500/[0.06] px-4 py-3 text-interface dark:border-nimba-400/30 dark:bg-nimba-400/[0.08]">
+                                            <CircleHelp
+                                                aria-hidden
+                                                className="mt-0.5 size-4 shrink-0 text-nimba-700 dark:text-nimba-300"
+                                            />
+                                            <span>
+                                                <strong className="font-semibold">
+                                                    Mini-question
+                                                </strong>{' '}
+                                                ·{' '}
+                                                {question?.extrait ??
+                                                    'question pas encore publiée'}
+                                            </span>
+                                        </p>
+                                    );
+                                }}
+                            />
                         )}
                     </article>
                 </section>
             </div>
         </div>
-    );
-}
-
-function IndicateurEnregistrement({ etat }: { etat: Etat }) {
-    const contenu = {
-        enregistre: {
-            icone: <CircleCheck aria-hidden className="size-4" />,
-            texte:
-                etat.cle === 'enregistre' && etat.le
-                    ? `Enregistré à ${formaterHeure(etat.le)}`
-                    : 'Brouillon enregistré',
-            classe: 'text-ink-500',
-        },
-        modifie: {
-            icone: <PenLine aria-hidden className="size-4" />,
-            texte: 'Modifications en cours',
-            classe: 'text-ink-500',
-        },
-        enregistrement: {
-            icone: <LoaderCircle aria-hidden className="size-4 animate-spin" />,
-            texte: 'Enregistrement…',
-            classe: 'text-ink-500',
-        },
-        conflit: {
-            icone: <CircleAlert aria-hidden className="size-4" />,
-            texte: 'Non enregistré',
-            classe: 'text-faux-600 dark:text-faux-400',
-        },
-        erreur: {
-            icone: <CircleAlert aria-hidden className="size-4" />,
-            texte: etat.cle === 'erreur' ? etat.message : '',
-            classe: 'text-faux-600 dark:text-faux-400',
-        },
-    }[etat.cle];
-
-    return (
-        <p
-            role="status"
-            aria-live="polite"
-            data-capture="variable"
-            className={cn(
-                'flex max-w-xs items-center gap-1.5 text-aide',
-                contenu.classe,
-            )}
-        >
-            {contenu.icone}
-            <span className="truncate">{contenu.texte}</span>
-        </p>
     );
 }

@@ -5,6 +5,7 @@
  */
 export const LIBELLES: Record<string, string> = {
     'tentative.enregistrer': 'Réponse à une question',
+    'tentative.auto_evaluer': 'Auto-évaluation d’une rédaction',
     'seance.terminer': 'Fin de séance',
     'lecon.progression': 'Progression dans une leçon',
 };

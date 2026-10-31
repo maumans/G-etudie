@@ -13,6 +13,7 @@ class RegistreOperations
     /** @var array<string, class-string<GestionnaireOperation>> */
     public const TYPES = [
         Operations\EnregistrerTentative::TYPE => Operations\EnregistrerTentative::class,
+        Operations\AutoEvaluerTentative::TYPE => Operations\AutoEvaluerTentative::class,
         Operations\TerminerSeance::TYPE => Operations\TerminerSeance::class,
         Operations\ProgressionLecon::TYPE => Operations\ProgressionLecon::class,
     ];

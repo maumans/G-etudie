@@ -1082,3 +1082,34 @@ la prolonge sans nouveau composant de base.
   (`data-capture="variable"`) ; ouvrir une leçon est un geste de la file,
   simulé dans `ecrans-lot2.spec.ts` pour que l'accueil des élèves de
   démonstration ne change pas d'un passage à l'autre.
+
+### Lot 3 — moteur de questions, ardoise de tous les types, saisie au back-office (2026-10-31)
+
+- **Verdicts** : quatre, toujours icône + mot + couleur (`components/
+  questions/commun.tsx`) — « Juste ! » (coche, vert), « En partie juste »
+  (demi-cercle pointillé, couleur indice, pourcentage à côté), « Pas
+  encore » (croix, framboise), « À toi d'évaluer » (plume, encre) pour une
+  rédaction pas encore auto-évaluée. Chaque partie d'une réponse (trou,
+  paire, rang) porte sa pastille ✓/✗ et un mot lu.
+- **Saisie par type, pensée pour un Android d'entrée de gamme** : listes
+  natives (trous à choix, appariement) plutôt que glisser-déposer ; flèches
+  monter/descendre de 44 px pour la remise en ordre ; clavier décimal pour
+  un nombre, unité affichée à côté (jamais tapée) ; cibles de 56 px.
+- **Indices** : bouton discret « Un indice 1/2 » couleur indice, cartes
+  teintées en opacité ; figés après « Vérifier ».
+- **Corrigé pas à pas** : étapes numérotées en pastilles d'encre, une à la
+  fois (« Étape suivante », « Tout voir ») ; tout d'un coup à la relecture.
+- **Back-office** : banque de questions en filets (tuile du type teintée par
+  la matière), écran de saisie à deux colonnes (saisie / « Comme l'élève la
+  verra », jouable, « Rejouer »), onglets « Saisir / Essayer » sous
+  1024 px ; fiche de relecture avec le seul moment fort `surface-encre`
+  (« À vous de relire »), la bonne réponse marquée, tous les indices, tout
+  le corrigé, « Essayer comme l'élève ». File de relecture à onglets
+  « Leçons · Questions ».
+- **Vu et corrigé** (Playwright, 360 / 768 / 1366, clair et sombre) : LaTeX
+  brut dans les listes → formules omises de l'extrait ; mini-question
+  annoncée deux fois → la carte seule ; surface blanche dans l'aperçu
+  (fond crème sous une carte blanche) → une seule surface ; difficulté sur
+  deux lignes → cinq cases égales et le mot dessous ; « Ta réponse » sur la
+  fiche de relecture → « Réponse attendue » ; feuille du verdict restée
+  défilée après l'auto-évaluation → remise en haut à chaque verdict.

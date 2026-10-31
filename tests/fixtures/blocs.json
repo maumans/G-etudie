@@ -2,12 +2,17 @@
     {
         "nom": "document vide",
         "valide": true,
-        "doc": { "type": "doc", "content": [] }
+        "doc": {
+            "type": "doc",
+            "content": []
+        }
     },
     {
         "nom": "document sans contenu",
         "valide": true,
-        "doc": { "type": "doc" }
+        "doc": {
+            "type": "doc"
+        }
     },
     {
         "nom": "leçon complète",
@@ -17,9 +22,14 @@
             "content": [
                 {
                     "type": "heading",
-                    "attrs": { "level": 2 },
+                    "attrs": {
+                        "level": 2
+                    },
                     "content": [
-                        { "type": "text", "text": "Le théorème de Pythagore" }
+                        {
+                            "type": "text",
+                            "text": "Le théorème de Pythagore"
+                        }
                     ]
                 },
                 {
@@ -31,21 +41,42 @@
                         },
                         {
                             "type": "formule",
-                            "attrs": { "latex": "a^2 + b^2 = c^2" }
+                            "attrs": {
+                                "latex": "a^2 + b^2 = c^2"
+                            }
                         },
                         {
                             "type": "text",
                             "text": " toujours.",
-                            "marks": [{ "type": "bold" }, { "type": "italic" }]
+                            "marks": [
+                                {
+                                    "type": "bold"
+                                },
+                                {
+                                    "type": "italic"
+                                }
+                            ]
                         },
-                        { "type": "hardBreak" },
-                        { "type": "text", "text": "Fin." }
+                        {
+                            "type": "hardBreak"
+                        },
+                        {
+                            "type": "text",
+                            "text": "Fin."
+                        }
                     ]
                 },
-                { "type": "formuleBloc", "attrs": { "latex": "\\frac{1}{2}" } },
+                {
+                    "type": "formuleBloc",
+                    "attrs": {
+                        "latex": "\\frac{1}{2}"
+                    }
+                },
                 {
                     "type": "encadre",
-                    "attrs": { "genre": "a_retenir" },
+                    "attrs": {
+                        "genre": "a_retenir"
+                    },
                     "content": [
                         {
                             "type": "paragraph",
@@ -56,12 +87,20 @@
                                 }
                             ]
                         },
-                        { "type": "formuleBloc", "attrs": { "latex": "c > a" } }
+                        {
+                            "type": "formuleBloc",
+                            "attrs": {
+                                "latex": "c > a"
+                            }
+                        }
                     ]
                 },
                 {
                     "type": "orderedList",
-                    "attrs": { "start": 1, "type": null },
+                    "attrs": {
+                        "start": 1,
+                        "type": null
+                    },
                     "content": [
                         {
                             "type": "listItem",
@@ -80,7 +119,11 @@
                                     "content": [
                                         {
                                             "type": "listItem",
-                                            "content": [{ "type": "paragraph" }]
+                                            "content": [
+                                                {
+                                                    "type": "paragraph"
+                                                }
+                                            ]
                                         }
                                     ]
                                 }
@@ -88,7 +131,9 @@
                         }
                     ]
                 },
-                { "type": "paragraph" }
+                {
+                    "type": "paragraph"
+                }
             ]
         }
     },
@@ -103,7 +148,11 @@
                     "content": [
                         {
                             "type": "listItem",
-                            "content": [{ "type": "paragraph" }]
+                            "content": [
+                                {
+                                    "type": "paragraph"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -118,23 +167,47 @@
             "content": [
                 {
                     "type": "encadre",
-                    "attrs": { "genre": "a_retenir" },
-                    "content": [{ "type": "paragraph" }]
+                    "attrs": {
+                        "genre": "a_retenir"
+                    },
+                    "content": [
+                        {
+                            "type": "paragraph"
+                        }
+                    ]
                 },
                 {
                     "type": "encadre",
-                    "attrs": { "genre": "methode" },
-                    "content": [{ "type": "paragraph" }]
+                    "attrs": {
+                        "genre": "methode"
+                    },
+                    "content": [
+                        {
+                            "type": "paragraph"
+                        }
+                    ]
                 },
                 {
                     "type": "encadre",
-                    "attrs": { "genre": "exemple" },
-                    "content": [{ "type": "paragraph" }]
+                    "attrs": {
+                        "genre": "exemple"
+                    },
+                    "content": [
+                        {
+                            "type": "paragraph"
+                        }
+                    ]
                 },
                 {
                     "type": "encadre",
-                    "attrs": { "genre": "piege" },
-                    "content": [{ "type": "paragraph" }]
+                    "attrs": {
+                        "genre": "piege"
+                    },
+                    "content": [
+                        {
+                            "type": "paragraph"
+                        }
+                    ]
                 }
             ]
         }
@@ -142,33 +215,62 @@
     {
         "nom": "pas un document",
         "valide": false,
-        "doc": { "type": "paragraph" }
+        "doc": {
+            "type": "paragraph"
+        }
     },
-    { "nom": "une chaîne", "valide": false, "doc": "bonjour" },
+    {
+        "nom": "une chaîne",
+        "valide": false,
+        "doc": "bonjour"
+    },
     {
         "nom": "propriété inconnue sur le document",
         "valide": false,
-        "doc": { "type": "doc", "content": [], "version": 2 }
+        "doc": {
+            "type": "doc",
+            "content": [],
+            "version": 2
+        }
     },
     {
         "nom": "bloc inconnu (image)",
         "valide": false,
         "doc": {
             "type": "doc",
-            "content": [{ "type": "image", "attrs": { "src": "x.png" } }]
+            "content": [
+                {
+                    "type": "image",
+                    "attrs": {
+                        "src": "x.png"
+                    }
+                }
+            ]
         }
     },
     {
         "nom": "bloc de code refusé",
         "valide": false,
-        "doc": { "type": "doc", "content": [{ "type": "codeBlock" }] }
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "codeBlock"
+                }
+            ]
+        }
     },
     {
         "nom": "texte au niveau du document",
         "valide": false,
         "doc": {
             "type": "doc",
-            "content": [{ "type": "text", "text": "seul" }]
+            "content": [
+                {
+                    "type": "text",
+                    "text": "seul"
+                }
+            ]
         }
     },
     {
@@ -176,13 +278,27 @@
         "valide": false,
         "doc": {
             "type": "doc",
-            "content": [{ "type": "heading", "attrs": { "level": 1 } }]
+            "content": [
+                {
+                    "type": "heading",
+                    "attrs": {
+                        "level": 1
+                    }
+                }
+            ]
         }
     },
     {
         "nom": "titre sans niveau",
         "valide": false,
-        "doc": { "type": "doc", "content": [{ "type": "heading" }] }
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "heading"
+                }
+            ]
+        }
     },
     {
         "nom": "marque souligné refusée",
@@ -196,7 +312,11 @@
                         {
                             "type": "text",
                             "text": "a",
-                            "marks": [{ "type": "underline" }]
+                            "marks": [
+                                {
+                                    "type": "underline"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -218,7 +338,9 @@
                             "marks": [
                                 {
                                     "type": "link",
-                                    "attrs": { "href": "https://exemple.org" }
+                                    "attrs": {
+                                        "href": "https://exemple.org"
+                                    }
                                 }
                             ]
                         }
@@ -235,7 +357,12 @@
             "content": [
                 {
                     "type": "paragraph",
-                    "content": [{ "type": "text", "text": "" }]
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": ""
+                        }
+                    ]
                 }
             ]
         }
@@ -245,7 +372,14 @@
         "valide": false,
         "doc": {
             "type": "doc",
-            "content": [{ "type": "formuleBloc", "attrs": { "latex": "  " } }]
+            "content": [
+                {
+                    "type": "formuleBloc",
+                    "attrs": {
+                        "latex": "  "
+                    }
+                }
+            ]
         }
     },
     {
@@ -256,7 +390,12 @@
             "content": [
                 {
                     "type": "paragraph",
-                    "content": [{ "type": "formule", "attrs": {} }]
+                    "content": [
+                        {
+                            "type": "formule",
+                            "attrs": {}
+                        }
+                    ]
                 }
             ]
         }
@@ -269,7 +408,10 @@
             "content": [
                 {
                     "type": "formuleBloc",
-                    "attrs": { "latex": "x", "couleur": "red" }
+                    "attrs": {
+                        "latex": "x",
+                        "couleur": "red"
+                    }
                 }
             ]
         }
@@ -283,7 +425,12 @@
                 {
                     "type": "paragraph",
                     "content": [
-                        { "type": "formuleBloc", "attrs": { "latex": "x" } }
+                        {
+                            "type": "formuleBloc",
+                            "attrs": {
+                                "latex": "x"
+                            }
+                        }
                     ]
                 }
             ]
@@ -297,8 +444,14 @@
             "content": [
                 {
                     "type": "encadre",
-                    "attrs": { "genre": "attention" },
-                    "content": [{ "type": "paragraph" }]
+                    "attrs": {
+                        "genre": "attention"
+                    },
+                    "content": [
+                        {
+                            "type": "paragraph"
+                        }
+                    ]
                 }
             ]
         }
@@ -311,7 +464,9 @@
             "content": [
                 {
                     "type": "encadre",
-                    "attrs": { "genre": "methode" },
+                    "attrs": {
+                        "genre": "methode"
+                    },
                     "content": []
                 }
             ]
@@ -325,12 +480,20 @@
             "content": [
                 {
                     "type": "encadre",
-                    "attrs": { "genre": "methode" },
+                    "attrs": {
+                        "genre": "methode"
+                    },
                     "content": [
                         {
                             "type": "encadre",
-                            "attrs": { "genre": "piege" },
-                            "content": [{ "type": "paragraph" }]
+                            "attrs": {
+                                "genre": "piege"
+                            },
+                            "content": [
+                                {
+                                    "type": "paragraph"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -342,7 +505,12 @@
         "valide": false,
         "doc": {
             "type": "doc",
-            "content": [{ "type": "bulletList", "content": [] }]
+            "content": [
+                {
+                    "type": "bulletList",
+                    "content": []
+                }
+            ]
         }
     },
     {
@@ -356,7 +524,12 @@
                     "content": [
                         {
                             "type": "listItem",
-                            "content": [{ "type": "bulletList", "content": [] }]
+                            "content": [
+                                {
+                                    "type": "bulletList",
+                                    "content": []
+                                }
+                            ]
                         }
                     ]
                 }
@@ -371,11 +544,17 @@
             "content": [
                 {
                     "type": "orderedList",
-                    "attrs": { "start": 0 },
+                    "attrs": {
+                        "start": 0
+                    },
                     "content": [
                         {
                             "type": "listItem",
-                            "content": [{ "type": "paragraph" }]
+                            "content": [
+                                {
+                                    "type": "paragraph"
+                                }
+                            ]
                         }
                     ]
                 }
@@ -388,18 +567,124 @@
         "doc": {
             "type": "doc",
             "content": [
-                { "type": "paragraph", "attrs": { "textAlign": "left" } }
+                {
+                    "type": "paragraph",
+                    "attrs": {
+                        "textAlign": "left"
+                    }
+                }
             ]
         }
     },
     {
         "nom": "élément sans type",
         "valide": false,
-        "doc": { "type": "doc", "content": [{ "text": "a" }] }
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "text": "a"
+                }
+            ]
+        }
     },
     {
         "nom": "contenu qui n'est pas une liste",
         "valide": false,
-        "doc": { "type": "doc", "content": "texte" }
+        "doc": {
+            "type": "doc",
+            "content": "texte"
+        }
+    },
+    {
+        "nom": "mini-question",
+        "valide": true,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": "Vérifie :"
+                        }
+                    ]
+                },
+                {
+                    "type": "question",
+                    "attrs": {
+                        "uuid": "0192f3a4-5b6c-7d8e-9f01-23456789abcd"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "nom": "mini-question sans identifiant",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "question",
+                    "attrs": {}
+                }
+            ]
+        }
+    },
+    {
+        "nom": "mini-question à l'identifiant mal formé",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "question",
+                    "attrs": {
+                        "uuid": "pas-un-uuid"
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "nom": "mini-question dans un encadré",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "encadre",
+                    "attrs": {
+                        "genre": "methode"
+                    },
+                    "content": [
+                        {
+                            "type": "question",
+                            "attrs": {
+                                "uuid": "0192f3a4-5b6c-7d8e-9f01-23456789abcd"
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "nom": "mini-question avec du contenu",
+        "valide": false,
+        "doc": {
+            "type": "doc",
+            "content": [
+                {
+                    "type": "question",
+                    "attrs": {
+                        "uuid": "0192f3a4-5b6c-7d8e-9f01-23456789abcd"
+                    },
+                    "content": []
+                }
+            ]
+        }
     }
 ]

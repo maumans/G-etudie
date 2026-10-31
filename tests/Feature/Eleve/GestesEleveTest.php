@@ -20,11 +20,11 @@ beforeEach(function () {
     $this->jeton = appareilDe($this->eleve);
 });
 
-test('les trois types du lot 2 sont inscrits au registre, chacun avec son libellé', function () {
+test('les gestes des lots 2 et 3 sont inscrits au registre, chacun avec son libellé', function () {
     $libelles = (string) file_get_contents(resource_path('js/lib/hors-ligne/libelles.ts'));
 
     expect(array_keys(RegistreOperations::TYPES))
-        ->toBe(['tentative.enregistrer', 'seance.terminer', 'lecon.progression']);
+        ->toBe(['tentative.enregistrer', 'tentative.auto_evaluer', 'seance.terminer', 'lecon.progression']);
 
     foreach (array_keys(RegistreOperations::TYPES) as $type) {
         expect($libelles)->toContain("'{$type}':");
@@ -153,7 +153,9 @@ test('par l\'écran : « Commencer » ouvre l\'ardoise, qui livre questions et r
             ->where('questions.0.uuid', $question->uuid)
             ->where('questions.0.attendue', ['option' => 'b'])
             ->where('questions.0.matiere', 'maths')
-            ->where('reponses.0', ['question' => $question->uuid, 'option' => 'b', 'correcte' => true]));
+            ->where('reponses.0.question', $question->uuid)
+            ->where('reponses.0.reponse', ['option' => 'b'])
+            ->where('reponses.0.score', 100));
 });
 
 test('sans question publiée, « Commencer » ramène à l\'accueil avec une explication', function () {

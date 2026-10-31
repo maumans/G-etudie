@@ -315,6 +315,26 @@
   affiché.
 - État : à faire
 
+### [Lot 3] Séance de tous les types, en mode avion, sur un vrai téléphone
+- Pourquoi : HORS_LIGNE.md A.15 n° 1 et A.14 n° 24 — Playwright coupe le
+  réseau du navigateur (`setOffline`), pas celui du téléphone ; un vrai
+  mode avion coupe aussi le service worker et peut tuer l'onglet.
+- Matériel : un Android d'entrée de gamme, Chrome, application installée ;
+  un compte élève BEPC neuf, objectif 30 minutes (15 questions).
+- Comment le provoquer : ouvrir la séance du jour en ligne ; passer en mode
+  avion ; répondre à trois questions (dont, si elles viennent, un texte à
+  trous et une question ouverte jusqu'à l'auto-évaluation) ; fermer
+  l'onglet ; rouvrir l'application, toujours en mode avion ; finir la
+  séance ; remettre le réseau.
+- Quoi observer : la séance reprend à la quatrième question ; le bilan dit
+  « Tes réponses sont gardées sur le téléphone » ; au retour du réseau, la
+  pastille passe à « Tout est envoyé » sans rien à corriger ; au
+  back-office (ou dans la base), une tentative par question, pas une de
+  plus ; la question ouverte a son score.
+- En cas d'échec, relever : la question où la reprise s'est faite, ce
+  qu'affiche « Tes réponses », une capture.
+- État : à faire
+
 ## 7. Paiements réels — Orange Money, MTN MoMo, codes prépayés
 
 *(aucune entrée)*

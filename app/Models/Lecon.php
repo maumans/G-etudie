@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
-use App\Enums\DecisionRelecture;
 use App\Enums\StatutContenu;
+use App\Models\Concerns\EstRelisable;
+use App\Models\Contracts\ContenuRelisable;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Support\Carbon;
 
 /**
@@ -32,10 +32,14 @@ use Illuminate\Support\Carbon;
  * @property bool $est_exemple
  * @property Carbon $created_at
  * @property Carbon $updated_at
+ * @property-read Notion $notion
+ * @property-read User $auteur
  */
 #[Fillable(['uuid', 'notion_id', 'titre', 'statut', 'auteur_id', 'brouillon', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
-class Lecon extends Model
+class Lecon extends Model implements ContenuRelisable
 {
+    use EstRelisable;
+
     protected function casts(): array
     {
         return [
@@ -58,39 +62,20 @@ class Lecon extends Model
         return $this->belongsTo(Notion::class);
     }
 
-    /** @return BelongsTo<User, $this> */
-    public function auteur(): BelongsTo
+    public function nomContenu(): string
     {
-        return $this->belongsTo(User::class, 'auteur_id');
+        return 'leçon';
     }
 
-    /** @return MorphMany<VersionContenu, $this> */
-    public function versions(): MorphMany
+    public function instantane(): array
     {
-        return $this->morphMany(VersionContenu::class, 'contenu')->orderByDesc('numero');
+        return ['titre' => $this->titre, 'blocs' => $this->brouillon];
     }
 
-    /** @return BelongsTo<VersionContenu, $this> */
-    public function versionPubliee(): BelongsTo
+    public function erreurAvantRelecture(): ?string
     {
-        return $this->belongsTo(VersionContenu::class, 'version_publiee_id');
-    }
-
-    /** La version qui attend le relecteur (`null` hors relecture). */
-    public function versionEnRelecture(): ?VersionContenu
-    {
-        if ($this->statut !== StatutContenu::EnRelecture) {
-            return null;
-        }
-
-        return $this->versions()->whereNull('decision')->first();
-    }
-
-    /** Dernière version renvoyée, si c'est la dernière décision (pour afficher le commentaire). */
-    public function dernierRenvoi(): ?VersionContenu
-    {
-        $derniere = $this->versions()->whereNotNull('decision')->first();
-
-        return $derniere?->decision === DecisionRelecture::Renvoyee ? $derniere : null;
+        return ($this->brouillon['content'] ?? []) === [] || trim($this->titre) === ''
+            ? 'Une leçon vide ne part pas en relecture.'
+            : null;
     }
 }

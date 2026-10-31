@@ -123,3 +123,49 @@ export async function capturer(
         },
     );
 }
+
+/**
+ * Répond à la question affichée dans l'ardoise, quel que soit son type
+ * (lot 3) : première proposition, « 1 » pour un nombre, premier choix des
+ * listes, une phrase pour une rédaction — puis « Vérifier » et, pour une
+ * rédaction, l'auto-évaluation (premier critère coché).
+ */
+export async function repondreAuHasard(page: Page): Promise<void> {
+    const principal = page.getByRole('main');
+    const radios = principal.getByRole('radio');
+    const cases = principal.getByRole('checkbox');
+    const listes = principal.locator('select');
+    const champs = principal.locator('input:not([type=hidden]), textarea');
+
+    if ((await radios.count()) > 0) {
+        await radios.first().click();
+    } else if ((await cases.count()) > 0) {
+        await cases.first().click();
+    }
+
+    for (let i = 0; i < (await listes.count()); i++) {
+        await listes.nth(i).selectOption({ index: 1 });
+    }
+
+    for (let i = 0; i < (await champs.count()); i++) {
+        const champ = champs.nth(i);
+        const decimal = (await champ.getAttribute('inputmode')) === 'decimal';
+
+        await champ.fill(decimal ? '1' : 'réponse');
+    }
+
+    await page.getByRole('button', { name: 'Vérifier' }).click();
+
+    const valider = page.getByRole('button', {
+        name: 'Valider mon auto-évaluation',
+    });
+
+    if (await valider.isVisible()) {
+        await page.getByRole('checkbox').first().click();
+        await valider.click();
+    }
+
+    await expect(
+        page.getByRole('button', { name: /^(Continuer|Voir mon bilan)$/ }),
+    ).toBeVisible();
+}

@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\CodeExamen;
 use App\Enums\CodeSerie;
 use App\Enums\EtatLecon;
+use App\Enums\TypeQuestion;
 use App\Models\Examen;
 use App\Models\Serie;
 use App\Models\Tentative;
@@ -58,7 +59,8 @@ class DemoEleveSeeder extends Seeder
         }
 
         $profil = CatalogueEleve::profil($aissatou);
-        $questions = CatalogueEleve::questions($profil)->orderBy('id')->get();
+        // Des QCM seulement : la réponse se tire de la bonne option.
+        $questions = CatalogueEleve::questions($profil)->with('versionPubliee')->where('type', TypeQuestion::QcmUne->value)->orderBy('id')->get();
         $lecons = CatalogueEleve::lecons($profil)->orderBy('id')->get();
         $maintenant = CarbonImmutable::now();
 
@@ -67,10 +69,13 @@ class DemoEleveSeeder extends Seeder
             $saisiLe = $maintenant->subDays(3 - intdiv($rang, 2))->setTime(20, 10 + $rang);
             // Une réponse fausse sur trois, pour une jauge honnête.
             $option = $rang % 3 === 2
-                ? collect($question->donnees['options'])->firstWhere('id', '!=', $question->reponse_attendue['option'])['id']
+                ? (array_values(array_filter(
+                    $question->donnees['options'],
+                    fn (array $o) => $o['id'] !== $question->reponse_attendue['option'],
+                ))[0]['id'])
                 : $question->reponse_attendue['option'];
 
-            $tentatives->enregistrer($aissatou, (string) Str::uuid7(), $question, $question->version, ['option' => $option], null, 40, $saisiLe, $saisiLe);
+            $tentatives->enregistrer($aissatou, (string) Str::uuid7(), $question, (int) $question->numeroPublie(), ['option' => $option], null, 40, $saisiLe, $saisiLe);
         }
 
         if ($lecons->count() >= 2) {

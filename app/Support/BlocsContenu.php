@@ -15,8 +15,10 @@ namespace App\Support;
  *
  *   doc        → bloc*
  *   bloc       → paragraph | heading (2, 3) | bulletList | orderedList
- *                | formuleBloc | encadre
- *   encadre    → genre (a_retenir, methode, exemple, piege), bloc* sans encadre
+ *                | formuleBloc | encadre | question
+ *   encadre    → genre (a_retenir, methode, exemple, piege), bloc* sans encadre ni question
+ *   question   → uuid d'une question (mini-question de vérification, lot 3) ;
+ *                l'objet de contenu de la leçon embarque la question publiée
  *   listItem   → paragraph, puis paragraph | bulletList | orderedList
  *   en ligne   → text (marques bold, italic) | hardBreak | formule
  */
@@ -30,7 +32,9 @@ class BlocsContenu
 
     public const PROFONDEUR_MAX = 8;
 
-    private const BLOCS = ['paragraph', 'heading', 'bulletList', 'orderedList', 'formuleBloc', 'encadre'];
+    private const BLOCS = ['paragraph', 'heading', 'bulletList', 'orderedList', 'formuleBloc', 'encadre', 'question'];
+
+    private const UUID = '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/';
 
     private const MARQUES = ['bold', 'italic'];
 
@@ -101,6 +105,61 @@ class BlocsContenu
         $parcourir($doc);
 
         return $resume;
+    }
+
+    /**
+     * Identifiants des mini-questions d'un document, dans l'ordre.
+     *
+     * @param  array<string, mixed>  $doc
+     * @return list<string>
+     */
+    public static function questionsCitees(array $doc): array
+    {
+        $uuids = [];
+
+        foreach ($doc['content'] ?? [] as $bloc) {
+            if (is_array($bloc) && ($bloc['type'] ?? null) === 'question' && is_string($bloc['attrs']['uuid'] ?? null)) {
+                $uuids[] = $bloc['attrs']['uuid'];
+            }
+        }
+
+        return array_values(array_unique($uuids));
+    }
+
+    /**
+     * Le texte d'un document (une formule devient « … »), coupé à `$max`
+     * caractères : ce que montre une liste du back-office.
+     *
+     * @param  array<string, mixed>  $doc
+     */
+    public static function extrait(array $doc, int $max): string
+    {
+        $morceaux = [];
+
+        $parcourir = function (array $noeud) use (&$parcourir, &$morceaux): void {
+            match ($noeud['type'] ?? null) {
+                'text' => $morceaux[] = (string) ($noeud['text'] ?? ''),
+                // Le LaTeX brut ne se lit pas dans une liste : la formule est omise.
+                'formule', 'formuleBloc' => $morceaux[] = ' … ',
+                'question' => $morceaux[] = ' [question] ',
+                default => null,
+            };
+
+            foreach ($noeud['content'] ?? [] as $enfant) {
+                if (is_array($enfant)) {
+                    $parcourir($enfant);
+                }
+            }
+
+            if (in_array($noeud['type'] ?? null, self::BLOCS, true) || ($noeud['type'] ?? null) === 'listItem') {
+                $morceaux[] = ' ';
+            }
+        };
+
+        $parcourir($doc);
+        $texte = trim((string) preg_replace('/\s+/u', ' ', implode('', $morceaux)));
+
+        return mb_strlen($texte) > $max ? rtrim(mb_substr($texte, 0, $max - 1)).'…' : $texte;
     }
 
     /**
@@ -176,7 +235,9 @@ class BlocsContenu
                 ?? self::latex($noeud),
             'encadre' => self::cles($noeud, ['attrs', 'content'])
                 ?? self::attributs($noeud, ['genre' => fn ($v) => in_array($v, self::GENRES_ENCADRE, true)], 'Genre d\'encadré inconnu.')
-                ?? self::enfantsNonVides($noeud, array_values(array_diff(self::BLOCS, ['encadre'])), $profondeur, 'Un encadré'),
+                ?? self::enfantsNonVides($noeud, array_values(array_diff(self::BLOCS, ['encadre', 'question'])), $profondeur, 'Un encadré'),
+            'question' => self::cles($noeud, ['attrs'])
+                ?? self::attributs($noeud, ['uuid' => fn ($v) => is_string($v) && preg_match(self::UUID, $v) === 1], 'Une mini-question renvoie à une question par son identifiant.'),
             'text' => self::cles($noeud, ['text', 'marks'])
                 ?? self::texte($noeud),
             'hardBreak' => self::cles($noeud, []),

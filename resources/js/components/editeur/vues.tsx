@@ -1,12 +1,12 @@
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
 import type { ReactNodeViewProps } from '@tiptap/react';
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { ChevronDown, CircleHelp, Trash2 } from 'lucide-react';
 import { ENCADRES } from '@/components/contenu/contenu-blocs';
 import { Formule } from '@/components/ui/formule';
 import type { GenreEncadre } from '@/lib/contenu/blocs';
 import { GENRES_ENCADRE } from '@/lib/contenu/blocs';
 import { cn } from '@/lib/utils';
-import type { OptionsFormule } from './extensions';
+import type { OptionsFormule, OptionsMiniQuestion } from './extensions';
 
 /**
  * Formule dans l'éditeur : rendue comme chez l'élève ; un clic (ou Entrée
@@ -118,6 +118,53 @@ export function VueEncadre({
                 </button>
             </div>
             <NodeViewContent className="grid gap-3" />
+        </NodeViewWrapper>
+    );
+}
+
+/** Mini-question dans l'éditeur : une carte qui dit quelle question l'élève recevra. */
+export function VueMiniQuestion({
+    node,
+    selected,
+    extension,
+    deleteNode,
+}: ReactNodeViewProps) {
+    const uuid = String(node.attrs.uuid ?? '');
+    const question = (extension.options as OptionsMiniQuestion).decrire(uuid);
+
+    return (
+        <NodeViewWrapper
+            as="div"
+            className={cn(
+                'my-1 flex items-start gap-3 rounded-carte border border-nimba-500/35 bg-nimba-500/[0.06] px-4 py-3 dark:border-nimba-400/30 dark:bg-nimba-400/[0.08]',
+                selected && 'ring-2 ring-nimba-500/60 dark:ring-nimba-400/60',
+            )}
+        >
+            <CircleHelp
+                aria-hidden
+                className="mt-0.5 size-4 shrink-0 text-nimba-700 dark:text-nimba-300"
+            />
+            <div
+                contentEditable={false}
+                className="grid min-w-0 flex-1 gap-0.5 select-none"
+            >
+                <p className="text-aide font-semibold text-nimba-700 dark:text-nimba-300">
+                    Mini-question{question ? ` · ${question.type}` : ''}
+                </p>
+                <p className="line-clamp-2 text-interface text-ink-900">
+                    {question?.extrait ??
+                        'Question introuvable ou plus publiée : l’élève ne la verra pas.'}
+                </p>
+            </div>
+            <button
+                type="button"
+                contentEditable={false}
+                onClick={deleteNode}
+                aria-label="Retirer la mini-question"
+                className="flex size-7 shrink-0 items-center justify-center rounded-[7px] text-ink-500 transition-colors outline-none hover:bg-faux-600/[0.08] hover:text-faux-600 focus-visible:outline-2 focus-visible:outline-ring"
+            >
+                <Trash2 aria-hidden className="size-3.5" />
+            </button>
         </NodeViewWrapper>
     );
 }

@@ -12,10 +12,12 @@ import {
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
+import { ExerciceQuestion } from '@/components/questions/exercice-question';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
 import { ProgressionBarre } from '@/components/ui/progression';
 import type { DocumentBlocs } from '@/lib/contenu/blocs';
+import type { QuestionEleve } from '@/lib/contenu/questions';
 import { enregistrer } from '@/lib/hors-ligne';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
@@ -34,6 +36,8 @@ export type ContenuLecon = {
     blocs: DocumentBlocs;
     minutes: number;
     est_exemple: boolean;
+    /** Mini-questions de la leçon (version publiée), par identifiant. */
+    questions?: Record<string, QuestionEleve>;
 };
 
 type Lien = { uuid: string; titre: string };
@@ -203,6 +207,17 @@ export default function Lecon({ lecon, contexte, progression, source }: Props) {
                         <ContenuBlocs
                             doc={lecon.blocs}
                             className="max-w-[42rem]"
+                            rendreQuestion={(uuid) => {
+                                const question = lecon.questions?.[uuid];
+
+                                return question ? (
+                                    <ExerciceQuestion
+                                        question={question}
+                                        envoyer
+                                        className="my-2 bg-craie-50 shadow-none dark:bg-relief/40"
+                                    />
+                                ) : null;
+                            }}
                         />
                     </article>
 

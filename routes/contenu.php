@@ -2,6 +2,7 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\Contenu\LeconController;
+use App\Http\Controllers\Contenu\QuestionController;
 use App\Http\Controllers\Contenu\Referentiel\AnneeScolaireController;
 use App\Http\Controllers\Contenu\Referentiel\MatiereController;
 use App\Http\Controllers\Contenu\Referentiel\OffreController;
@@ -33,6 +34,30 @@ Route::middleware('auth')->prefix('contenu')->name('contenu.lecons.')->group(fun
     Route::post('lecons/{lecon}/renvoyer', [LeconController::class, 'renvoyer'])->middleware($relire)->name('renvoyer');
     Route::post('lecons/{lecon}/archiver', [LeconController::class, 'archiver'])->middleware($administrer)->name('archiver');
     Route::post('lecons/{lecon}/restaurer', [LeconController::class, 'restaurer'])->middleware($administrer)->name('restaurer');
+});
+
+// Questions (PLAN M5, M17) : le même circuit que les leçons, les mêmes
+// permissions ; une fiche est gardée par QuestionPolicy.
+Route::middleware('auth')->prefix('contenu')->name('contenu.questions.')->group(function () {
+    $consulter = 'can:'.Permission::EspaceContenu->value;
+    $rediger = 'can:'.Permission::RedigerContenu->value;
+    $relire = 'can:'.Permission::RelireContenu->value;
+    $administrer = 'can:'.Permission::AdministrerContenu->value;
+
+    Route::get('questions', [QuestionController::class, 'index'])->middleware($consulter)->name('index');
+    Route::get('relecture/questions', [QuestionController::class, 'relecture'])->middleware($relire)->name('relecture');
+    Route::get('questions/creer', [QuestionController::class, 'create'])->middleware($rediger)->name('create');
+    Route::post('questions', [QuestionController::class, 'store'])->middleware($rediger)->name('store');
+    Route::get('questions/{question}', [QuestionController::class, 'show'])->middleware($consulter)->name('show');
+    Route::get('questions/{question}/edition', [QuestionController::class, 'edit'])->middleware($rediger)->name('edit');
+    Route::put('questions/{question}', [QuestionController::class, 'update'])->middleware($rediger)->name('update');
+    Route::post('questions/{question}/soumettre', [QuestionController::class, 'soumettre'])->middleware($rediger)->name('soumettre');
+    Route::post('questions/{question}/reprendre', [QuestionController::class, 'reprendre'])->middleware($rediger)->name('reprendre');
+    Route::post('questions/{question}/modifier', [QuestionController::class, 'modifier'])->middleware($rediger)->name('modifier');
+    Route::post('questions/{question}/publier', [QuestionController::class, 'publier'])->middleware($relire)->name('publier');
+    Route::post('questions/{question}/renvoyer', [QuestionController::class, 'renvoyer'])->middleware($relire)->name('renvoyer');
+    Route::post('questions/{question}/archiver', [QuestionController::class, 'archiver'])->middleware($administrer)->name('archiver');
+    Route::post('questions/{question}/restaurer', [QuestionController::class, 'restaurer'])->middleware($administrer)->name('restaurer');
 });
 
 // Référentiel (PLAN M3) : responsable pédagogique et administrateur plateforme.

@@ -2,6 +2,7 @@ import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
 import type { Editor } from '@tiptap/react';
 import {
     Bold,
+    CircleHelp,
     Heading2,
     Heading3,
     Italic,
@@ -20,7 +21,8 @@ import type { DocumentBlocs, GenreEncadre } from '@/lib/contenu/blocs';
 import { GENRES_ENCADRE } from '@/lib/contenu/blocs';
 import { cn } from '@/lib/utils';
 import { DialogueFormule } from './dialogue-formule';
-import type { DemandeFormule } from './extensions';
+import { DialogueMiniQuestion } from './dialogue-mini-question';
+import type { DemandeFormule, QuestionDisponible } from './extensions';
 import { extensionsLecon } from './extensions';
 
 /**
@@ -33,15 +35,30 @@ export function EditeurLecon({
     initial,
     onChange,
     libelle,
+    compact = false,
+    placeholder,
+    questions,
 }: {
     initial: DocumentBlocs;
     onChange: (doc: DocumentBlocs) => void;
     libelle: string;
+    /** Énoncé, indice, étape de corrigé : plus bas, sans titres. */
+    compact?: boolean;
+    placeholder?: string;
+    /** Leçon : les questions publiées qu'on peut y glisser en mini-question. */
+    questions?: QuestionDisponible[];
 }) {
     const [demande, setDemande] = useState<DemandeFormule | null>(null);
+    const [choixQuestion, setChoixQuestion] = useState(false);
 
     const editeur = useEditor({
-        extensions: extensionsLecon({ ouvrirFormule: setDemande }),
+        extensions: extensionsLecon({
+            ouvrirFormule: setDemande,
+            placeholder,
+            decrireQuestion: questions
+                ? (uuid) => questions.find((q) => q.uuid === uuid)
+                : undefined,
+        }),
         content: initial,
         immediatelyRender: true,
         editorProps: {
@@ -49,7 +66,10 @@ export function EditeurLecon({
                 'aria-label': libelle,
                 'aria-multiline': 'true',
                 role: 'textbox',
-                class: 'min-h-[22rem] outline-none',
+                class: cn(
+                    'outline-none',
+                    compact ? 'min-h-[5.5rem]' : 'min-h-[22rem]',
+                ),
             },
         },
         onUpdate: ({ editor }) => onChange(editor.getJSON() as DocumentBlocs),
@@ -57,11 +77,19 @@ export function EditeurLecon({
 
     return (
         <div className="grid">
-            <BarreOutils editeur={editeur} ouvrirFormule={setDemande} />
+            <BarreOutils
+                editeur={editeur}
+                ouvrirFormule={setDemande}
+                compact={compact}
+                ouvrirQuestions={
+                    questions ? () => setChoixQuestion(true) : undefined
+                }
+            />
             <EditorContent
                 editor={editeur}
                 className={cn(
-                    'px-5 py-5 text-lecture [overflow-wrap:anywhere] text-ink-900',
+                    compact ? 'px-4 py-3' : 'px-5 py-5',
+                    'text-lecture [overflow-wrap:anywhere] text-ink-900',
                     // Mise en page de lecture, comme ContenuBlocs.
                     '[&_.ProseMirror>*+*]:mt-4 [&_aside>div>*+*]:mt-3',
                     '[&_p]:leading-[1.65]',
@@ -78,6 +106,23 @@ export function EditeurLecon({
                 demande={demande}
                 fermer={() => setDemande(null)}
             />
+            {questions && (
+                <DialogueMiniQuestion
+                    ouvert={choixQuestion}
+                    fermer={() => setChoixQuestion(false)}
+                    questions={questions}
+                    inserer={(uuid) =>
+                        editeur
+                            ?.chain()
+                            .focus()
+                            .insertContent({
+                                type: 'question',
+                                attrs: { uuid },
+                            })
+                            .run()
+                    }
+                />
+            )}
         </div>
     );
 }
@@ -85,9 +130,13 @@ export function EditeurLecon({
 function BarreOutils({
     editeur,
     ouvrirFormule,
+    compact,
+    ouvrirQuestions,
 }: {
     editeur: Editor | null;
     ouvrirFormule: (demande: DemandeFormule) => void;
+    compact: boolean;
+    ouvrirQuestions?: () => void;
 }) {
     const etat = useEditorState({
         editor: editeur,
@@ -150,18 +199,26 @@ function BarreOutils({
                 actif={etat.paragraphe && !etat.encadre}
                 onClick={() => chaine().setParagraph().run()}
             />
-            <Outil
-                icone={Heading2}
-                nom="Titre"
-                actif={etat.titre2}
-                onClick={() => chaine().toggleHeading({ level: 2 }).run()}
-            />
-            <Outil
-                icone={Heading3}
-                nom="Sous-titre"
-                actif={etat.titre3}
-                onClick={() => chaine().toggleHeading({ level: 3 }).run()}
-            />
+            {!compact && (
+                <>
+                    <Outil
+                        icone={Heading2}
+                        nom="Titre"
+                        actif={etat.titre2}
+                        onClick={() =>
+                            chaine().toggleHeading({ level: 2 }).run()
+                        }
+                    />
+                    <Outil
+                        icone={Heading3}
+                        nom="Sous-titre"
+                        actif={etat.titre3}
+                        onClick={() =>
+                            chaine().toggleHeading({ level: 3 }).run()
+                        }
+                    />
+                </>
+            )}
             <Separateur />
             <Outil
                 icone={Bold}
@@ -211,6 +268,16 @@ function BarreOutils({
                     onClick={() => encadrer(genre)}
                 />
             ))}
+            {ouvrirQuestions && (
+                <>
+                    <Separateur />
+                    <Outil
+                        icone={CircleHelp}
+                        nom="Mini-question de vérification"
+                        onClick={ouvrirQuestions}
+                    />
+                </>
+            )}
             <span className="flex border-l border-border pl-1 sm:ml-auto sm:border-0 sm:pl-0">
                 <Outil
                     icone={Undo2}

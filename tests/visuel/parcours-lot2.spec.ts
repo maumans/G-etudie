@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { THEMES, capturer } from './gabarits';
+import { THEMES, capturer, repondreAuHasard } from './gabarits';
 
 /**
  * Critère d'acceptation du lot 2 (PLAN § 12) : **un nouvel élève fait son
@@ -103,9 +103,10 @@ test('un nouvel élève fait son premier exercice en moins de 60 s après son in
         .click();
 
     await expect(page).toHaveURL(/\/eleve\/seances\//, ATTENTE);
-    await page.getByRole('radio').first().click();
-    await page.getByRole('button', { name: 'Vérifier' }).click();
-    await expect(page.getByText(/^(Juste !|Pas encore)$/)).toBeVisible();
+    await repondreAuHasard(page);
+    await expect(
+        page.getByText(/^(Juste !|Pas encore|En partie juste)/).last(),
+    ).toBeVisible();
 
     const secondes = (Date.now() - debut) / 1000;
     console.info(
@@ -116,7 +117,7 @@ test('un nouvel élève fait son premier exercice en moins de 60 s après son in
     // L'ardoise après « Vérifier » : verdict et explication.
     await capturerPartout(page, 'seance-verdict');
 
-    // La suite de la séance, réponse « A » partout, jusqu'au bilan.
+    // La suite de la séance, n'importe quelle réponse, jusqu'au bilan.
     for (let rang = 0; rang < 20; rang++) {
         const suite = page.getByRole('button', { name: 'Continuer' });
 
@@ -130,8 +131,7 @@ test('un nouvel élève fait son premier exercice en moins de 60 s après son in
             await capturerPartout(page, 'seance-question');
         }
 
-        await page.getByRole('radio').first().click();
-        await page.getByRole('button', { name: 'Vérifier' }).click();
+        await repondreAuHasard(page);
     }
 
     await page.getByRole('button', { name: 'Voir mon bilan' }).click();
