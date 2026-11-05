@@ -17,6 +17,7 @@ class RegistreOperations
         Operations\TerminerSeance::TYPE => Operations\TerminerSeance::class,
         Operations\ProgressionLecon::TYPE => Operations\ProgressionLecon::class,
         Operations\CreerSignalement::TYPE => Operations\CreerSignalement::class,
+        Operations\TerminerExamenBlanc::TYPE => Operations\TerminerExamenBlanc::class,
     ];
 
     /** @var array<string, class-string<GestionnaireOperation>> */

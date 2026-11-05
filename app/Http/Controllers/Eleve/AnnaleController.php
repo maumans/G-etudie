@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Eleve;
 
 use App\Http\Controllers\Contenu\AnnaleController as AnnaleBackOffice;
 use App\Http\Controllers\Controller;
+use App\Models\AnneeScolaire;
 use App\Models\Chapitre;
+use App\Models\Epreuve;
 use App\Models\Matiere;
 use App\Models\ProfilEleve;
 use App\Models\Question;
@@ -102,14 +104,39 @@ class AnnaleController extends Controller
             ->get(['questions.uuid as question', 'tentatives.score'])
             ->mapWithKeys(fn (Tentative $t) => [$t->getAttribute('question') => $t->score]);
 
-        $mode = $request->string('mode')->toString() === 'entrainement' ? 'entrainement' : 'lecture';
+        $mode = in_array($request->string('mode')->toString(), ['entrainement', 'examen'], true)
+            ? $request->string('mode')->toString()
+            : 'lecture';
 
         return Inertia::render('eleve/annale', [
             'sujet' => $contenu,
             'mode' => $mode,
             'question' => $request->string('question')->toString() ?: null,
             'scores' => (object) $scores->all(),
+            // Lot 5 : la durée de l'épreuve saisie par l'équipe, quand
+            // l'annale n'imprime pas la sienne (sinon, l'élève choisit).
+            'duree_epreuve' => $this->dureeEpreuve($sujet),
         ]);
+    }
+
+    /** La durée de l'épreuve de l'année courante (examen, série, filière, matière). */
+    private function dureeEpreuve(Sujet $sujet): ?int
+    {
+        $annee = AnneeScolaire::courante();
+
+        if ($annee === null) {
+            return null;
+        }
+
+        $epreuve = Epreuve::query()
+            ->where('annee_scolaire_id', $annee->id)
+            ->where('examen_id', $sujet->examen_id)
+            ->where('matiere_id', $sujet->matiere_id)
+            ->where('filiere', $sujet->filiere->value)
+            ->where(fn (Builder $q) => $sujet->serie_id === null ? $q->whereNull('serie_id') : $q->where('serie_id', $sujet->serie_id))
+            ->first();
+
+        return $epreuve?->duree_minutes;
     }
 
     public function document(Sujet $sujet): StreamedResponse

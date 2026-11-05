@@ -43,6 +43,8 @@ type Parcours = {
     phares: number;
     examen_id: number;
     session: string | null;
+    /** Seuil du verdict des examens blancs (lot 5), vide tant que non saisi. */
+    moyenne_admission: string | null;
 };
 
 type Epreuve = {
@@ -411,7 +413,7 @@ function SessionExamen({ parcours }: { parcours: Parcours }) {
         <Section titre={`Prochaine session · ${examen}`}>
             <Form
                 {...enregistrerSession.form(parcours.examen_id)}
-                key={`${parcours.examen_id}-${parcours.session ?? ''}`}
+                key={`${parcours.examen_id}-${parcours.session ?? ''}-${parcours.moyenne_admission ?? ''}`}
                 options={{ preserveScroll: true }}
                 className="grid gap-3"
             >
@@ -421,7 +423,9 @@ function SessionExamen({ parcours }: { parcours: Parcours }) {
                             La date officielle de l'examen, quand elle est
                             annoncée. Elle donne aux élèves leur compte à
                             rebours ; sans elle, ils lisent « date pas encore
-                            annoncée ».
+                            annoncée ». La moyenne d'admission est la règle
+                            officielle de l'examen : à saisir telle qu'elle est
+                            publiée.
                         </p>
                         <Champ
                             libelle="Date de la session"
@@ -435,6 +439,24 @@ function SessionExamen({ parcours }: { parcours: Parcours }) {
                                 />
                             )}
                         </Champ>
+                        <Champ
+                            libelle="Moyenne d'admission"
+                            aide="Sur 20. Elle donne le verdict des examens blancs ; vide, aucun verdict n'est affiché."
+                            erreur={errors.moyenne_admission}
+                        >
+                            {(attributs) => (
+                                <NumberInput
+                                    {...attributs}
+                                    name="moyenne_admission"
+                                    decimales
+                                    valeur={
+                                        parcours.moyenne_admission === null
+                                            ? null
+                                            : Number(parcours.moyenne_admission)
+                                    }
+                                />
+                            )}
+                        </Champ>
                         <Button
                             type="submit"
                             variant="outline"
@@ -443,7 +465,7 @@ function SessionExamen({ parcours }: { parcours: Parcours }) {
                             className="justify-self-start"
                         >
                             {processing && <Spinner />}
-                            Enregistrer la date
+                            Enregistrer
                         </Button>
                     </>
                 )}

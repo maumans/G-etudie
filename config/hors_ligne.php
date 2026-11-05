@@ -27,6 +27,8 @@ return [
         // ligne seulement.
         '/eleve/annales',
         '/eleve/signalements$',
+        // Lot 5 : l'historique et les résultats se relisent d'après leur copie.
+        '/eleve/examens-blancs',
         '/compte/affichage$',
     ],
 

@@ -9,6 +9,7 @@ export const LIBELLES: Record<string, string> = {
     'seance.terminer': 'Fin de séance',
     'lecon.progression': 'Progression dans une leçon',
     'signalement.creer': 'Signalement d’une erreur',
+    'examen_blanc.terminer': 'Fin d’un examen blanc',
 };
 
 export function libelleOperation(type: string): string {

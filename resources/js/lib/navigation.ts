@@ -23,6 +23,7 @@ import { index as indexQuestions } from '@/routes/contenu/questions';
 import { index as matieresReferentiel } from '@/routes/contenu/referentiel/matieres';
 import { accueil as accueilEleve, cours as coursEleve } from '@/routes/eleve';
 import { index as annalesEleve } from '@/routes/eleve/annales';
+import { index as examensBlancs } from '@/routes/eleve/examens-blancs';
 import { index as indexAnnales } from '@/routes/contenu/annales';
 import { index as indexSignalements } from '@/routes/contenu/signalements';
 import { edit as monCompte } from '@/routes/compte/profil';
@@ -49,7 +50,12 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         href: annalesEleve().url,
         actifSous: '/eleve/annales',
     },
-    { libelle: 'Examens blancs', icone: Timer },
+    {
+        libelle: 'Examens blancs',
+        icone: Timer,
+        href: examensBlancs().url,
+        actifSous: '/eleve/examens-blancs',
+    },
     {
         libelle: 'Moi',
         icone: CircleUser,

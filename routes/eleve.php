@@ -4,6 +4,7 @@ use App\Enums\Permission;
 use App\Http\Controllers\Eleve\AccueilController;
 use App\Http\Controllers\Eleve\AnnaleController;
 use App\Http\Controllers\Eleve\CoursController;
+use App\Http\Controllers\Eleve\ExamenBlancController;
 use App\Http\Controllers\Eleve\LeconController;
 use App\Http\Controllers\Eleve\ParcoursAccueilController;
 use App\Http\Controllers\Eleve\SeanceController;
@@ -40,5 +41,11 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value])
             // service worker ne copie pas un PDF de plusieurs Mo.
             Route::get('documents/annales/{sujet}', [AnnaleController::class, 'document'])->name('annales.document');
             Route::get('signalements', [SignalementController::class, 'index'])->name('signalements');
+
+            // Lot 5 : examens blancs. Le passage se fait sur la fiche de
+            // l'annale (?mode=examen) et vit sur l'appareil ; la fin arrive
+            // par la file (`examen_blanc.terminer`).
+            Route::get('examens-blancs', [ExamenBlancController::class, 'index'])->name('examens-blancs.index');
+            Route::get('examens-blancs/{examen}', [ExamenBlancController::class, 'show'])->name('examens-blancs.show');
         });
     });

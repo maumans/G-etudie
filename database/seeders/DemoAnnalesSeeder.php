@@ -267,8 +267,8 @@ class DemoAnnalesSeeder extends Seeder
                     'consigne' => 'On donne l\'expression $E = (x + 3)^2 - 9$.',
                     'questions' => [
                         self::q('Développe et réduis $E$.', 'ouverte', 3, ['bareme' => [
-                            ['critere' => 'J\'applique l\'identité $(a + b)^2 = a^2 + 2ab + b^2$.', 'points' => 2],
-                            ['critere' => 'J\'obtiens $E = x^2 + 6x$.', 'points' => 2],
+                            ['critere' => 'J\'applique l\'identité remarquable (a + b)² = a² + 2ab + b².', 'points' => 2],
+                            ['critere' => 'J\'obtiens E = x² + 6x.', 'points' => 2],
                         ]], [
                             ['L\'identité remarquable', '$(x + 3)^2 = x^2 + 6x + 9$.'],
                             ['Réduire', '$E = x^2 + 6x + 9 - 9 = x^2 + 6x$.'],

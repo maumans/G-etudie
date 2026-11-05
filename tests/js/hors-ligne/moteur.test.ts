@@ -179,6 +179,28 @@ describe('la file d’opérations', () => {
         await moteur.vider();
     });
 
+    it('un geste qui porte son uuid (examen blanc) ne s’enregistre qu’une fois', async () => {
+        const { moteur, serveur } = creerMoteur();
+        await moteur.definirUtilisateur(7);
+        serveur.panne = true;
+        const uuid = '0192f3a4-5b6c-7d8e-9f01-23456789abcd';
+
+        const premier = await moteur.enregistrer({
+            type: 'test.noter',
+            charge: {},
+            uuid,
+        });
+        const second = await moteur.enregistrer({
+            type: 'test.noter',
+            charge: {},
+            uuid,
+        });
+
+        expect([premier, second]).toEqual([uuid, uuid]);
+        expect(await base.operations.count()).toBe(1);
+        await moteur.vider();
+    });
+
     it('envoie dans l’ordre [priorité, uuid] et attend la dépendance (n° 14)', async () => {
         const { moteur, serveur } = creerMoteur();
         serveur.panne = true;

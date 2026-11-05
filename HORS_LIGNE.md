@@ -657,7 +657,7 @@ hors ligne ; les packs viennent ensuite.
 | HL1 | Rendu indépendant de la source | ✅ fait (lots 1 et 2) | 2 / 2 |
 | HL2 | Tentatives et séances | ✅ fait (lots 2 et 3) : neuf types par la file, auto-évaluation, correction contre la version vue (A.9), séance complète en mode avion (A.14 n° 24) | 4 / 4 |
 | — | Lot 4 (sans lot HL) : `signalement.creer`, objet de contenu des annales, liste blanche | ✅ fait (2026-10-31), B.3 « Lot 4 » | 4 / 5 (packs au lot 7) |
-| HL3 | Examen blanc | ⬜ à faire | 0 / 4 |
+| HL3 | Examen blanc | ✅ fait (lot 5, 2026-11-05) : sauvegarde continue, chronomètre depuis l'heure de début, `examen_blanc.terminer`, horloge signalée ; lancement depuis un pack au lot 7 | 4 / 4 |
 | HL4 | Jauge, séances pré-calculées, trace | ⬜ à faire | 0 / 3 |
 | HL5 | Packs | ⬜ à faire | 0 / 7 |
 | HL6 | Profils et session | ⬜ à faire | 0 / 4 |
@@ -857,6 +857,37 @@ hors ligne ; les packs viennent ensuite.
   `contenus` les attend, comme les leçons) ; aujourd'hui, une annale se
   relit hors ligne seulement si elle a déjà été ouverte en ligne.
 
+### HL3 — Examen blanc (A.8, lot 5)
+
+- [x] **Sauvegarde continue** : `lib/examen-blanc/passage.ts` écrit dans
+  la table Dexie `examens_blancs` **à chaque geste** (réponse, changement de
+  question), jamais sur un minuteur ; rouvrir l'application rouvre l'examen
+  à la question en cours (« Examen repris ») : bandeau « Examen blanc en
+  cours » dans tout l'espace élève (`BandeauExamenEnCours`), reprise depuis
+  la fiche (`?mode=examen`). Preuve : Vitest `examen-blanc.test.ts` (A.14
+  n° 20), Playwright `parcours-lot5.spec.ts` (onglet fermé, repris).
+- [x] **Chronomètre** (HL-D5, « conditions réelles ») : temps restant
+  calculé depuis l'heure de début (`tempsRestantMs`), jamais additionné ;
+  le temps court application fermée ; à la fin du temps, l'examen se
+  termine seul, l'heure de fin étant celle de la fin du temps. Preuve :
+  Vitest (A.14 n° 21). Mode « entraînement » avec pause : pas au lot 5.
+- [x] **Horloge** : recul (> 1 min sous la dernière heure vue) ou saut de
+  plus de 5 min pendant que l'écran tourne (écart entre `Date.now()` et
+  `performance.now()`) → **signalé** sur le résultat ; côté serveur, aussi
+  un examen plus long que sa durée (+ 5 min) ou fini avant d'avoir
+  commencé, et l'horloge suspecte de la synchronisation. Jamais sanctionné.
+- [x] **Fin** : correction d'affichage immédiate (`noteExamen`, jumelle de
+  `NoteExamen`), puis `examen_blanc.terminer` (priorité 0, `uuid` de
+  l'examen) ; « en attente d'envoi » jusqu'à l'accusé (table
+  `acquittees`) ; la note du serveur fait foi, un écart est expliqué sur le
+  résultat. La ligne quitte `examens_blancs` à l'envoi : le service worker
+  n'active une nouvelle version que sans examen en cours (A.3.1). Carte de
+  partage dessinée sur l'appareil (hors ligne). Preuve :
+  `ExamenBlancHorsLigneTest` (A.14 n° 7), Vitest.
+- [ ] **Reste au lot 7 (HL5)** : lancer un examen hors ligne depuis un pack
+  (aujourd'hui : depuis la copie de la fiche d'annale déjà ouverte en
+  ligne).
+
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
@@ -892,6 +923,16 @@ hors ligne ; les packs viennent ensuite.
   inventée refusée, question retirée, chaque type recorrigé (score
   partiel compris), réponse mal formée à 0, trop grosse refusée, indices
   bornés, séance livrant la version publiée mélangée.
+- [x] 7 — `ExamenBlancHorsLigneTest` (10) : note recalculée par le serveur
+  (l'appareil disait 20, le serveur 10), tentatives `examen_blanc`
+  recorrigées, même examen deux fois → une note, horloge douteuse signalée
+  (trois cas) sans toucher à la note, version jamais publiée, réponse mal
+  formée, durée absurde et annale retirée refusées, résultat gardé (404),
+  verdict seulement avec la moyenne d'admission.
+- [x] 20 — Vitest : examen rouvert à la bonne question, réponses gardées,
+  après une nouvelle connexion à la base (`examen-blanc.test.ts`).
+- [x] 21 — Vitest : chronomètre calculé depuis l'heure de début (fermée
+  45 min → 45 min de moins), fin à la fin du temps.
 - [x] 10 — progression : la saisie la plus récente gagne
   (`GestesEleveTest`, 3 tests).
 - [x] 24 — séance complète hors ligne (`parcours-lot3.spec.ts`, lot 3) :
@@ -1041,6 +1082,13 @@ hors ligne ; les packs viennent ensuite.
     l'équipe est marquée lue à l'ouverture de « Mes signalements » (une
     écriture sur un GET, pas un geste de l'élève : pas de file). Hors
     ligne, la copie de l'écran montre la dernière réponse connue.
+22. **2026-11-05 — L'examen blanc vit sur la fiche de l'annale.** Le
+    passage se fait sur `/eleve/annales/{uuid}?mode=examen` (déjà gardée
+    hors ligne), en surcouche plein écran, plutôt que sur une page à part :
+    une fiche ouverte en ligne suffit pour passer l'examen sans réseau. Le
+    serveur ne voit l'examen qu'à la fin (`examen_blanc.terminer`), comme
+    le prévoit A.8 ; l'`uuid` de l'examen est celui de l'opération
+    (`NouveauGeste.uuid`, ajouté au moteur).
 
 ## B.6 Points de vigilance
 

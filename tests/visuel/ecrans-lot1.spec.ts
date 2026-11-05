@@ -135,7 +135,7 @@ async function ouvrirProgramme(page: Page): Promise<void> {
     await page.getByRole('link', { name: /^Physique/ }).click();
     await expect(
         page.getByRole('heading', { name: 'Physique · Terminale' }),
-    ).toBeVisible();
+    ).toBeVisible(ATTENTE);
 }
 
 for (const gabarit of GABARITS) {

@@ -9,9 +9,11 @@ import {
     Hash,
     ListChecks,
     Scale,
+    Timer,
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
+import { ExamenBlanc } from '@/components/examen-blanc/examen-blanc';
 import { CorrigePasAPas } from '@/components/questions/aides-question';
 import { ExerciceQuestion } from '@/components/questions/exercice-question';
 import { SaisieQuestion } from '@/components/questions/saisie-question';
@@ -32,7 +34,7 @@ import { MATIERES } from '@/lib/matieres';
 import { cn, pluriel } from '@/lib/utils';
 import { index } from '@/routes/eleve/annales';
 
-type Mode = 'lecture' | 'entrainement';
+type Mode = 'lecture' | 'entrainement' | 'examen';
 
 type Props = {
     sujet: SujetEleve;
@@ -41,19 +43,29 @@ type Props = {
     question: string | null;
     /** Dernier score de l'élève par question (uuid → 0-100, null : à auto-évaluer). */
     scores: Record<string, number | null>;
+    /** Durée de l'épreuve saisie par l'équipe, si l'annale n'imprime pas la sienne. */
+    duree_epreuve: number | null;
 };
 
 /**
- * Une annale (PLAN M6), en deux modes :
+ * Une annale (PLAN M6), en trois modes :
  *  - **Lecture** : l'énoncé partie par partie, et sous chaque question son
  *    corrigé, dévoilé à la demande ;
  *  - **Entraînement** : question par question, avec indices, réponse par
- *    la file d'opérations (`tentative.enregistrer`, mode entraînement).
+ *    la file d'opérations (`tentative.enregistrer`, mode entraînement) ;
+ *  - **Conditions réelles** (lot 5) : l'examen blanc, chronométré, sans
+ *    aide (`components/examen-blanc`).
  * Le document original reste consultable à côté : c'est la preuve que la
  * version structurée est fidèle. Reçoit un **objet de contenu** (`sujet`),
  * comme la leçon : un pack (lot 7) le fournira tel quel.
  */
-export default function Annale({ sujet, mode, question, scores }: Props) {
+export default function Annale({
+    sujet,
+    mode,
+    question,
+    scores,
+    duree_epreuve,
+}: Props) {
     const [vue, setVue] = useState<Mode>(mode);
     const style = MATIERES[sujet.matiere.cle];
     const liste = useMemo(() => questionsDuSujet(sujet), [sujet]);
@@ -148,6 +160,12 @@ export default function Annale({ sujet, mode, question, scores }: Props) {
                                 Les questions de ce sujet sont en cours de
                                 relecture. Reviens bientôt.
                             </p>
+                        ) : vue === 'examen' ? (
+                            <ExamenBlanc
+                                sujet={sujet}
+                                dureeEpreuve={duree_epreuve}
+                                reprendre={mode === 'examen'}
+                            />
                         ) : vue === 'lecture' ? (
                             <Lecture sujet={sujet} />
                         ) : (
@@ -238,13 +256,19 @@ function ChoixMode({
             aide: 'Question par question',
             icone: ListChecks,
         },
+        {
+            cle: 'examen' as const,
+            libelle: 'Conditions réelles',
+            aide: 'Chronométré, sans aide',
+            icone: Timer,
+        },
     ];
 
     return (
         <div
             role="tablist"
             aria-label="Mode"
-            className="grid grid-cols-2 gap-1 rounded-controle bg-craie-100 p-1 sm:w-fit"
+            className="grid grid-cols-3 gap-1 rounded-controle bg-craie-100 p-1 sm:w-fit"
         >
             {modes.map((m) => (
                 <button
@@ -254,7 +278,7 @@ function ChoixMode({
                     aria-selected={vue === m.cle}
                     onClick={() => changer(m.cle)}
                     className={cn(
-                        'flex items-center gap-2.5 rounded-[7px] px-3 py-2 text-left outline-none focus-visible:outline-2 focus-visible:outline-ring sm:pr-5',
+                        'flex min-w-0 items-center gap-2 rounded-[7px] px-2 py-2 text-left outline-none focus-visible:outline-2 focus-visible:outline-ring max-sm:flex-col max-sm:gap-1 max-sm:text-center sm:gap-2.5 sm:px-3 sm:pr-5',
                         vue === m.cle
                             ? 'bg-relief text-ink-900 shadow-xs ring-1 ring-black/5 dark:ring-white/5'
                             : 'text-ink-600 hover:text-ink-900',
@@ -262,7 +286,18 @@ function ChoixMode({
                 >
                     <m.icone aria-hidden className="size-4 shrink-0" />
                     <span className="grid leading-tight">
-                        <span className="font-semibold">{m.libelle}</span>
+                        <span className="text-aide font-semibold sm:text-interface">
+                            {m.cle === 'examen' ? (
+                                <>
+                                    <span className="sm:hidden">Examen</span>
+                                    <span className="max-sm:hidden">
+                                        {m.libelle}
+                                    </span>
+                                </>
+                            ) : (
+                                m.libelle
+                            )}
+                        </span>
                         <span className="text-meta text-ink-600 max-sm:hidden">
                             {m.aide}
                         </span>

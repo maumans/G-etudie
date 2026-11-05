@@ -353,6 +353,25 @@
   geste, une capture.
 - État : à faire
 
+### [Lot 5] Extinction forcée du téléphone en plein examen blanc
+- Pourquoi : HORS_LIGNE.md A.15 n° 2 — Playwright ferme un onglet, pas un
+  téléphone ; une batterie vide ou un redémarrage coupe tout d'un coup.
+- Matériel : un Android d'entrée de gamme, Chrome, application installée ;
+  le compte 01 (Aïssatou) ou un élève BEPC ; une annale déjà ouverte.
+- Comment le provoquer : « Conditions réelles », commencer ; répondre à
+  deux questions, aller à la troisième ; **éteindre le téléphone de force**
+  (appui long) ; attendre 10 minutes ; le rallumer ; ouvrir l'application
+  (en mode avion une première fois, puis avec le réseau).
+- Quoi observer : l'accueil annonce « Examen blanc en cours » ; « Reprendre »
+  rouvre l'examen à la troisième question, les deux réponses gardées ; le
+  chronomètre a perdu les 10 minutes (le temps a couru) ; terminer : la note
+  s'affiche « en attente d'envoi », puis « Note reçue » au retour du réseau ;
+  dans « Examens blancs », **un seul** résultat ; aucune mention d'horloge
+  suspecte (le téléphone n'a pas changé d'heure).
+- En cas d'échec, relever : la question rouverte, le temps restant affiché,
+  ce qu'affiche « Tes réponses », une capture.
+- État : à faire
+
 ## 7. Paiements réels — Orange Money, MTN MoMo, codes prépayés
 
 *(aucune entrée)*
