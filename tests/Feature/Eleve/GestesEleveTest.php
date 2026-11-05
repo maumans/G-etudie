@@ -141,9 +141,9 @@ test('par l\'écran : « Commencer » ouvre l\'ardoise, qui livre questions et r
     $question = questionDeTest(notionDeTest());
 
     $this->actingAs($this->eleve)->post(route('eleve.seance.commencer'))
-        ->assertRedirect(route('eleve.seances.show', Seance::sole()));
+        ->assertRedirect(route('eleve.seances.show', Seance::whereNotNull('jour')->sole()));
 
-    $seance = Seance::sole();
+    $seance = Seance::whereNotNull('jour')->sole();
     envoyer($this->jeton, [geste($this->eleve, 'tentative.enregistrer', ['question' => $question->uuid, 'version' => 1, 'reponse' => ['option' => 'b'], 'seance' => $seance->uuid])]);
 
     $this->actingAs($this->eleve)->get(route('eleve.seances.show', $seance))

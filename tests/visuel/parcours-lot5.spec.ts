@@ -35,8 +35,11 @@ test.afterAll(() => {
         return;
     }
 
+    // Lot 6 : l'examen a aussi donné des points et compté dans la maîtrise
+    // et la série d'Aïssatou ; on retire ses points et on recalcule, sinon
+    // les captures de son accueil et de sa progression dérivent.
     tinker(
-        `$e = App\\Models\\ExamenBlanc::where('uuid', '${uuid}')->first(); if ($e) { App\\Models\\Tentative::where('user_id', $e->user_id)->where('mode', 'examen_blanc')->where('recu_le', '>=', $e->recu_le)->delete(); $e->delete(); }`,
+        `$e = App\\Models\\ExamenBlanc::where('uuid', '${uuid}')->first(); if ($e) { $t = App\\Models\\Tentative::where('user_id', $e->user_id)->where('mode', 'examen_blanc')->where('recu_le', '>=', $e->recu_le); App\\Models\\PointEffort::where('user_id', $e->user_id)->where(fn ($q) => $q->where(fn ($q) => $q->where('source', 'examen_blanc')->where('source_cle', $e->uuid))->orWhere(fn ($q) => $q->where('source', 'reponse')->whereIn('source_cle', (clone $t)->pluck('uuid'))))->delete(); $t->delete(); $e->delete(); Illuminate\\Support\\Facades\\Artisan::call('progression:recalculer', ['--eleve' => $e->user_id]); }`,
     );
 });
 

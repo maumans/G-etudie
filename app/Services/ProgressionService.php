@@ -21,6 +21,8 @@ use Illuminate\Support\Carbon;
  */
 class ProgressionService
 {
+    public function __construct(private MotivationService $motivation) {}
+
     /**
      * @param  EtatLecon|false|null  $etat  `false` : ne pas toucher ; `null` : effacer
      */
@@ -45,6 +47,8 @@ class ProgressionService
         }
 
         $progression->save();
+        // Lot 6 : ouvrir une leçon compte dans la série, au jour du geste.
+        $this->motivation->apresLecon($eleve->id, $saisiLe);
 
         return $progression;
     }

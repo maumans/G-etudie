@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Database\Seeders\RolesEtPermissionsSeeder;
+use Database\Seeders\SocleSeeder;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Laravel\Fortify\Features;
 use RuntimeException;
@@ -10,12 +10,12 @@ use RuntimeException;
 abstract class TestCase extends BaseTestCase
 {
     /**
-     * Rôles et permissions semés une fois, à la création de la base de test :
+     * Rôles, permissions et badges semés une fois, à la création de la base de test :
      * comme en production, où chaque déploiement lance `db:seed`.
      */
     protected bool $seed = true;
 
-    protected string $seeder = RolesEtPermissionsSeeder::class;
+    protected string $seeder = SocleSeeder::class;
 
     /**
      * Les tests ne dépendent pas d'un build : une page ajoutée et pas encore

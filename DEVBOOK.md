@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-05, lot 5)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-05, lot 6)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,11 +19,26 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-05 (lot 5 fait ; lot 0 en attente de D11)
+### État au 2026-11-05 (lot 6 fait ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte les lots 0 à 5. Les lots 3, 4 et 5 ont été
+- **Dépôt git** : `main` porte les lots 0 à 6. Les lots 3 à 6 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 6 fait** (point 20) : **maîtrise par notion** (scores récents
+  pondérés, confiance à 3 réponses), **révision espacée** (1, 3, 7, 14,
+  30 jours), **jauge** par matière pondérée par les coefficients saisis,
+  **séance du jour** choisie par la maîtrise (révisions dues d'abord),
+  **motivation** : série au jour du geste avec un jour de grâce par
+  semaine, points d'effort et niveaux, 12 badges, défi de la semaine ;
+  écran **« Ma progression »** et matière filtrée « À travailler ».
+  Autorités : `MaitriseService`, `MotivationService`, `SeanceService`.
+  **HL4 fait** : dernière jauge du serveur + « N réponses pas encore
+  comptées », trois séances préparées faites hors ligne
+  (`GET /eleve/instantane`), trace complétée sur l'appareil. **Critère
+  tenu** : `JaugeScenarioTest` rejoue `tests/fixtures/scenario-jauge.json`
+  (valeurs calculées à la main) par la file, et dans le désordre.
+  ⚠ **Au déploiement : `php artisan progression:recalculer`** une fois,
+  après `migrate` et `db:seed`.
 - **Lot 5 fait** (point 19) : **examen blanc** sur une annale publiée (3ᵉ
   mode « Conditions réelles » de la fiche d'annale) : durée imprimée,
   sinon celle de l'épreuve, sinon choisie par l'élève ; passage plein
@@ -142,11 +157,12 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 456 Pest (MySQL `g_etudie_test`, rôles semés une fois par
-  `TestCase`), 313 Vitest, Playwright (sessions par compte, écrans des
-  lots 0 à 5, parcours d'inscription, parcours des critères des lots 1, 2,
-  4 et 5, séance en mode avion du lot 3, socle hors ligne ; 426 tests) —
-  verts. `tsc`,
+- **Tests** : 482 Pest (MySQL `g_etudie_test`, rôles et badges semés une
+  fois par `TestCase`, `SocleSeeder`), 322 Vitest, Playwright (sessions par
+  compte, écrans des lots 0 à 6, parcours d'inscription, parcours des
+  critères des lots 1, 2, 4 et 5, séance en mode avion du lot 3, socle hors
+  ligne ; 444 tests) — verts. Sur ce poste, lancer les captures en série
+  (`--workers=1`) et sans `npm run dev`. `tsc`,
   `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
 - **File d'attente** : l'import assisté tourne en file (`database`). En
   développement, lancer aussi `php artisan queue:work` (configuration
@@ -195,17 +211,24 @@
    chaque examen (Référentiel › Épreuves) pour le compte à rebours ; **la
    convention D5** avant toute publication publique des annales (le champ
    « Droits de publication » de chaque annale l'attend).
-5. **Maurice : essayer le lot 5** — 01 Aïssatou : une annale, « Conditions
+5. **Maurice : essayer le lot 6** — 01 Aïssatou : l'accueil (jauge,
+   série sur deux semaines, défi, réussites), « Ma progression », toucher
+   un segment de la jauge (matière « À travailler »), « Commencer » ;
+   relire les badges et leurs points dans `database/seeders/BadgeSeeder.php`
+   (à changer librement). 09 Ousmane : « Ma progression » avant tout
+   exercice.
+6. **Maurice : essayer le lot 5** — 01 Aïssatou : une annale, « Conditions
    réelles », commencer, répondre, fermer l'onglet, rouvrir (l'accueil
    annonce l'examen), terminer ; « Examens blancs ». Équipe : saisir la
    **moyenne d'admission** de chaque examen (Référentiel › Épreuves) pour
    le verdict.
-6. **Lot 6** : progression, maîtrise par notion, révision espacée, jauge,
-   motivation ; jauge et séances pré-calculées hors ligne (HL4).
-7. **Équipe pédagogique** : saisir dans le référentiel le programme
+7. **Lot 7** : hors ligne complet — packs téléchargeables, profils
+   multiples, copies datées, budgets mesurés (HL5 à HL7) ; les trois
+   séances préparées par matière téléchargée.
+8. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
-8. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+9. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
    BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
@@ -1454,6 +1477,107 @@ cette question à sa façon. Elle distingue deux notions :
      la moyenne d'admission à saisir par l'équipe ; lancement hors ligne
      depuis un pack (lot 7).
 
+20. [x] **Lot 6 — progression, maîtrise par notion, révision espacée,
+   jauge, motivation ; HL4** (2026-11-05, sur `main`, un commit)
+   - **Constat** : la jauge du lot 2 comptait la part des questions
+     réussies au moins une fois ; la série était recalculée à chaque
+     affichage, sans grâce ; ni maîtrise, ni points, ni badges, ni défis ;
+     la séance du jour se choisissait à « Commencer », en ligne seulement.
+   - **Décisions** (proposées, acceptées par Maurice le 2026-11-05) :
+     - **maîtrise d'une notion** : moyenne des scores des 20 dernières
+       réponses, une réponse pesant deux fois moins tous les 14 jours
+       (comptés depuis la plus récente), × min(1, réponses / 3) ;
+       « maîtrisée » à 80, « fragile » sous 50 ; les indices ne retirent
+       rien. Recalculée **depuis toutes les réponses triées par
+       `saisi_le`** : l'ordre d'arrivée (hors ligne) ne change rien ;
+     - **révision espacée** : 1, 3, 7, 14, 30 jours ; réussir une notion
+       due la fait monter d'un palier ; en partie juste → demain ; faux →
+       palier 0, demain ; réussir avant la date ne fait pas monter ;
+     - **matière** = moyenne de ses notions **évaluables** (au moins une
+       question pour l'élève), une notion jamais travaillée compte 0 ;
+       **jauge** = matières pondérées par les coefficients s'ils sont tous
+       saisis, sinon moyenne simple (règle du lot 2 inchangée) ;
+     - **séance du jour** : révisions dues, puis notions commencées pas
+       maîtrisées, puis nouvelles, puis le reste ; la matière qui rapporte
+       le plus d'abord (coefficient × ce qui manque) ; deux questions par
+       notion au plus ; **trois séances préparées d'avance** (HL4) ;
+     - **points d'effort** à la réception : 1 par réponse (juste ou non),
+       20 par séance, 50 par examen blanc, 30 par défi, + les points des
+       badges ; source unique, donc idempotents ; **niveaux** à paliers
+       fixes (0, 50, 150, 300, 500…) ;
+     - **série** au jour du geste, **un jour de grâce par semaine** (le
+       plus récent manqué, s'il est précédé d'un jour fait ; il ne compte
+       pas comme un jour fait) ; objectif du soir atteint par une séance
+       terminée ou le temps passé ≥ l'objectif ; trace sur deux semaines ;
+     - **12 badges** (catalogue `BadgeSeeder`, semé partout — c'est un
+       référentiel, modifiable par Maurice) ; règles dans
+       `MotivationService::regles()` ;
+     - **défi de la semaine** automatique : 2 × les questions d'une séance
+       en bonnes réponses, dans la matière qui rapporte le plus ;
+     - **« Ma progression »** dans la barre latérale ; sur téléphone, par
+       la jauge et ses liens (les cinq onglets du bas ne bougent pas) ;
+       toucher un segment ouvre la matière filtrée « À travailler »
+       (`?faibles=1`, filtrée par le serveur).
+   - **Une autorité par règle** : `MaitriseService` (maîtrise, révision,
+     jauge, poids des matières), `MotivationService` (série, points,
+     niveaux, badges, défi), `SeanceService` (choix des questions) ;
+     `TableauDeBordEleveService` met en forme. `TentativeService`,
+     `SeanceService::terminer`, `ProgressionService` et
+     `ExamenBlancService` les appellent dans la même transaction que le
+     geste — en ligne comme par la file.
+   - **Écarts au plan** : séances préparées toutes matières confondues, pas
+     « par matière téléchargée » (packs au lot 7, `HORS_LIGNE.md` écart
+     n° 23) ; défis seulement automatiques (saisie au back-office plus
+     tard) ; pas de classements (V1.1, opt-in).
+   - **Ajouts** : migration `2026_11_05_090000_create_progression_tables`
+     (`maitrises`, `series_jours`, `points_effort`, `badges`,
+     `badges_obtenus`, `defis`, `participations_defis` ; `seances.jour`
+     facultatif, `rang`, `remplacee_le`) ; `SocleSeeder` (rôles + badges,
+     semé aussi par `Tests\TestCase`) ; commande **`progression:recalculer`**
+     (à lancer une fois au déploiement du lot 6 : les réponses des lots 2 à
+     5 n'avaient ni maîtrise ni série ; idempotente) ; routes
+     `eleve.progression` et `eleve.instantane` (`can:espace.eleve`).
+   - **Corrigé en chemin** : quand une séance préparée manquait de
+     questions, une question déjà prise par une autre séance passait avant
+     une question libre (trouvé par `SeancesPrepareesTest`) ; le résumé
+     « maîtrisées » de « Ma progression » comptait une notion due à 82 %
+     comme « à revoir » et contredisait la matière (1/6) : compté par score,
+     les révisions dues à part ; mes scripts d'édition avaient passé 17
+     fichiers en fins de ligne CRLF : remis en LF.
+   - **Vu avec Playwright** (`ecrans-lot6.spec.ts`, 3 écrans × 3 tailles ×
+     2 thèmes : « Ma progression » d'Aïssatou, celle d'Ousmane qui n'a rien
+     fait, la matière « À travailler ») : axe sans violation sérieuse, aucun
+     débordement. Captures régénérées volontairement : l'accueil (lots 0 et
+     2, série, défi, réussites, notions maîtrisées), la page matière (lot 2,
+     maîtrise par notion), l'accueil du premier soir (parcours du lot 2) et
+     la séance ouverte du parcours du lot 3 (même question, autre rang : le
+     nouvel ordre). Corrigé à la relecture : voir `DESIGN.md` § 13, « Lot
+     6 » (contraste du bloc des points, carte qui débordait, titres
+     tronqués, page élargie à 1 027 px par un `sr-only`, nom accessible du
+     lien « Détail »).
+   - **Preuve** : **critère** `JaugeScenarioTest` (scénario écrit, par la
+     file, puis dans le désordre) ; `MaitriseCalculTest` 4,
+     `SeancesPrepareesTest` 8, `MotivationTest` 6, `EcransProgressionTest` 4,
+     `RecalculerProgressionTest` 2 ; Vitest `progression.test.ts` 9 (HL4).
+     Totaux : **482 Pest, 322 Vitest, 444 Playwright** (434 écrans,
+     5 connexions, 5 parcours ; captures sur le build). `tsc`, `vp check`,
+     Pint, Larastan niveau 7 et `npm run build` passent.
+   - **Pièges rencontrés** : le parcours du lot 5 passe un examen sur le
+     compte d'Aïssatou puis l'efface ; depuis le lot 6, il laissait ses
+     points, sa maîtrise et sa série → les captures d'Aïssatou dérivaient
+     après chaque passage. Le nettoyage retire désormais ces points et
+     relance `progression:recalculer --eleve`, qui recalcule aussi les
+     notions dont toutes les réponses ont disparu. Sur ce poste, le serveur
+     `php artisan serve` tombe sous la charge de connexions parallèles
+     (connexions de démo au-delà de 30 s) : les captures passent en série
+     (`--workers=1`). `hors-ligne.spec.ts` échoue tant que `npm run dev`
+     tourne (`public/hot` : le service worker se retire, voulu) ; il passe
+     sur le build.
+   - **Reste** : séance préparée faite en mode avion sur un vrai téléphone
+     et série sur une vraie semaine (`A_TESTER.md`, lot 6) ; trois séances
+     par matière téléchargée (lot 7) ; défis saisis par l'équipe et
+     classements opt-in (V1.1).
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -1537,7 +1661,12 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `Etablissement` | `etablissements` | — | liste à constituer (vide) |
 | `ProgressionLecon` | `progressions_lecons` | élève, leçon | `etat` + `etat_saisi_le`, `position` + `position_saisie_le` : la plus récente gagne |
 | `Question` | `questions` | notion, auteur | `uuid` v7, `type` (`TypeQuestion`, fixé à la création), brouillon dans les colonnes (`enonce`, `donnees`, `reponse_attendue`, `indices`, `corrige`, `difficulte`), `extrait` (listes, recherche), `revision`, `version_publiee_id` ; circuit par `ContenuService` ; format : `FormatQuestion` ; vue élève : `PresentationQuestion` |
-| `Seance` | `seances` | élève | `uuid`, `jour`, `questions` (ids ordonnés), `termine_le` |
+| `Seance` | `seances` | élève | `uuid`, `jour` (vide tant qu'une séance préparée n'est pas commencée), `rang` (1 à 3), `questions` (ids ordonnés), `termine_le`, `remplacee_le` ; choisie par `SeanceService` seulement |
+| `Maitrise` | `maitrises` | élève, notion | `score` 0–100, `reponses`, `palier` 0–5, `prochaine_revision_le`, `derniere_reponse_le`, `maj_le` ; écrite par `MaitriseService` seulement, recalculée depuis toutes les réponses |
+| `SerieJour` | `series_jours` | élève | `jour` (du geste), `reponses`, `secondes`, `objectif_atteint` ; `MotivationService` |
+| `PointEffort` | `points_effort` | élève | ajout seulement ; `source` + `source_cle` uniques (idempotent), `points`, `recu_le` |
+| `Badge`, `BadgeObtenu` | `badges`, `badges_obtenus` | — ; élève, badge | catalogue semé (`BadgeSeeder`, clé, nom, description, icône, points, ordre) ; règle par clé dans `MotivationService::regles()` |
+| `Defi`, `ParticipationDefi` | `defis`, `participations_defis` | matière ; défi, élève | `semaine` (lundi), `type` `bonnes_reponses`, `objectif` ; `reussi_le` |
 | `Sujet` | `sujets` | examen, série nulle, matière, auteur | `uuid` v7, `session`, `type` (`TypeSujet`), durée et coefficient **imprimés** (vides sinon), `droits` (D5), document original (disque privé) ; circuit par `SujetService` ; vue élève : `PresentationSujet` |
 | `SujetPartie` | `sujet_parties` | sujet | `uuid`, `ordre`, `titre`, `bareme`, `consigne` (blocs) |
 | `ImportSujet` | `imports_sujets` | auteur, examen, série, matière, sujet créé | `statut` (`StatutImport`), `extracteur`, `modele`, jetons, `avertissements`, `erreur` |
@@ -1588,6 +1717,7 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `/eleve/examens-blancs`, `/eleve/examens-blancs/{uuid}` (le passage : `/eleve/annales/{uuid}?mode=examen`) | `auth` + `can:espace.eleve` ; résultat gardé par `ExamenBlancPolicy::voir` (404) | `routes/eleve.php` |
 | `/eleve/annales`, `/eleve/annales/{uuid}`, `/eleve/documents/annales/{uuid}`, `/eleve/signalements` | `auth` + `can:espace.eleve` ; annale gardée par `SujetPolicy::lire` (404) | `routes/eleve.php` |
 | `/contenu/annales` (liste, fiche, document), `/contenu/relecture/annales` ; importer (`annales/importer`, `annales/imports`, relancer) ; parties, questions d'annale, circuit | `can:espace.contenu` · `can:annales.importer` (+ `throttle:20,60`) · `can:contenu.rediger` / `relire` / `administrer` ; `SujetPolicy` | `routes/contenu.php` |
+| `/eleve/progression` (« Ma progression »), `/eleve/instantane` (JSON de l'appareil, HL4) | `can:espace.eleve` + profil requis | `routes/eleve.php` |
 | `/contenu/signalements`, fiche, répondre | `can:signalements.traiter` ; `SignalementPolicy` (404) | `routes/contenu.php` |
 | `/compte/*` (profil, mot de passe, numéro, affichage, vérification, suppression) | `auth`, dérogations « Mon compte » | `routes/compte.php` |
 | `/compte/securite` | `auth` + `can:compte.double_authentification` + `password.confirm` | `routes/compte.php` |
@@ -1631,3 +1761,5 @@ Toute exception est justifiée dans `AccesParRoleTest::OUVERTES_A_TOUS`.
    plateforme à la main (`php artisan tinker`, rôle `superadmin`), activer sa
    double authentification, puis dérouler les contrôles « bloqués tant que
    le domaine HTTPS n'existe pas » de `A_TESTER.md`.
+
+- [ ] **Lot 6, une fois** : après `migrate` et `db:seed`, `php artisan progression:recalculer` (maîtrises, séries, points et badges des réponses reçues avant le lot 6 ; idempotente).

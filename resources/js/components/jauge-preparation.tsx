@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import { cn } from '@/lib/utils';
@@ -8,6 +9,10 @@ import { cn } from '@/lib/utils';
  * sa maîtrise. Les segments ont des longueurs égales tant que les
  * coefficients officiels ne sont pas saisis (CLAUDE.md § 5). Le pourcentage
  * est au centre ; le nom accessible donne le détail.
+ *
+ * `lienSegment` (lot 6) : toucher un segment ouvre la matière, filtrée sur
+ * ses notions faibles. Au doigt et à la souris seulement : l'arc reste une
+ * image ; la page offre les mêmes liens au clavier (la légende).
  */
 export type SegmentJauge = { cle: CleMatiere; maitrise: number };
 
@@ -38,11 +43,13 @@ export function JaugePreparation({
     pourcentage,
     examen,
     segments,
+    lienSegment,
     className,
 }: {
     pourcentage: number;
     examen: string;
     segments: SegmentJauge[];
+    lienSegment?: (cle: CleMatiere) => string | null;
     className?: string;
 }) {
     const part =
@@ -70,10 +77,18 @@ export function JaugePreparation({
                         (part * Math.min(100, segment.maitrise)) / 100,
                     );
 
+                    const lien = lienSegment?.(segment.cle) ?? null;
+
                     return (
                         <g
                             key={segment.cle}
-                            className={MATIERES[segment.cle].trait}
+                            className={cn(
+                                MATIERES[segment.cle].trait,
+                                lien && 'cursor-pointer',
+                            )}
+                            onClick={
+                                lien ? () => router.visit(lien) : undefined
+                            }
                         >
                             <path
                                 d={arc(depart, depart + part)}

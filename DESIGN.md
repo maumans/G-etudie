@@ -359,9 +359,11 @@ Depuis le lot 2, les données sont celles de l'élève
 (`App\Services\TableauDeBordEleveService`) : compte à rebours (date saisie
 par l'équipe, sinon « Date du BEPC pas encore annoncée »), jauge (0 % tant que
 rien n'est réussi), séance du jour, mes matières (lien vers la matière),
-reprendre, série. « Défi » et « Réussites » attendent la motivation (lot 6) :
-à leur place, **« Mes premiers pas »** (quatre gestes cochés, la carte
-disparaît quand tout est fait) et **« Mon examen »** (lien « Changer »). Le
+reprendre, série. Depuis le lot 6 : **série sur deux semaines** (cases
+pleines, à moitié, étoile du jour de grâce) avec points d'effort et niveau,
+**« Défi de la semaine »** et **« Mes réussites »** (badges) ; **« Mes
+premiers pas »** (quatre gestes cochés, la carte disparaît quand tout est
+fait) et **« Mon examen »** (lien « Changer ») restent. Le
 bandeau « EXEMPLE » reste tant que le contenu vu est d'exemple. Aucun rang
 entre élèves (classements opt-in, PLAN M9).
 
@@ -1202,3 +1204,34 @@ la prolonge sans nouveau composant de base.
 - **Vu** (Playwright, 360 / 768 / 1366, clair et sombre) : axe sans
   violation sérieuse, aucun débordement. Corrigé : critères du barème
   affichés avec leurs `$…$` (seeder d'exemple et conversion de l'IA).
+
+### Lot 6 — progression et motivation (2026-11-05)
+
+- **« Ma progression »** (`pages/eleve/progression.tsx`) : en-tête en
+  contraste ; le moment fort est la carte `surface-marque` « Révision
+  espacée » (notions dues, « Réviser maintenant » ; « Tout commence ce
+  soir » pour qui n'a rien fait), **première sur mobile** pour que l'action
+  tienne dans 360 × 740 ; la jauge avec trois compteurs (maîtrisées, en
+  cours, à découvrir) ; « Notion par notion » : une carte par matière
+  (tuile, %, segments), chapitres en sous-titres, notions en filets (titre
+  entier sur mobile, barre, %, étiquette d'état mot + couleur) ; colonne de
+  320 px : série, défi, badges (pastille soleil gagnée, cadenas sinon).
+- **Série** (`components/progression/carte-serie.tsx`) : 14 cases à 9 px
+  de rayon, pleine mandarine (objectif), moitié basse (commencé), étoile
+  soleil (grâce), pointillés (aujourd'hui) ; légende ; « Nouvelle série —
+  on repart ce soir » sans reproche ; bloc niveau / points.
+- **Matière « À travailler »** : bascule à deux segments (« Tout le
+  programme » / « À travailler ») ; chaque notion évaluable a une ligne
+  d'en-tête (maîtrise, état) au-dessus de ses leçons.
+- **Jauge** : un segment se touche (vers la matière « À travailler ») ; au
+  clavier, la légende porte les mêmes liens.
+- **Vu** (Playwright, 360 / 768 / 1366, clair et sombre, axe, débordement)
+  et **corrigé** : texte `ink-500` sur `craie-100` dans le bloc des points
+  (contraste insuffisant, axe) → `ink-600` ; carte « Révision espacée » qui
+  débordait à 1366 (grille de liste sans colonne bornée) ; titres de
+  notions tronqués à 360 → sur leur propre ligne ; cartes « Mes matières »
+  de l'accueil : « 38 % » coupé et segments débordants à quatre colonnes
+  → libellé court « 1/6 notions » ; un `sr-only` sans ancêtre positionné
+  dans la rangée qui défile élargissait la page à 1 027 px (360 px) →
+  `relative` sur la carte ; lien « Détail » dont le nom accessible ne
+  contenait pas le texte visible (axe) → « Détail de ma progression ».

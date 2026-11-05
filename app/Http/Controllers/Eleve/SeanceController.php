@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Eleve;
 
 use App\Http\Controllers\Controller;
-use App\Models\Question;
 use App\Models\Seance;
-use App\Models\Tentative;
 use App\Services\SeanceService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -38,30 +36,6 @@ class SeanceController extends Controller
         // Une séance d'un autre élève n'existe pas (404, pas 403).
         abort_unless($seance->user_id === $request->user()->id, 404);
 
-        $uuids = Question::query()->whereKey($seance->questions)->pluck('uuid', 'id');
-
-        return Inertia::render('eleve/seance', [
-            'seance' => [
-                'uuid' => $seance->uuid,
-                'duree_minutes' => $seance->duree_minutes,
-                'terminee' => $seance->termine_le !== null,
-            ],
-            'questions' => $seances->questionsDe($seance),
-            // Réponses déjà reçues par le serveur : la séance reprend là où
-            // l'élève l'a laissée (les réponses encore en file sont lues sur
-            // l'appareil).
-            'reponses' => Tentative::query()
-                ->where('seance_id', $seance->id)
-                ->orderBy('saisi_le')
-                ->get()
-                ->map(fn (Tentative $tentative) => [
-                    'question' => $uuids->get($tentative->question_id),
-                    'tentative' => $tentative->uuid,
-                    'reponse' => (object) $tentative->reponse,
-                    'score' => $tentative->score,
-                    'auto_evaluee' => $tentative->auto_evaluee_le !== null,
-                ])
-                ->values(),
-        ]);
+        return Inertia::render('eleve/seance', $seances->props($seance));
     }
 }

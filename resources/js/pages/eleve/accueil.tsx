@@ -5,6 +5,7 @@ import {
     CalendarDays,
     Check,
     ChevronRight,
+    CloudUpload,
     Clock,
     Flame,
     GraduationCap,
@@ -18,32 +19,41 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import type { SegmentJauge } from '@/components/jauge-preparation';
 import { JaugePreparation } from '@/components/jauge-preparation';
+import { CarteSerie } from '@/components/progression/carte-serie';
+import { CarteDefi, CarteReussites } from '@/components/progression/motivation';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     ProgressionBarre,
     ProgressionSegments,
 } from '@/components/ui/progression';
+import { useProgressionLocale } from '@/hooks/use-progression-locale';
 import { annoncerBientot } from '@/lib/bientot';
+import { afficherDepuisLaBase, base, moteur } from '@/lib/hors-ligne';
+import type { Badge, Defi, Points } from '@/lib/motivation';
+import type { Jauge, Serie } from '@/lib/progression/locale';
+import { prochaineSeanceLocale } from '@/lib/progression/locale';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import { cn, formaterNombre, pluriel } from '@/lib/utils';
 import { edit as verifierNumero } from '@/routes/compte/verification';
-import { bienvenue, cours, signalements } from '@/routes/eleve';
+import {
+    bienvenue,
+    cours,
+    progression as pageProgression,
+    signalements,
+} from '@/routes/eleve';
 import { matiere as pageMatiere } from '@/routes/eleve/cours';
 import { show as pageLecon } from '@/routes/eleve/lecons';
 import { commencer } from '@/routes/eleve/seance';
 import { show as pageSeance } from '@/routes/eleve/seances';
-
-type EtatJour = 'fait' | 'manque' | 'en_cours' | 'a_venir';
 
 /** Données du tableau de bord (App\Services\TableauDeBordEleveService). */
 type Tableau = {
     est_exemple: boolean;
     examen: string;
     compte_a_rebours: { date: string | null; jours: number | null };
-    jauge: { pourcentage: number; matieres: SegmentJauge[] };
+    jauge: Jauge & { matieres: SegmentJauge[] };
     seance: {
         en_cours: string | null;
         repondues: number;
@@ -52,14 +62,20 @@ type Tableau = {
         matieres: CleMatiere[];
         terminee_aujourdhui: boolean;
     };
-    serie: {
-        jours: number;
-        reponses_semaine: number;
-        semaine: { jour: string; etat: EtatJour }[];
+    serie: Serie;
+    points: Points;
+    defi: Defi | null;
+    reussites: {
+        obtenus: number;
+        total: number;
+        derniers: Badge[];
+        prochain: Badge | null;
     };
     progression: {
         cle: CleMatiere;
         slug: string;
+        notions: number;
+        notions_maitrisees: number;
         lecons: number;
         lecons_comprises: number;
     }[];
@@ -83,8 +99,33 @@ function salutation(maintenant: Date): string {
     return maintenant.getHours() >= 18 ? 'Bonsoir' : 'Bonjour';
 }
 
-function commencerSeance() {
+/**
+ * « Commencer » : en ligne, le serveur ouvre la première séance préparée ;
+ * hors ligne, l'appareil ouvre la suivante qu'il a gardée (HL4, A.10) —
+ * aucune question n'est choisie ici.
+ */
+async function commencerSeance(auteurId?: number) {
+    if (moteur.etat.reseau === 'hors_ligne' && auteurId !== undefined) {
+        const uuid = await prochaineSeanceLocale(base, auteurId);
+
+        if (
+            uuid !== null &&
+            (await afficherDepuisLaBase(pageSeance.url(uuid)))
+        ) {
+            return;
+        }
+    }
+
     router.post(commencer.url());
+}
+
+/** La matière d'un segment de la jauge, filtrée sur ses notions faibles (DESIGN.md § 6.1). */
+function lienFaibles(tableau: Tableau, cle: CleMatiere): string | null {
+    const matiere = tableau.progression.find((m) => m.cle === cle);
+
+    return matiere
+        ? pageMatiere.url(matiere.slug, { query: { faibles: 1 } })
+        : null;
 }
 
 /**
@@ -104,6 +145,7 @@ export default function Accueil({
     reponses_signalements?: number;
 }) {
     const { auth } = usePage().props;
+    const local = useProgressionLocale(auth.user?.id, tableau);
     const maintenant = new Date();
     const date = new Intl.DateTimeFormat('fr-FR', {
         weekday: 'long',
@@ -111,10 +153,7 @@ export default function Accueil({
         month: 'long',
     }).format(maintenant);
     const maitrises = new Map(
-        tableau.jauge.matieres.map((segment) => [
-            segment.cle,
-            segment.maitrise,
-        ]),
+        local.jauge.matieres.map((segment) => [segment.cle, segment.maitrise]),
     );
     const premiersPasFaits = tableau.premiers_pas.every((pas) => pas.fait);
 
@@ -202,30 +241,43 @@ export default function Accueil({
                     {/* Colonne principale */}
                     <div className="grid content-start gap-5 lg:gap-6">
                         <div className="grid gap-5 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-6">
-                            <SeanceDuJour seance={tableau.seance} />
+                            <SeanceDuJour
+                                seance={tableau.seance}
+                                auteurId={auth.user?.id}
+                            />
                             <Carte className="grid content-between gap-3">
-                                <EnTeteCarte
-                                    titre="Ma jauge de préparation"
-                                    detail={tableau.examen}
-                                />
+                                <div className="flex items-center justify-between gap-3">
+                                    <h2 className="text-[0.9375rem]">
+                                        Ma jauge de préparation
+                                    </h2>
+                                    <LienTout
+                                        href={pageProgression().url}
+                                        libelle="Détail"
+                                        nom="Détail de ma progression"
+                                    />
+                                </div>
                                 <JaugePreparation
-                                    pourcentage={tableau.jauge.pourcentage}
+                                    pourcentage={local.jauge.pourcentage}
                                     examen={tableau.examen}
-                                    segments={tableau.jauge.matieres}
+                                    segments={local.jauge.matieres}
+                                    lienSegment={(cle) =>
+                                        lienFaibles(tableau, cle)
+                                    }
                                 />
-                                {tableau.jauge.pourcentage === 0 ? (
+                                {local.jauge.pourcentage === 0 ? (
                                     <p className="text-center text-aide text-ink-600">
                                         Ta jauge se remplit à chaque exercice
                                         réussi. Commence ce soir.
                                     </p>
                                 ) : (
                                     <ul className="flex flex-wrap justify-center gap-x-3 gap-y-1.5">
-                                        {tableau.jauge.matieres.map(
-                                            (segment) => (
-                                                <li
-                                                    key={segment.cle}
-                                                    className="flex items-center gap-1.5 text-meta text-ink-600"
-                                                >
+                                        {local.jauge.matieres.map((segment) => {
+                                            const lien = lienFaibles(
+                                                tableau,
+                                                segment.cle,
+                                            );
+                                            const contenu = (
+                                                <>
                                                     <span
                                                         aria-hidden
                                                         className={cn(
@@ -236,10 +288,42 @@ export default function Accueil({
                                                         )}
                                                     />
                                                     {MATIERES[segment.cle].nom}
+                                                </>
+                                            );
+
+                                            return (
+                                                <li key={segment.cle}>
+                                                    {lien ? (
+                                                        <Link
+                                                            href={lien}
+                                                            prefetch
+                                                            aria-label={`${MATIERES[segment.cle].nom} : ${segment.maitrise} %, voir les notions à travailler`}
+                                                            className="flex items-center gap-1.5 rounded-controle text-meta text-ink-600 outline-none hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring"
+                                                        >
+                                                            {contenu}
+                                                        </Link>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1.5 text-meta text-ink-600">
+                                                            {contenu}
+                                                        </span>
+                                                    )}
                                                 </li>
-                                            ),
-                                        )}
+                                            );
+                                        })}
                                     </ul>
+                                )}
+                                {local.nonComptees > 0 && (
+                                    <p className="flex items-center justify-center gap-1.5 text-meta text-ink-500">
+                                        <CloudUpload
+                                            aria-hidden
+                                            className="size-3.5"
+                                        />
+                                        {pluriel(
+                                            local.nonComptees,
+                                            'réponse pas encore comptée',
+                                            'réponses pas encore comptées',
+                                        )}
+                                    </p>
                                 )}
                             </Carte>
                         </div>
@@ -320,10 +404,22 @@ export default function Accueil({
 
                     {/* Colonne latérale */}
                     <div className="grid content-start gap-5 lg:gap-6">
-                        <CarteSerie serie={tableau.serie} />
+                        <CarteSerie
+                            serie={local.serie}
+                            points={tableau.points}
+                            provisoire={local.serie.provisoire}
+                        />
                         {!premiersPasFaits && (
-                            <PremiersPas pas={tableau.premiers_pas} />
+                            <PremiersPas
+                                pas={tableau.premiers_pas}
+                                auteurId={auth.user?.id}
+                            />
                         )}
+                        <CarteDefi defi={tableau.defi} />
+                        <CarteReussites
+                            reussites={tableau.reussites}
+                            href={pageProgression().url}
+                        />
                         <Carte className="grid gap-3">
                             <div className="flex items-center justify-between gap-3">
                                 <h2 className="text-[0.9375rem]">Mon examen</h2>
@@ -422,20 +518,21 @@ function Carte({
     );
 }
 
-function EnTeteCarte({ titre, detail }: { titre: string; detail?: string }) {
-    return (
-        <div className="flex items-center justify-between gap-3">
-            <h2 className="text-[0.9375rem]">{titre}</h2>
-            {detail && <Badge variant="nimba">{detail}</Badge>}
-        </div>
-    );
-}
-
-function LienTout({ href, libelle }: { href: string; libelle: string }) {
+function LienTout({
+    href,
+    libelle,
+    nom,
+}: {
+    href: string;
+    libelle: string;
+    /** Nom accessible plus explicite que le libellé visible. */
+    nom?: string;
+}) {
     return (
         <Link
             href={href}
             prefetch
+            aria-label={nom}
             className="shrink-0 rounded-controle text-aide font-medium text-ink-500 transition-colors outline-none hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring"
         >
             {libelle}
@@ -443,7 +540,13 @@ function LienTout({ href, libelle }: { href: string; libelle: string }) {
     );
 }
 
-function SeanceDuJour({ seance }: { seance: Tableau['seance'] }) {
+function SeanceDuJour({
+    seance,
+    auteurId,
+}: {
+    seance: Tableau['seance'];
+    auteurId?: number;
+}) {
     const enCours = seance.en_cours !== null;
     const disponible = seance.questions > 0;
 
@@ -528,7 +631,7 @@ function SeanceDuJour({ seance }: { seance: Tableau['seance'] }) {
                     taille="grande"
                     disabled={!disponible}
                     className="w-full bg-white text-nimba-700 shadow-flottant hover:bg-white/90 sm:w-fit"
-                    onClick={commencerSeance}
+                    onClick={() => void commencerSeance(auteurId)}
                 >
                     <Play aria-hidden className="fill-current" />
                     {seance.terminee_aujourdhui
@@ -543,18 +646,18 @@ function SeanceDuJour({ seance }: { seance: Tableau['seance'] }) {
 function CarteMatiere({
     cle,
     slug,
-    lecons,
-    lecons_comprises,
+    notions,
+    notions_maitrisees,
     maitrise,
 }: Tableau['progression'][number] & { maitrise: number }) {
     const matiere = MATIERES[cle];
 
     return (
-        <li className="w-[15.5rem] shrink-0 snap-start sm:w-auto">
+        <li className="relative w-[15.5rem] shrink-0 snap-start sm:w-auto">
             <Link
                 href={pageMatiere(slug)}
                 prefetch
-                className="grid h-full gap-4 rounded-carte border bg-card p-4 shadow-carte transition-[border-color,box-shadow] outline-none hover:border-ink-400/60 hover:shadow-releve focus-visible:outline-2 focus-visible:outline-ring"
+                className="grid h-full min-w-0 grid-cols-1 gap-4 rounded-carte border bg-card p-4 shadow-carte transition-[border-color,box-shadow] outline-none hover:border-ink-400/60 hover:shadow-releve focus-visible:outline-2 focus-visible:outline-ring"
             >
                 <span className="flex items-center gap-2.5">
                     <span
@@ -571,23 +674,27 @@ function CarteMatiere({
                     </span>
                 </span>
                 <span className="flex items-end justify-between gap-2">
-                    <span className="text-[1.75rem] leading-none font-bold font-data">
+                    <span className="text-[1.75rem] leading-none font-bold whitespace-nowrap font-data">
                         {maitrise}
                         <span className="text-base font-semibold text-ink-500">
                             {' '}
                             %
                         </span>
                     </span>
-                    <span className="text-meta text-ink-500">
+                    <span
+                        className="text-meta whitespace-nowrap text-ink-500"
+                        title="Notions maîtrisées"
+                    >
                         <span className="font-semibold text-ink-900 font-data">
-                            {lecons_comprises}/{lecons}
+                            {notions_maitrisees}/{notions}
                         </span>{' '}
-                        leçons
+                        notions
+                        <span className="sr-only"> maîtrisées</span>
                     </span>
                 </span>
                 <ProgressionSegments
                     valeur={maitrise}
-                    libelle={`${matiere.nom} : ${maitrise} % des exercices réussis`}
+                    libelle={`${matiere.nom} : maîtrise ${maitrise} %`}
                     couleur={matiere.plein}
                 />
             </Link>
@@ -647,116 +754,37 @@ function LigneReprendre({
     );
 }
 
-const STYLES_JOUR: Record<EtatJour, { pastille: string; libelle: string }> = {
-    fait: {
-        pastille:
-            'bg-nimba-500 text-white dark:bg-nimba-400 dark:text-[#110e0b]',
-        libelle: 'fait',
-    },
-    manque: {
-        pastille:
-            'border border-contour bg-craie-100 text-ink-400 dark:bg-white/[0.04]',
-        libelle: 'pas de révision',
-    },
-    en_cours: {
-        pastille:
-            'border-2 border-dashed border-nimba-500 text-nimba-700 dark:border-nimba-400 dark:text-nimba-300',
-        libelle: "aujourd'hui, en cours",
-    },
-    a_venir: {
-        pastille: 'border border-contour text-ink-400',
-        libelle: 'à venir',
-    },
-};
-
-function CarteSerie({ serie }: { serie: Tableau['serie'] }) {
-    return (
-        // Dépend du jour : masquée dans les captures de référence.
-        <Carte className="grid gap-4" data-capture="variable">
-            <div className="flex items-start justify-between gap-3">
-                <div className="grid gap-0.5">
-                    <h2 className="text-[0.9375rem]">Ma série</h2>
-                    {serie.jours > 0 ? (
-                        <p className="flex items-baseline gap-1.5">
-                            <span className="text-[2rem] leading-none font-bold font-data">
-                                {serie.jours}
-                            </span>
-                            <span className="text-ink-600">
-                                {serie.jours > 1 ? 'jours de suite' : 'jour'}
-                            </span>
-                        </p>
-                    ) : (
-                        <p className="text-ink-600">
-                            Nouvelle série : on commence ce soir.
-                        </p>
-                    )}
-                </div>
-                <span
-                    aria-hidden
-                    className="flex size-11 items-center justify-center rounded-full bg-nimba-500/[0.12] text-nimba-600 dark:bg-nimba-400/15 dark:text-nimba-400"
-                >
-                    <Flame className="size-5 fill-current" />
-                </span>
-            </div>
-            <ol className="grid grid-cols-7 gap-1.5">
-                {serie.semaine.map(({ jour, etat }) => (
-                    <li
-                        key={jour}
-                        className="grid justify-items-center gap-1.5"
-                    >
-                        <span className="text-meta font-medium text-ink-500">
-                            {jour}
-                        </span>
-                        <span
-                            className={cn(
-                                'flex size-8 items-center justify-center rounded-full',
-                                STYLES_JOUR[etat].pastille,
-                            )}
-                        >
-                            {etat === 'fait' && (
-                                <Check
-                                    aria-hidden
-                                    className="size-3.5"
-                                    strokeWidth={3}
-                                />
-                            )}
-                            <span className="sr-only">
-                                {STYLES_JOUR[etat].libelle}
-                            </span>
-                        </span>
-                    </li>
-                ))}
-            </ol>
-            <p className="flex items-center justify-between rounded-controle bg-craie-100 px-3 py-2 text-aide text-ink-600 dark:bg-relief/60">
-                Réponses cette semaine
-                <span className="font-semibold text-ink-900 font-data">
-                    {formaterNombre(serie.reponses_semaine)}
-                </span>
-            </p>
-        </Carte>
-    );
-}
-
 const PREMIERS_PAS: Record<
     Tableau['premiers_pas'][number]['cle'],
-    { libelle: string; icone: LucideIcon; action?: () => void; href?: string }
+    {
+        libelle: string;
+        icone: LucideIcon;
+        action?: (auteurId?: number) => void;
+        href?: string;
+    }
 > = {
     profil: { libelle: 'Choisir ton examen', icone: GraduationCap },
     exercice: {
         libelle: 'Faire ton premier exercice',
         icone: Target,
-        action: commencerSeance,
+        action: (auteurId) => void commencerSeance(auteurId),
     },
     lecon: { libelle: 'Ouvrir une leçon', icone: BookOpen, href: cours().url },
     seance: {
         libelle: 'Terminer une séance du jour',
         icone: Flame,
-        action: commencerSeance,
+        action: (auteurId) => void commencerSeance(auteurId),
     },
 };
 
 /** Les quatre premiers gestes : la carte disparaît quand tout est fait. */
-function PremiersPas({ pas }: { pas: Tableau['premiers_pas'] }) {
+function PremiersPas({
+    pas,
+    auteurId,
+}: {
+    pas: Tableau['premiers_pas'];
+    auteurId?: number;
+}) {
     const faits = pas.filter((p) => p.fait).length;
 
     return (
@@ -847,7 +875,7 @@ function PremiersPas({ pas }: { pas: Tableau['premiers_pas'] }) {
                             ) : (
                                 <button
                                     type="button"
-                                    onClick={action}
+                                    onClick={() => action?.(auteurId)}
                                     className={cn(
                                         classe,
                                         'outline-none hover:bg-craie-100 focus-visible:outline-2 focus-visible:outline-ring dark:hover:bg-white/[0.04]',

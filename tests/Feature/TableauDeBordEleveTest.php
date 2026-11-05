@@ -16,7 +16,8 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 /*
  * L'accueil élève avec ses vraies données (lot 2) : compte à rebours, jauge
- * qui ne ment pas, séance du jour, matières, reprendre, série, premiers pas.
+ * qui ne ment pas, séance du jour, matières, reprendre, série, premiers pas ;
+ * points, défi et réussites depuis le lot 6.
  */
 
 function repondre(User $eleve, $question, string $option, ?CarbonImmutable $quand = null): void
@@ -42,7 +43,11 @@ test('un élève qui n\'a rien fait voit une jauge à 0 % et ses premiers pas', 
             ->where('tableau.seance.questions', 1)
             ->where('tableau.seance.duree_minutes', 15)
             ->where('tableau.serie.jours', 0)
-            ->has('tableau.serie.semaine', 7)
+            ->has('tableau.serie.cases', 14)
+            ->where('tableau.points.total', 0)
+            ->where('tableau.points.niveau', 1)
+            ->where('tableau.defi.cle', 'maths')
+            ->where('tableau.reussites.obtenus', 0)
             ->where('tableau.premiers_pas', [
                 ['cle' => 'profil', 'fait' => true],
                 ['cle' => 'exercice', 'fait' => false],
@@ -64,10 +69,12 @@ test('la jauge se remplit des questions réussies, pondérée seulement si tous 
     $jauge = app(MaitriseService::class)->jauge($profil);
     $parCle = collect($jauge['matieres'])->pluck('maitrise', 'cle');
 
-    // Maths 50 %, les trois autres 0 % : moyenne simple sur 4 matières.
-    expect($parCle['maths'])->toBe(50)
+    // Lot 6 : maths a une notion évaluable, une réponse juste sur les trois
+    // qu'il faut pour la confiance pleine : 100 × 1/3 = 33 %. Physique : une
+    // réponse fausse, 0 %. Moyenne simple sur 4 matières : 8 %.
+    expect($parCle['maths'])->toBe(33)
         ->and($parCle['physique'])->toBe(0)
-        ->and($jauge['pourcentage'])->toBe(13);
+        ->and($jauge['pourcentage'])->toBe(8);
 
     // Coefficients saisis partout : maths pèse 4 sur 10.
     $bepc = Examen::where('code', 'BEPC')->value('id');
@@ -75,7 +82,7 @@ test('la jauge se remplit des questions réussies, pondérée seulement si tous 
         'coefficient' => $e->matiere->slug === 'maths' ? 4 : 2,
     ]));
 
-    expect(app(MaitriseService::class)->jauge($profil)['pourcentage'])->toBe(20);
+    expect(app(MaitriseService::class)->jauge($profil)['pourcentage'])->toBe(13);
 });
 
 test('le compte à rebours suit la date saisie par l\'équipe ; une date passée ne s\'affiche pas', function () {
@@ -106,8 +113,14 @@ test('la série compte les jours de suite, jusqu\'à aujourd\'hui ou hier', func
     $serie = app(TableauDeBordEleveService::class)->donnees($eleve, CatalogueEleve::profil($eleve), $maintenant)['serie'];
 
     expect($serie['jours'])->toBe(3)
-        ->and(array_column($serie['semaine'], 'jour'))->toBe(['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'])
-        ->and(array_column($serie['semaine'], 'etat'))->toBe(['manque', 'manque', 'fait', 'fait', 'fait', 'en_cours', 'a_venir']);
+        ->and($serie['rompue'])->toBeFalse()
+        // Lot 6 : deux semaines, de lundi dernier (19 octobre) à dimanche.
+        ->and(array_column($serie['cases'], 'jour'))->toBe(['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'])
+        ->and($serie['cases'][0]['date'])->toBe('2026-10-19')
+        ->and(array_column($serie['cases'], 'etat'))->toBe([
+            'manque', 'manque', 'manque', 'manque', 'manque', 'manque', 'commence',
+            'manque', 'manque', 'commence', 'commence', 'commence', 'aujourdhui', 'a_venir',
+        ]);
 });
 
 test('« Reprendre » : les leçons commencées d\'abord, puis les premières du programme', function () {

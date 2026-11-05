@@ -43,7 +43,7 @@ test('par l\'écran : choisir le BEPC enregistre le profil et ouvre le premier e
     ]);
 
     $profil = ProfilEleve::sole();
-    $seance = Seance::sole();
+    $seance = Seance::whereNotNull('jour')->sole();
     $reponse->assertRedirect(route('eleve.seances.show', $seance));
 
     // Relu en base (CLAUDE.md § 4 : `$fillable` incomplet = valeur perdue).

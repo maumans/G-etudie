@@ -19,6 +19,7 @@ import { useTentative } from '@/hooks/use-tentative';
 import { corriger, scoreAutoEvaluation } from '@/lib/contenu/questions';
 import type { QuestionEleve, ReponseQuestion } from '@/lib/contenu/questions';
 import { base, enregistrer, useHorsLigne } from '@/lib/hors-ligne';
+import { marquerSeanceTerminee } from '@/lib/progression/locale';
 import { accueil, cours } from '@/routes/eleve';
 
 /** Une réponse de la séance : reçue par le serveur, ou encore dans la file. */
@@ -196,6 +197,8 @@ export default function Seance({ seance, questions, reponses }: Props) {
                 charge: { seance: seance.uuid },
                 priorite: 2,
             });
+            // HL4 : hors ligne, « Commencer » passe à la séance préparée suivante.
+            void marquerSeanceTerminee(base, seance.uuid);
         }
     }, [terminee, seance.uuid]);
 

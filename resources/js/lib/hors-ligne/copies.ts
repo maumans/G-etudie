@@ -12,6 +12,7 @@ type Copie = { sujet: string; lecture: boolean };
 
 const ECRANS: Record<string, Copie> = {
     'eleve/accueil': { sujet: 'Accueil', lecture: true },
+    'eleve/progression': { sujet: 'Ma progression', lecture: true },
     'compte/affichage': { sujet: 'Affichage', lecture: false },
 };
 
