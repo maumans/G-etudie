@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>N'karamögö · G-Étudie — Dossier de présentation</title>
+<style>
+@font-face { font-family: 'Bricolage'; src: url('ressources/bricolage-grotesque-latin-opsz-normal.woff2') format('woff2-variations'); font-weight: 200 800; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Bricolage'; src: url('ressources/bricolage-grotesque-latin-ext-opsz-normal.woff2') format('woff2-variations'); font-weight: 200 800; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+
+:root {
+  --nimba-50: #fef4f1; --nimba-100: #feeae2; --nimba-500: #f6641b; --nimba-600: #d04904; --nimba-700: #a63d02;
+  --soleil-100: #fff0c7; --soleil-400: #ffc21a; --soleil-700: #705303;
+  --craie-50: #fcf7f4; --craie-100: #f5efea;
+  --ink-900: #1e1814; --ink-600: #655c55; --ink-500: #766d66; --ink-400: #988f87;
+  --juste: #15803d; --filet: #e9e0d9;
+}
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: 'Bricolage', Arial, sans-serif; color: var(--ink-900); font-size: 10.5pt; line-height: 1.5; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+.page { width: 210mm; height: 297mm; position: relative; overflow: hidden; padding: 20mm 18mm 18mm; background: #fff; page-break-after: always; break-after: page; }
+.page.creme { background: var(--craie-50); }
+.page:last-child { page-break-after: auto; break-after: auto; }
+
+.pied { position: absolute; left: 18mm; right: 18mm; bottom: 9mm; display: flex; justify-content: space-between; font-size: 8pt; color: var(--ink-500); }
+.pied .num { font-weight: 600; color: var(--ink-600); }
+
+h1, h2, h3 { margin: 0; font-weight: 400; letter-spacing: -0.01em; }
+h1 strong, h2 strong { font-weight: 700; }
+.rubrique { font-size: 9pt; font-weight: 600; color: var(--nimba-700); margin-bottom: 3mm; display: flex; align-items: center; gap: 2.5mm; }
+.rubrique .pastille { width: 6.5mm; height: 6.5mm; border-radius: 2mm; background: var(--nimba-500); color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 9pt; font-weight: 700; }
+h2.titre { font-size: 22pt; line-height: 1.12; margin-bottom: 4mm; }
+.chapeau { font-size: 11.5pt; color: var(--ink-600); max-width: 160mm; margin: 0 0 7mm; }
+h3 { font-size: 12pt; font-weight: 650; margin-bottom: 1.5mm; }
+p { margin: 0 0 3mm; }
+.petit { font-size: 9pt; color: var(--ink-600); }
+.muet { color: var(--ink-500); }
+
+/* Téléphones */
+.tel { width: 58mm; border-radius: 7mm; padding: 2.2mm; background: var(--ink-900); box-shadow: 0 3mm 8mm rgba(30,24,20,.18); flex-shrink: 0; }
+.tel img { width: 100%; display: block; border-radius: 5mm; }
+.tel.grand { width: 66mm; }
+.tel.moyen { width: 52mm; }
+.legende { font-size: 8.5pt; color: var(--ink-600); margin-top: 2.5mm; text-align: center; }
+.figure { display: flex; flex-direction: column; align-items: center; }
+
+/* Ordinateur */
+.ecran { border-radius: 3mm; overflow: hidden; border: 0.3mm solid var(--filet); box-shadow: 0 2mm 6mm rgba(30,24,20,.12); background: #fff; }
+.ecran .barre { height: 5mm; background: var(--craie-100); display: flex; align-items: center; gap: 1.3mm; padding-left: 3mm; }
+.ecran .barre i { width: 1.8mm; height: 1.8mm; border-radius: 50%; background: var(--ink-400); opacity: .5; display: block; }
+.ecran img { width: 100%; display: block; }
+
+.ligne { display: flex; gap: 8mm; align-items: flex-start; }
+.col { flex: 1; min-width: 0; }
+
+/* Points */
+.points { list-style: none; padding: 0; margin: 0; display: grid; gap: 3.2mm; }
+.points li { display: grid; grid-template-columns: 6mm 1fr; gap: 2.5mm; align-items: start; }
+.points li::before { content: ''; width: 2.4mm; height: 2.4mm; border-radius: 50%; background: var(--nimba-500); margin-top: 1.9mm; justify-self: center; }
+.points b { font-weight: 650; }
+
+.etapes { counter-reset: e; list-style: none; padding: 0; margin: 0; display: grid; gap: 4mm; }
+.etapes li { counter-increment: e; display: grid; grid-template-columns: 8mm 1fr; gap: 3mm; }
+.etapes li::before { content: counter(e); width: 7mm; height: 7mm; border-radius: 2mm; background: var(--ink-900); color: var(--craie-50); font-weight: 700; font-size: 9.5pt; display: flex; align-items: center; justify-content: center; }
+
+.carte { background: #fff; border: 0.3mm solid var(--filet); border-radius: 4mm; padding: 5mm 5.5mm; }
+.creme .carte { background: #fff; }
+.carte.teinte { background: var(--nimba-50); border-color: var(--nimba-100); }
+.carte.encre { background: var(--ink-900); color: var(--craie-50); border: 0; }
+.carte.encre .muet, .carte.encre .petit { color: #cfc6bf; }
+.grille2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5mm; }
+.grille3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4.5mm; }
+.grille3 img { max-width: 100%; }
+.rangee { display: flex; justify-content: center; gap: 12mm; margin-bottom: 7mm; }
+.ecran.coupe img { height: 92mm; object-fit: cover; object-position: top; }
+
+.encadre { border-radius: 3.5mm; padding: 4mm 5mm; background: var(--soleil-100); color: var(--soleil-700); font-size: 9.5pt; }
+.encadre b { color: #3d2d02; }
+.etiquette { display: inline-block; font-size: 8pt; font-weight: 650; padding: 0.6mm 2.2mm; border-radius: 10mm; background: var(--nimba-100); color: var(--nimba-700); }
+.etiquette.fait { background: #dcf3e3; color: var(--juste); }
+.etiquette.avenir { background: var(--craie-100); color: var(--ink-600); }
+
+table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
+th { text-align: left; font-weight: 650; padding: 2.4mm 3mm; background: var(--craie-100); }
+td { padding: 2.1mm 3mm; border-bottom: 0.3mm solid var(--filet); vertical-align: top; }
+
+/* Couverture */
+.couverture { background: var(--craie-50); padding: 0; }
+.couverture .halo { position: absolute; width: 190mm; height: 190mm; border-radius: 50%; right: -60mm; top: -50mm; background: radial-gradient(circle, #ffd3c3 0%, rgba(254,234,226,0) 68%); }
+.couverture .haut { position: absolute; left: 18mm; top: 18mm; display: flex; align-items: center; gap: 3mm; }
+.couverture .haut img { width: 11mm; }
+.couverture .marque { font-weight: 700; font-size: 13pt; line-height: 1.1; }
+.couverture .marque span { display: block; font-weight: 500; font-size: 9pt; color: var(--ink-500); }
+.couverture h1 { position: absolute; left: 18mm; top: 50mm; width: 96mm; font-size: 33pt; line-height: 1.03; letter-spacing: -0.02em; }
+.couverture .sous { position: absolute; left: 18mm; top: 104mm; width: 88mm; font-size: 12pt; color: var(--ink-600); }
+.couverture .illus { position: absolute; left: 0; right: 0; bottom: 0; height: 120mm; background: url('ressources/heros.svg') center bottom / cover no-repeat; opacity: .96; }
+.couverture .tels { position: absolute; right: 12mm; top: 40mm; display: flex; gap: 5mm; align-items: flex-start; }
+.couverture .tels .tel { width: 41mm; }
+.couverture .tels .tel:last-child { margin-top: 14mm; }
+.couverture .porteur { position: absolute; left: 18mm; bottom: 16mm; background: rgba(255,255,255,.92); border-radius: 4mm; padding: 4mm 5.5mm; font-size: 9.5pt; box-shadow: 0 2mm 6mm rgba(30,24,20,.12); }
+.couverture .porteur b { display: block; font-size: 10.5pt; }
+.couverture .doc { position: absolute; left: 18mm; top: 146mm; display: inline-block; font-size: 9.5pt; font-weight: 600; background: var(--ink-900); color: var(--craie-50); border-radius: 2.5mm; padding: 2mm 3.5mm; }
+</style>
+</head>
+<body>
+
+<!-- 1. Couverture -->
+<section class="page couverture">
+  <div class="halo"></div>
+  <div class="illus"></div>
+  <div class="haut"><img src="ressources/favicon.svg" alt=""><div class="marque">N'karamögö<span>G-Étudie · la Guinée étudie</span></div></div>
+  <h1>Tout pour réussir <strong>le CEE, le BEPC et le Bac.</strong></h1>
+  <p class="sous">Une application d'apprentissage pour les élèves guinéens en classe d'examen : cours, annales corrigées, séances du soir, examens blancs, suivi des progrès — même sans connexion.</p>
+  <div class="doc">Dossier de présentation · novembre 2026</div>
+  <div class="tels">
+    <div class="tel"><img src="captures-jpg/accueil.jpg" alt="Accueil de l'élève"></div>
+    <div class="tel"><img src="captures-jpg/progression.jpg" alt="Ma progression"></div>
+  </div>
+  <div class="porteur"><b>VISION FUTURE – ENTREPRISES Sarlu</b>Kountya, Coyah — République de Guinée</div>
+</section>
+
+<!-- 2. En une page -->
+<section class="page">
+  <div class="rubrique">En une page</div>
+  <h2 class="titre">Un soir, quinze minutes, <strong>et l'élève sait où il en est.</strong></h2>
+  <p class="chapeau">N'karamögö (« mon maître ») accompagne l'élève guinéen jusqu'à son examen. Chaque soir, l'application répond à trois questions : combien de temps avant l'examen, suis-je prêt, que faire ce soir.</p>
+
+  <div class="grille2" style="margin-bottom:6mm">
+    <div class="carte">
+      <h3>Le constat</h3>
+      <ul class="points petit">
+        <li><span>Les élèves révisent <b>le soir</b>, souvent sur <b>un téléphone partagé</b> par la famille, avec <b>peu de données</b> et un réseau qui coupe.</span></li>
+        <li><span>Les annales corrigées et les exercices de qualité sont <b>difficiles à trouver</b>, rarement adaptés au programme guinéen.</span></li>
+        <li><span>L'élève ne sait pas mesurer <b>s'il est prêt</b>, ni par quoi commencer.</span></li>
+      </ul>
+    </div>
+    <div class="carte teinte">
+      <h3>Notre réponse</h3>
+      <ul class="points petit">
+        <li><span>Des <b>cours</b> et des <b>annales corrigées pas à pas</b>, par matière et par chapitre.</span></li>
+        <li><span>Une <b>séance du jour</b> de 10 à 30 minutes, choisie là où l'élève est le plus faible.</span></li>
+        <li><span>Des <b>examens blancs</b> en conditions réelles et une <b>jauge de préparation</b> honnête.</span></li>
+        <li><span>Une application <b>installable</b>, utilisable <b>hors ligne</b>, économe en données.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grille3" style="margin-bottom:6mm">
+    <div class="carte"><span class="etiquette fait">Aujourd'hui</span><h3 style="margin-top:2.5mm">Le socle est construit</h3><p class="petit">L'application fonctionne : espace élève complet, espace de l'équipe pédagogique, hors ligne, plus de 1 200 tests automatiques.</p></div>
+    <div class="carte"><span class="etiquette">Ce qui manque</span><h3 style="margin-top:2.5mm">Le contenu officiel</h3><p class="petit">Les sujets officiels, les programmes, les coefficients et les dates d'examen relèvent de l'État. Le contenu montré ici est <b>fictif</b>.</p></div>
+    <div class="carte encre"><span class="etiquette">Notre demande</span><h3 style="margin-top:2.5mm">Un partenariat</h3><p class="petit">Une convention sur les annales, la validation des données officielles et un essai pilote dans des établissements.</p></div>
+  </div>
+
+  <div class="encadre"><b>À propos des écrans de ce dossier.</b> Toutes les captures sont prises sur l'application réelle, avec des données de démonstration. Le bandeau « Exemple — contenu fictif » le signale à l'écran : aucun sujet, corrigé, coefficient ou date n'a été présenté comme officiel.</div>
+
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">2</span></div>
+</section>
+
+<!-- 3. Périmètre -->
+<section class="page creme">
+  <div class="rubrique">Le périmètre</div>
+  <h2 class="titre">Les trois examens nationaux, <strong>avec leurs vrais noms.</strong></h2>
+  <p class="chapeau">L'application suit l'organisation du système éducatif guinéen. Chaque élève choisit son examen, sa série et son objectif du soir ; tout ce qu'il voit ensuite en découle.</p>
+
+  <div class="grille3" style="margin-bottom:8mm">
+    <div class="carte" style="text-align:center"><img src="ressources/cee.svg" alt="" style="height:30mm;margin-bottom:3mm"><h3>CEE</h3><p class="petit">Certificat d'études élémentaires, fin de la 6e année.</p></div>
+    <div class="carte" style="text-align:center"><img src="ressources/bepc.svg" alt="" style="height:30mm;margin-bottom:3mm"><h3>BEPC</h3><p class="petit">Brevet d'études du premier cycle, fin de la 10e année.</p></div>
+    <div class="carte" style="text-align:center"><img src="ressources/bac.svg" alt="" style="height:30mm;margin-bottom:3mm"><h3>Baccalauréat unique</h3><p class="petit">Terminale, séries Sciences mathématiques (SM), Sciences expérimentales (SE) et Sciences sociales (SS).</p></div>
+  </div>
+
+  <div class="ligne">
+    <div class="col">
+      <h3>Ce qui est prévu dès la conception</h3>
+      <ul class="points">
+        <li><span><b>La filière franco-arabe</b> (CEE, Bac SE et SS) est prévue dans le modèle de données ; son contenu viendra dans un second temps.</span></li>
+        <li><span><b>Les coefficients et durées d'épreuve</b> sont des champs saisis par l'équipe pédagogique. Tant qu'ils ne sont pas saisis, l'application ne les devine pas : la jauge fait alors une moyenne simple.</span></li>
+        <li><span><b>Les dates de session</b> alimentent le compte à rebours de l'élève (« J-214 avant le BEPC »). Sans date officielle, l'écran le dit : « Date du BEPC pas encore annoncée ».</span></li>
+        <li><span><b>Le programme</b> est découpé en chapitres et en notions ; c'est sur ces notions que se mesure la progression de chaque élève.</span></li>
+      </ul>
+    </div>
+    <div class="figure"><div class="tel moyen"><img src="captures-jpg/choix-examen.jpg" alt="Choix de l'examen"></div><div class="legende">Le choix de l'examen, à l'inscription</div></div>
+  </div>
+
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">3</span></div>
+</section>
+
+<!-- 4. Accueil -->
+<section class="page">
+  <div class="rubrique"><span class="pastille">1</span>Manuel · l'élève</div>
+  <h2 class="titre">L'accueil : <strong>trois réponses d'un coup d'œil.</strong></h2>
+  <p class="chapeau">Dès qu'il ouvre l'application, l'élève voit le temps qui reste avant son examen, sa préparation par matière, et la séance qui l'attend ce soir.</p>
+  <div class="rangee">
+    <div class="figure"><div class="tel"><img src="captures-jpg/accueil.jpg" alt=""></div><div class="legende">La séance du jour en premier</div></div>
+    <div class="figure"><div class="tel"><img src="captures-jpg/accueil-suite.jpg" alt=""></div><div class="legende">La jauge et les matières</div></div>
+  </div>
+  <div class="grille2">
+    <ol class="etapes">
+      <li><span><b>La séance du jour.</b> Une seule action : « Commencer ». 10, 15 ou 30 minutes selon l'objectif choisi par l'élève.</span></li>
+      <li><span><b>La jauge de préparation.</b> Un pourcentage par matière, pondéré par les coefficients officiels une fois saisis. Elle ne flatte pas : rien de fait, 0 %.</span></li>
+      <li><span><b>Le compte à rebours</b> jusqu'à la session, dès que la date officielle est saisie.</span></li>
+    </ol>
+    <ol class="etapes" style="counter-reset: e 3">
+      <li><span><b>Mes matières.</b> La maîtrise de chacune et le nombre de notions acquises.</span></li>
+      <li><span><b>Reprendre.</b> Les leçons commencées, là où l'élève s'était arrêté.</span></li>
+      <li><span><b>Ma série, le défi, les réussites.</b> Une motivation sans pression : aucun classement entre élèves.</span></li>
+    </ol>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">4</span></div>
+</section>
+
+<!-- 5. Cours -->
+<section class="page creme">
+  <div class="rubrique"><span class="pastille">2</span>Manuel · l'élève</div>
+  <h2 class="titre">Les cours, <strong>chapitre par chapitre.</strong></h2>
+  <p class="chapeau">Chaque leçon suit le programme : courte, avec ses formules, ses points « À retenir » et une fiche de révision imprimable par chapitre. L'élève note lui-même « Compris » ou « À revoir ».</p>
+  <div class="ligne" style="justify-content:space-between">
+    <div class="figure"><div class="tel moyen"><img src="captures-jpg/cours.jpg" alt=""></div><div class="legende">Mes cours : une carte par matière</div></div>
+    <div class="figure"><div class="tel moyen"><img src="captures-jpg/matiere.jpg" alt=""></div><div class="legende">Une matière : chapitres et notions</div></div>
+    <div class="figure"><div class="tel moyen"><img src="captures-jpg/lecon.jpg" alt=""></div><div class="legende">Une leçon, formules comprises</div></div>
+  </div>
+  <div class="grille3" style="margin-top:8mm">
+    <div class="carte"><h3>Lisible sur un petit écran</h3><p class="petit">Formules mathématiques nettes, taille de texte réglable, mode sombre pour le soir.</p></div>
+    <div class="carte"><h3>Léger</h3><p class="petit">Une leçon est du texte structuré, pas un PDF : quelques kilo-octets, lisible hors ligne.</p></div>
+    <div class="carte"><h3>Corrigeable</h3><p class="petit">Un bouton « Signaler une erreur » sur chaque leçon ; l'équipe répond et corrige.</p></div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">5</span></div>
+</section>
+
+<!-- 6. Séance -->
+<section class="page">
+  <div class="rubrique"><span class="pastille">3</span>Manuel · l'élève</div>
+  <h2 class="titre">La séance du jour : <strong>s'entraîner là où ça compte.</strong></h2>
+  <p class="chapeau">Une question à la fois, plein écran. L'élève répond, vérifie, et lit aussitôt le corrigé pas à pas. Les questions sont choisies par l'application, jamais au hasard.</p>
+  <div class="rangee">
+    <div class="figure"><div class="tel"><img src="captures-jpg/seance-question.jpg" alt=""></div><div class="legende">La question</div></div>
+    <div class="figure"><div class="tel"><img src="captures-jpg/seance-verdict.jpg" alt=""></div><div class="legende">Le verdict et le corrigé pas à pas</div></div>
+  </div>
+  <div class="grille2">
+    <div>
+      <h3>Comment la séance est choisie</h3>
+      <ol class="etapes petit">
+        <li><span>D'abord les notions <b>à revoir</b> : une notion réussie revient après 1, 3, 7, 14 puis 30 jours.</span></li>
+        <li><span>Puis les notions <b>commencées mais pas encore maîtrisées</b>.</span></li>
+        <li><span>Puis les <b>nouvelles notions</b>, en commençant par la matière qui rapporte le plus de points.</span></li>
+      </ol>
+    </div>
+    <div>
+      <h3>Neuf types d'exercices</h3>
+      <p class="petit">Choix unique ou multiple, vrai ou faux, réponse numérique avec unité, réponse courte, texte à trous, appariement, remise en ordre, rédaction auto-évaluée au barème. Indices à la demande.</p>
+      <h3 style="margin-top:3mm">Le serveur recorrige tout</h3>
+      <p class="petit">La correction du téléphone est immédiate ; le serveur la refait. Un téléphone trafiqué ne peut pas s'attribuer de bonnes réponses.</p>
+    </div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">6</span></div>
+</section>
+
+<!-- 7. Annales -->
+<section class="page creme">
+  <div class="rubrique"><span class="pastille">4</span>Manuel · l'élève</div>
+  <h2 class="titre">Les annales : <strong>les vrais sujets, corrigés pas à pas.</strong></h2>
+  <p class="chapeau">L'objectif : réunir les sujets du CEE, du BEPC et du Bac depuis 2010, chacun avec un corrigé détaillé rédigé et relu par des enseignants. Cette bibliothèque ne sera publiée qu'avec l'accord du ministère.</p>
+  <div class="rangee">
+    <div class="figure"><div class="tel"><img src="captures-jpg/annales.jpg" alt=""></div><div class="legende">Les annales par matière et par session</div></div>
+    <div class="figure"><div class="tel"><img src="captures-jpg/annale.jpg" alt=""></div><div class="legende">Un sujet, en lecture</div></div>
+  </div>
+  <div class="grille3">
+    <div class="carte"><h3>Trois façons de travailler</h3><p class="petit"><b>Lecture</b> : l'énoncé et son corrigé. <b>Entraînement</b> : l'élève répond, l'application corrige. <b>Examen</b> : en conditions réelles, chronométré.</p></div>
+    <div class="carte"><h3>Exercices par chapitre</h3><p class="petit">Les questions des annales sont rattachées aux notions du programme : « tous les exercices d'annales sur Pythagore ».</p></div>
+    <div class="carte"><h3>Le document original</h3><p class="petit">Le sujet scanné reste consultable à côté de la version saisie : chacun peut vérifier la fidélité.</p></div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">7</span></div>
+</section>
+
+<!-- 8. Examen blanc -->
+<section class="page">
+  <div class="rubrique"><span class="pastille">5</span>Manuel · l'élève</div>
+  <h2 class="titre">L'examen blanc, <strong>comme le jour de l'examen.</strong></h2>
+  <p class="chapeau">Un vrai sujet, sa vraie durée, sans indice ni corrigé pendant l'épreuve. À la fin, une note sur 20, partie par partie, puis le corrigé complet.</p>
+  <div class="ligne" style="justify-content:space-between;margin-bottom:7mm">
+    <div class="figure"><div class="tel moyen"><img src="captures-jpg/examen-blanc-lancement.jpg" alt=""></div><div class="legende">Avant de commencer</div></div>
+    <div class="figure"><div class="tel moyen"><img src="captures-jpg/examen-blanc-passage.jpg" alt=""></div><div class="legende">Pendant l'épreuve</div></div>
+    <div class="figure"><div class="tel moyen"><img src="captures-jpg/examen-blanc-resultat.jpg" alt=""></div><div class="legende">La note et le corrigé</div></div>
+  </div>
+  <div class="grille3">
+    <div class="carte"><h3>Une coupure ne fait rien perdre</h3><p class="petit">Chaque réponse est gardée sur le téléphone à l'instant. Batterie vide, onglet fermé : l'examen reprend à la bonne question.</p></div>
+    <div class="carte"><h3>Le temps est réel</h3><p class="petit">Le chronomètre court même application fermée ; à la fin du temps, l'examen se termine seul.</p></div>
+    <div class="carte"><h3>Une note honnête</h3><p class="petit">La note est recalculée par le serveur. Le verdict par rapport à la moyenne d'admission n'apparaît que si l'équipe l'a saisie.</p></div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">8</span></div>
+</section>
+
+<!-- 9. Progression -->
+<section class="page creme">
+  <div class="rubrique"><span class="pastille">6</span>Manuel · l'élève</div>
+  <h2 class="titre">Ma progression : <strong>notion par notion.</strong></h2>
+  <p class="chapeau">L'application mesure la maîtrise de chaque notion du programme à partir des réponses récentes de l'élève, et lui dit ce qui revient aujourd'hui.</p>
+  <div class="rangee">
+    <div class="figure"><div class="tel"><img src="captures-jpg/progression.jpg" alt=""></div><div class="legende">Les révisions du jour, la jauge</div></div>
+    <div class="figure"><div class="tel"><img src="captures-jpg/progression-notions.jpg" alt=""></div><div class="legende">La maîtrise de chaque notion</div></div>
+  </div>
+  <div class="grille2">
+    <div>
+      <h3>Une mesure qui ne ment pas</h3>
+      <ul class="points petit">
+        <li><span>Les réponses récentes comptent plus que les anciennes.</span></li>
+        <li><span>Une seule bonne réponse ne suffit pas : il en faut trois pour atteindre 100 %.</span></li>
+        <li><span>Une notion est « maîtrisée » à partir de 80 % ; un scénario de test écrit à l'avance vérifie chaque calcul.</span></li>
+      </ul>
+    </div>
+    <div>
+      <h3>Une motivation sans pression</h3>
+      <ul class="points petit">
+        <li><span>Une série de jours, avec un jour pardonné par semaine : une coupure de courant ne punit pas l'élève.</span></li>
+        <li><span>Des points d'effort, des niveaux, des badges mérités, un défi par semaine.</span></li>
+        <li><span>Aucun classement nominatif entre élèves.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">9</span></div>
+</section>
+
+<!-- 10. Ordinateur -->
+<section class="page">
+  <div class="rubrique"><span class="pastille">7</span>Manuel · l'élève</div>
+  <h2 class="titre">Le même compte, <strong>sur téléphone, tablette ou ordinateur.</strong></h2>
+  <p class="chapeau">L'application s'adapte à l'écran. Au cybercafé, au centre de documentation ou à la maison, l'élève retrouve sa progression.</p>
+  <div class="ecran coupe" style="margin-bottom:7mm"><div class="barre"><i></i><i></i><i></i></div><img src="captures-jpg/accueil-ordinateur.jpg" alt=""></div>
+  <div class="ecran coupe"><div class="barre"><i></i><i></i><i></i></div><img src="captures-jpg/progression-ordinateur.jpg" alt=""></div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">10</span></div>
+</section>
+
+<!-- 11. Terrain -->
+<section class="page creme">
+  <div class="rubrique">Pensé pour la Guinée</div>
+  <h2 class="titre">Peu de données, un réseau qui coupe : <strong>l'application tient.</strong></h2>
+  <p class="chapeau">Les contraintes du terrain sont traitées comme des exigences vérifiées par des tests, pas comme des souhaits.</p>
+  <div class="ligne">
+    <div class="col">
+      <table>
+        <tr><th style="width:38%">Contrainte</th><th>Ce que fait l'application</th></tr>
+        <tr><td><b>Forfaits chers et petits</b></td><td>Polices et écrans gardés sur le téléphone ; le contenu circule comme des données légères, pas comme des pages lourdes.</td></tr>
+        <tr><td><b>Réseau instable</b></td><td>Chaque réponse est enregistrée d'abord sur le téléphone, puis envoyée au retour du réseau, une seule fois. Aucune réponse perdue.</td></tr>
+        <tr><td><b>Coupures de courant</b></td><td>Sauvegarde continue des séances et des examens blancs.</td></tr>
+        <tr><td><b>Android d'entrée de gamme</b></td><td>Conçu et vérifié sur un écran de 360 pixels de large, sans animation lourde.</td></tr>
+        <tr><td><b>Téléphone partagé</b></td><td>Profils séparés et déconnexion simple ; profils protégés par un code à 4 chiffres prévus.</td></tr>
+        <tr><td><b>Révisions le soir</b></td><td>Mode sombre soigné.</td></tr>
+        <tr><td><b>Pas de magasin d'applications</b></td><td>Application web installable sur l'écran d'accueil ; publication sur le Play Store prévue ensuite.</td></tr>
+      </table>
+      <p class="petit" style="margin-top:5mm">La séance complète a été jouée en mode avion dans les tests : rechargement, retour du réseau, chaque réponse reçue une seule fois. Les essais sur de vrais téléphones, en conditions réelles, font partie de l'essai pilote.</p>
+    </div>
+    <div class="figure"><div class="tel moyen"><img src="captures-jpg/vitrine-mobile.jpg" alt=""></div><div class="legende">La page publique, sur téléphone</div></div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">11</span></div>
+</section>
+
+<!-- 12. Équipe pédagogique 1 -->
+<section class="page">
+  <div class="rubrique"><span class="pastille">8</span>Manuel · l'équipe pédagogique</div>
+  <h2 class="titre">Un contenu <strong>sous contrôle humain.</strong></h2>
+  <p class="chapeau">Les enseignants rédigent dans un espace dédié. Aucun contenu n'est publié sans la relecture d'un second enseignant, et l'auteur ne peut pas se relire lui-même.</p>
+  <div class="ecran" style="margin-bottom:6mm"><div class="barre"><i></i><i></i><i></i></div><img src="captures-jpg/equipe-accueil.jpg" alt=""></div>
+  <div class="grille2">
+    <div><div class="ecran"><div class="barre"><i></i><i></i><i></i></div><img src="captures-jpg/equipe-editeur.jpg" alt=""></div><p class="legende">L'éditeur de leçons, avec formules et aperçu « comme l'élève la verra »</p></div>
+    <div><div class="ecran"><div class="barre"><i></i><i></i><i></i></div><img src="captures-jpg/equipe-relecture.jpg" alt=""></div><p class="legende">La file de relecture</p></div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">12</span></div>
+</section>
+
+<!-- 13. Équipe pédagogique 2 -->
+<section class="page creme">
+  <div class="rubrique"><span class="pastille">9</span>Manuel · l'équipe pédagogique</div>
+  <h2 class="titre">Du sujet scanné <strong>à l'annale publiée.</strong></h2>
+  <p class="chapeau">Saisir à la main les quelque 500 sujets depuis 2010 prendrait des années. L'outil d'import lit un sujet scanné et propose une version structurée ; un enseignant vérifie chaque réponse, un autre publie.</p>
+  <div class="grille2" style="margin-bottom:6mm">
+    <div><div class="ecran"><div class="barre"><i></i><i></i><i></i></div><img src="captures-jpg/equipe-import.jpg" alt=""></div><p class="legende">Importer un sujet (PDF ou photo)</p></div>
+    <div><div class="ecran"><div class="barre"><i></i><i></i><i></i></div><img src="captures-jpg/equipe-programme.jpg" alt=""></div><p class="legende">Le référentiel : programme, épreuves, coefficients</p></div>
+  </div>
+  <div class="ligne">
+    <div class="col">
+      <ol class="etapes">
+        <li><span><b>Import</b> : l'intelligence artificielle transcrit l'énoncé mot pour mot et <b>propose</b> réponses et corrigés ; elle ne publie rien.</span></li>
+        <li><span><b>Vérification</b> : chaque réponse est marquée « à vérifier » jusqu'à ce qu'un enseignant l'ait comparée au document original.</span></li>
+        <li><span><b>Relecture et publication</b> par un second enseignant.</span></li>
+        <li><span><b>Signalements</b> : une erreur repérée par un élève arrive dans la file de l'équipe, qui corrige et lui répond.</span></li>
+      </ol>
+    </div>
+    <div class="col"><div class="ecran"><div class="barre"><i></i><i></i><i></i></div><img src="captures-jpg/equipe-signalements.jpg" alt=""></div><p class="legende">Les signalements des élèves</p></div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">13</span></div>
+</section>
+
+<!-- 14. Mineurs -->
+<section class="page">
+  <div class="rubrique">Protection des élèves</div>
+  <h2 class="titre">Des utilisateurs mineurs : <strong>la prudence par défaut.</strong></h2>
+  <p class="chapeau">La plupart des élèves ont entre 11 et 20 ans. Les règles suivantes sont inscrites dans le cahier des charges et vérifiées par des tests.</p>
+  <div class="grille2">
+    <div class="carte"><h3>Données minimales</h3><p class="petit">Un numéro de téléphone, un prénom, un pseudo, une classe. Pas de photo de profil, pas de date de naissance exacte, pas de géolocalisation.</p></div>
+    <div class="carte"><h3>Pas de messagerie privée</h3><p class="petit">Aucune messagerie libre entre élèves. Les échanges à venir se feront en groupes encadrés par un enseignant, avec pseudonyme.</p></div>
+    <div class="carte"><h3>Comptes protégés</h3><p class="petit">Mots de passe jamais stockés en clair, nombre de tentatives limité, double authentification proposée au personnel, journal des accès sensibles.</p></div>
+    <div class="carte"><h3>Chacun voit ce qui le concerne</h3><p class="petit">Un enseignant ne voit que ses groupes, un parent que ses enfants. Chaque page de l'application vérifie qui y a droit.</p></div>
+    <div class="carte"><h3>Intelligence artificielle encadrée</h3><p class="petit">Rien de personnel n'est envoyé au futur tuteur ; ses consignes seront adaptées aux mineurs.</p></div>
+    <div class="carte"><h3>Cadre légal</h3><p class="petit">Le seuil de consentement parental sera fixé après vérification de la loi guinéenne sur les données personnelles.</p></div>
+  </div>
+  <div class="ligne" style="margin-top:6mm;align-items:center">
+    <div class="figure"><div class="tel" style="width:38mm"><img src="captures-jpg/connexion.jpg" alt=""></div><div class="legende">La connexion : un numéro et un mot de passe</div></div>
+    <div class="col carte teinte">
+      <h3>À l'inscription, l'élève donne quatre informations</h3>
+      <p class="petit">Son prénom, un pseudo, son numéro de téléphone et un mot de passe. Puis il choisit son examen et son objectif du soir. C'est tout.</p>
+      <p class="petit" style="margin:0">Il peut changer lui-même son mot de passe et son numéro, et supprimer son compte. La vérification du numéro par SMS permettra de retrouver un compte oublié, dès que le fournisseur SMS sera choisi.</p>
+    </div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">14</span></div>
+</section>
+
+<!-- 15. Feuille de route -->
+<section class="page creme">
+  <div class="rubrique">Feuille de route</div>
+  <h2 class="titre">Ce qui est fait, <strong>ce qui vient.</strong></h2>
+  <p class="chapeau">Le développement avance par étapes, chacune terminée par des tests automatiques et une vérification des écrans sur téléphone, tablette et ordinateur.</p>
+  <table>
+    <tr><th style="width:9%">Étape</th><th>Contenu</th><th style="width:17%">État</th></tr>
+    <tr><td>0</td><td>Socle : comptes par téléphone, rôles, design, fonctionnement hors ligne de base</td><td><span class="etiquette fait">Fait</span></td></tr>
+    <tr><td>1</td><td>Référentiel pédagogique et espace de rédaction avec relecture</td><td><span class="etiquette fait">Fait</span></td></tr>
+    <tr><td>2</td><td>Cours côté élève, accueil, parcours d'inscription</td><td><span class="etiquette fait">Fait</span></td></tr>
+    <tr><td>3</td><td>Exercices (neuf types), indices, corrigés pas à pas</td><td><span class="etiquette fait">Fait</span></td></tr>
+    <tr><td>4</td><td>Annales, import assisté, signalement des erreurs</td><td><span class="etiquette fait">Fait</span></td></tr>
+    <tr><td>5</td><td>Examen blanc chronométré, sauvegarde continue</td><td><span class="etiquette fait">Fait</span></td></tr>
+    <tr><td>6</td><td>Progression par notion, révision espacée, jauge, motivation</td><td><span class="etiquette fait">Fait</span></td></tr>
+    <tr><td>7</td><td>Hors ligne complet : matières téléchargeables, plusieurs élèves par téléphone</td><td><span class="etiquette">Suivant</span></td></tr>
+    <tr><td>8</td><td>Mise en ligne publique, installation, partage</td><td><span class="etiquette avenir">À venir</span></td></tr>
+    <tr><td>9</td><td>Abonnements, Orange Money et MTN MoMo, codes prépayés</td><td><span class="etiquette avenir">À venir</span></td></tr>
+    <tr><td>10</td><td>Tuteur N'karamögö (explications par intelligence artificielle)</td><td><span class="etiquette avenir">À venir</span></td></tr>
+    <tr><td>11</td><td>Espaces parents, enseignants et établissements, devoirs</td><td><span class="etiquette avenir">À venir</span></td></tr>
+    <tr><td>12–13</td><td>Culture générale, groupes encadrés, console et rapport d'impact</td><td><span class="etiquette avenir">À venir</span></td></tr>
+    <tr><td>14</td><td>Essai sur le terrain avec de vrais élèves (Conakry et une préfecture)</td><td><span class="etiquette avenir">À venir</span></td></tr>
+  </table>
+  <p class="petit" style="margin-top:4mm">La version de lancement correspond aux étapes 0 à 8, avec le contenu des matières à plus fort coefficient pour le BEPC et le Baccalauréat.</p>
+  <div class="grille3" style="margin-top:5mm">
+    <div class="carte encre"><div style="font-size:24pt;font-weight:700;line-height:1">1 248</div><p class="petit" style="margin:1.5mm 0 0">tests automatiques, relancés à chaque étape.</p></div>
+    <div class="carte"><h3>Chaque écran vu</h3><p class="petit" style="margin:0">Sur téléphone, tablette et ordinateur, en clair et en sombre, avant d'être déclaré terminé.</p></div>
+    <div class="carte"><h3>Accessibilité vérifiée</h3><p class="petit" style="margin:0">Contrastes et lecteurs d'écran contrôlés automatiquement sur chaque écran.</p></div>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">15</span></div>
+</section>
+
+<!-- 16. Partenariat -->
+<section class="page">
+  <div class="rubrique">Notre proposition</div>
+  <h2 class="titre">Un partenariat avec le ministère, <strong>au service des élèves.</strong></h2>
+  <p class="chapeau">L'outil est prêt à recevoir le contenu officiel. Ce qui fera sa valeur pour les élèves relève de l'État ; nous proposons de le construire ensemble.</p>
+  <div class="grille2" style="margin-bottom:7mm">
+    <div class="carte teinte">
+      <h3>Ce que nous sollicitons</h3>
+      <ol class="etapes petit">
+        <li><span>Une <b>convention sur les sujets d'examens</b> (CEE, BEPC, Baccalauréat) depuis 2010, pour les publier avec leurs corrigés.</span></li>
+        <li><span>La <b>validation des données officielles</b> : programmes, coefficients, durées d'épreuve, dates de session.</span></li>
+        <li><span>Un <b>essai pilote</b> dans quelques établissements, à Conakry et dans une préfecture.</span></li>
+        <li><span>L'accès aux <b>résultats officiels publiés</b>, pour mesurer l'effet de l'application.</span></li>
+      </ol>
+    </div>
+    <div class="carte">
+      <h3>Ce que le projet apporte</h3>
+      <ul class="points petit">
+        <li><span>Un accès aux annales corrigées pour chaque élève, sur le téléphone de la famille, même hors connexion.</span></li>
+        <li><span>Des corrigés rédigés et relus par des enseignants guinéens, sur le programme guinéen.</span></li>
+        <li><span>Un circuit de correction rapide : une erreur signalée est corrigée et tracée.</span></li>
+        <li><span>À terme, des indicateurs anonymes sur les notions qui posent problème aux élèves.</span></li>
+        <li><span>Un travail rémunéré pour des enseignants rédacteurs et relecteurs.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="carte encre">
+    <h3>Comment nous mesurerons l'effet</h3>
+    <p class="petit" style="margin:0">Élèves actifs chaque semaine, part de ceux qui font au moins trois séances par semaine, évolution de leur jauge et de leurs notes d'examens blancs, puis, après chaque session nationale, comparaison avec les taux de réussite officiels publiés.</p>
+  </div>
+  <div class="pied"><span>N'karamögö · G-Étudie — VISION FUTURE – ENTREPRISES Sarlu</span><span class="num">16</span></div>
+</section>
+
+<!-- 17. Fin -->
+<section class="page couverture">
+  <div class="halo"></div>
+  <div class="illus" style="background-image:url('ressources/soir.svg')"></div>
+  <div class="haut"><img src="ressources/favicon.svg" alt=""><div class="marque">N'karamögö<span>G-Étudie · la Guinée étudie</span></div></div>
+  <h1 style="top:56mm">Un soir, quinze minutes, <strong>et je sais où j'en suis.</strong></h1>
+  <p class="sous" style="top:112mm;width:120mm">Merci de votre attention. L'application peut être présentée en direct sur téléphone ou sur ordinateur.</p>
+  <div class="porteur" style="bottom:auto;top:140mm"><b>VISION FUTURE – ENTREPRISES Sarlu</b>Kountya, Coyah — République de Guinée</div>
+</section>
+
+</body>
+</html>

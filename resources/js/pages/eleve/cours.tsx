@@ -161,7 +161,7 @@ function CarteMatiere({
                     <Chiffre
                         valeur={maitrise}
                         unite="%"
-                        libelle="exercices réussis"
+                        libelle="maîtrise"
                     />
                 </div>
 
