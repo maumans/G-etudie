@@ -53,6 +53,12 @@ export type NouveauGeste = {
     charge: Record<string, unknown>;
     priorite?: number;
     depend_de?: string | null;
+    /**
+     * Un geste qui porte sa propre identité (UUID v7 créé plus tôt : un
+     * examen blanc, créé au lancement). Enregistré deux fois : une seule
+     * opération.
+     */
+    uuid?: string;
 };
 
 type Verdict = {
@@ -213,8 +219,16 @@ export class MoteurHorsLigne {
             throw new Error('Aucun profil actif : geste non enregistré.');
         }
 
+        if (
+            geste.uuid !== undefined &&
+            ((await this.base.operations.get(geste.uuid)) ||
+                (await this.base.acquittees.get(geste.uuid)))
+        ) {
+            return geste.uuid;
+        }
+
         const operation: Operation = {
-            uuid: this.uuid7(),
+            uuid: geste.uuid ?? this.uuid7(),
             type: geste.type,
             charge: geste.charge,
             auteur_id: this.utilisateurId,

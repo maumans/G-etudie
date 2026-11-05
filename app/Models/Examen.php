@@ -18,8 +18,9 @@ use Illuminate\Support\Carbon;
  * @property string $nom
  * @property int $ordre
  * @property Carbon|null $date_prochaine_session saisie par le responsable pédagogique, jamais semée
+ * @property string|null $moyenne_admission moyenne d'admission, saisie par l'équipe (lot 5), jamais semée
  */
-#[Fillable(['code', 'nom', 'ordre', 'date_prochaine_session'])]
+#[Fillable(['code', 'nom', 'ordre', 'date_prochaine_session', 'moyenne_admission'])]
 class Examen extends Model
 {
     protected function casts(): array
@@ -27,6 +28,7 @@ class Examen extends Model
         return [
             'code' => CodeExamen::class,
             'date_prochaine_session' => 'date',
+            'moyenne_admission' => 'decimal:2',
         ];
     }
 

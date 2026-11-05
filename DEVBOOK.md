@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-10-31, lot 4)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-05, lot 5)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,11 +19,26 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-10-31 (lot 4 fait ; lot 0 en attente de D11)
+### État au 2026-11-05 (lot 5 fait ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte les lots 0 à 4. Les lots 3 et 4 ont été
+- **Dépôt git** : `main` porte les lots 0 à 5. Les lots 3, 4 et 5 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 5 fait** (point 19) : **examen blanc** sur une annale publiée (3ᵉ
+  mode « Conditions réelles » de la fiche d'annale) : durée imprimée,
+  sinon celle de l'épreuve, sinon choisie par l'élève ; passage plein
+  écran sans indice ; **sauvegarde continue sur l'appareil** (Dexie, à
+  chaque geste) et reprise à la bonne question ; **chronomètre calculé
+  depuis l'heure de début** (le temps court application fermée, l'examen
+  se termine seul) ; horloge douteuse signalée ; auto-évaluation des
+  rédactions ; note affichée tout de suite puis `examen_blanc.terminer`
+  (priorité 0), **recorrigée par le serveur** ; « Mes examens blancs »,
+  résultat détaillé, évolution, carte de partage (prénom seul). **Note sur
+  20 seule** : la moyenne pondérée attend la session complète ; le verdict
+  compare à la **moyenne d'admission saisie par l'équipe** (vide = aucun
+  verdict). HL3 terminé. **Critère tenu** : `parcours-lot5.spec.ts`
+  (onglet fermé en plein examen, repris, une seule note) ;
+  `ExamenBlancHorsLigneTest` (A.14 n° 7).
 - **Lot 4 fait** (point 18) : **annales** (sujets découpés en parties, dont
   les questions sont des questions ordinaires, `source = annale`) ;
   **import assisté** : un PDF ou une photo → l'API Claude (Opus 5.5, en
@@ -127,10 +142,11 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 436 Pest (MySQL `g_etudie_test`, rôles semés une fois par
-  `TestCase`), 296 Vitest, Playwright (sessions par compte, écrans des
-  lots 0 à 4, parcours d'inscription, parcours des critères des lots 1, 2
-  et 4, séance en mode avion du lot 3, socle hors ligne) — verts. `tsc`,
+- **Tests** : 456 Pest (MySQL `g_etudie_test`, rôles semés une fois par
+  `TestCase`), 313 Vitest, Playwright (sessions par compte, écrans des
+  lots 0 à 5, parcours d'inscription, parcours des critères des lots 1, 2,
+  4 et 5, séance en mode avion du lot 3, socle hors ligne ; 426 tests) —
+  verts. `tsc`,
   `vp check`, Pint, Larastan (niveau 7) et `npm run build` passent.
 - **File d'attente** : l'import assisté tourne en file (`database`). En
   développement, lancer aussi `php artisan queue:work` (configuration
@@ -179,13 +195,17 @@
    chaque examen (Référentiel › Épreuves) pour le compte à rebours ; **la
    convention D5** avant toute publication publique des annales (le champ
    « Droits de publication » de chaque annale l'attend).
-5. **Lot 5** : examen blanc chronométré (le mode « Conditions réelles » des
-   annales y arrive), coefficients, moyenne pondérée, sauvegarde continue
-   sur l'appareil (HL3).
-6. **Équipe pédagogique** : saisir dans le référentiel le programme
+5. **Maurice : essayer le lot 5** — 01 Aïssatou : une annale, « Conditions
+   réelles », commencer, répondre, fermer l'onglet, rouvrir (l'accueil
+   annonce l'examen), terminer ; « Examens blancs ». Équipe : saisir la
+   **moyenne d'admission** de chaque examen (Référentiel › Épreuves) pour
+   le verdict.
+6. **Lot 6** : progression, maîtrise par notion, révision espacée, jauge,
+   motivation ; jauge et séances pré-calculées hors ligne (HL4).
+7. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
-7. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+8. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
    BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
@@ -330,7 +350,7 @@ permission s'exerce (section 7).
 | `ProfilEleveService` | seule porte du profil d'examen (classe déduite, série exigée au Bac, filière gardée) | ✅ lot 2 |
 | `ProgressionService` | « compris / à revoir », position ; la saisie la plus récente gagne | ✅ lot 2 |
 | `TableauDeBordEleveService` | met en forme l'accueil élève depuis les services qui font autorité | ✅ lot 2 |
-| `ExamenBlancService` | passage, note, moyenne pondérée | ⬜ |
+| `ExamenBlancService` | `examen_blanc.terminer` : recorrection contre les versions vues, note sur 20 (`NoteExamen`), horloge signalée, idempotent ; moyenne pondérée avec la session complète | ✅ lot 5 |
 | `MaitriseService` | jauge (lot 2 : part des questions réussies par matière, pondérée seulement si tous les coefficients sont saisis) ; maîtrise par notion et révision espacée au lot 6 | 🟡 lot 2 |
 | `PackService` | génération, empreintes, différentiel, droits | ⬜ |
 | `SynchroService` | file d'opérations (`HORS_LIGNE.md` A.3.6) : cinq verdicts, idempotence par la base, `enTantQue`, horloge ; quatre types d'opération élève au lot 3 | ✅ étape 6 |
@@ -354,7 +374,7 @@ permission s'exerce (section 7).
 | Lecteur d'exercice (« l'ardoise ») | ✅ lot 3 : neuf types, indices, verdict (juste / en partie / pas encore / à toi d'évaluer), corrigé pas à pas, auto-évaluation, reprise, bilan |
 | Mini-question dans une leçon | ✅ lot 3 |
 | Annales (liste, exercices par chapitre, fiche en lecture et en entraînement, document original), « Mes signalements », « Signaler une erreur » | ✅ lot 4 (« Conditions réelles » au lot 5) |
-| Examen blanc (lancement, passage, résultat, carte de partage) | ⬜ |
+| Examen blanc (lancement, passage plein écran, auto-évaluation, résultat, « Mes examens blancs », carte de partage) | ✅ lot 5 |
 | Progression, profil, téléchargements | ⬜ |
 | Back-office contenu : tableau de bord, référentiel (matières, épreuves, programme, années), leçons (liste, relecture, création, éditeur TipTap, fiche, historique) | ✅ lot 1 (point 15) ; **questions** ✅ lot 3 (liste, création, saisie par type avec aperçu jouable, fiche, relecture) ; **annales** (liste, import, fiche à côté du document, relecture) et **signalements** (file, fiche, réponse) ✅ lot 4 |
 | Console plateforme | ⬜ |
@@ -1365,6 +1385,75 @@ cette question à sa façon. Elle distingue deux notions :
      téléphone ; la convention D5 ; le mode « Conditions réelles » (lot 5) ;
      les annales dans les packs (lot 7).
 
+19. [x] **Lot 5 — examen blanc chronométré, sauvegarde continue sur
+   l'appareil ; HL3** (2026-11-05, sur `main`, un commit)
+   - **Constat** : la table Dexie `examens_blancs` existait depuis le lot 0
+     (vide) ; `tentatives.mode` n'avait que `seance` et `entrainement` ;
+     « Examens blancs » était désactivé dans la navigation ; ni coefficients
+     ni moyenne d'admission saisis.
+   - **Décisions** (Maurice, 2026-11-01 et 2026-11-05) :
+     - l'examen blanc se passe sur **une annale publiée** (3ᵉ mode
+       « Conditions réelles ») ; la session complète (toutes les épreuves,
+       moyenne pondérée) viendra plus tard ;
+     - **durée** : imprimée sur l'annale, sinon celle de l'épreuve
+       (Référentiel), sinon **choisie par l'élève** (1 h, 2 h, 3 h, 4 h) ;
+       l'origine est gardée sur le résultat ;
+     - **fin du temps** : l'examen se termine seul, même application
+       fermée (heure de fin = fin du temps) ; les rédactions s'auto-évaluent
+       ensuite au barème ;
+     - **note sur 20 seule** ; **verdict** « au-dessus / en dessous de la
+       moyenne d'admission », seulement si l'équipe l'a saisie
+       (`examens.moyenne_admission`, Référentiel › Épreuves) ; pas
+       « admis » sur une seule épreuve ;
+     - **carte de partage** dans ce lot : image dessinée sur l'appareil,
+       prénom seul, partagée par le menu du téléphone.
+     - **Règle de note** (une seule autorité, deux jumelles :
+       `App\Support\NoteExamen`, `lib/examen-blanc/note.ts`, jeu commun
+       `tests/fixtures/notes-examen.json`) : une partie vaut son barème
+       imprimé (parts égales si un barème manque) ; dans une partie, les
+       questions pèsent autant ; sans réponse = 0 ; arrondi au centième.
+     - L'examen **vit sur l'appareil** pendant le passage ; il n'arrive au
+       serveur qu'à la fin, par `examen_blanc.terminer` (priorité 0), dont
+       l'`uuid` est celui de l'examen (ajout de `uuid` facultatif à
+       `NouveauGeste` : enregistré deux fois, une seule opération). Le
+       serveur recorrige chaque réponse contre la version vue
+       (`TentativeService`, tentatives `examen_blanc`, qui compteront pour
+       la maîtrise du lot 6). Horloge douteuse : signalée, jamais
+       sanctionnée.
+   - **Écarts au plan** : PLAN M7 prévoit coefficients réels, ordre des
+     épreuves et moyenne pondérée : ils attendent la session complète
+     (décision de Maurice) et les coefficients officiels. Le passage se
+     fait sur la fiche de l'annale (`?mode=examen`), pas sur une page à
+     part : elle est déjà gardée hors ligne.
+   - **Corrigé en chemin** : deux critères du barème d'une annale de
+     démonstration (lot 4) contenaient des `$…$` affichés tels quels (un
+     critère est du texte simple) → seeder corrigé, et
+     `PropositionEnQuestion` retire les `$` d'un critère proposé par l'IA.
+     MySQL (Laragon) était arrêté après un redémarrage du poste : relancé.
+   - **Vu avec Playwright** (`ecrans-lot5.spec.ts`, 6 écrans × 3 tailles ×
+     2 thèmes) : lancement, passage, auto-évaluation, résultat sur
+     l'appareil (« en attente d'envoi »), « Mes examens blancs », résultat
+     détaillé ; axe sans violation sérieuse, aucun débordement. Captures des
+     autres lots régénérées volontairement : la navigation (« Examens
+     blancs » actif), l'accueil d'Aïssatou (ses réponses d'examen comptent),
+     Référentiel › Épreuves (moyenne d'admission).
+   - **Preuve** : Pest (dont `ExamenBlancHorsLigneTest` 10 — A.14 n° 7 —,
+     `NoteExamenTest` 10), Vitest (dont `examen-blanc.test.ts` 16 — A.14
+     n° 20 et 21 —, `moteur.test.ts` +1), Playwright : **parcours du
+     critère** `parcours-lot5.spec.ts` et les écrans. Totaux : **456 Pest,
+     313 Vitest, 426 Playwright** (captures régénérées sur le build, sans
+     `public/hot`). `tsc`, `vp check`, Pint, Larastan niveau 7 et
+     `npm run build` passent. En chemin : `hors-ligne.spec.ts` coupait le
+     réseau pendant que le premier `/sync/etat` était en route ; sa réponse
+     arrivait après et remettait, à raison, « en ligne » : le test attend
+     désormais ce premier contact (course du test, pas du produit) ;
+     `SeederDemonstrationTest` compte à part les sept réponses des deux
+     examens blancs semés.
+   - **Reste** : extinction forcée du téléphone en plein examen
+     (`A_TESTER.md`, A.15 n° 2) ; session complète et moyenne pondérée ;
+     la moyenne d'admission à saisir par l'équipe ; lancement hors ligne
+     depuis un pack (lot 7).
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -1453,6 +1542,7 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `SujetPartie` | `sujet_parties` | sujet | `uuid`, `ordre`, `titre`, `bareme`, `consigne` (blocs) |
 | `ImportSujet` | `imports_sujets` | auteur, examen, série, matière, sujet créé | `statut` (`StatutImport`), `extracteur`, `modele`, jetons, `avertissements`, `erreur` |
 | `Signalement` | `signalements` | élève, cible (question, leçon, sujet) | `uuid` = celui de l'opération ; `motif`, `message` (500), `statut`, `reponse` (figée une fois lue), `saisi_le` |
+| `ExamenBlanc` | `examens_blancs` | élève, annale (version vue) | `uuid` = celui de l'examen (appareil) ; durée et origine, début, fin, `temps_ecoule`, `note_sur_20` (serveur), `note_appareil`, `details` par partie, `horloge_suspecte` ; écrit par `ExamenBlancService` seulement |
 | `Tentative` | `tentatives` | élève, question, séance nulle | ajout seulement (sauf l'auto-évaluation, une fois) ; `uuid` = celui de l'opération ; `version` = numéro vu ; `score` 0–100 et `correcte` = correction du serveur ; `criteres`, `auto_evaluee_le` |
 
 ## 10. Enums
@@ -1470,7 +1560,7 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `StatutContenu` | `brouillon`, `en_relecture`, `publie`, `archive` | statut d'une leçon ou d'une question |
 | `DecisionRelecture` | `publiee`, `renvoyee`, `retiree` | issue d'une version envoyée en relecture |
 | `TypeQuestion` | `qcm_une`, `qcm_plusieurs`, `vrai_faux`, `numerique`, `courte`, `trous`, `appariement`, `ordre`, `ouverte` | type d'une question, `libelle()`, `estAutoEvaluee()` |
-| `ModeTentative` | `seance`, `entrainement` (`examen_blanc` au lot 5) | où la réponse a été donnée |
+| `ModeTentative` | `seance`, `entrainement`, `examen_blanc` (lot 5) | où la réponse a été donnée |
 | `EtatLecon` | `comprise`, `a_revoir` | ce que l'élève dit d'une leçon |
 | `TypeEtablissement` | `public`, `prive`, `franco_arabe` | type d'un établissement |
 | `TypeSujet` | `officiel`, `blanc_maison` | annale ou sujet maison |
@@ -1495,6 +1585,7 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `/contenu/relecture`, publier, renvoyer | `can:contenu.relire` + `LeconPolicy::relire` (jamais l'auteur) | `routes/contenu.php` |
 | archiver, restaurer | `can:contenu.administrer` | `routes/contenu.php` |
 | `/contenu/questions` (liste, fiche), `creer`, édition, envoi, reprise, modification ; `/contenu/relecture/questions`, publier, renvoyer ; archiver, restaurer | mêmes gardes que les leçons ; `QuestionPolicy` (circuit commun `PolicyContenuRelisable`) | `routes/contenu.php` |
+| `/eleve/examens-blancs`, `/eleve/examens-blancs/{uuid}` (le passage : `/eleve/annales/{uuid}?mode=examen`) | `auth` + `can:espace.eleve` ; résultat gardé par `ExamenBlancPolicy::voir` (404) | `routes/eleve.php` |
 | `/eleve/annales`, `/eleve/annales/{uuid}`, `/eleve/documents/annales/{uuid}`, `/eleve/signalements` | `auth` + `can:espace.eleve` ; annale gardée par `SujetPolicy::lire` (404) | `routes/eleve.php` |
 | `/contenu/annales` (liste, fiche, document), `/contenu/relecture/annales` ; importer (`annales/importer`, `annales/imports`, relancer) ; parties, questions d'annale, circuit | `can:espace.contenu` · `can:annales.importer` (+ `throttle:20,60`) · `can:contenu.rediger` / `relire` / `administrer` ; `SujetPolicy` | `routes/contenu.php` |
 | `/contenu/signalements`, fiche, répondre | `can:signalements.traiter` ; `SignalementPolicy` (404) | `routes/contenu.php` |

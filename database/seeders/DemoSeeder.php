@@ -60,6 +60,6 @@ class DemoSeeder extends Seeder
         // Leçons fictives, écrites et relues par ces comptes (lot 1), puis le
         // cours côté élève et les profils d'examen des élèves (lot 2), puis les
         // annales fictives et les signalements (lot 4).
-        $this->call([DemoContenuSeeder::class, DemoCoursSeeder::class, DemoEleveSeeder::class, DemoAnnalesSeeder::class]);
+        $this->call([DemoContenuSeeder::class, DemoCoursSeeder::class, DemoEleveSeeder::class, DemoAnnalesSeeder::class, DemoExamensBlancsSeeder::class]);
     }
 }

@@ -160,7 +160,9 @@ class PropositionEnQuestion
         $criteres = [];
 
         foreach (array_slice(array_values($bareme), 0, 8) as $rang => $critere) {
-            $texte = is_array($critere) ? trim(self::texte($critere['critere'] ?? '')) : '';
+            // Un critère est du texte simple (lot 3) : pas de délimiteurs de
+            // formule, qui s'afficheraient tels quels.
+            $texte = is_array($critere) ? trim(str_replace('$', '', self::texte($critere['critere'] ?? ''))) : '';
 
             if (mb_strlen($texte) < 3) {
                 continue;

@@ -1,7 +1,9 @@
 <?php
 
+use App\Enums\ModeTentative;
 use App\Enums\Role;
 use App\Models\Chapitre;
+use App\Models\ExamenBlanc;
 use App\Models\Lecon;
 use App\Models\Notion;
 use App\Models\Question;
@@ -115,6 +117,9 @@ test('le cours de démonstration côté élève : fictif, QCM valides, deux él�
         ->and(CatalogueEleve::lecons(CatalogueEleve::profil($aissatou))->count())->toBeGreaterThan(3)
         ->and(CatalogueEleve::questions(CatalogueEleve::profil($ousmane))->count())->toBeGreaterThan(3)
         // Historique semé une fois : le second passage n'ajoute rien.
-        ->and(Tentative::where('user_id', $aissatou->id)->count())->toBe(6)
+        ->and(Tentative::where('user_id', $aissatou->id)->where('mode', '!=', ModeTentative::ExamenBlanc->value)->count())->toBe(6)
+        // Ses deux examens blancs (lot 5) : sept réponses, semées une fois.
+        ->and(ExamenBlanc::where('user_id', $aissatou->id)->count())->toBe(2)
+        ->and(Tentative::where('user_id', $aissatou->id)->where('mode', ModeTentative::ExamenBlanc->value)->count())->toBe(7)
         ->and(Tentative::where('user_id', $ousmane->id)->count())->toBe(0);
 });

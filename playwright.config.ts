@@ -33,7 +33,7 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
-            testIgnore: /parcours-lot[1234]\.spec\.ts/,
+            testIgnore: /parcours-lot[12345]\.spec\.ts/,
             dependencies: ['connexion'],
         },
         // Crée puis efface une leçon : après les captures, qu'il ne doit pas
@@ -60,6 +60,13 @@ export default defineConfig({
             name: 'parcours-annales',
             testMatch: /parcours-lot4\.spec\.ts/,
             dependencies: ['parcours-contenu'],
+        },
+        // Un examen blanc interrompu (onglet fermé), repris, noté une fois
+        // (lot 5) ; l'examen est effacé à la fin.
+        {
+            name: 'parcours-examen',
+            testMatch: /parcours-lot5\.spec\.ts/,
+            dependencies: ['parcours-annales'],
         },
         {
             name: 'parcours-hors-ligne',

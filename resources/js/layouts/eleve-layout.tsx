@@ -5,6 +5,7 @@ import {
     BandeauIphone,
     BandeauReseau,
 } from '@/components/hors-ligne/bandeaux';
+import { BandeauExamenEnCours } from '@/components/examen-blanc/bandeau-examen';
 import { PastilleReseau } from '@/components/hors-ligne/pastille-reseau';
 import { LienNavigation } from '@/components/lien-navigation';
 import { Marque } from '@/components/marque';
@@ -90,6 +91,7 @@ function BandeauxHorsLigne() {
             <BandeauReseau />
             <BandeauCopie />
             <BandeauIphone />
+            <BandeauExamenEnCours />
         </div>
     );
 }

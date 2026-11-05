@@ -1,0 +1,78 @@
+{
+    "_": "Jeu d'exemples commun : App\\Support\\NoteExamen (NoteExamenTest) et lib/examen-blanc/note.ts (note.test.ts).",
+    "notes": [
+        {
+            "nom": "tout juste",
+            "parties": [
+                { "bareme": 4, "scores": [100, 100] },
+                { "bareme": 6, "scores": [100] }
+            ],
+            "note": 20,
+            "points": [4, 6]
+        },
+        {
+            "nom": "rien donné",
+            "parties": [{ "bareme": 4, "scores": [null, null] }],
+            "note": 0,
+            "points": [0]
+        },
+        {
+            "nom": "barèmes imprimés",
+            "parties": [
+                { "bareme": 4, "scores": [100, 0] },
+                { "bareme": 6, "scores": [100] }
+            ],
+            "note": 16,
+            "points": [2, 6]
+        },
+        {
+            "nom": "score partiel",
+            "parties": [
+                { "bareme": 5, "scores": [50, 100] },
+                { "bareme": 5, "scores": [25] }
+            ],
+            "note": 10,
+            "points": [3.75, 1.25]
+        },
+        {
+            "nom": "un barème manque : parts égales",
+            "parties": [
+                { "bareme": 8, "scores": [100] },
+                { "bareme": null, "scores": [0] }
+            ],
+            "note": 10,
+            "points": [1, 0]
+        },
+        {
+            "nom": "arrondi au centième",
+            "parties": [
+                { "bareme": 3, "scores": [100, 0, 0] },
+                { "bareme": 4, "scores": [0] }
+            ],
+            "note": 2.86,
+            "points": [1, 0]
+        },
+        {
+            "nom": "arrondi au plus proche",
+            "parties": [{ "bareme": null, "scores": [100, 100, 0] }],
+            "note": 13.33,
+            "points": [0.67]
+        },
+        {
+            "nom": "partie vide ignorée",
+            "parties": [
+                { "bareme": 4, "scores": [100] },
+                { "bareme": 6, "scores": [] }
+            ],
+            "note": 20,
+            "points": [4, 0]
+        },
+        { "nom": "aucune partie", "parties": [], "note": 0, "points": [] },
+        {
+            "nom": "score hors bornes ramené",
+            "parties": [{ "bareme": 2, "scores": [150, -10] }],
+            "note": 10,
+            "points": [1]
+        }
+    ]
+}

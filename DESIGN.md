@@ -1170,3 +1170,35 @@ la prolonge sans nouveau composant de base.
   imports à suivre seulement ; deux « Signaler une erreur » en
   entraînement → un par question ; titre répété sur la fiche d'un
   signalement ; listes déroulantes tronquées (« Toutes les ann… »).
+
+### Lot 5 — examen blanc (2026-11-05)
+
+- **Trois modes** sur la fiche d'annale : « Lecture », « Entraînement »,
+  « Conditions réelles » (« Examen » sous 640 px, libellé court).
+- **Lancement** : le moment fort `surface-encre` « Comme le jour de
+  l'examen » : nombre de questions, durée (imprimée / de l'épreuve, ou
+  quatre cases 1 h · 2 h · 3 h · 4 h quand rien ne la donne), deux règles
+  (le temps court application fermée ; tout est gardé sans réseau), un
+  seul bouton plein « Commencer l'examen · 2 h ». Examen en cours : la
+  même carte dit le temps qui reste et « Reprendre ».
+- **Passage** : surcouche plein écran calme (pas de navigation) ; en haut,
+  tuile de la matière, « 1 / 4 répondues », chronomètre discret en
+  pastille muette (couleur indice sous 10 min), segments de progression ;
+  la consigne de la partie dans une carte, l'énoncé, la saisie du type, la
+  mention « Pas d'indice pendant l'examen » ; les numéros des questions en
+  cases (encre = répondue) ; en bas, précédente / suivante et « Terminer
+  l'examen » (encre, mandarine sur la dernière question).
+- **Auto-évaluation** puis **résultat** : la note en grand sur
+  `surface-encre` (`/20` en mandarine), « en attente d'envoi » ou « Note
+  reçue », points par partie ; « Partager » (image dessinée sur
+  l'appareil : encre, halo mandarine, note, prénom seul, « EXEMPLE » sur un
+  contenu fictif).
+- **Mes examens blancs** : liste en filets (tuile, matière · session,
+  barre fine de la note, note à droite, « au-dessus du seuil » seulement si
+  la moyenne d'admission est saisie) ; à droite, la moyenne en grand.
+  **Résultat** : note, verdict ou « pas de verdict », écart expliqué,
+  horloge signalée en soleil ; « Partie par partie », « Ton évolution » ;
+  le corrigé question par question avec son verdict (mot + couleur).
+- **Vu** (Playwright, 360 / 768 / 1366, clair et sombre) : axe sans
+  violation sérieuse, aucun débordement. Corrigé : critères du barème
+  affichés avec leurs `$…$` (seeder d'exemple et conversion de l'IA).

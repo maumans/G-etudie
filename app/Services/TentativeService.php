@@ -44,6 +44,7 @@ class TentativeService
         CarbonImmutable $saisiLe,
         CarbonImmutable $recuLe,
         int $indicesUtilises = 0,
+        ?ModeTentative $mode = null,
     ): array {
         $existante = Tentative::query()->where('uuid', $uuid)->first();
 
@@ -75,7 +76,7 @@ class TentativeService
             'question_id' => $question->id,
             'version' => $version->numero,
             'seance_id' => $seance?->id,
-            'mode' => $seance !== null ? ModeTentative::Seance : ModeTentative::Entrainement,
+            'mode' => $mode ?? ($seance !== null ? ModeTentative::Seance : ModeTentative::Entrainement),
             'reponse' => $reponse,
             'score' => $score,
             'correcte' => $score === null ? null : $score === 100,

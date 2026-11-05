@@ -134,13 +134,18 @@ class OffreController extends Controller
     {
         $donnees = $request->validate([
             'date_prochaine_session' => ['nullable', 'date_format:Y-m-d', 'after:today'],
+            // Lot 5 : le seuil du verdict des examens blancs, saisi par l'équipe.
+            'moyenne_admission' => ['nullable', 'numeric', 'between:0,20'],
         ], [
             'date_prochaine_session.after' => 'La date de la session doit être à venir.',
         ]);
 
-        $examen->update(['date_prochaine_session' => $donnees['date_prochaine_session'] ?? null]);
+        $examen->update([
+            'date_prochaine_session' => $donnees['date_prochaine_session'] ?? null,
+            'moyenne_admission' => $donnees['moyenne_admission'] ?? null,
+        ]);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Date de session enregistrée.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Session enregistrée.']);
 
         return back();
     }
@@ -178,7 +183,7 @@ class OffreController extends Controller
 
         foreach (Examen::query()->with('series')->orderBy('ordre')->get() as $examen) {
             if ($examen->series->isEmpty()) {
-                $parcours[] = ['cle' => $examen->code->value, 'libelle' => $examen->code->value, 'examen_id' => $examen->id, 'serie_id' => null, 'session' => $examen->date_prochaine_session?->toDateString()];
+                $parcours[] = ['cle' => $examen->code->value, 'libelle' => $examen->code->value, 'examen_id' => $examen->id, 'serie_id' => null, 'session' => $examen->date_prochaine_session?->toDateString(), 'moyenne_admission' => $examen->moyenne_admission];
 
                 continue;
             }
@@ -190,6 +195,7 @@ class OffreController extends Controller
                     'examen_id' => $examen->id,
                     'serie_id' => $serie->id,
                     'session' => $examen->date_prochaine_session?->toDateString(),
+                    'moyenne_admission' => $examen->moyenne_admission,
                 ];
             }
         }

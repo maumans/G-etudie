@@ -23,8 +23,12 @@ test('hors ligne : jamais de clic mort, copie datée, page de repli, retour du r
         { timeout: 30_000 },
     );
 
-    // Une visite en ligne range la copie complète de l'accueil.
+    // Une visite en ligne range la copie complète de l'accueil. Le premier
+    // contact (`/sync/etat`) doit être revenu avant la coupure : une réponse
+    // encore en route arriverait après et remettrait, à raison, « en ligne ».
+    const premierContact = page.waitForResponse(/\/sync\/etat/);
     await page.reload();
+    await premierContact;
     await expect(
         page.getByRole('button', { name: /Tout est envoyé/ }),
     ).toBeVisible();
