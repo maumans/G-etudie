@@ -1,0 +1,126 @@
+{
+    "description": "Critère d'acceptation du lot 6 : la jauge d'un élève de test évolue comme attendu. Élève BEPC (4 matières, coefficients non saisis : moyenne simple). Trois notions évaluables, trois QCM chacune : A et B en maths, C en physique. Chaque réponse est saisie à 20:00 le jour indiqué. Valeurs attendues calculées à la main (DEVBOOK point 20) : maîtrise = moyenne des scores pondérée par 0,5^(âge en jours / 14), multipliée par min(1, réponses / 3) ; révision après 1, 3, 7, 14, 30 jours ; matière = moyenne de ses notions évaluables ; jauge = moyenne des 4 matières.",
+    "examen": "BEPC",
+    "notions": {
+        "A": { "matiere": "maths", "titre": "Le théorème de Pythagore" },
+        "B": { "matiere": "maths", "titre": "La réciproque" },
+        "C": { "matiere": "physique", "titre": "La loi d'Ohm" }
+    },
+    "etapes": [
+        {
+            "jour": "2026-11-02",
+            "commentaire": "Une seule réponse juste : 100 × 1/3. A revient demain.",
+            "reponses": [["A", true]],
+            "attendu": {
+                "notions": {
+                    "A": {
+                        "maitrise": 33,
+                        "palier": 1,
+                        "prochaine_revision_le": "2026-11-03"
+                    }
+                },
+                "matieres": { "maths": 17, "physique": 0 },
+                "jauge": 4
+            }
+        },
+        {
+            "jour": "2026-11-03",
+            "commentaire": "A était due : elle monte au palier 2 (la seconde réussite du jour ne compte pas pour le palier). B ratée : palier 0, demain.",
+            "a_revoir_avant": ["A"],
+            "reponses": [
+                ["A", true],
+                ["A", true],
+                ["B", false]
+            ],
+            "attendu": {
+                "notions": {
+                    "A": {
+                        "maitrise": 100,
+                        "palier": 2,
+                        "prochaine_revision_le": "2026-11-06"
+                    },
+                    "B": {
+                        "maitrise": 0,
+                        "palier": 0,
+                        "prochaine_revision_le": "2026-11-04"
+                    }
+                },
+                "matieres": { "maths": 50, "physique": 0 },
+                "jauge": 13
+            }
+        },
+        {
+            "jour": "2026-11-04",
+            "commentaire": "B réussie : (0 × 0,95 + 100) / 1,95 × 2/3 = 34. Première réponse en physique.",
+            "a_revoir_avant": ["B"],
+            "reponses": [
+                ["B", true],
+                ["C", true]
+            ],
+            "attendu": {
+                "notions": {
+                    "B": {
+                        "maitrise": 34,
+                        "palier": 1,
+                        "prochaine_revision_le": "2026-11-05"
+                    },
+                    "C": {
+                        "maitrise": 33,
+                        "palier": 1,
+                        "prochaine_revision_le": "2026-11-05"
+                    }
+                },
+                "matieres": { "maths": 67, "physique": 33 },
+                "jauge": 25
+            }
+        },
+        {
+            "jour": "2026-11-07",
+            "commentaire": "Trois révisions en retard. A ratée : sa maîtrise baisse (71) et elle repart au palier 0 ; la jauge recule.",
+            "a_revoir_avant": ["A", "B", "C"],
+            "reponses": [["A", false]],
+            "attendu": {
+                "notions": {
+                    "A": {
+                        "maitrise": 71,
+                        "palier": 0,
+                        "prochaine_revision_le": "2026-11-08"
+                    }
+                },
+                "matieres": { "maths": 53, "physique": 33 },
+                "jauge": 22
+            }
+        },
+        {
+            "jour": "2026-11-09",
+            "commentaire": "Tout réussi : A remonte au palier 1, B et C (dues depuis le 5) au palier 2.",
+            "a_revoir_avant": ["A", "B", "C"],
+            "reponses": [
+                ["A", true],
+                ["B", true],
+                ["C", true]
+            ],
+            "attendu": {
+                "notions": {
+                    "A": {
+                        "maitrise": 78,
+                        "palier": 1,
+                        "prochaine_revision_le": "2026-11-10"
+                    },
+                    "B": {
+                        "maitrise": 71,
+                        "palier": 2,
+                        "prochaine_revision_le": "2026-11-12"
+                    },
+                    "C": {
+                        "maitrise": 67,
+                        "palier": 2,
+                        "prochaine_revision_le": "2026-11-12"
+                    }
+                },
+                "matieres": { "maths": 75, "physique": 67 },
+                "jauge": 36
+            }
+        }
+    ]
+}

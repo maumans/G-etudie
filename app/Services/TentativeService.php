@@ -29,6 +29,12 @@ use Carbon\CarbonImmutable;
  */
 class TentativeService
 {
+    public function __construct(
+        private MaitriseService $maitrise,
+        private MotivationService $motivation,
+        private SeanceService $seances,
+    ) {}
+
     /**
      * @param  array<string, mixed>  $reponse
      * @return array{score: int|null, correcte: bool|null, attendue: array<string, mixed>}
@@ -88,6 +94,19 @@ class TentativeService
             'recu_le' => $recuLe,
         ]);
 
+        // Lot 6 : la séance préparée prend son jour, la maîtrise de la notion
+        // est recalculée, la série et les points suivent — dans la même
+        // transaction que la réponse (SynchroService).
+        if ($seance !== null) {
+            $this->seances->demarrer($seance, $saisiLe);
+        }
+
+        if ($tentative->score !== null) {
+            $this->maitrise->apresTentative($tentative);
+        }
+
+        $this->motivation->apresTentative($tentative);
+
         return $this->resultat($tentative, $version);
     }
 
@@ -124,6 +143,9 @@ class TentativeService
                 'criteres' => array_values(array_intersect($connus, $criteres)),
                 'auto_evaluee_le' => $saisiLe,
             ])->save();
+
+            $this->maitrise->apresTentative($tentative);
+            $this->motivation->apresEvaluation($tentative);
         }
 
         return ['score' => $tentative->score, 'correcte' => $tentative->correcte];

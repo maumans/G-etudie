@@ -8,6 +8,8 @@ import type {
     RouteurGarde,
 } from '@/lib/hors-ligne/garde-navigation';
 import { MoteurHorsLigne } from '@/lib/hors-ligne/moteur';
+import { rangerInstantane, URL_INSTANTANE } from '@/lib/progression/locale';
+import type { Instantane } from '@/lib/progression/locale';
 import type {
     EtatHorsLigne,
     NouveauGeste,
@@ -70,6 +72,56 @@ export function useHorsLigne(): EtatHorsLigne {
         () => moteur.etat,
         () => moteur.etat,
     );
+}
+
+/* ---------- Progression gardée sur l'appareil (HL4, A.10) ---------- */
+
+const auditeursProgression = new Set<() => void>();
+
+/** Rappelé quand un nouvel instantané a été rangé. */
+export function surProgression(rappel: () => void): () => void {
+    auditeursProgression.add(rappel);
+
+    return () => auditeursProgression.delete(rappel);
+}
+
+let instantaneEnCours: Promise<boolean> | null = null;
+
+/**
+ * Lit `GET /eleve/instantane` (dernière jauge, série, trois séances
+ * préparées) et le range pour le profil actif. Silencieux en cas d'échec :
+ * l'appareil garde l'instantané précédent.
+ */
+export function rafraichirInstantane(): Promise<boolean> {
+    const auteur = moteur.utilisateur;
+
+    if (auteur === null) {
+        return Promise.resolve(false);
+    }
+
+    instantaneEnCours ??= (async () => {
+        try {
+            const reponse = await transportFetch({
+                methode: 'GET',
+                url: URL_INSTANTANE,
+            });
+
+            if (reponse.statut !== 200 || reponse.corps === null) {
+                return false;
+            }
+
+            await rangerInstantane(base, auteur, reponse.corps as Instantane);
+            auditeursProgression.forEach((rappel) => rappel());
+
+            return true;
+        } catch {
+            return false;
+        } finally {
+            instantaneEnCours = null;
+        }
+    })();
+
+    return instantaneEnCours;
 }
 
 /* ---------- Dialogue « écran indisponible » (monté une fois à la racine) ---------- */
@@ -244,7 +296,34 @@ export function copieDuDocument(url: string): string | null {
  * À appeler une fois, avant la barre de progression : garde de navigation,
  * profil actif, battement, service worker.
  */
+let routeurActif: RouteurHorsLigne | null = null;
+
+/**
+ * Affiche un écran depuis la base locale (pack, séance préparée), avec les
+ * props mêmes du serveur (A.4). `false` : il n'y est pas.
+ */
+export async function afficherDepuisLaBase(chemin: string): Promise<boolean> {
+    const page = await lirePageLocale(base, chemin);
+
+    if (page === null || routeurActif === null) {
+        return false;
+    }
+
+    routeurActif.push({
+        url: chemin,
+        component: page.component,
+        props: (actuelles) => ({
+            ...actuelles,
+            ...page.props,
+            source: 'pack',
+        }),
+    });
+
+    return true;
+}
+
 export function demarrerHorsLigne(routeur: RouteurHorsLigne): void {
+    routeurActif = routeur;
     initialiserGardeNavigation(routeur, {
         horsLigne: () => moteur.etat.reseau === 'hors_ligne',
         pages: () => pages,
@@ -252,25 +331,7 @@ export function demarrerHorsLigne(routeur: RouteurHorsLigne): void {
         signalerHorsLigne: () => moteur.signalerHorsLigne(),
         // Un contenu téléchargé (pack) s'affiche sans réseau, avec les props
         // mêmes du serveur (HORS_LIGNE.md A.4).
-        afficherLocal: async (url) => {
-            const page = await lirePageLocale(base, url.pathname);
-
-            if (page === null) {
-                return false;
-            }
-
-            routeur.push({
-                url: url.pathname,
-                component: page.component,
-                props: (actuelles) => ({
-                    ...actuelles,
-                    ...page.props,
-                    source: 'pack',
-                }),
-            });
-
-            return true;
-        },
+        afficherLocal: (url) => afficherDepuisLaBase(url.pathname),
     });
 
     routeur.on('navigate', (evenement) => {
@@ -329,6 +390,18 @@ export function demarrerHorsLigne(routeur: RouteurHorsLigne): void {
             copieDe(pageCourante.component).lecture
         ) {
             routeur.reload();
+        }
+    });
+
+    // HL4 : la file vient de se vider, le serveur a tout compté — on
+    // reprend la jauge, la série et les séances préparées à jour.
+    let enAttentePrecedent = moteur.etat.enAttente;
+    moteur.on('etat', ({ reseau, enAttente }) => {
+        const videe = enAttentePrecedent > 0 && enAttente === 0;
+        enAttentePrecedent = enAttente;
+
+        if (videe && reseau === 'en_ligne') {
+            void rafraichirInstantane();
         }
     });
 

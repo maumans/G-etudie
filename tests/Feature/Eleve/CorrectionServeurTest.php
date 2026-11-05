@@ -113,7 +113,7 @@ test('la séance livre la version publiée, éléments mélangés, jamais dans l
         ['ordre' => ['e1', 'e2', 'e3', 'e4']]);
 
     $this->actingAs($this->eleve)->post(route('eleve.seance.commencer'));
-    $seance = Seance::sole();
+    $seance = Seance::whereNotNull('jour')->sole();
 
     $this->actingAs($this->eleve)->get(route('eleve.seances.show', $seance))
         ->assertInertia(fn ($page) => $page

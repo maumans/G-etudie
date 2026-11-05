@@ -30,6 +30,13 @@ const ECRANS_LOCAUX: { motif: RegExp; component: string; type: string }[] = [
         component: 'eleve/lecon',
         type: 'lecon',
     },
+    // Lot 6 (HL4) : les séances préparées d'avance, rangées par
+    // lib/progression/locale.ts avec les props mêmes de la route.
+    {
+        motif: /^\/eleve\/seances\/([0-9a-f-]{36})\/?$/i,
+        component: 'eleve/seance',
+        type: 'seance',
+    },
 ];
 
 export function cleContenu(type: string, uuid: string): string {

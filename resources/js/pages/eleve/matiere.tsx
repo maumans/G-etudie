@@ -9,14 +9,18 @@ import {
     Play,
     RotateCcw,
 } from 'lucide-react';
+import { Badge as Etiquette } from '@/components/ui/badge';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
 import { EtatVide } from '@/components/ui/etat-vide';
 import { ProgressionBarre } from '@/components/ui/progression';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
-import { cn, pluriel } from '@/lib/utils';
+import type { EtatNotion } from '@/lib/motivation';
+import { ETATS_NOTION } from '@/lib/motivation';
+import { cn } from '@/lib/utils';
 import { cours } from '@/routes/eleve';
+import { matiere as pageMatiere } from '@/routes/eleve/cours';
 import { fiche } from '@/routes/eleve/chapitres';
 import { show as pageLecon } from '@/routes/eleve/lecons';
 import { commencer } from '@/routes/eleve/seance';
@@ -32,7 +36,14 @@ type LeconListe = {
 type Chapitre = {
     id: number;
     titre: string;
-    notions: { id: number; titre: string; lecons: LeconListe[] }[];
+    notions: {
+        id: number;
+        titre: string;
+        /** Lot 6 : maîtrise (MaitriseService) ; `etat` vide sans exercice. */
+        maitrise: number | null;
+        etat: EtatNotion | null;
+        lecons: LeconListe[];
+    }[];
 };
 
 type Props = {
@@ -40,6 +51,9 @@ type Props = {
     examen: string;
     est_exemple: boolean;
     questions: number;
+    maitrise: number;
+    /** `?faibles=1` : seulement les notions à travailler (filtrées par le serveur). */
+    faibles: boolean;
     chapitres: Chapitre[];
 };
 
@@ -48,12 +62,18 @@ type Props = {
  * chacune (comprise, à revoir, commencée, à lire) et la fiche de révision
  * du chapitre. Une notion sans leçon publiée reste visible : l'élève voit
  * tout le programme saisi, et ce qui arrive.
+ *
+ * Lot 6 : chaque notion qui a des exercices montre sa maîtrise ; « À
+ * travailler » (ouvert depuis un segment de la jauge, DESIGN.md § 6.1) ne
+ * garde que les notions à revoir, fragiles ou en cours.
  */
 export default function Matiere({
     matiere,
     examen,
     est_exemple,
     questions,
+    maitrise,
+    faibles,
     chapitres,
 }: Props) {
     const style = MATIERES[matiere.cle];
@@ -89,9 +109,12 @@ export default function Matiere({
                                     {matiere.nom}
                                 </h1>
                                 <p className="text-aide text-ink-500">
-                                    {examen} ·{' '}
-                                    {pluriel(chapitres.length, 'chapitre')} ·{' '}
-                                    {comprises}/{lecons.length} leçons comprises
+                                    {examen} · maîtrise{' '}
+                                    <span className="font-semibold text-ink-900 font-data">
+                                        {maitrise} %
+                                    </span>{' '}
+                                    · {comprises}/{lecons.length} leçons
+                                    comprises
                                 </p>
                             </div>
                         </div>
@@ -106,9 +129,43 @@ export default function Matiere({
                         )}
                     </div>
                     {est_exemple && <BandeauExemple />}
+                    {questions > 0 && (
+                        <nav
+                            aria-label="Notions affichées"
+                            className="flex gap-1 self-start rounded-controle bg-craie-100 p-1 dark:bg-white/[0.04]"
+                        >
+                            <Filtre
+                                href={pageMatiere.url(matiere.slug)}
+                                actif={!faibles}
+                            >
+                                Tout le programme
+                            </Filtre>
+                            <Filtre
+                                href={pageMatiere.url(matiere.slug, {
+                                    query: { faibles: 1 },
+                                })}
+                                actif={faibles}
+                            >
+                                À travailler
+                            </Filtre>
+                        </nav>
+                    )}
                 </header>
 
-                {chapitres.length === 0 ? (
+                {chapitres.length === 0 && faibles ? (
+                    <EtatVide
+                        illustration={ListTree}
+                        titre="Rien à travailler en ce moment"
+                        message="Aucune notion à revoir ni fragile dans cette matière. Une séance du jour en apportera de nouvelles."
+                        action={
+                            <Button asChild variant="outline">
+                                <Link href={pageMatiere(matiere.slug)}>
+                                    Voir tout le programme
+                                </Link>
+                            </Button>
+                        }
+                    />
+                ) : chapitres.length === 0 ? (
                     <EtatVide
                         illustration={ListTree}
                         titre="Le programme de cette matière arrive"
@@ -200,7 +257,10 @@ function CarteChapitre({
                 )}
             </div>
             <ul className="divide-y border-t">
-                {chapitre.notions.map((notion) =>
+                {chapitre.notions.map((notion) => [
+                    notion.etat !== null && (
+                        <EnteteNotion key={`n${notion.id}`} notion={notion} />
+                    ),
                     notion.lecons.length === 0 ? (
                         <li
                             key={notion.id}
@@ -223,7 +283,7 @@ function CarteChapitre({
                             <LigneLecon key={lecon.uuid} lecon={lecon} />
                         ))
                     ),
-                )}
+                ])}
             </ul>
         </li>
     );
@@ -289,6 +349,54 @@ function LigneLecon({ lecon }: { lecon: LeconListe }) {
                     </span>
                 </span>
             </Link>
+        </li>
+    );
+}
+
+function Filtre({
+    href,
+    actif,
+    children,
+}: {
+    href: string;
+    actif: boolean;
+    children: React.ReactNode;
+}) {
+    return (
+        <Link
+            href={href}
+            prefetch
+            preserveScroll
+            aria-current={actif ? 'page' : undefined}
+            className={cn(
+                'rounded-[8px] px-3 py-1.5 text-aide font-medium outline-none focus-visible:outline-2 focus-visible:outline-ring',
+                actif
+                    ? 'bg-relief text-ink-900 shadow-xs ring-1 ring-black/5'
+                    : 'text-ink-600 hover:text-ink-900',
+            )}
+        >
+            {children}
+        </Link>
+    );
+}
+
+/** La notion et sa maîtrise, au-dessus de ses leçons (lot 6). */
+function EnteteNotion({ notion }: { notion: Chapitre['notions'][number] }) {
+    const etat = notion.etat ? ETATS_NOTION[notion.etat] : null;
+
+    return (
+        <li className="flex items-center gap-3 bg-craie-100/50 px-5 py-2 dark:bg-white/[0.02]">
+            <span className="min-w-0 flex-1 truncate text-aide font-semibold text-ink-600">
+                {notion.titre}
+            </span>
+            {notion.maitrise !== null && (
+                <span className="text-aide font-semibold font-data">
+                    {notion.maitrise} %
+                </span>
+            )}
+            {etat && (
+                <Etiquette variant={etat.variante}>{etat.libelle}</Etiquette>
+            )}
         </li>
     );
 }

@@ -372,6 +372,42 @@
   ce qu'affiche « Tes réponses », une capture.
 - État : à faire
 
+### [Lot 6] Trois séances préparées faites en mode avion, sur un vrai téléphone
+- Pourquoi : HL4 (HORS_LIGNE.md A.10) est vérifié en Vitest (séances
+  rangées, « Commencer » hors ligne, trace locale) et en Pest (séance
+  remplacée encore acceptée), pas sur un Android d'entrée de gamme avec une
+  vraie coupure, ni sur plusieurs jours.
+- Matériel : Android d'entrée de gamme, application installée (HTTPS, D11),
+  un compte élève qui a des questions publiées dans au moins deux matières.
+- Comment le provoquer : en ligne, ouvrir l'accueil (l'instantané part) ;
+  passer en **mode avion** ; « Commencer » → faire la séance jusqu'au bout ;
+  revenir à l'accueil, « Commencer » encore → la **deuxième** séance doit
+  s'ouvrir, puis la troisième. Le lendemain, toujours hors ligne, rouvrir
+  l'accueil. Couper le mode avion.
+- Quoi observer : chaque « Commencer » ouvre une séance différente, sans
+  écran blanc ; sous la jauge « N réponses pas encore comptées » augmente ;
+  la série compte le jour (« compte provisoire ») ; au retour du réseau, la
+  file se vide, la jauge change **une fois**, le compteur disparaît, la
+  série reste juste ; dans « Ma progression », les notions travaillées ont
+  une prochaine révision.
+- En cas d'échec, relever : la séance ouverte (ou le message), le compteur,
+  une capture de l'accueil avant et après le retour du réseau, l'heure du
+  téléphone.
+- État : à faire (bloqué par D11 : pas de service worker sans HTTPS)
+
+### [Lot 6] Série et jour de grâce sur une vraie semaine
+- Pourquoi : la grâce est testée sur des dates fixées (MotivationTest),
+  pas sur un vrai calendrier avec l'heure du téléphone.
+- Comment le provoquer : un élève fait une réponse lundi, mardi, rien
+  mercredi, une réponse jeudi ; regarder « Ma série » jeudi soir, puis ne
+  rien faire vendredi ni samedi et regarder dimanche.
+- Quoi observer : jeudi, 3 jours et une étoile mercredi ; dimanche, la
+  série recommence (« Nouvelle série — on repart ce soir »), sans message
+  culpabilisant.
+- En cas d'échec, relever : les captures de « Ma série » chaque jour et
+  l'heure du téléphone.
+- État : à faire
+
 ## 7. Paiements réels — Orange Money, MTN MoMo, codes prépayés
 
 *(aucune entrée)*

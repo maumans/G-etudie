@@ -31,7 +31,7 @@ class TerminerSeance implements GestionnaireOperation
         $seance = Seance::query()->where('uuid', $charge['seance'])->first()
             ?? throw new OperationRejetee('Cette séance n\'existe plus.');
 
-        $seance = $this->seances->terminer($contexte->auteur, $seance, $contexte->saisiLe);
+        $seance = $this->seances->terminer($contexte->auteur, $seance, $contexte->saisiLe, $contexte->recuLe);
 
         return ['termine_le' => $seance->termine_le?->toIso8601ZuluString('millisecond')];
     }

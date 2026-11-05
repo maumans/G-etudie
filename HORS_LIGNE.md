@@ -658,7 +658,7 @@ hors ligne ; les packs viennent ensuite.
 | HL2 | Tentatives et séances | ✅ fait (lots 2 et 3) : neuf types par la file, auto-évaluation, correction contre la version vue (A.9), séance complète en mode avion (A.14 n° 24) | 4 / 4 |
 | — | Lot 4 (sans lot HL) : `signalement.creer`, objet de contenu des annales, liste blanche | ✅ fait (2026-10-31), B.3 « Lot 4 » | 4 / 5 (packs au lot 7) |
 | HL3 | Examen blanc | ✅ fait (lot 5, 2026-11-05) : sauvegarde continue, chronomètre depuis l'heure de début, `examen_blanc.terminer`, horloge signalée ; lancement depuis un pack au lot 7 | 4 / 4 |
-| HL4 | Jauge, séances pré-calculées, trace | ⬜ à faire | 0 / 3 |
+| HL4 | Jauge, séances pré-calculées, trace | ✅ fait (lot 6, 2026-11-05) : dernière jauge du serveur + réponses pas encore comptées, 3 séances préparées faites hors ligne, trace complétée sur l'appareil ; « par matière téléchargée » au lot 7 (écart n° 23) | 3 / 3 |
 | HL5 | Packs | ⬜ à faire | 0 / 7 |
 | HL6 | Profils et session | ⬜ à faire | 0 / 4 |
 | HL7 | Budgets | ⬜ à faire | 0 / 2 |
@@ -888,6 +888,41 @@ hors ligne ; les packs viennent ensuite.
   (aujourd'hui : depuis la copie de la fiche d'annale déjà ouverte en
   ligne).
 
+### HL4 — Jauge, séances pré-calculées, trace (A.10, lot 6)
+
+- [x] **Jauge hors ligne** (HL-D7) : maîtrise et jauge calculées par
+  `App\Services\MaitriseService` seulement. `GET /eleve/instantane`
+  (`TableauDeBordEleveService::instantane`, `no-store`, jamais copié par
+  le service worker) donne la jauge, la série et les séances préparées ;
+  l'appareil les range dans la table Dexie `progression`
+  (`lib/progression/locale.ts`). L'accueil et « Ma progression »
+  affichent **la plus récente** des deux jauges du serveur (page ou
+  gardée, `calcule_le`) et « N réponses pas encore comptées » (les
+  `tentative.enregistrer` du profil encore en file). L'instantané est relu
+  à l'ouverture de ces écrans en ligne et **chaque fois que la file se
+  vide** (`rafraichirInstantane`, `lib/hors-ligne/index.ts`). Preuve :
+  Vitest `progression.test.ts` (9), Pest `SeancesPrepareesTest`,
+  `JaugeScenarioTest` (jauge relue par la route de l'appareil).
+- [x] **Séances préparées d'avance** : le serveur en tient toujours
+  **trois** (`SeanceService::aVenir`, `seances.jour` vide, `rang` 1 à 3),
+  sans question en double ; « Commencer » en ligne ouvre la première — la
+  même que l'appareil a gardée. Leurs props sont celles de l'écran
+  (`SeanceService::props`), rangées dans `contenus` sous `seance:<uuid>`
+  (comme un pack, A.4) : hors ligne, « Commencer » ouvre la suivante non
+  terminée (`prochaineSeanceLocale`, `afficherDepuisLaBase`) ; aucun choix
+  de questions sur l'appareil. Une réponse comptée **remplace** les
+  séances préparées (`remplacee_le`), sans les supprimer : un appareil
+  resté hors ligne y répond encore, elles prennent le jour du premier
+  geste (`SeanceService::demarrer`). Une séance encore citée par la file
+  reste sur l'appareil. Preuve : Pest `SeancesPrepareesTest` (8), Vitest.
+- [x] **Trace** : la série est calculée par `MotivationService`, au jour
+  du geste (`saisi_le`) ; l'appareil ajoute les jours de ses réponses
+  encore en file (« commencé », jour compté, « compte provisoire »), le
+  serveur confirme à la synchronisation (`traceAvecLocal`). Preuve :
+  Vitest, Pest `MotivationTest` (jour reçu deux jours plus tard).
+- [ ] **Reste au lot 7 (HL5)** : trois séances **par matière téléchargée**
+  (écart n° 23) ; contrôle sur vrai téléphone (`A_TESTER.md`, lot 6).
+
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
@@ -1089,6 +1124,14 @@ hors ligne ; les packs viennent ensuite.
     serveur ne voit l'examen qu'à la fin (`examen_blanc.terminer`), comme
     le prévoit A.8 ; l'`uuid` de l'examen est celui de l'opération
     (`NouveauGeste.uuid`, ajouté au moteur).
+
+23. **2026-11-05 — Trois séances d'avance, pas « par matière
+    téléchargée ».** A.10 prévoit les 3 prochaines séances de chaque
+    matière téléchargée ; les packs n'arrivent qu'au lot 7. Au lot 6, le
+    serveur prépare trois séances toutes matières confondues (le choix
+    alterne déjà les matières) ; le découpage par matière viendra avec les
+    packs. L'instantané passe par `GET /eleve/instantane` et non par
+    `GET /sync/etat`, qui reste un battement de moins de 1 Ko (A.11).
 
 ## B.6 Points de vigilance
 

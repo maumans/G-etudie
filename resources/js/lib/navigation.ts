@@ -1,5 +1,6 @@
 import {
     Activity,
+    ChartPie,
     BookOpen,
     ChartNoAxesCombined,
     CircleUser,
@@ -21,7 +22,11 @@ import { accueil as accueilContenu } from '@/routes/contenu';
 import { index as indexLecons, relecture } from '@/routes/contenu/lecons';
 import { index as indexQuestions } from '@/routes/contenu/questions';
 import { index as matieresReferentiel } from '@/routes/contenu/referentiel/matieres';
-import { accueil as accueilEleve, cours as coursEleve } from '@/routes/eleve';
+import {
+    accueil as accueilEleve,
+    cours as coursEleve,
+    progression as progressionEleve,
+} from '@/routes/eleve';
 import { index as annalesEleve } from '@/routes/eleve/annales';
 import { index as examensBlancs } from '@/routes/eleve/examens-blancs';
 import { index as indexAnnales } from '@/routes/contenu/annales';
@@ -55,6 +60,13 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         icone: Timer,
         href: examensBlancs().url,
         actifSous: '/eleve/examens-blancs',
+    },
+    {
+        libelle: 'Ma progression',
+        icone: ChartPie,
+        href: progressionEleve().url,
+        actifSous: '/eleve/progression',
+        lateralSeulement: true,
     },
     {
         libelle: 'Moi',

@@ -13,7 +13,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([RolesEtPermissionsSeeder::class, ReferentielSeeder::class]);
+        $this->call([SocleSeeder::class, ReferentielSeeder::class]);
 
         if (! app()->isProduction()) {
             $this->call(DemoSeeder::class);

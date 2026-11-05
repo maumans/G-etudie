@@ -6,6 +6,7 @@ use App\Enums\EtatLecon;
 use App\Models\Lecon;
 use App\Models\ProfilEleve;
 use App\Models\ProgressionLecon;
+use App\Models\Question;
 use App\Models\Seance;
 use App\Models\Tentative;
 use App\Models\User;
@@ -17,17 +18,16 @@ use Illuminate\Support\Collection;
 /**
  * Les données de l'accueil élève (DESIGN.md § 6.0), assemblées depuis les
  * services qui font autorité : jauge (MaitriseService), séance du jour
- * (SeanceService), leçons visibles (CatalogueEleve). Ce service ne décide
+ * (SeanceService), motivation (MotivationService), leçons visibles
+ * (CatalogueEleve). Ce service ne décide
  * rien lui-même ; il met en forme.
  */
 class TableauDeBordEleveService
 {
-    /** Jours de la semaine, du lundi au dimanche. */
-    private const JOURS = ['Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa', 'Di'];
-
     public function __construct(
         private MaitriseService $maitrise,
         private SeanceService $seances,
+        private MotivationService $motivation,
     ) {}
 
     /**
@@ -38,7 +38,6 @@ class TableauDeBordEleveService
         $maintenant ??= CarbonImmutable::now();
         $lecons = CatalogueEleve::lecons($profil)->with(['notion.chapitre.matiere', 'versionPubliee'])->get();
         $progressions = ProgressionLecon::query()->where('user_id', $eleve->id)->get()->keyBy('lecon_id');
-        $epreuves = CatalogueEleve::epreuves($profil);
 
         return [
             'est_exemple' => $lecons->contains('est_exemple', true)
@@ -47,15 +46,20 @@ class TableauDeBordEleveService
             'compte_a_rebours' => $this->compteARebours($profil, $maintenant),
             'jauge' => $this->maitrise->jauge($profil),
             'seance' => $this->seance($eleve, $profil),
-            'serie' => $this->serie($eleve, $maintenant),
-            'progression' => $epreuves->map(function ($epreuve) use ($lecons, $progressions) {
-                $sienne = $lecons->filter(fn (Lecon $lecon) => $lecon->notion->chapitre->matiere_id === $epreuve->matiere_id);
+            'serie' => $this->motivation->serie($eleve->id, $maintenant),
+            'points' => $this->motivation->points($eleve->id),
+            'defi' => $this->motivation->defi($profil, $maintenant),
+            'reussites' => $this->reussites($eleve),
+            'progression' => $this->maitrise->parMatiere($profil)->map(function (array $matiere) use ($lecons, $progressions) {
+                $siennes = $lecons->filter(fn (Lecon $lecon) => $lecon->notion->chapitre->matiere_id === $matiere['matiere_id']);
 
                 return [
-                    'cle' => $epreuve->matiere->teinte->value,
-                    'slug' => $epreuve->matiere->slug,
-                    'lecons' => $sienne->count(),
-                    'lecons_comprises' => $sienne->filter(
+                    'cle' => $matiere['cle'],
+                    'slug' => $matiere['slug'],
+                    'notions' => $matiere['notions'],
+                    'notions_maitrisees' => $matiere['maitrisees'],
+                    'lecons' => $siennes->count(),
+                    'lecons_comprises' => $siennes->filter(
                         fn (Lecon $lecon) => $progressions->get($lecon->id)?->etat === EtatLecon::Comprise,
                     )->count(),
                 ];
@@ -88,18 +92,21 @@ class TableauDeBordEleveService
     private function seance(User $eleve, ProfilEleve $profil): array
     {
         $enCours = $this->seances->enCours($eleve);
-        $disponibles = CatalogueEleve::questions($profil)->count();
+        // Sinon, la première des séances préparées : ce que l'accueil annonce
+        // est ce que « Commencer » ouvre, en ligne comme hors ligne (HL4).
+        $prochaine = $enCours ?? $this->seances->aVenir($eleve, $profil)->first();
         $termineeAujourdhui = Seance::query()
             ->where('user_id', $eleve->id)
             ->whereDate('jour', CarbonImmutable::today())
             ->whereNotNull('termine_le')
             ->exists();
 
-        $matieres = CatalogueEleve::questions($profil)
+        $matieres = $prochaine === null ? [] : Question::query()
             ->with('notion.chapitre.matiere')
-            ->when($enCours !== null, fn ($requete) => $requete->whereKey($enCours->questions))
+            ->whereKey($prochaine->questions)
             ->get()
-            ->map(fn ($question) => $question->notion->chapitre->matiere->teinte->value)
+            ->sortBy(fn (Question $question) => array_search($question->id, $prochaine->questions, true))
+            ->map(fn (Question $question) => $question->notion->chapitre->matiere->teinte->value)
             ->unique()
             ->take(3)
             ->values()
@@ -108,9 +115,7 @@ class TableauDeBordEleveService
         return [
             'en_cours' => $enCours?->uuid,
             'repondues' => $enCours !== null ? $enCours->tentatives()->distinct()->count('question_id') : 0,
-            'questions' => $enCours !== null
-                ? count($enCours->questions)
-                : min($disponibles, SeanceService::nombreDeQuestions($profil->objectif_minutes)),
+            'questions' => $prochaine !== null ? count($prochaine->questions) : 0,
             'duree_minutes' => $profil->objectif_minutes,
             'matieres' => $matieres,
             'terminee_aujourdhui' => $termineeAujourdhui && $enCours === null,
@@ -118,50 +123,43 @@ class TableauDeBordEleveService
     }
 
     /**
-     * Série de jours : un jour compte dès qu'il y a eu une réponse ou une
-     * leçon ouverte (au jour du geste, `saisi_le`, A.6). Points, jour de
-     * grâce et objectif atteint arrivent avec la motivation (lot 6).
+     * Mes réussites : combien de badges, les trois derniers obtenus, et le
+     * prochain à gagner.
      *
      * @return array<string, mixed>
      */
-    private function serie(User $eleve, CarbonImmutable $maintenant): array
+    private function reussites(User $eleve): array
     {
-        $depuis = $maintenant->startOfDay()->subDays(60);
-        $jours = Tentative::query()->where('user_id', $eleve->id)->where('saisi_le', '>=', $depuis)->pluck('saisi_le')
-            ->concat(ProgressionLecon::query()->where('user_id', $eleve->id)->where('position_saisie_le', '>=', $depuis)->pluck('position_saisie_le'))
-            ->map(fn ($moment) => CarbonImmutable::parse($moment)->toDateString())
-            ->unique()
-            ->flip();
-
-        $aujourdhui = $maintenant->startOfDay();
-        $suite = 0;
-        $jour = $jours->has($aujourdhui->toDateString()) ? $aujourdhui : $aujourdhui->subDay();
-
-        while ($jours->has($jour->toDateString())) {
-            $suite++;
-            $jour = $jour->subDay();
-        }
-
-        $lundi = $aujourdhui->startOfWeek();
-        $semaine = [];
-
-        foreach (self::JOURS as $rang => $nom) {
-            $date = $lundi->addDays($rang);
-            $semaine[] = [
-                'jour' => $nom,
-                'etat' => match (true) {
-                    $jours->has($date->toDateString()) => 'fait',
-                    $date->equalTo($aujourdhui) => 'en_cours',
-                    $date->greaterThan($aujourdhui) => 'a_venir',
-                    default => 'manque',
-                },
-            ];
-        }
+        $badges = collect($this->motivation->badges($eleve->id));
+        $obtenus = $badges->whereNotNull('obtenu_le')->sortByDesc('obtenu_le')->values();
 
         return [
-            'jours' => $suite,
-            'reponses_semaine' => Tentative::query()->where('user_id', $eleve->id)->where('saisi_le', '>=', $lundi)->count(),
-            'semaine' => $semaine,
+            'obtenus' => $obtenus->count(),
+            'total' => $badges->count(),
+            'derniers' => $obtenus->take(3)->all(),
+            'prochain' => $badges->firstWhere('obtenu_le', null),
+        ];
+    }
+
+    /**
+     * L'instantané de l'élève pour l'appareil (HL4, HORS_LIGNE.md A.10) :
+     * la dernière jauge du serveur, la série confirmée et les trois
+     * prochaines séances avec **les props mêmes** de leur écran, pour les
+     * faire hors ligne. Lu après chaque synchronisation.
+     *
+     * @return array<string, mixed>
+     */
+    public function instantane(User $eleve, ProfilEleve $profil): array
+    {
+        return [
+            'calcule_le' => CarbonImmutable::now()->toIso8601ZuluString('millisecond'),
+            'jauge' => $this->maitrise->jauge($profil),
+            'serie' => $this->motivation->serie($eleve->id),
+            'seances' => $this->seances->aVenir($eleve, $profil)->map(fn (Seance $seance) => [
+                'uuid' => $seance->uuid,
+                'rang' => $seance->rang,
+                'props' => $this->seances->props($seance),
+            ])->values()->all(),
         ];
     }
 

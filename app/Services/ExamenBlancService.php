@@ -37,7 +37,10 @@ class ExamenBlancService
     /** Au-delà de la durée, la marge tolérée avant de signaler l'horloge. */
     public const MARGE_MINUTES = 5;
 
-    public function __construct(private TentativeService $tentatives) {}
+    public function __construct(
+        private TentativeService $tentatives,
+        private MotivationService $motivation,
+    ) {}
 
     /**
      * @param  array<string, array{version: int, reponse: array<string, mixed>|null, criteres: list<string>|null}>  $reponses  par uuid de question
@@ -129,6 +132,8 @@ class ExamenBlancService
                 'motif_horloge' => $motif,
                 'recu_le' => $recuLe,
             ]);
+            // Lot 6 : série, points et badges.
+            $this->motivation->apresExamenBlanc($examen);
 
             return $this->resultat($examen);
         });

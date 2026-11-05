@@ -14,6 +14,7 @@ use App\Models\ProgressionLecon;
 use App\Services\MaitriseService;
 use App\Support\BlocsContenu;
 use App\Support\CatalogueEleve;
+use Carbon\CarbonImmutable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Inertia\Inertia;
@@ -53,10 +54,25 @@ class CoursController extends Controller
         ]);
     }
 
-    public function matiere(Request $request, Matiere $matiere): Response
+    /**
+     * Une matière. `?faibles=1` (lot 6, depuis un segment de la jauge,
+     * DESIGN.md § 6.1) : seulement les notions à revoir, fragiles ou en
+     * cours — filtrées ici, pas dans la page.
+     */
+    public function matiere(Request $request, Matiere $matiere, MaitriseService $maitrise): Response
     {
         $profil = $this->profil($request);
         abort_unless(CatalogueEleve::voitMatiere($profil, $matiere), 404);
+
+        $faibles = $request->boolean('faibles');
+        $aujourdhui = CarbonImmutable::now();
+        $maitrises = $maitrise->maitrises($request->user()->id);
+        $evaluables = $maitrise->notionsEvaluables($profil)->keyBy('id');
+        $etatDe = fn (Notion $notion): ?string => $evaluables->has($notion->id)
+            ? MaitriseService::etat($maitrises->get($notion->id), $aujourdhui)
+            : null;
+        $estFaible = fn (Notion $notion): bool => in_array($etatDe($notion), ['a_revoir', 'fragile', 'en_cours'], true);
+        $resume = $maitrise->parMatiere($profil)->firstWhere('matiere_id', $matiere->id);
 
         $lecons = CatalogueEleve::lecons($profil, $matiere)->with('versionPubliee')->get()->groupBy('notion_id');
         $progressions = $this->progressions($request);
@@ -67,12 +83,16 @@ class CoursController extends Controller
             'examen' => $profil->libelleExamen(),
             'est_exemple' => $lecons->flatten()->contains('est_exemple', true),
             'questions' => CatalogueEleve::questions($profil, $matiere)->count(),
+            'maitrise' => $resume['maitrise'] ?? 0,
+            'faibles' => $faibles,
             'chapitres' => $chapitres->map(fn (Chapitre $chapitre) => [
                 'id' => $chapitre->id,
                 'titre' => $chapitre->titre,
-                'notions' => $chapitre->notions->map(fn (Notion $notion) => [
+                'notions' => $chapitre->notions->filter(fn (Notion $notion) => ! $faibles || $estFaible($notion))->map(fn (Notion $notion) => [
                     'id' => $notion->id,
                     'titre' => $notion->titre,
+                    'maitrise' => $maitrises->get($notion->id)?->score,
+                    'etat' => $etatDe($notion),
                     'lecons' => ($lecons->get($notion->id) ?? collect())->map(fn (Lecon $lecon) => [
                         'uuid' => $lecon->uuid,
                         'titre' => $lecon->versionPubliee->titre ?? $lecon->titre,
@@ -81,7 +101,7 @@ class CoursController extends Controller
                         'position' => $progressions->get($lecon->id)->position ?? 0,
                     ])->values()->all(),
                 ])->values()->all(),
-            ])->values()->all(),
+            ])->filter(fn (array $chapitre) => ! $faibles || $chapitre['notions'] !== [])->values()->all(),
         ]);
     }
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Eleve\CoursController;
 use App\Http\Controllers\Eleve\ExamenBlancController;
 use App\Http\Controllers\Eleve\LeconController;
 use App\Http\Controllers\Eleve\ParcoursAccueilController;
+use App\Http\Controllers\Eleve\ProgressionController;
 use App\Http\Controllers\Eleve\SeanceController;
 use App\Http\Controllers\Eleve\SignalementController;
 use App\Http\Middleware\ProfilEleveRequis;
@@ -47,5 +48,10 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value])
             // par la file (`examen_blanc.terminer`).
             Route::get('examens-blancs', [ExamenBlancController::class, 'index'])->name('examens-blancs.index');
             Route::get('examens-blancs/{examen}', [ExamenBlancController::class, 'show'])->name('examens-blancs.show');
+
+            // Lot 6 : « Ma progression » ; l'instantané (jauge, série, trois
+            // séances préparées) que l'appareil garde pour le hors ligne (HL4).
+            Route::get('progression', [ProgressionController::class, 'index'])->name('progression');
+            Route::get('instantane', [ProgressionController::class, 'instantane'])->name('instantane');
         });
     });

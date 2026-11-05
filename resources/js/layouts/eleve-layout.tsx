@@ -71,7 +71,9 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
                 aria-label="Espace élève"
                 className="fixed inset-x-0 bottom-0 z-30 flex border-t bg-card/95 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_-8px_rgb(16_16_24/0.08)] backdrop-blur-md lg:hidden print:hidden"
             >
-                {NAVIGATION_ELEVE.map((entree) => (
+                {NAVIGATION_ELEVE.filter(
+                    (entree) => !entree.lateralSeulement,
+                ).map((entree) => (
                     <LienNavigation
                         key={entree.libelle}
                         entree={entree}

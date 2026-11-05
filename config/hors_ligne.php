@@ -29,6 +29,10 @@ return [
         '/eleve/signalements$',
         // Lot 5 : l'historique et les résultats se relisent d'après leur copie.
         '/eleve/examens-blancs',
+        // Lot 6 : « Ma progression » se relit d'après sa copie, complétée de
+        // la dernière jauge gardée (HL4). L'instantané (/eleve/instantane)
+        // n'est jamais copié : c'est une donnée, rangée dans la base locale.
+        '/eleve/progression$',
         '/compte/affichage$',
     ],
 

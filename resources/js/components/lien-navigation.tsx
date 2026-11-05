@@ -23,6 +23,11 @@ export type EntreeNavigation = {
     actifAussiSous?: string[];
     /** Entrée tue pour un compte sans cette permission (la route reste gardée). */
     permission?: Permission;
+    /**
+     * Barre latérale seulement : la barre d'onglets du téléphone garde ses
+     * cinq entrées (lot 6, « Ma progression » s'y ouvre depuis la jauge).
+     */
+    lateralSeulement?: boolean;
 };
 
 const STYLES = {
