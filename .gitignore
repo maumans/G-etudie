@@ -46,3 +46,4 @@ yarn-error.log
 /test-results
 /tests/visuel/.auth
 /playwright-report
+/docs
