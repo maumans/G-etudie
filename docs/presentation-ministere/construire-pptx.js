@@ -283,30 +283,7 @@ titre(s, 'Des utilisateurs mineurs : ', 'la prudence par défaut');
 });
 s.addNotes("La plupart des élèves sont mineurs. Ces règles sont dans le cahier des charges dès le départ et vérifiées par des tests automatiques.");
 
-// ---------- 14. Feuille de route ----------
 pres.addSection({ title: 'La suite' });
-s = pres.addSlide({ masterName: 'CONTENU', sectionTitle: 'La suite' });
-rubrique(s, 'Feuille de route');
-titre(s, 'Ce qui est fait, ', 'ce qui vient');
-const etapes = [
-    ['Fait', 'Socle, comptes, hors ligne de base'], ['Fait', 'Référentiel et rédaction avec relecture'],
-    ['Fait', 'Cours, accueil, inscription'], ['Fait', 'Exercices, indices, corrigés'],
-    ['Fait', 'Annales, import, signalements'], ['Fait', 'Examen blanc chronométré'],
-    ['Fait', 'Progression, révision espacée, motivation'], ['Suivant', 'Hors ligne complet'],
-    ['À venir', 'Mise en ligne publique'], ['À venir', 'Abonnements, Orange Money, MTN MoMo'],
-    ['À venir', 'Tuteur par intelligence artificielle'], ['À venir', 'Parents, enseignants, établissements'],
-    ['À venir', 'Essai avec de vrais élèves'],
-];
-etapes.forEach(([etat, texte], i) => {
-    const col = Math.floor(i / 7); const lig = i % 7;
-    const x = 0.6 + col * 6.2; const y = 1.85 + lig * 0.68;
-    const couleur = etat === 'Fait' ? C.accent5 : etat === 'Suivant' ? C.accent1 : 'C8BEB6';
-    s.addShape(pres.shapes.OVAL, { x, y: y + 0.08, w: 0.38, h: 0.38, fill: { color: couleur }, line: { type: 'none' }, objectName: `etape-${i}` });
-    s.addText([{ text: `${texte}  `, options: { color: C.text1 } }, { text: etat, options: { color: etat === 'Fait' ? C.accent5 : etat === 'Suivant' ? C.accent3 : C.text2, bold: true } }], { x: x + 0.55, y, w: 5.5, h: 0.55, fontSize: 15, margin: 0, valign: 'middle', isTextBox: true });
-});
-carte(s, 6.8, 6.0, 5.95, 0.92, '1 248 tests automatiques', 'Chaque écran vérifié sur téléphone, tablette et ordinateur.', 'encre');
-s.addNotes("Sept étapes sur quatorze sont faites, dont tout l'espace élève et l'espace de l'équipe pédagogique. La version de lancement correspond aux étapes 0 à 8, avec les matières à plus fort coefficient du BEPC et du Bac.");
-
 // ---------- 15. La demande ----------
 s = pres.addSlide({ masterName: 'CONTENU_CREME', sectionTitle: 'La suite' });
 rubrique(s, 'Notre proposition');
@@ -322,7 +299,7 @@ s.addImage({ path: img('illus-favicon.png'), x: 0.7, y: 0.55, w: 0.55, h: 0.55, 
 s.addText([{ text: 'Un soir, quinze minutes, ', options: {} }, { text: 'et je sais où j’en suis.', options: { bold: true } }], { x: 0.7, y: 1.8, w: 5.2, h: 2.4, fontSize: 40, color: C.text1, margin: 0, valign: 'top', isTextBox: true });
 s.addText('Merci de votre attention. Démonstration en direct sur téléphone ou ordinateur.', { x: 0.7, y: 4.35, w: 5.1, h: 0.8, fontSize: 16, color: C.text2, margin: 0, isTextBox: true });
 s.addText([{ text: 'VISION FUTURE – ENTREPRISES Sarlu', options: { bold: true, fontSize: 14, breakLine: true } }, { text: 'Kountya, Coyah — République de Guinée', options: { fontSize: 12, color: C.text2 } }], { x: 0.7, y: 5.8, w: 5.2, h: 0.7, margin: 0, color: C.text1, isTextBox: true });
-s.addNotes('Remerciez, puis passez à la démonstration en direct (compte élève de démonstration).');
+s.addNotes("Remerciez, puis passez à la démonstration en direct (compte élève de démonstration).\n\nSi l'on vous demande ce qui reste à faire ou quand ce sera disponible, réponse courte et honnête : « L'outil élève et l'outil de l'équipe pédagogique fonctionnent, vous venez de les voir. Ce qui reste dépend en grande partie de vous : le contenu officiel. Viendront ensuite la mise en ligne publique, le paiement par mobile money et un tuteur qui explique les corrigés. Nous proposons de commencer par un essai pilote dans quelques établissements. » Ne donnez pas de date ferme.");
 
 (async () => {
     await pres.writeFile({ fileName: SORTIE });
