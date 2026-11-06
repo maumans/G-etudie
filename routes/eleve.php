@@ -6,6 +6,7 @@ use App\Http\Controllers\Eleve\AnnaleController;
 use App\Http\Controllers\Eleve\CoursController;
 use App\Http\Controllers\Eleve\ExamenBlancController;
 use App\Http\Controllers\Eleve\LeconController;
+use App\Http\Controllers\Eleve\PackController;
 use App\Http\Controllers\Eleve\ParcoursAccueilController;
 use App\Http\Controllers\Eleve\ProgressionController;
 use App\Http\Controllers\Eleve\SeanceController;
@@ -53,5 +54,15 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value])
             // séances préparées) que l'appareil garde pour le hors ligne (HL4).
             Route::get('progression', [ProgressionController::class, 'index'])->name('progression');
             Route::get('instantane', [ProgressionController::class, 'instantane'])->name('instantane');
+
+            // Lot 7 (HL5) : téléchargements. L'écran se relit hors ligne ;
+            // les routes JSON des packs ne sont jamais copiées par le
+            // service worker (hors de sa liste blanche).
+            Route::get('telechargements', [PackController::class, 'index'])->name('telechargements');
+            Route::post('packs/{pack}/prendre', [PackController::class, 'prendre'])->name('packs.prendre');
+            Route::get('packs/{pack}/manifeste', [PackController::class, 'manifeste'])->name('packs.manifeste');
+            Route::get('packs/{pack}/morceaux/{numero}', [PackController::class, 'morceau'])->whereNumber('numero')->name('packs.morceau');
+            Route::post('packs/{pack}/elements', [PackController::class, 'elements'])->name('packs.elements');
+            Route::delete('packs/{pack}', [PackController::class, 'retirer'])->name('packs.retirer');
         });
     });

@@ -57,7 +57,11 @@ class ProgressionController extends Controller
     public function instantane(Request $request, TableauDeBordEleveService $tableau): JsonResponse
     {
         return response()
-            ->json($tableau->instantane($request->user(), $this->profil($request)))
+            ->json($tableau->instantane(
+                $request->user(),
+                $this->profil($request),
+                array_values(array_filter(explode(',', $request->string('matieres')->toString()))),
+            ))
             ->header('Cache-Control', 'no-store');
     }
 

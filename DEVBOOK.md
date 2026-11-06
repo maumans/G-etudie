@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-05, lot 6)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-06, lot 7)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -19,11 +19,26 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-05 (lot 6 fait ; lot 0 en attente de D11)
+### État au 2026-11-06 (lot 7 fait ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte les lots 0 à 6. Les lots 3 à 6 ont été
+- **Dépôt git** : `main` porte les lots 0 à 7. Les lots 3 à 7 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 7 fait** (point 21) : **packs** (HL5) — une matière se télécharge
+  (« Téléchargements », poids affiché avant), par morceaux, reprise après
+  coupure, mise à jour **différentielle** ; hors ligne, sa page, ses
+  leçons, ses fiches et ses annales s'ouvrent **depuis le pack**, même
+  jamais ouvertes en ligne, et « M'entraîner » ouvre l'une de ses **trois
+  séances préparées** ; droits HL-D3 (un pack gratuit ; abonnés au lot 9).
+  **Profils multiples** (HL6) — « Qui révise ? », code local à 4 chiffres,
+  jeton de profil (changer de profil sans mot de passe, réponses de chaque
+  profil au bon nom), « Ordinateur partagé », « Mon compte › Appareils ».
+  **Budgets** (HL7) mesurés par `budgets.spec.ts` (coquille 272 Ko). **Critère
+  tenu** : `parcours-lot7.spec.ts` (mode avion, séance complète,
+  rechargement, retour du réseau → un seul envoi). ⚠ **Au déploiement :
+  `php artisan packs:generer`** après `migrate` et `db:seed`, et le
+  planificateur (`schedule:run`) pour la regénération de nuit ; un
+  `queue:work` pour les regénérations à la publication.
 - **Lot 6 fait** (point 20) : **maîtrise par notion** (scores récents
   pondérés, confiance à 3 réponses), **révision espacée** (1, 3, 7, 14,
   30 jours), **jauge** par matière pondérée par les coefficients saisis,
@@ -157,7 +172,9 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
-- **Tests** : 482 Pest (MySQL `g_etudie_test`, rôles et badges semés une
+- **Tests (lot 7)** : **511 Pest, 341 Vitest, 479 Playwright** (écrans des lots 0 à 7, 5 connexions, 7 parcours, socle hors ligne, 3 budgets ; captures sur le build). Dernier passage complet : 478 / 479 — le parcours « deux profils » a échoué une fois (course de session, voir « Pièges ») ; corrigé, puis 8 passages verts de suite. `tsc`, `vp check`, Pint, Larastan niveau 7 et `npm run build` passent. Sur ce poste, lancer
+  Playwright en série (`--workers=1`) et sans `npm run dev`.
+- **Tests (lot 6)** : 482 Pest (MySQL `g_etudie_test`, rôles et badges semés une
   fois par `TestCase`, `SocleSeeder`), 322 Vitest, Playwright (sessions par
   compte, écrans des lots 0 à 6, parcours d'inscription, parcours des
   critères des lots 1, 2, 4 et 5, séance en mode avion du lot 3, socle hors
@@ -222,13 +239,20 @@
    annonce l'examen), terminer ; « Examens blancs ». Équipe : saisir la
    **moyenne d'admission** de chaque examen (Référentiel › Épreuves) pour
    le verdict.
-7. **Lot 7** : hors ligne complet — packs téléchargeables, profils
-   multiples, copies datées, budgets mesurés (HL5 à HL7) ; les trois
-   séances préparées par matière téléchargée.
-8. **Équipe pédagogique** : saisir dans le référentiel le programme
+7. **Maurice : essayer le lot 7** — 01 Aïssatou : « Téléchargements »,
+   télécharger les Mathématiques (les autres matières disent « Avec
+   l'abonnement ») ; couper le réseau (mode avion du navigateur) : ouvrir
+   la matière, une leçon, une annale, « M'entraîner » ; revenir en ligne.
+   Puis la pastille du profil → « Qui révise ? » → choisir un code ;
+   « Ajouter un profil » → se connecter avec 09 Ousmane ; repasser à
+   Aïssatou par son code. Sur un vrai téléphone : `A_TESTER.md` (lot 7),
+   après D11.
+8. **Lot 8** : vitrine finale, SEO des annales, cartes de partage,
+   installation (critère : Lighthouse mobile ≥ 90).
+9. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
-9. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+10. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
    BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
@@ -1577,6 +1601,117 @@ cette question à sa façon. Elle distingue deux notions :
      et série sur une vraie semaine (`A_TESTER.md`, lot 6) ; trois séances
      par matière téléchargée (lot 7) ; défis saisis par l'équipe et
      classements opt-in (V1.1).
+
+21. [x] **Lot 7 — hors ligne complet : packs (HL5), profils multiples
+   (HL6), budgets (HL7)** (2026-11-06, sur `main`, un commit)
+   - **Constat** : le hors ligne gardait les écrans déjà ouverts et trois
+     séances préparées ; rien ne se téléchargeait (la table `contenus`
+     n'était remplie que par les séances), un seul profil par téléphone
+     (les gestes d'un autre profil restaient `reporte`, écart HL n° 9), pas
+     de connexion « ordinateur partagé », budgets jamais mesurés par un test.
+   - **Décisions** (proposées, acceptées par Maurice le 2026-11-06) :
+     - **droits aux packs avant le lot 9** : HL-D3 tel quel — un pack
+       gratuit au choix, qu'on échange en supprimant le sien ; la règle
+       « abonné = tous les packs de son examen, expiration fin + 7 jours »
+       est écrite et testée, active au lot 9 (`SourceAbonnements`) ;
+     - **réponses des profils non actifs** : elles partent au retour du
+       réseau avec le **jeton de profil** de leur auteur (vérifié par le
+       serveur, `enTantQue`) — lève l'écart HL n° 9 ;
+     - **ordinateur partagé** : case à la connexion, rien n'est gardé
+       (session jusqu'à la fermeture du navigateur, ni profil, ni pack, ni
+       copie).
+   - **Une autorité par règle** : `PackService` (ce que contient un pack,
+     composé pour un profil fictif : aucune donnée personnelle) ;
+     `DroitsPacks` (qui prend, qui met à jour, expiration) ;
+     `AppareilService` (jetons de profil) ; `PresentationCours` (props des
+     écrans de cours, pour la route **et** le pack — extrait de
+     `CoursController` et `LeconController`). Côté appareil :
+     `lib/hors-ligne/packs.ts`, `lib/hors-ligne/profils.ts`,
+     `lib/contenu/source.ts` (lecture depuis le pack). Détail : `HORS_LIGNE.md`
+     B.3 « HL5 », « HL6 », « HL7 ».
+   - **Écrans** : « Téléchargements » (`/eleve/telechargements`, barre
+     latérale et « Qui révise ? ») ; « Qui révise ? » (pastille du profil) ;
+     connexion « Déjà sur ce téléphone » et « Ordinateur partagé » ; « Mon
+     compte › Appareils » ; page d'une matière : invitation au pack et
+     annales. `DESIGN.md` § 13, « Lot 7 ».
+   - **Écarts** : `HORS_LIGNE.md` n° 24 à 29 — pas encore de médias (aucun
+     bloc image) ; la fiche cite ses leçons ; packs en base (JSON brut) et
+     poids compressé ; jeton de profil ; coquille servie pour un écran
+     jamais copié ; événement `offline` du navigateur.
+   - **Ajouts** : migration `2026_11_06_090000_create_packs_tables`
+     (`packs`, `pack_elements`, `packs_eleves`, `seances.matiere_id`,
+     `appareil_profils.jeton_profil_hache` / `jeton_utilise_le` /
+     `retire_le`) ; commande **`packs:generer`** (à lancer au déploiement
+     après `migrate` et `db:seed`, puis chaque nuit à 3 h par le
+     planificateur ; `DemoSeeder` la lance aussi) ; file `GenererPack`
+     (regénère les packs d'une matière à chaque publication, retrait ou
+     correction) ; routes `eleve.telechargements`, `eleve.packs.*`
+     (`can:espace.eleve`), `compte.appareils.*` et
+     `appareil.profils.retirer` (dérogations motivées dans
+     `AccesParRoleTest`), `appareil.profils.basculer` (sans session,
+     `throttle:basculer-profil`) ; middleware `OrdinateurPartage` ; journal
+     `profil.bascule`, `appareil.retire`.
+   - **Corrigé en chemin** : `PackService` laissait passer un champ de
+     travail (`est_exemple`) dans l'INSERT des éléments — invisible en
+     test, cassé sous `db:seed` (un seeder lève la protection `$fillable`,
+     trouvé par `SeederDemonstrationTest`) ; une page lue dans la base
+     locale, ou un retour arrière vers une page servie d'après sa copie,
+     faisait croire l'application en ligne ; juste après une coupure,
+     « Commencer » partait vers le serveur au lieu d'ouvrir la séance
+     gardée ; le battement présentait le jeton du profil actif au lieu de
+     celui de la session (le serveur en remettait un neuf, rangé sous le
+     mauvais profil) ; une visite Inertia ne trouvait pas la copie d'un
+     écran ouvert comme document ; le bandeau de copie datée ne s'affichait
+     plus après un rechargement hors ligne (trouvé par `hors-ligne.spec.ts`,
+     effet de bord de la détection `offline`) ; les scripts d'édition avaient remis des
+     fins de ligne CRLF dans 40 fichiers : remis en LF ; un fichier
+     (`pages/eleve/cours.tsx`) n'était pas au format du projet depuis le
+     dossier ministère : reformaté.
+   - **Vu avec Playwright** : `ecrans-lot7.spec.ts` (Téléchargements,
+     matière avec son pack, « Qui révise ? », Appareils, connexion avec deux
+     profils ; 3 tailles × 2 thèmes) — axe sans violation sérieuse, aucun
+     débordement ; corrections : `DESIGN.md` § 13, « Lot 7 ». Captures
+     régénérées volontairement, après relecture des écarts : la
+     connexion (lot 0, case « Ordinateur partagé ») ; l'accueil élève et
+     « Mon compte » (lot 0 : entrée « Téléchargements » de la barre latérale,
+     pastille du profil devenue bouton avec chevron, onglet « Appareils ») ;
+     la page d'une matière (lots 2 et 6 : invitation au pack, annales) ;
+     « Ma progression » (lot 6 : barre latérale, et la série, le défi et
+     les dates relatives que le serveur calcule à sa vraie date — ces
+     références dérivent d'un jour à l'autre, déjà au lot 6).
+   - **Preuve** : **critère** `parcours-lot7.spec.ts` — un élève neuf
+     télécharge les Mathématiques ; **en mode avion**, la matière, une
+     leçon, une fiche et une annale **jamais ouvertes en ligne** s'ouvrent
+     depuis le pack, la leçon **rechargée** hors ligne se rouvre, une séance
+     de la matière se fait jusqu'au bilan, rechargement ; **retour du
+     réseau → chaque geste reçu une fois, tous acceptés**. Second parcours :
+     deux profils sur un téléphone, chacun répond hors ligne, changement de
+     profil par le code sans réseau ; au retour, chaque réponse au nom de
+     son auteur, la session suit le profil choisi. Pest `PacksTest` (16 :
+     A.14 n° 8 et 9), `ProfilsAppareilTest` (15) ; Vitest `packs.test.ts`
+     (12 : n° 22 et 23), `profils.test.ts` (5), `moteur.test.ts` (+1),
+     `gnf.test.ts` (+1) ; budgets `budgets.spec.ts` (A.14 n° 25, chiffres
+     dans `HORS_LIGNE.md` B.4). Totaux : **511 Pest, 341 Vitest, 479 Playwright** (écrans des lots 0 à 7, 5 connexions, 7 parcours, socle hors ligne, 3 budgets ; captures sur le build). Dernier passage complet : 478 / 479 — le parcours « deux profils » a échoué une fois (course de session, voir « Pièges ») ; corrigé, puis 8 passages verts de suite. `tsc`, `vp check`, Pint, Larastan niveau 7 et `npm run build` passent.
+   - **Pièges rencontrés** : `page.waitForFunction` avec une fonction
+     asynchrone n'attend pas (la promesse est « vraie ») : `expect.poll`. Un
+     parcours lancé par son nom de fichier relance d'abord toutes les
+     captures (projets Playwright dépendants) : `--no-deps` pour le rejouer
+     seul. Chaque contexte Playwright enregistre un appareil pour Aïssatou
+     (des milliers) : « Appareils » n'en montre que dix. Le parcours du
+     lot 4 demande un `php artisan queue:work` (import assisté), et les
+     regénérations de packs aussi. **Course de session** : changer de
+     profil régénère la session ; une requête partie avant, avec l'ancien
+     cookie, pouvait revenir avec un cookie vide et déconnecter le
+     téléphone. Les requêtes de l'application attendent désormais la fin
+     d'un changement de profil (et lui, que celles en vol reviennent), et
+     un écran de lecture n'est rechargé qu'après ; reste le cas d'un clic
+     de l'élève exactement pendant ce changement (il arrive alors sur la
+     connexion, où son profil se rouvre par son code) — `HORS_LIGNE.md`
+     B.6, à observer sur vrai téléphone.
+   - **Reste** : vrais téléphones (`A_TESTER.md` : pack interrompu sur
+     réseau faible, deux profils en mode avion, code et ordinateur partagé,
+     iPhone sept jours) — bloqués par D11 ; médias des packs avec le premier
+     bloc image ; limite de deux appareils d'un compte payant (lot 9).
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

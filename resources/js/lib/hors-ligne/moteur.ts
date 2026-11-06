@@ -20,6 +20,12 @@ import { uuid7 as uuid7Navigateur } from '@/lib/hors-ligne/uuid7';
  * - « hors ligne » est décidé par l'échec d'une requête, jamais par
  *   `navigator.onLine` seul.
  *
+ * Lot 7 (HL6) : la file contient les gestes de **tous** les profils du
+ * téléphone. Ceux du profil de la session partent comme avant ; ceux d'un
+ * autre profil partent avec **son jeton de profil** (`jetonsProfils`), que le
+ * serveur vérifie avant de les exécuter en son nom. Un profil sans jeton
+ * attend sa prochaine connexion.
+ *
  * Tout est injecté (base, transport, horloge, minuterie) : les tests le font
  * tourner sans réseau ni navigateur.
  */
@@ -113,6 +119,11 @@ export class MoteurHorsLigne {
     private readonly maintenant: () => number;
     private readonly planifier: Planifier;
     private readonly uuid7: () => string;
+    private readonly entetesEtat: () => Promise<Record<string, string>>;
+    private readonly apresEtat: (
+        corps: Record<string, unknown>,
+    ) => Promise<void>;
+    private readonly jetonsProfils: () => Promise<Record<number, string>>;
 
     constructor(options: {
         base: BaseHorsLigne;
@@ -120,7 +131,16 @@ export class MoteurHorsLigne {
         maintenant?: () => number;
         planifier?: Planifier;
         uuid7?: () => string;
+        /** En-têtes ajoutés au battement : jeton du profil, packs présents (lot 7). */
+        entetesEtat?: () => Promise<Record<string, string>>;
+        /** Ce que le battement rapporte en plus : jeton de profil neuf, versions des packs. */
+        apresEtat?: (corps: Record<string, unknown>) => Promise<void>;
+        /** Jetons des profils du téléphone (auteur => jeton), HL6. */
+        jetonsProfils?: () => Promise<Record<number, string>>;
     }) {
+        this.entetesEtat = options.entetesEtat ?? (async () => ({}));
+        this.apresEtat = options.apresEtat ?? (async () => {});
+        this.jetonsProfils = options.jetonsProfils ?? (async () => ({}));
         this.base = options.base;
         this.transport = options.transport;
         this.maintenant = options.maintenant ?? (() => Date.now());
@@ -426,8 +446,15 @@ export class MoteurHorsLigne {
     }
 
     private async prochainLot(): Promise<Operation[]> {
-        const candidates = (await this.aEnvoyer()).filter(
-            (operation) => !this.reportes.has(operation.uuid),
+        const actif = this.utilisateurId;
+        const jetons = await this.jetonsProfils();
+        const candidates = (
+            await this.base.operations.orderBy('[priorite+uuid]').toArray()
+        ).filter(
+            (operation) =>
+                !this.reportes.has(operation.uuid) &&
+                (operation.auteur_id === actif ||
+                    jetons[operation.auteur_id] !== undefined),
         );
         const dependances = candidates
             .map((operation) => operation.depend_de)
@@ -478,6 +505,18 @@ export class MoteurHorsLigne {
             mesure_le: string;
         }>('horloge');
         const envoyeLe = this.maintenant();
+        const jetons = await this.jetonsProfils();
+        const profils: Record<number, string> = {};
+
+        // Le jeton de chaque auteur du lot qui en a un, profil actif compris :
+        // choisi hors ligne, il n'est peut-être pas encore la session du
+        // serveur. Le serveur ne le lit que pour un autre compte que le sien.
+        for (const operation of lot) {
+            if (jetons[operation.auteur_id] !== undefined) {
+                profils[operation.auteur_id] = jetons[operation.auteur_id];
+            }
+        }
+
         let reponse: ReponseTransport;
 
         try {
@@ -490,6 +529,7 @@ export class MoteurHorsLigne {
                     decalage_horloge_ms: horloge?.decalage_ms ?? null,
                     mesure_le: horloge?.mesure_le ?? null,
                     envoye_le: new Date(envoyeLe).toISOString(),
+                    ...(Object.keys(profils).length > 0 ? { profils } : {}),
                     operations: lot.map((operation) => ({
                         uuid: operation.uuid,
                         type: operation.type,
@@ -711,7 +751,10 @@ export class MoteurHorsLigne {
             reponse = await this.transport({
                 methode: 'GET',
                 url: URL_ETAT,
-                entetes: appareil ? { 'X-Appareil': appareil } : {},
+                entetes: {
+                    ...(await this.entetesEtat().catch(() => ({}))),
+                    ...(appareil ? { 'X-Appareil': appareil } : {}),
+                },
             });
         } catch {
             this.signalerHorsLigne();
@@ -741,6 +784,7 @@ export class MoteurHorsLigne {
         }
 
         await this.mesurerHorloge(corps.heure_serveur, envoyeLe);
+        await this.apresEtat(corps as Record<string, unknown>).catch(() => {});
         const revient = this.etatCourant.reseau !== 'en_ligne';
         this.changerEtat({ reseau: 'en_ligne' });
 

@@ -158,11 +158,7 @@ function CarteMatiere({
                         sur={lecons}
                         libelle="leçons comprises"
                     />
-                    <Chiffre
-                        valeur={maitrise}
-                        unite="%"
-                        libelle="maîtrise"
-                    />
+                    <Chiffre valeur={maitrise} unite="%" libelle="maîtrise" />
                 </div>
 
                 <ProgressionSegments

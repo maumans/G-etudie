@@ -17,6 +17,8 @@ class JournalAcces
     /** Ce que chaque action veut dire, pour l'afficher (« Mon compte › Sécurité », console). */
     public const LIBELLES = [
         'compte.cree' => 'Compte créé',
+        'profil.bascule' => 'Profil ouvert sur un téléphone partagé (code local)',
+        'appareil.retire' => 'Profil retiré d\'un appareil',
         'compte.supprime' => 'Compte supprimé',
         'mot_de_passe.change' => 'Mot de passe changé',
         'mot_de_passe.recupere' => 'Mot de passe retrouvé par SMS',

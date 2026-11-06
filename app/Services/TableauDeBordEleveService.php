@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\EtatLecon;
 use App\Models\Lecon;
+use App\Models\Matiere;
 use App\Models\ProfilEleve;
 use App\Models\ProgressionLecon;
 use App\Models\Question;
@@ -147,19 +148,33 @@ class TableauDeBordEleveService
      * prochaines séances avec **les props mêmes** de leur écran, pour les
      * faire hors ligne. Lu après chaque synchronisation.
      *
+     * `$matieres` (lot 7) : les slugs des matières dont l'appareil a le pack ;
+     * pour chacune, trois séances préparées de plus (A.10).
+     *
+     * @param  list<string>  $matieres
      * @return array<string, mixed>
      */
-    public function instantane(User $eleve, ProfilEleve $profil): array
+    public function instantane(User $eleve, ProfilEleve $profil, array $matieres = []): array
     {
+        $enProps = fn (Seance $seance) => [
+            'uuid' => $seance->uuid,
+            'rang' => $seance->rang,
+            'props' => $this->seances->props($seance),
+        ];
+        $siennes = Matiere::query()
+            ->whereIn('slug', array_slice($matieres, 0, 20))
+            ->whereIn('id', CatalogueEleve::matieresIds($profil))
+            ->orderBy('ordre')
+            ->get();
+
         return [
             'calcule_le' => CarbonImmutable::now()->toIso8601ZuluString('millisecond'),
             'jauge' => $this->maitrise->jauge($profil),
             'serie' => $this->motivation->serie($eleve->id),
-            'seances' => $this->seances->aVenir($eleve, $profil)->map(fn (Seance $seance) => [
-                'uuid' => $seance->uuid,
-                'rang' => $seance->rang,
-                'props' => $this->seances->props($seance),
-            ])->values()->all(),
+            'seances' => $this->seances->aVenir($eleve, $profil)->map($enProps)->values()->all(),
+            'seances_matieres' => (object) $siennes->mapWithKeys(fn (Matiere $matiere) => [
+                $matiere->slug => $this->seances->aVenir($eleve, $profil, $matiere)->map($enProps)->values()->all(),
+            ])->all(),
         ];
     }
 

@@ -13,7 +13,12 @@
  *   version précédente (police, fragment inchangé) est recopié, pas
  *   retéléchargé : l'élève ne paie pas deux fois le même fichier.
  * - pages-u<id> : écrans de la liste blanche, par utilisateur, réseau
- *   d'abord ; vidé à la déconnexion.
+ *   d'abord ; vidé à la déconnexion. Rien n'y est rangé sur un ordinateur
+ *   partagé (message UTILISATEUR avec `garder: false`, lot 7).
+ *
+ * Lot 7 : changer de profil hors ligne envoie UTILISATEUR puis recharge ; le
+ * worker répond sur le port du message une fois l'utilisateur rangé, pour
+ * que le rechargement serve bien les copies du nouveau profil.
  */
 
 /* global VERSION, PRECACHE, PAGES, REPLI, DELAI_RESEAU_MS, VERSIONS_GARDEES */
@@ -37,6 +42,7 @@ const JAMAIS = [
 ];
 
 let utilisateur = null;
+let garder = true;
 
 // <ecran-garde> — copie conforme de resources/js/lib/hors-ligne/ecrans.ts,
 // vérifiée par tests/js/hors-ligne/ecrans.test.ts.
@@ -163,14 +169,20 @@ self.addEventListener('message', (evenement) => {
         self.skipWaiting();
     } else if (message.type === 'UTILISATEUR') {
         utilisateur = message.id ?? null;
-        evenement.waitUntil(ecrireMeta('utilisateur', utilisateur));
+        garder = message.garder !== false;
+        evenement.waitUntil(
+            Promise.all([
+                ecrireMeta('utilisateur', utilisateur),
+                ecrireMeta('garder', garder),
+            ]).then(() => evenement.ports?.[0]?.postMessage('ok')),
+        );
     } else if (message.type === 'DECONNEXION') {
         utilisateur = null;
         evenement.waitUntil(
             Promise.all([
                 caches.delete(`pages-u${message.id}`),
                 ecrireMeta('utilisateur', null),
-            ]),
+            ]).then(() => evenement.ports?.[0]?.postMessage('ok')),
         );
     }
 });
@@ -311,6 +323,11 @@ async function ranger(adresse, inertia, partiel, reponse) {
         return;
     }
 
+    // Ordinateur partagé : aucune copie d'écran (HL-D9).
+    if (!garder || (await lireMeta('garder')) === false) {
+        return;
+    }
+
     const corps = await reponse.text();
     let id = await utilisateurCourant();
     let page = null;
@@ -382,12 +399,75 @@ async function copieGardee(adresse, inertia) {
         }
     }
 
+    // Lot 7 : une visite Inertia sans copie Inertia, mais l'écran a été
+    // ouvert comme document (rechargé, adresse tapée) : la page Inertia est
+    // dans le document (`<script data-page="app">`), on la sert.
+    if (!copie && inertia) {
+        const pageDocument = await cache.match(cle(adresse, false));
+        const html = pageDocument ? await pageDocument.text() : '';
+        const trouve = html.match(
+            /<script data-page="app" type="application\/json">([\s\S]*?)<\/script>/,
+        );
+
+        if (trouve) {
+            const page = JSON.parse(trouve[1]);
+            page.props = {
+                ...page.props,
+                copie_hors_ligne: pageDocument.headers.get('X-Copie-Le') ?? '',
+            };
+
+            return new Response(JSON.stringify(page), {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Inertia': 'true',
+                    Vary: 'X-Inertia',
+                },
+            });
+        }
+    }
+
+    // Lot 7 : un écran de l'espace élève jamais copié (une leçon, une
+    // séance ouvertes depuis un pack) qu'on recharge hors ligne. On sert la
+    // coquille de l'accueil, marquée de l'adresse voulue : l'application
+    // l'ouvre depuis la base locale si elle l'y trouve (HORS_LIGNE.md A.4).
+    let ecranLocal = null;
+
+    if (!copie && !inertia && adresse.pathname.startsWith('/eleve/')) {
+        // L'accueil d'abord, sinon n'importe quel document de l'espace élève :
+        // il ne sert que de coquille.
+        copie = await cache.match(
+            `${adresse.origin}${prefixeCopie(false)}/eleve`,
+        );
+
+        if (!copie) {
+            for (const requete of await cache.keys()) {
+                if (
+                    new URL(requete.url).pathname.startsWith(
+                        `${prefixeCopie(false)}/eleve`,
+                    )
+                ) {
+                    copie = await cache.match(requete);
+                    break;
+                }
+            }
+        }
+
+        ecranLocal = copie ? `${adresse.pathname}${adresse.search}` : null;
+    }
+
     if (!copie) {
         return null;
     }
 
     const heure = copie.headers.get('X-Copie-Le') ?? '';
-    const corps = await copie.text();
+    let corps = await copie.text();
+
+    if (ecranLocal !== null) {
+        corps = corps.replace(
+            '<head>',
+            `<head><meta name="ecran-local" content="${ecranLocal.replace(/["<>&]/g, '')}">`,
+        );
+    }
 
     if (inertia) {
         const page = JSON.parse(corps);

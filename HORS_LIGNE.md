@@ -657,11 +657,11 @@ hors ligne ; les packs viennent ensuite.
 | HL1 | Rendu indépendant de la source | ✅ fait (lots 1 et 2) | 2 / 2 |
 | HL2 | Tentatives et séances | ✅ fait (lots 2 et 3) : neuf types par la file, auto-évaluation, correction contre la version vue (A.9), séance complète en mode avion (A.14 n° 24) | 4 / 4 |
 | — | Lot 4 (sans lot HL) : `signalement.creer`, objet de contenu des annales, liste blanche | ✅ fait (2026-10-31), B.3 « Lot 4 » | 4 / 5 (packs au lot 7) |
-| HL3 | Examen blanc | ✅ fait (lot 5, 2026-11-05) : sauvegarde continue, chronomètre depuis l'heure de début, `examen_blanc.terminer`, horloge signalée ; lancement depuis un pack au lot 7 | 4 / 4 |
-| HL4 | Jauge, séances pré-calculées, trace | ✅ fait (lot 6, 2026-11-05) : dernière jauge du serveur + réponses pas encore comptées, 3 séances préparées faites hors ligne, trace complétée sur l'appareil ; « par matière téléchargée » au lot 7 (écart n° 23) | 3 / 3 |
-| HL5 | Packs | ⬜ à faire | 0 / 7 |
-| HL6 | Profils et session | ⬜ à faire | 0 / 4 |
-| HL7 | Budgets | ⬜ à faire | 0 / 2 |
+| HL3 | Examen blanc | ✅ fait (lot 5, 2026-11-05) : sauvegarde continue, chronomètre depuis l'heure de début, `examen_blanc.terminer`, horloge signalée ; lancement depuis un pack (lot 7) | 4 / 4 |
+| HL4 | Jauge, séances pré-calculées, trace | ✅ fait (lot 6, 2026-11-05) : dernière jauge du serveur + réponses pas encore comptées, 3 séances préparées faites hors ligne, trace complétée sur l'appareil ; trois de plus par matière téléchargée (lot 7) | 3 / 3 |
+| HL5 | Packs | ✅ fait (lot 7, 2026-11-06), sauf les médias (aucun bloc image encore, écart n° 24) et les vrais téléphones (`A_TESTER.md`) | 7 / 7 |
+| HL6 | Profils et session | ✅ fait (lot 7, 2026-11-06) ; contrôles sur vrai téléphone dans `A_TESTER.md` | 4 / 4 |
+| HL7 | Budgets | ✅ mesurés (lot 7, 2026-11-06), B.3 « HL7 » | 2 / 2 |
 | HL8 | Terrain | ⬜ à faire | 0 / 7 |
 
 ## B.1 Décisions
@@ -678,7 +678,7 @@ hors ligne ; les packs viennent ensuite.
     rôles back-office et console. *Appliqué au lot 0, étape 5* :
     `SessionCourtePersonnel` (12 h après la connexion, même en activité ;
     cookie « se souvenir de moi » refusé au personnel). Le code local de
-    profil reste à faire (lot 7).
+    profil : fait au lot 7 (HL6, B.3).
   - **HL-D12** : Vitest 5 (fourni par Vite+) + `fake-indexeddb`.
 
 ## B.2 HL0 — Socle
@@ -770,8 +770,8 @@ hors ligne ; les packs viennent ensuite.
   garde qui affiche le pack, dialogue sans élément ou base en panne,
   écriture jamais servie localement) ; Pest `EcransCoursTest` (objet de
   contenu, leçon < 50 Ko).
-  **Reste au lot 7 (HL5)** : remplir la table `contenus` (packs). Tant
-  qu'elle est vide, le chemin « pack » n'est exercé que par les tests.
+  **Lot 7 (HL5)** : la table `contenus` est remplie par les packs ; le
+  chemin « pack » est exercé par `parcours-lot7.spec.ts`.
 
 ### HL2 — Tentatives et séances (avancé en partie au lot 2, écart n° 16)
 
@@ -853,9 +853,10 @@ hors ligne ; les packs viennent ensuite.
 - [x] Réponses d'entraînement sur une annale : `tentative.enregistrer`
   sans séance, mode `entrainement`, recorrigées contre la version vue
   (inchangé depuis HL2). Preuve : `AnnalesEleveTest`.
-- [ ] **Reste au lot 7 (HL5)** : les annales dans les packs (la table
-  `contenus` les attend, comme les leçons) ; aujourd'hui, une annale se
-  relit hors ligne seulement si elle a déjà été ouverte en ligne.
+- [x] **Les annales dans les packs** (lot 7, HL5) : élément `annale:<uuid>`
+  (`sujet` + `duree_epreuve`), ouvert hors ligne depuis le pack, en
+  lecture, en entraînement ou en examen (`?mode=`). Preuve : `PacksTest`,
+  Vitest `packs.test.ts`, `parcours-lot7.spec.ts`.
 
 ### HL3 — Examen blanc (A.8, lot 5)
 
@@ -884,9 +885,10 @@ hors ligne ; les packs viennent ensuite.
   n'active une nouvelle version que sans examen en cours (A.3.1). Carte de
   partage dessinée sur l'appareil (hors ligne). Preuve :
   `ExamenBlancHorsLigneTest` (A.14 n° 7), Vitest.
-- [ ] **Reste au lot 7 (HL5)** : lancer un examen hors ligne depuis un pack
-  (aujourd'hui : depuis la copie de la fiche d'annale déjà ouverte en
-  ligne).
+- [x] **Lancer un examen hors ligne depuis un pack** (lot 7) : la fiche
+  d'annale s'ouvre depuis le pack avec `?mode=examen` (`lib/contenu/source.ts`,
+  `completer`). Preuve : Vitest `packs.test.ts` (« les écrans s'affichent
+  depuis le pack »).
 
 ### HL4 — Jauge, séances pré-calculées, trace (A.10, lot 6)
 
@@ -920,8 +922,129 @@ hors ligne ; les packs viennent ensuite.
   encore en file (« commencé », jour compté, « compte provisoire »), le
   serveur confirme à la synchronisation (`traceAvecLocal`). Preuve :
   Vitest, Pest `MotivationTest` (jour reçu deux jours plus tard).
-- [ ] **Reste au lot 7 (HL5)** : trois séances **par matière téléchargée**
-  (écart n° 23) ; contrôle sur vrai téléphone (`A_TESTER.md`, lot 6).
+- [x] **Trois séances par matière téléchargée** (lot 7, lève l'écart
+  n° 23) : `GET /eleve/instantane?matieres=maths,…` (les packs présents)
+  rend `seances_matieres` ; `SeanceService::aVenir($eleve, $profil,
+  $matiere)` les prépare (`seances.matiere_id`) ; hors ligne, « M'entraîner »
+  sur la page d'une matière ouvre la sienne (`prochaineSeanceLocale(…,
+  slug)`), sinon une séance toutes matières. Preuve : Pest `PacksTest`
+  (« trois séances préparées de plus par matière »), Vitest, parcours lot 7.
+  Contrôle sur vrai téléphone : `A_TESTER.md`, lot 6 et lot 7.
+
+### HL5 — Packs (A.5, lot 7)
+
+- [x] **Génération** — `App\Services\PackService` (seule autorité sur le
+  contenu d'un pack) : pour une épreuve (examen, série, filière, matière),
+  la page de la matière (`matiere:<cle du pack>`), chaque leçon publiée
+  (`lecon:<uuid>`, objet de contenu + contexte), la fiche de chaque
+  chapitre (`fiche:<id>`, qui **cite** ses leçons, écart n° 25) et chaque
+  annale publiée (`annale:<uuid>`). Les props viennent des **mêmes
+  fonctions** que les routes en ligne (`PresentationCours`, extrait de
+  `CoursController` et `LeconController` ; `LeconController::contenu` ;
+  `PresentationSujet` ; `AnnaleController::dureeEpreuve`). Composé pour un
+  **profil fictif**, jamais pour un élève : aucune donnée personnelle.
+  Empreinte par élément (xxh128 du JSON), version = empreinte de la liste,
+  morceaux d'environ 500 Ko, poids **compressé** calculé (gzip). Tables
+  `packs`, `pack_elements` (JSON brut, renvoyé sans être décodé),
+  `packs_eleves`. Regénéré **en file** (`GenererPack`, unique tant qu'il
+  attend) à chaque publication, retrait ou correction d'une leçon, d'une
+  question ou d'une annale de la matière ; `php artisan packs:generer`
+  (déploiement, et chaque nuit à 3 h). Preuve : `PacksTest` (contenu =
+  props des écrans, même pack pour deux élèves, morceaux).
+- [x] **Téléchargement par morceaux, reprise** — `lib/hors-ligne/packs.ts`
+  (`telechargerPack`) : manifeste (`POST …/prendre` la première fois,
+  `GET …/manifeste` ensuite), puis les morceaux ; chaque morceau reçu est
+  rangé aussitôt dans `contenus` ; ce qui doit venir, ce sont les éléments
+  dont l'empreinte locale diffère : une reprise après coupure repart donc
+  du morceau suivant. Un pack qui change pendant le téléchargement (409)
+  repart du nouveau manifeste sans redemander ce qui est rangé. Preuve :
+  Vitest `packs.test.ts` (A.14 n° 22).
+- [x] **Différentiel** — moins de la moitié d'un morceau à refaire : les
+  éléments un à un (`POST …/elements`), sinon le morceau entier ; un
+  élément retiré du manifeste est effacé de l'appareil. Le battement
+  (`GET /sync/etat`, en-tête `X-Packs: cle@version,…`) annonce seulement
+  les packs qui ont changé ou qui expirent (« Mise à jour disponible ») ;
+  la mise à jour reste **demandée par l'élève**. Preuve : Pest `PacksTest`
+  (A.14 n° 8 : seule l'annale corrigée change d'empreinte, mise à jour
+  < 20 Ko), Vitest.
+- [x] **Droits et expiration** (HL-D3, HL-D4) — `App\Support\DroitsPacks`,
+  seule autorité : pack hors de son examen → 404 ; gratuit : **un** pack au
+  choix (le supprimer libère la place) ; abonné : tous les packs de son
+  examen, expiration fin d'abonnement + 7 jours, avancée à chaque
+  synchronisation ; expiré → plus de mise à jour (403, phrase pour
+  l'élève). Les abonnements arrivent au lot 9 : `SourceAbonnements`
+  (`AucunAbonnement` d'ici là). Hors ligne, un pack expiré ne s'affiche
+  plus (horloge de l'appareil, acceptée). Preuve : Pest `PacksTest` (A.14
+  n° 9 : gratuit, autre examen, abonné puis expiré), Vitest.
+- [x] **Écran « Téléchargements »** (`pages/eleve/telechargements.tsx`,
+  `/eleve/telechargements`, dans la liste blanche) : un pack par matière,
+  contenu et **poids avant** de télécharger, progression, « Reprendre »,
+  « Mettre à jour », « Supprimer », place utilisée et libre
+  (`storage.estimate()`), `storage.persist()` après le premier pack ;
+  invitation « Réviser … sans réseau » sur la page de chaque matière.
+  Entrée « Téléchargements » dans la barre latérale et dans « Qui révise ? »
+  (mobile). Preuve : `ecrans-lot7.spec.ts`.
+- [x] **Lecture depuis le pack** — `lib/contenu/source.ts` : la matière, une
+  leçon, une fiche (assemblée), une annale (avec son mode) s'ouvrent hors
+  ligne depuis le pack, avec les props mêmes du serveur ; ce qui est
+  personnel arrive vide (état de lecture, scores). Une page de l'espace
+  élève **jamais copiée** et rechargée hors ligne : le service worker sert
+  la coquille d'une autre copie, marquée `<meta name="ecran-local">`, et
+  l'application rouvre l'écran depuis la base locale (écart n° 28). Preuve :
+  Vitest, `parcours-lot7.spec.ts`.
+- [~] **Médias** (`medias-<pack>`, option « sans images ») : le manifeste
+  porte `medias` et `taille_sans_images`, mais le format des blocs n'a pas
+  encore de bloc image (écart n° 24) : rien à ranger, l'option ne
+  s'affiche pas. À brancher avec le premier bloc image.
+
+### HL6 — Profils, code local, session longue (A.7, lot 7)
+
+- [x] **Plusieurs profils par téléphone, code à 4 chiffres** —
+  `lib/hors-ligne/profils.ts` : 4 profils au plus (table `profils`), code
+  gardé en **empreinte PBKDF2 salée** (100 000 itérations), 5 essais
+  libres puis une attente qui double (30 s … 15 min). Écrans :
+  « Qui révise ? » (`components/hors-ligne/profils-telephone.tsx`, ouvert
+  par la pastille du profil : garder son profil avec un code, changer de
+  profil, « Ajouter un profil », Téléchargements, Mon compte) ; la
+  connexion propose les profils « Déjà sur ce téléphone ». Preuve : Vitest
+  `profils.test.ts`, `ecrans-lot7.spec.ts`.
+- [x] **Jeton de profil** — `AppareilService` : un élève rattaché reçoit
+  une fois, au battement, un jeton propre au téléphone (empreinte SHA-256
+  dans `appareil_profils`), valable **30 jours glissants** (HL-D10), retiré
+  à la déconnexion (« Se déconnecter » = quitter le téléphone ;
+  « Ajouter un profil » = garder le sien). Jamais pour le personnel, ni sur
+  un ordinateur partagé. `POST /appareil/profils/basculer` (sans session,
+  `throttle:basculer-profil`, une seule réponse pour tous les refus,
+  journal `profil.bascule`) ouvre la session du profil. Hors ligne, le
+  profil devient actif sur l'appareil (copies et file du profil) et la
+  session suit au retour du réseau (`bascule_en_attente`). Preuve : Pest
+  `ProfilsAppareilTest` (14).
+- [x] **Réponses de chaque profil, au bon nom** (lève l'écart n° 9) — le
+  moteur envoie aussi les gestes des autres profils du téléphone, avec leur
+  jeton (`profils: {auteur: jeton}`) ; `SynchroService` les exécute **en
+  tant que** leur auteur après avoir vérifié le jeton ; sans jeton valable,
+  `reporte`. Preuve : Pest `ProfilsAppareilTest` (A.15 n° 4 côté serveur),
+  Vitest `moteur.test.ts`, `parcours-lot7.spec.ts` (deux profils, hors
+  ligne, chacun ses réponses).
+- [x] **Ordinateur partagé** (HL-D9, précision du 2026-10-30) — case
+  « Ordinateur partagé — ne rien garder » à la connexion : session jusqu'à
+  la fermeture du navigateur (`OrdinateurPartage`), aucun jeton de profil,
+  aucun profil local, aucun pack, aucune copie d'écran (le service worker
+  reçoit `garder: false`). « Mon compte › Appareils » : les appareils du
+  compte, « Retirer ». Preuve : Pest `ProfilsAppareilTest`.
+
+### HL7 — Budgets (A.11, lot 7)
+
+- [x] **Mesurés par des tests qui échouent au-delà du budget** —
+  `tests/visuel/budgets.spec.ts` (3G lente, processeur ×4, réponses
+  compressées en gzip comme par le serveur web) : coquille de l'espace
+  élève, une tentative, un lot de 50 tentatives, battement ; Pest
+  `PacksTest` : mise à jour d'un pack après correction d'un corrigé,
+  battement. Mesures : B.4 n° 25.
+- [x] **Pack d'une matière sans images < 2 Mo (objectif)** : packs de
+  démonstration entre 1 et 4 Ko compressés (contenu fictif, quelques
+  leçons) ; à remesurer avec le vrai contenu des matières phares
+  (`php artisan packs:generer` affiche chaque poids).
 
 ## B.4 Tests
 
@@ -980,7 +1103,24 @@ hors ligne ; les packs viennent ensuite.
   doublon. Le contrôle sur vrai téléphone reste dans `A_TESTER.md`
   (`setOffline` ne coupe pas le service worker comme un mode avion).
   Playwright `hors-ligne.spec.ts` rejoue toujours le socle.
-- [ ] 25 — budgets : lot 7 (HL7). Mesure faite à la main : écart n° 10.
+- [x] 8 — `PackDifferentielTest` : dans `PacksTest` (« A.14 n° 8 ») —
+  seule l'annale corrigée change d'empreinte ; manifeste + éléments
+  < 20 Ko compressés.
+- [x] 9 — `PackDroitsTest` : dans `PacksTest` (« A.14 n° 9 », trois tests) —
+  gratuit, autre examen (404), abonné puis expiré (plus de mise à jour).
+- [x] 22 — Vitest `packs.test.ts` : coupure au deuxième morceau, reprise au
+  morceau suivant.
+- [x] 23 — Vitest `packs.test.ts` : les packs survivent à la déconnexion
+  d'un profil, pas ses réponses (gardées tant qu'elles sont en file).
+- [x] 25 — `budgets.spec.ts` (2026-11-06, build, 3G lente, processeur
+  ×4, gzip 6) : **coquille de l'espace élève 272 Ko** compressés au premier
+  chargement (budget 500 Ko ; le précache du service worker suit en
+  arrière-plan) ; **une tentative 334 octets** (2 Ko) ; **50 tentatives
+  1 Ko** compressé (40 Ko : des gestes de même forme se compressent très
+  bien) ; **battement 288 octets** (1 Ko, aussi dans `PacksTest`) ; **mise
+  à jour d'un pack** après correction d'un corrigé < 20 Ko (`PacksTest`).
+  Les polices ne sont pas comptées (A.11) : servies par le cache du
+  navigateur et du service worker.
 
 ## B.5 Journal des écarts
 
@@ -1133,12 +1273,77 @@ hors ligne ; les packs viennent ensuite.
     packs. L'instantané passe par `GET /eleve/instantane` et non par
     `GET /sync/etat`, qui reste un battement de moins de 1 Ko (A.11).
 
+24. **2026-11-06 — Pas encore de médias dans les packs.** A.5 prévoit les
+    médias (WebP, `medias-<pack>`) et l'option « sans images ». Le format
+    des blocs n'a pas de bloc image (lot 1, B.3) : le manifeste porte
+    `medias: []` et `taille_sans_images = taille_octets`, l'option ne
+    s'affiche que si un pack a des images. À brancher avec le premier bloc
+    image, aux deux autorités du format (`BlocsContenu`, `blocs.ts`).
+25. **2026-11-06 — La fiche cite ses leçons.** L'élément `fiche:<id>` porte
+    la liste de ses leçons (`lecons_du_pack`), l'appareil l'assemble à
+    l'affichage depuis les éléments `lecon:` : une leçon n'est téléchargée
+    qu'une fois, et en corriger une ne change qu'elle (A.14 n° 8).
+26. **2026-11-06 — Packs en base, pas en fichiers.** A.5 décrit des
+    morceaux « compressés par le serveur web ». Les éléments sont gardés en
+    base (`pack_elements.props`, JSON brut renvoyé tel quel), les morceaux
+    assemblés à la demande ; le serveur web compresse la réponse
+    (`Cache-Control: no-store` : pas de seconde copie dans le cache HTTP).
+    Le poids affiché est celui des morceaux **compressés** (gzip 6), ce que
+    l'élève paie.
+27. **2026-11-06 — Jeton de profil (lève l'écart n° 9).** A.7 ne dit pas
+    comment le serveur sait qu'un geste vient bien d'un profil du
+    téléphone sans sa session : chaque profil a un **jeton** remis une fois
+    au battement, présenté pour changer de profil sans mot de passe et pour
+    envoyer ses gestes quand la session est celle d'un autre. Le code à 4
+    chiffres reste local (il protège entre frères et sœurs) ; le jeton, lui,
+    s'use en 30 jours sans usage et disparaît à la déconnexion.
+28. **2026-11-06 — Coquille pour un écran jamais copié.** Une leçon ou une
+    séance ouverte depuis le pack n'a pas de copie : rechargée hors ligne,
+    elle tombait sur la page de repli. Le service worker sert la copie d'un
+    autre écran de l'espace élève (l'accueil d'abord), marquée de l'adresse
+    voulue (`<meta name="ecran-local">`) ; l'application l'ouvre depuis la
+    base locale, sinon le dialogue « pas encore ouvert ».
+29. **2026-11-06 — `offline` du navigateur.** A.3.9 décide « hors ligne »
+    par l'échec d'une requête. Juste après une coupure, aucune requête n'a
+    encore échoué : « Commencer » partait vers le serveur au lieu d'ouvrir
+    la séance gardée. L'événement `offline` (et `navigator.onLine ===
+    false`) fait passer l'indicateur hors ligne aussitôt ; il ne sert
+    jamais à se croire **en** ligne. Une page lue dans la base locale
+    (`source: 'pack'`) ne dit plus rien du réseau, et un retour arrière vers
+    une page servie d'après sa copie garde l'heure de cette copie. Effet
+    de bord trouvé par `hors-ligne.spec.ts` : le bandeau « Accueil au … »
+    ne s'affichait plus après un rechargement hors ligne (il comptait sur le
+    rendu provoqué par le passage « hors ligne », désormais antérieur) ;
+    l'heure de la copie du document est maintenant observée
+    (`useCopieDuDocument`). Et une visite Inertia vers un écran qui n'a
+    qu'une copie **de document** (rechargé, adresse tapée) se sert de la
+    page rangée dans ce document (`<script data-page>`).
+
 ## B.6 Points de vigilance
 
-- **Poids du fragment commun** : `createLucideIcon-*.js` pèse 373 Ko bruts
-  (React, React DOM et les icônes réunis par le découpage de Rolldown). Déjà
-  chargé par la première page, donc pas payé deux fois, mais c'est l'essentiel
-  du budget « coquille < 500 Ko » : à mesurer au lot 7 (HL7).
+- **Changement de profil et requêtes concurrentes** (lot 7) : le
+  changement régénère la session du serveur ; une requête partie avec
+  l'ancien cookie peut revenir avec un cookie vide. Les requêtes de
+  l'application (`transportFetch`) attendent la fin du changement, qui
+  attend celles en vol (`seule`), et le rechargement d'un écran de lecture
+  au retour du réseau passe après. Une navigation lancée par l'élève
+  exactement pendant ce changement n'est pas retenue : elle peut mener à la
+  connexion (« Déjà sur ce téléphone » rouvre le profil par son code).
+  Contrôle sur vrai téléphone : `A_TESTER.md`, lot 7, deux profils.
+
+- **Poids du fragment commun** : React, React DOM et les icônes réunis par
+  le découpage de Rolldown (≈ 385 Ko bruts, ≈ 120 Ko compressés). Mesuré au
+  lot 7 : la coquille entière pèse 272 Ko compressés (budget 500 Ko). Tout
+  nouvel import lourd dans le layout élève se verra dans `budgets.spec.ts`.
+- **Appareils du compte de démonstration** : chaque contexte Playwright
+  enregistre un appareil pour Aïssatou (des milliers après quelques
+  passages). « Appareils » n'en montre que dix ; la limite de deux
+  appareils d'un compte payant (HL-D8) arrive au lot 9.
+- **Réponses d'un profil choisi hors ligne** : elles partent avec son jeton
+  dès le retour du réseau, avant même que la session ait suivi (le
+  battement présente le jeton du compte **de la session**, jamais celui du
+  profil actif : sinon le serveur en remettait un neuf au mauvais compte —
+  trouvé par `parcours-lot7.spec.ts`).
 - **Test de concurrence** (`SynchroIdempotenteTest`) : une seconde connexion
   MySQL écrit hors de la transaction du test. Sa ligne est effacée après le
   retour en arrière du test (`beforeApplicationDestroyed`) ; l'effacer avant

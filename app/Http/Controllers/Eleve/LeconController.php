@@ -10,9 +10,9 @@ use App\Models\ProgressionLecon;
 use App\Models\Question;
 use App\Support\BlocsContenu;
 use App\Support\CatalogueEleve;
+use App\Support\PresentationCours;
 use App\Support\PresentationQuestion;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Gate;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -32,26 +32,13 @@ class LeconController extends Controller
         Gate::authorize('lire', $lecon);
 
         $lecon->load(['versionPubliee', 'notion.chapitre.matiere']);
-        $chapitre = $lecon->notion->chapitre;
-        $voisines = $this->leconsDuChapitre($request, $chapitre);
-        $rang = $voisines->search(fn (Lecon $voisine) => $voisine->id === $lecon->id);
+        $profil = CatalogueEleve::profil($request->user()) ?? abort(404);
+        $voisines = PresentationCours::leconsDuChapitre($profil, $lecon->notion->chapitre);
         $progression = ProgressionLecon::query()->where('user_id', $request->user()->id)->where('lecon_id', $lecon->id)->first();
 
         return Inertia::render('eleve/lecon', [
             'lecon' => self::contenu($lecon),
-            'contexte' => [
-                'matiere' => [
-                    'cle' => $chapitre->matiere->teinte->value,
-                    'nom' => $chapitre->matiere->nom,
-                    'slug' => $chapitre->matiere->slug,
-                ],
-                'chapitre' => ['id' => $chapitre->id, 'titre' => $chapitre->titre],
-                'notion' => $lecon->notion->titre,
-                'rang' => $rang === false ? 1 : $rang + 1,
-                'total' => $voisines->count(),
-                'precedente' => $rang > 0 ? self::lien($voisines[$rang - 1]) : null,
-                'suivante' => $rang !== false && $rang + 1 < $voisines->count() ? self::lien($voisines[$rang + 1]) : null,
-            ],
+            'contexte' => PresentationCours::contexteLecon($lecon, $voisines),
             'progression' => [
                 'etat' => $progression?->etat?->value,
                 'position' => $progression->position ?? 0,
@@ -64,17 +51,9 @@ class LeconController extends Controller
         abort_unless(CatalogueEleve::peutVoirChapitre($request->user(), $chapitre), 404);
 
         $chapitre->load('matiere');
-        $lecons = $this->leconsDuChapitre($request, $chapitre);
+        $profil = CatalogueEleve::profil($request->user()) ?? abort(404);
 
-        return Inertia::render('eleve/fiche', [
-            'chapitre' => ['id' => $chapitre->id, 'titre' => $chapitre->titre],
-            'matiere' => [
-                'cle' => $chapitre->matiere->teinte->value,
-                'nom' => $chapitre->matiere->nom,
-                'slug' => $chapitre->matiere->slug,
-            ],
-            'lecons' => $lecons->map(fn (Lecon $lecon) => self::contenu($lecon))->values(),
-        ]);
+        return Inertia::render('eleve/fiche', PresentationCours::fiche($chapitre, PresentationCours::leconsDuChapitre($profil, $chapitre)));
     }
 
     /**
@@ -123,27 +102,5 @@ class LeconController extends Controller
             ->get()
             ->mapWithKeys(fn (Question $question) => [$question->uuid => PresentationQuestion::publiee($question)])
             ->all();
-    }
-
-    /** @return array{uuid: string, titre: string} */
-    private static function lien(Lecon $lecon): array
-    {
-        return ['uuid' => $lecon->uuid, 'titre' => $lecon->versionPubliee->titre ?? $lecon->titre];
-    }
-
-    /** @return Collection<int, Lecon> */
-    private function leconsDuChapitre(Request $request, Chapitre $chapitre): Collection
-    {
-        $profil = CatalogueEleve::profil($request->user()) ?? abort(404);
-
-        return CatalogueEleve::lecons($profil)
-            ->with(['versionPubliee', 'notion'])
-            ->whereHas('notion', fn ($notion) => $notion->where('chapitre_id', $chapitre->id))
-            ->get()
-            ->sortBy([
-                fn (Lecon $a, Lecon $b) => $a->notion->ordre <=> $b->notion->ordre,
-                fn (Lecon $a, Lecon $b) => $a->id <=> $b->id,
-            ])
-            ->values();
     }
 }

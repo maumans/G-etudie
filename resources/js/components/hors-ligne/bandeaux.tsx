@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
-    copieDuDocument,
+    useCopieDuDocument,
     estInstallee,
     estIphone,
     useHorsLigne,
@@ -97,10 +97,8 @@ export function BandeauReseau({ eleve = true }: { eleve?: boolean }) {
  */
 export function BandeauCopie() {
     const page = usePage();
-    const heure = heureCopie(
-        page.props as Record<string, unknown>,
-        copieDuDocument(page.url),
-    );
+    const deDocument = useCopieDuDocument(page.url);
+    const heure = heureCopie(page.props as Record<string, unknown>, deDocument);
     const { reseau } = useHorsLigne();
 
     if (!heure) {

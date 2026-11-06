@@ -33,6 +33,9 @@ return [
         // la dernière jauge gardée (HL4). L'instantané (/eleve/instantane)
         // n'est jamais copié : c'est une donnée, rangée dans la base locale.
         '/eleve/progression$',
+        // Lot 7 : « Téléchargements » se relit hors ligne (l'état des packs
+        // vient de l'appareil) ; les routes /eleve/packs/… n'y sont pas.
+        '/eleve/telechargements$',
         '/compte/affichage$',
     ],
 

@@ -42,6 +42,8 @@ class AccesParRoleTest extends TestCase
         'compte.numero.annuler' => 'Mon compte : annuler son changement de numéro.',
         'compte.affichage.edit' => 'Mon compte : réglages d\'affichage, locaux au téléphone.',
         'compte.destroy' => 'Mon compte : supprimer son propre compte (DA5).',
+        'compte.appareils.index' => 'Mon compte : ses propres appareils (HL6).',
+        'compte.appareils.retirer' => 'Mon compte : retirer son propre profil d\'un appareil (HL6).',
         'compte.verification.edit' => 'Vérifier son propre numéro (D3).',
         'compte.verification.envoyer' => 'Vérifier son propre numéro (D3).',
         'compte.verification.confirmer' => 'Vérifier son propre numéro (D3).',
@@ -67,6 +69,7 @@ class AccesParRoleTest extends TestCase
         // opération (GestionnaireOperation::permission()), pas par route.
         'sync.etat' => 'Battement et enregistrement de l\'appareil : tout compte connecté.',
         'sync.operations' => 'File d\'opérations : chaque opération vérifie la permission de son auteur.',
+        'appareil.profils.retirer' => 'Tout compte peut retirer son profil du téléphone où il se déconnecte (HL6).',
     ];
 
     #[Test]

@@ -1,10 +1,14 @@
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import {
     BookmarkCheck,
     Check,
     ChevronLeft,
+    ChevronRight,
     Circle,
+    CircleCheck,
     Clock,
+    Download,
+    FileText,
     ListTree,
     Play,
     RotateCcw,
@@ -24,6 +28,14 @@ import { matiere as pageMatiere } from '@/routes/eleve/cours';
 import { fiche } from '@/routes/eleve/chapitres';
 import { show as pageLecon } from '@/routes/eleve/lecons';
 import { commencer } from '@/routes/eleve/seance';
+import { show as pageSeance } from '@/routes/eleve/seances';
+import { show as pageAnnale } from '@/routes/eleve/annales';
+import { telechargements } from '@/routes/eleve';
+import { usePacksLocaux } from '@/hooks/use-packs-locaux';
+import { afficherDepuisLaBase, base, horsLigneSur } from '@/lib/hors-ligne';
+import { estUtilisable } from '@/lib/hors-ligne/packs';
+import { prochaineSeanceLocale } from '@/lib/progression/locale';
+import { formaterOctets } from '@/lib/utils';
 
 type LeconListe = {
     uuid: string;
@@ -55,7 +67,40 @@ type Props = {
     /** `?faibles=1` : seulement les notions à travailler (filtrées par le serveur). */
     faibles: boolean;
     chapitres: Chapitre[];
+    /** Lot 7 : les annales de la matière (ouvrables depuis le pack). */
+    annales?: {
+        uuid: string;
+        titre: string;
+        session: number;
+        est_exemple: boolean;
+    }[];
+    /** Lot 7 : le pack de la matière (absent quand l'écran vient du pack). */
+    pack?: { cle: string; taille_octets: number } | null;
+    /** `pack` : affichée depuis le téléchargement (HORS_LIGNE.md A.4). */
+    source?: 'pack';
 };
+
+/**
+ * « M'entraîner » : en ligne, le serveur ouvre la séance du jour ; hors
+ * ligne, l'appareil ouvre la prochaine séance préparée de cette matière
+ * (trois par matière téléchargée, A.10), sinon une séance toutes matières.
+ */
+async function entrainer(auteurId: number | undefined, slug: string) {
+    if (horsLigneSur() && auteurId !== undefined) {
+        const uuid =
+            (await prochaineSeanceLocale(base, auteurId, slug)) ??
+            (await prochaineSeanceLocale(base, auteurId));
+
+        if (
+            uuid !== null &&
+            (await afficherDepuisLaBase(pageSeance.url(uuid)))
+        ) {
+            return;
+        }
+    }
+
+    router.post(commencer.url());
+}
 
 /**
  * Une matière : ses chapitres, leurs notions et leurs leçons, avec l'état de
@@ -75,7 +120,15 @@ export default function Matiere({
     maitrise,
     faibles,
     chapitres,
+    annales = [],
+    pack = null,
+    source,
 }: Props) {
+    const { auth } = usePage().props;
+    const { packs: locaux } = usePacksLocaux();
+    const local = pack ? locaux[pack.cle] : undefined;
+    const telecharge =
+        source === 'pack' || (local !== undefined && estUtilisable(local));
     const style = MATIERES[matiere.cle];
     const lecons = chapitres.flatMap((c) => c.notions.flatMap((n) => n.lecons));
     const comprises = lecons.filter((l) => l.etat === 'comprise').length;
@@ -120,7 +173,9 @@ export default function Matiere({
                         </div>
                         {questions > 0 && (
                             <Button
-                                onClick={() => router.post(commencer.url())}
+                                onClick={() =>
+                                    void entrainer(auth.user?.id, matiere.slug)
+                                }
                                 className="self-start md:self-auto"
                             >
                                 <Play aria-hidden className="fill-current" />
@@ -151,6 +206,13 @@ export default function Matiere({
                         </nav>
                     )}
                 </header>
+
+                <BandePack
+                    nom={matiere.nom}
+                    telecharge={telecharge}
+                    depuisLePack={source === 'pack'}
+                    pack={pack}
+                />
 
                 {chapitres.length === 0 && faibles ? (
                     <EtatVide
@@ -191,8 +253,112 @@ export default function Matiere({
                         ))}
                     </ol>
                 )}
+
+                {annales.length > 0 && !faibles && (
+                    <section
+                        aria-labelledby="titre-annales"
+                        className="grid gap-3"
+                    >
+                        <h2 id="titre-annales" className="text-titre-carte">
+                            Annales
+                        </h2>
+                        <ul className="divide-y rounded-carte border bg-card shadow-carte">
+                            {annales.map((annale) => (
+                                <li key={annale.uuid}>
+                                    <Link
+                                        href={pageAnnale(annale.uuid)}
+                                        className="flex items-center gap-3 p-4 outline-none hover:bg-craie-100/60 focus-visible:outline-2 focus-visible:outline-ring"
+                                    >
+                                        <span
+                                            aria-hidden
+                                            className={cn(
+                                                'flex size-10 shrink-0 items-center justify-center rounded-[12px]',
+                                                style.tuile,
+                                            )}
+                                        >
+                                            <FileText className="size-5" />
+                                        </span>
+                                        <span className="grid min-w-0 flex-1">
+                                            <span className="truncate font-semibold">
+                                                {annale.titre}
+                                            </span>
+                                            <span className="text-aide text-ink-500">
+                                                Session {annale.session}
+                                            </span>
+                                        </span>
+                                        <ChevronRight
+                                            aria-hidden
+                                            className="size-4 shrink-0 text-ink-400"
+                                        />
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </section>
+                )}
             </div>
         </>
+    );
+}
+
+/**
+ * Le pack de la matière (HL5) : déjà sur le téléphone, ou l'invitation à le
+ * télécharger avec son poids (A.4 : « Télécharge Maths BEPC pour lire hors
+ * ligne »).
+ */
+function BandePack({
+    nom,
+    telecharge,
+    depuisLePack,
+    pack,
+}: {
+    nom: string;
+    telecharge: boolean;
+    depuisLePack: boolean;
+    pack: { cle: string; taille_octets: number } | null;
+}) {
+    if (telecharge) {
+        return (
+            <p className="flex items-center gap-2 text-aide text-ink-600">
+                <CircleCheck
+                    aria-hidden
+                    className="size-4 text-juste-600 dark:text-juste-400"
+                />
+                {depuisLePack
+                    ? 'Lu depuis ton téléchargement : cours, fiches et annales s’ouvrent sans réseau.'
+                    : `${nom} est sur ce téléphone : tu peux la réviser sans réseau.`}
+            </p>
+        );
+    }
+
+    if (pack === null) {
+        return null;
+    }
+
+    return (
+        <Link
+            href={telechargements()}
+            className="flex items-center gap-3 rounded-carte border border-dashed border-nimba-500/50 bg-card/60 p-4 outline-none hover:border-nimba-500 focus-visible:outline-2 focus-visible:outline-ring"
+        >
+            <span
+                aria-hidden
+                className="flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-nimba-500/[0.12] text-nimba-700 dark:bg-nimba-400/15 dark:text-nimba-300"
+            >
+                <Download className="size-5" />
+            </span>
+            <span className="grid flex-1 gap-0.5">
+                <span className="font-semibold">Réviser sans réseau</span>
+                <span className="text-aide text-ink-600">
+                    Télécharge {nom} une fois (
+                    {formaterOctets(pack.taille_octets)}) : leçons, fiches et
+                    annales.
+                </span>
+            </span>
+            <ChevronRight
+                aria-hidden
+                className="size-4 shrink-0 text-ink-400"
+            />
+        </Link>
     );
 }
 

@@ -3,12 +3,10 @@
 use App\Enums\Filiere;
 use App\Enums\ModeTentative;
 use App\Enums\Role;
-use App\Enums\TypeQuestion;
 use App\Enums\TypeSujet;
 use App\Models\Examen;
 use App\Models\Matiere;
 use App\Models\Serie;
-use App\Models\Sujet;
 use App\Models\Tentative;
 use App\Models\User;
 use App\Services\Annales\SujetService;
@@ -31,34 +29,6 @@ beforeEach(function () {
     $this->autreChapitre = notionAilleurs('maths', '10e année', 'Les identités remarquables');
     $this->eleve = eleveAvecProfil('BEPC');
 });
-
-/** Une annale publiée (circuit réel), une question par notion donnée. */
-function annalePubliee(Examen $examen, ?Serie $serie, Matiere $matiere, int $session, array $notions, bool $document = false): Sujet
-{
-    $sujets = app(SujetService::class);
-    $contenu = app(ContenuService::class);
-    $redacteur = User::factory()->avecRole(Role::Redacteur)->create();
-
-    $sujet = $sujets->creer($redacteur, [
-        'examen' => $examen, 'serie' => $serie, 'matiere' => $matiere, 'filiere' => Filiere::Generale,
-        'session' => $session, 'type' => TypeSujet::Officiel, 'titre' => "{$matiere->nom} {$session}",
-    ], $document ? ['chemin' => 'annales/doc.pdf', 'nom' => 'doc.pdf', 'type' => 'application/pdf', 'octets' => 4] : null);
-    $partie = $sujets->ajouterPartie($sujet, $redacteur, 'Exercice 1', 5, blocsDeTest('Soit un triangle.'));
-
-    foreach ($notions as $rang => $notion) {
-        $question = $sujets->ajouterQuestion($partie, $redacteur, $notion, TypeQuestion::QcmUne);
-        $contenu->enregistrerQuestion($question, $redacteur, [
-            'enonce' => blocsDeTest("Question {$rang} sur {$notion->titre}"),
-            'donnees' => ['options' => [['id' => 'a', 'texte' => 'Oui'], ['id' => 'b', 'texte' => 'Non']]],
-            'attendue' => ['option' => 'a'],
-            'indices' => [],
-            'corrige' => [['titre' => '', 'blocs' => blocsDeTest('Parce que.')]],
-            'difficulte' => 2,
-        ], 0);
-    }
-
-    return $sujets->publier($sujets->soumettre($sujet->fresh(), $redacteur), User::factory()->avecRole(Role::Relecteur)->create())->fresh();
-}
 
 test('l\'élève voit les annales de son examen, pas celles des autres ; un brouillon ou un autre examen : 404', function () {
     $bepc = Examen::where('code', 'BEPC')->sole();

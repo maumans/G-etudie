@@ -1235,3 +1235,46 @@ la prolonge sans nouveau composant de base.
   dans la rangée qui défile élargissait la page à 1 027 px (360 px) →
   `relative` sur la carte ; lien « Détail » dont le nom accessible ne
   contenait pas le texte visible (axe) → « Détail de ma progression ».
+
+### Lot 7 — hors ligne complet : téléchargements, profils du téléphone (2026-11-06)
+
+- **« Téléchargements »** (`pages/eleve/telechargements.tsx`) : en-tête en
+  contraste (« Réviser **sans réseau** ») ; liste en filets, une ligne par
+  matière (tuile de la matière, nom, état en étiquette — « Sur le
+  téléphone », « Mise à jour disponible », « Interrompu », « Expiré »,
+  « Avec l'abonnement » —, contenu « 3 leçons · 2 fiches · 2 annales » et
+  **poids avant de télécharger**) ; une seule action dominante (le premier
+  pack proposé pas encore là) ; barre de progression à la couleur de la
+  matière ; le moment fort est la carte `surface-encre` « Sur ce
+  téléphone » (matières présentes, place utilisée et libre, la place
+  gratuite dite **une fois**) ; « Bon à savoir » en trois lignes.
+- **Page d'une matière** : bande « Réviser … sans réseau » (pointillés
+  mandarine, poids) tant que le pack n'est pas là, une ligne « … est sur ce
+  téléphone » ensuite ; « Annales de la matière » en filets sous le
+  programme.
+- **« Qui révise ? »** (`components/hors-ligne/profils-telephone.tsx`) :
+  ouvert par la pastille du profil (en-tête mobile, carte de la barre
+  latérale, avec un chevron) ; profil actif en `craie-100` avec « Actif » ;
+  « Garde ton profil ici » (cadenas, arête mandarine) puis le code en
+  quatre cases (`CodeInput`), deux fois ; les autres profils en lignes
+  (pastille, prénom, pseudo, cadenas) ; « Ajouter un profil »,
+  « Téléchargements », « Mon compte » en boutons fantômes.
+- **Connexion** : « Déjà sur ce téléphone » au-dessus du formulaire quand
+  des profils sont gardés ; case « Ordinateur partagé — ne rien garder »
+  avec sa précision.
+- **Mon compte › Appareils** : sixième onglet (élève : cinq, trois puis
+  deux ; personnel : six, deux rangées de trois) ; une ligne par appareil
+  (icône téléphone / ordinateur, libellé, dernière visite, profils),
+  « Retirer » en contour framboise ; les dix plus récents, les autres
+  comptés.
+- **Vu** (Playwright, 360 / 768 / 1366, clair et sombre, axe, débordement ;
+  `ecrans-lot7.spec.ts`) et **corrigé** : la feuille « Qui révise ? »
+  débordait à droite à 360 (bouton `whitespace-nowrap` avec sa précision
+  entre parenthèses) → précision sur sa propre ligne, enfants `min-w-0` ;
+  la ligne du profil actif tronquée (« · en train de r… ») → étiquette
+  « Actif » ; la phrase de la place gratuite répétée sous chaque matière
+  (lourd, trois fois à l'écran) → étiquette « Avec l'abonnement », la phrase
+  une fois dans la carte ; carte du profil de la barre latérale dont le
+  nom accessible ne contenait pas le texte visible (axe,
+  `label-content-name-mismatch`) → texte réservé aux lecteurs d'écran
+  avant le texte visible ; « 10 240 Mo libres » → « 10 Go ».

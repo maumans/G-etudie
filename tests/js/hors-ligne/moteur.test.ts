@@ -261,6 +261,56 @@ describe('la file d’opérations', () => {
         expect(await base.operations.count()).toBe(1);
     });
 
+    it('HL6 : les gestes d’un autre profil partent avec son jeton de profil', async () => {
+        const serveur = fauxServeur();
+        const moteur = new MoteurHorsLigne({
+            base,
+            transport: (requete) => serveur.transport(requete),
+            planifier: (rappel, delai) =>
+                minuterieManuelle().planifier(rappel, delai),
+            jetonsProfils: async () => ({ 7: 'jeton-aine' }),
+            entetesEtat: async () => ({ 'X-Profil': 'jeton-cadet' }),
+        });
+        serveur.panne = true;
+        await moteur.definirUtilisateur(7);
+        await moteur.enregistrer({ type: 'aine', charge: {} });
+        await moteur.definirUtilisateur(8);
+        await moteur.enregistrer({ type: 'cadet', charge: {} });
+        // Un troisième profil, sans jeton sur ce téléphone.
+        await base.operations.add({
+            uuid: '01a18f5a-009c-706e-8f15-c520b81a2e99',
+            type: 'sans-jeton',
+            charge: {},
+            auteur_id: 9,
+            saisi_le: new Date().toISOString(),
+            priorite: 5,
+            depend_de: null,
+            essais: 0,
+            statut: 'en_attente',
+            derniere_erreur: null,
+        });
+
+        serveur.panne = false;
+        await moteur.vider();
+
+        const lot = serveur.requetes.find(
+            (requete) => requete.url === URL_OPERATIONS,
+        )?.corps as { profils?: Record<string, string> };
+        expect(serveur.lots.flat().map((envoi) => envoi.type)).toEqual([
+            'aine',
+            'cadet',
+        ]);
+        expect(lot.profils).toEqual({ 7: 'jeton-aine' });
+        expect(
+            serveur.requetes.find((requete) => requete.url === URL_ETAT)
+                ?.entetes?.['X-Profil'],
+        ).toBe('jeton-cadet');
+        // Le profil sans jeton attend sa prochaine connexion.
+        expect((await base.operations.toArray()).map((o) => o.type)).toEqual([
+            'sans-jeton',
+        ]);
+    });
+
     it('401 : pause sans rien perdre, reprise à la reconnexion (n° 15)', async () => {
         const { moteur, serveur } = creerMoteur();
         await moteur.definirUtilisateur(7);

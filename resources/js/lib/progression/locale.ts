@@ -46,7 +46,15 @@ export type Instantane = {
     calcule_le: string;
     jauge: Jauge;
     serie: Serie;
-    seances: { uuid: string; rang: number; props: Record<string, unknown> }[];
+    seances: SeanceInstantane[];
+    /** Lot 7 : trois séances de plus par matière téléchargée (slug => séances). */
+    seances_matieres?: Record<string, SeanceInstantane[]>;
+};
+
+type SeanceInstantane = {
+    uuid: string;
+    rang: number;
+    props: Record<string, unknown>;
 };
 
 /** Ce que la table `progression` garde pour un profil. */
@@ -63,6 +71,8 @@ export type SeanceLocale = {
     auteur_id: number;
     rang: number;
     terminee: boolean;
+    /** Lot 7 : séance d'une matière téléchargée (slug), sinon toutes matières. */
+    matiere?: string | null;
 };
 
 export const URL_INSTANTANE = '/eleve/instantane';
@@ -179,7 +189,14 @@ export async function rangerInstantane(
             .map((operation) => operation.charge.seance)
             .filter((uuid): uuid is string => typeof uuid === 'string'),
     );
-    const nouvelles = new Set(instantane.seances.map((seance) => seance.uuid));
+    const toutes: (SeanceInstantane & { matiere: string | null })[] = [
+        ...instantane.seances.map((seance) => ({ ...seance, matiere: null })),
+        ...Object.entries(instantane.seances_matieres ?? {}).flatMap(
+            ([matiere, seances]) =>
+                seances.map((seance) => ({ ...seance, matiere })),
+        ),
+    ];
+    const nouvelles = new Set(toutes.map((seance) => seance.uuid));
     const anciennes = (await base.seances
         .where('auteur_id')
         .equals(auteurId)
@@ -205,13 +222,14 @@ export async function rangerInstantane(
                 }
             }
 
-            for (const seance of instantane.seances) {
+            for (const seance of toutes) {
                 const deja = anciennes.find((a) => a.id === seance.uuid);
                 await base.seances.put({
                     id: seance.uuid,
                     auteur_id: auteurId,
                     rang: seance.rang,
                     terminee: deja?.terminee ?? false,
+                    matiere: seance.matiere,
                 } satisfies SeanceLocale);
                 await base.contenus.put({
                     cle: cleContenu('seance', seance.uuid),
@@ -223,10 +241,15 @@ export async function rangerInstantane(
     );
 }
 
-/** La prochaine séance préparée à faire sur ce téléphone, ou `null`. */
+/**
+ * La prochaine séance préparée à faire sur ce téléphone, ou `null`.
+ * `matiere` (lot 7) : celle d'une matière téléchargée ; sans, une séance
+ * toutes matières.
+ */
 export async function prochaineSeanceLocale(
     base: Pick<BaseHorsLigne, 'seances'>,
     auteurId: number,
+    matiere: string | null = null,
 ): Promise<string | null> {
     try {
         const seances = (await base.seances
@@ -234,7 +257,10 @@ export async function prochaineSeanceLocale(
             .equals(auteurId)
             .toArray()) as SeanceLocale[];
         const suivante = seances
-            .filter((seance) => !seance.terminee)
+            .filter(
+                (seance) =>
+                    !seance.terminee && (seance.matiere ?? null) === matiere,
+            )
             .sort((a, b) => a.rang - b.rang)[0];
 
         return suivante?.id ?? null;

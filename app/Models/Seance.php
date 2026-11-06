@@ -24,13 +24,14 @@ use Illuminate\Support\Carbon;
  * @property int $user_id
  * @property Carbon|null $jour vide tant qu'elle n'est pas commencée
  * @property int|null $rang
+ * @property int|null $matiere_id séance préparée pour une matière téléchargée (lot 7), sinon toutes matières
  * @property list<int> $questions identifiants, dans l'ordre
  * @property int $duree_minutes
  * @property Carbon $genere_le
  * @property Carbon|null $termine_le
  * @property Carbon|null $remplacee_le
  */
-#[Fillable(['uuid', 'user_id', 'jour', 'rang', 'questions', 'duree_minutes', 'genere_le', 'termine_le', 'remplacee_le'])]
+#[Fillable(['uuid', 'user_id', 'jour', 'rang', 'matiere_id', 'questions', 'duree_minutes', 'genere_le', 'termine_le', 'remplacee_le'])]
 class Seance extends Model
 {
     protected function casts(): array

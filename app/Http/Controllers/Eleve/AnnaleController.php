@@ -115,12 +115,12 @@ class AnnaleController extends Controller
             'scores' => (object) $scores->all(),
             // Lot 5 : la durée de l'épreuve saisie par l'équipe, quand
             // l'annale n'imprime pas la sienne (sinon, l'élève choisit).
-            'duree_epreuve' => $this->dureeEpreuve($sujet),
+            'duree_epreuve' => self::dureeEpreuve($sujet),
         ]);
     }
 
     /** La durée de l'épreuve de l'année courante (examen, série, filière, matière). */
-    private function dureeEpreuve(Sujet $sujet): ?int
+    public static function dureeEpreuve(Sujet $sujet): ?int
     {
         $annee = AnneeScolaire::courante();
 

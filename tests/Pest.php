@@ -1,7 +1,9 @@
 <?php
 
+use App\Enums\Filiere;
 use App\Enums\Role;
 use App\Enums\TypeQuestion;
+use App\Enums\TypeSujet;
 use App\Models\Chapitre;
 use App\Models\Classe;
 use App\Models\Examen;
@@ -10,7 +12,9 @@ use App\Models\Matiere;
 use App\Models\Notion;
 use App\Models\Question;
 use App\Models\Serie;
+use App\Models\Sujet;
 use App\Models\User;
+use App\Services\Annales\SujetService;
 use App\Services\ContenuService;
 use App\Services\HorsLigne\RegistreOperations;
 use App\Services\ProfilEleveService;
@@ -275,4 +279,32 @@ function geste(User $auteur, string $type, array $charge, ?string $saisiLe = nul
         'depend_de' => null,
         'charge' => $charge,
     ];
+}
+
+/** Une annale publiée (circuit réel), une question par notion donnée. */
+function annalePubliee(Examen $examen, ?Serie $serie, Matiere $matiere, int $session, array $notions, bool $document = false): Sujet
+{
+    $sujets = app(SujetService::class);
+    $contenu = app(ContenuService::class);
+    $redacteur = User::factory()->avecRole(Role::Redacteur)->create();
+
+    $sujet = $sujets->creer($redacteur, [
+        'examen' => $examen, 'serie' => $serie, 'matiere' => $matiere, 'filiere' => Filiere::Generale,
+        'session' => $session, 'type' => TypeSujet::Officiel, 'titre' => "{$matiere->nom} {$session}",
+    ], $document ? ['chemin' => 'annales/doc.pdf', 'nom' => 'doc.pdf', 'type' => 'application/pdf', 'octets' => 4] : null);
+    $partie = $sujets->ajouterPartie($sujet, $redacteur, 'Exercice 1', 5, blocsDeTest('Soit un triangle.'));
+
+    foreach ($notions as $rang => $notion) {
+        $question = $sujets->ajouterQuestion($partie, $redacteur, $notion, TypeQuestion::QcmUne);
+        $contenu->enregistrerQuestion($question, $redacteur, [
+            'enonce' => blocsDeTest("Question {$rang} sur {$notion->titre}"),
+            'donnees' => ['options' => [['id' => 'a', 'texte' => 'Oui'], ['id' => 'b', 'texte' => 'Non']]],
+            'attendue' => ['option' => 'a'],
+            'indices' => [],
+            'corrige' => [['titre' => '', 'blocs' => blocsDeTest('Parce que.')]],
+            'difficulte' => 2,
+        ], 0);
+    }
+
+    return $sujets->publier($sujets->soumettre($sujet->fresh(), $redacteur), User::factory()->avecRole(Role::Relecteur)->create())->fresh();
 }

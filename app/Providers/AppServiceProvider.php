@@ -3,13 +3,17 @@
 namespace App\Providers;
 
 use App\Models\Lecon;
+use App\Models\Question;
 use App\Models\Sujet;
 use App\Services\Annales\ExtracteurClaude;
 use App\Services\Annales\ExtracteurSimule;
 use App\Services\Annales\ExtracteurSujet;
 use App\Services\HorsLigne\RegistreOperations;
+use App\Services\PackService;
 use App\Services\Sms\EnvoiSms;
 use App\Services\Sms\JournalSms;
+use App\Support\Abonnements\AucunAbonnement;
+use App\Support\Abonnements\SourceAbonnements;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -41,6 +45,10 @@ class AppServiceProvider extends ServiceProvider
 
         // Une seule liste des types d'opération hors ligne par requête.
         $this->app->singleton(RegistreOperations::class);
+
+        // Abonnements au lot 9 : d'ici là, personne n'est abonné et chaque
+        // élève a son pack gratuit (HL-D3, DroitsPacks).
+        $this->app->bind(SourceAbonnements::class, AucunAbonnement::class);
     }
 
     /**
@@ -58,6 +66,11 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('synchro', fn (Request $request) => Limit::perMinute(120)
             ->by('synchro|'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
 
+        RateLimiter::for('basculer-profil', fn (Request $request) => Limit::perMinute(10)
+            ->by('basculer|'.$request->ip()));
+
+        $this->regenererLesPacks();
+
         // Noms courts et stables dans les colonnes polymorphes
         // (`versions_contenu.contenu_type`). Carte non imposée : les rôles de
         // spatie gardent le nom de classe de User dans `model_has_roles`.
@@ -65,6 +78,33 @@ class AppServiceProvider extends ServiceProvider
             'lecon' => Lecon::class,
             'sujet' => Sujet::class,
         ]);
+    }
+
+    /**
+     * Lot 7 (HORS_LIGNE.md A.5) : une leçon, une question ou une annale
+     * publiée, retirée ou corrigée fait regénérer (en file) les packs de sa
+     * matière. Seuls les champs qui changent ce que voit l'élève comptent.
+     */
+    protected function regenererLesPacks(): void
+    {
+        $champs = ['version_publiee_id', 'statut'];
+        $relancer = fn (?int $matiereId) => $matiereId === null ? null : app(PackService::class)->aRegenerer($matiereId);
+
+        Lecon::saved(function (Lecon $lecon) use ($champs, $relancer) {
+            if ($lecon->wasChanged($champs) || $lecon->wasRecentlyCreated) {
+                $relancer($lecon->notion->chapitre->matiere_id);
+            }
+        });
+        Question::saved(function (Question $question) use ($champs, $relancer) {
+            if ($question->wasChanged($champs) || $question->wasRecentlyCreated) {
+                $relancer($question->notion->chapitre->matiere_id);
+            }
+        });
+        Sujet::saved(function (Sujet $sujet) use ($champs, $relancer) {
+            if ($sujet->wasChanged($champs) || $sujet->wasRecentlyCreated) {
+                $relancer($sujet->matiere_id);
+            }
+        });
     }
 
     /**

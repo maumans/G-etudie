@@ -20,7 +20,7 @@ import {
     ProgressionSegments,
 } from '@/components/ui/progression';
 import { useProgressionLocale } from '@/hooks/use-progression-locale';
-import { afficherDepuisLaBase, base, moteur } from '@/lib/hors-ligne';
+import { afficherDepuisLaBase, base, horsLigneSur } from '@/lib/hors-ligne';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import type { Badge, Defi, EtatNotion, Points } from '@/lib/motivation';
@@ -280,7 +280,7 @@ function Chiffre({ valeur, libelle }: { valeur: number; libelle: string }) {
 }
 
 async function reviser(auteurId?: number) {
-    if (moteur.etat.reseau === 'hors_ligne' && auteurId !== undefined) {
+    if (horsLigneSur() && auteurId !== undefined) {
         const uuid = await prochaineSeanceLocale(base, auteurId);
 
         if (

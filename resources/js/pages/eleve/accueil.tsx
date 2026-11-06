@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/progression';
 import { useProgressionLocale } from '@/hooks/use-progression-locale';
 import { annoncerBientot } from '@/lib/bientot';
-import { afficherDepuisLaBase, base, moteur } from '@/lib/hors-ligne';
+import { afficherDepuisLaBase, base, horsLigneSur } from '@/lib/hors-ligne';
 import type { Badge, Defi, Points } from '@/lib/motivation';
 import type { Jauge, Serie } from '@/lib/progression/locale';
 import { prochaineSeanceLocale } from '@/lib/progression/locale';
@@ -105,7 +105,7 @@ function salutation(maintenant: Date): string {
  * aucune question n'est choisie ici.
  */
 async function commencerSeance(auteurId?: number) {
-    if (moteur.etat.reseau === 'hors_ligne' && auteurId !== undefined) {
+    if (horsLigneSur() && auteurId !== undefined) {
         const uuid = await prochaineSeanceLocale(base, auteurId);
 
         if (

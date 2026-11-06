@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HorsLigne\ProfilAppareilController;
 use App\Http\Controllers\HorsLigne\ServiceWorkerController;
 use App\Http\Controllers\HorsLigne\SynchroController;
 use Illuminate\Support\Facades\Route;
@@ -14,3 +15,13 @@ Route::middleware(['auth', 'throttle:synchro'])->prefix('sync')->name('sync.')->
     Route::get('etat', [SynchroController::class, 'etat'])->name('etat');
     Route::post('operations', [SynchroController::class, 'operations'])->name('operations');
 });
+
+// Profils d'un même téléphone (A.7, HL6). Changer de profil se fait sans
+// session (celle d'un frère, ou expirée) : le jeton du profil sur cet
+// appareil fait foi, après le code local vérifié par l'appareil.
+Route::post('appareil/profils/basculer', [ProfilAppareilController::class, 'basculer'])
+    ->middleware('throttle:basculer-profil')
+    ->name('appareil.profils.basculer');
+Route::post('appareil/profils/retirer', [ProfilAppareilController::class, 'retirer'])
+    ->middleware('auth')
+    ->name('appareil.profils.retirer');

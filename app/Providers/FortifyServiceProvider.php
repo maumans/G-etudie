@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Actions\Fortify\ActiverDoubleAuthentification;
 use App\Actions\Fortify\CreateNewUser;
+use App\Http\Middleware\OrdinateurPartage;
 use App\Http\Middleware\SessionCourtePersonnel;
 use App\Models\User;
 use App\Support\JournalAcces;
@@ -78,6 +79,8 @@ class FortifyServiceProvider extends ServiceProvider
         Event::listen(function (Login $evenement) {
             if (request()->hasSession()) {
                 request()->session()->put(SessionCourtePersonnel::CLE, now()->getTimestamp());
+                // Lot 7 (HL-D9) : « Ordinateur partagé — ne rien garder ».
+                request()->session()->put(OrdinateurPartage::CLE, request()->boolean('ordinateur_partage'));
             }
         });
 

@@ -2,6 +2,7 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn } from '@/lib/utils';
 import { edit as affichage } from '@/routes/compte/affichage';
+import { index as appareils } from '@/routes/compte/appareils';
 import { edit as motDePasse } from '@/routes/compte/mot-de-passe';
 import { edit as numero } from '@/routes/compte/numero';
 import { edit as profil } from '@/routes/compte/profil';
@@ -12,6 +13,8 @@ const ONGLETS = [
     { libelle: 'Mot de passe', href: motDePasse().url },
     { libelle: 'Numéro', href: numero().url },
     { libelle: 'Affichage', href: affichage().url },
+    // Lot 7 (HL6) : les téléphones où le compte est gardé.
+    { libelle: 'Appareils', href: appareils().url },
 ];
 
 /** Double authentification : onglet du personnel seulement (DA4). */
@@ -30,6 +33,7 @@ export function EnteteCompte({ titre }: { titre: string }) {
         : ONGLETS;
     const formule = useFormule();
     const cinqOnglets = onglets.length === 5;
+    const sixOnglets = onglets.length === 6;
 
     return (
         <div className="grid gap-4">
@@ -40,8 +44,8 @@ export function EnteteCompte({ titre }: { titre: string }) {
                 </h1>
                 <p className="text-ink-600">
                     {formule(
-                        'Ton profil, ta sécurité et ton affichage.',
-                        'Votre profil, votre sécurité et votre affichage.',
+                        'Ton profil, ta sécurité, ton affichage et tes appareils.',
+                        'Votre profil, votre sécurité, votre affichage et vos appareils.',
                     )}
                 </p>
             </div>
@@ -49,8 +53,13 @@ export function EnteteCompte({ titre }: { titre: string }) {
                 aria-label="Mon compte"
                 className={cn(
                     'grid gap-0.5 rounded-controle bg-craie-100 p-1 sm:inline-flex sm:w-fit',
-                    // Cinq onglets : trois puis deux, sans case vide.
-                    cinqOnglets ? 'grid-cols-6' : 'grid-cols-2',
+                    // Cinq onglets : trois puis deux ; six : deux rangées de
+                    // trois — sans case vide.
+                    cinqOnglets
+                        ? 'grid-cols-6'
+                        : sixOnglets
+                          ? 'grid-cols-3'
+                          : 'grid-cols-2',
                 )}
             >
                 {onglets.map((onglet, rang) => {

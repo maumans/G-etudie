@@ -72,6 +72,8 @@ class HandleInertiaRequests extends Middleware
             // Liste blanche des écrans gardés hors ligne (HORS_LIGNE.md A.3.7) :
             // la garde de navigation la lit pour ne jamais laisser un clic mort.
             'hors_ligne_pages' => array_values(config('hors_ligne.pages')),
+            // Lot 7 (HL-D9) : ordinateur partagé, rien n'est gardé sur l'appareil.
+            'appareil_partage' => $user !== null && $request->hasSession() && $request->session()->get(OrdinateurPartage::CLE) === true,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

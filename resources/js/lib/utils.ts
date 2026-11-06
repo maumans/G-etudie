@@ -80,6 +80,22 @@ export function formaterGnf(montant: number): string {
     return `${formaterNombre(montant)}${ESPACE_INSECABLE}GNF`;
 }
 
+/**
+ * Poids d'un téléchargement (A.5 : « 4,2 Mo ») : Ko sans décimale sous
+ * 1 Mo, puis Mo et Go avec une décimale ; jamais « 0 Ko ».
+ */
+export function formaterOctets(octets: number): string {
+    if (octets < 1024 * 1024) {
+        return `${formaterNombre(Math.max(1, Math.round(octets / 1024)))}${ESPACE_INSECABLE}Ko`;
+    }
+
+    if (octets < 1024 ** 3) {
+        return `${formaterNombre(Math.round((octets / 1024 ** 2) * 10) / 10)}${ESPACE_INSECABLE}Mo`;
+    }
+
+    return `${formaterNombre(Math.round((octets / 1024 ** 3) * 10) / 10)}${ESPACE_INSECABLE}Go`;
+}
+
 /** « 1 chapitre », « 3 chapitres » ; `pluriel` quand il n'est pas régulier. */
 export function pluriel(
     nombre: number,

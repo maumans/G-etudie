@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Permission;
+use App\Http\Controllers\Compte\AppareilsController;
 use App\Http\Controllers\Compte\MonCompteController;
 use App\Http\Controllers\Compte\RecuperationController;
 use App\Http\Controllers\Compte\SecuriteController;
@@ -52,6 +53,10 @@ Route::middleware('auth')->prefix('compte')->name('compte.')->group(function () 
     Route::delete('numero/en-attente', [MonCompteController::class, 'annulerNumero'])->name('numero.annuler');
 
     Route::get('affichage', [MonCompteController::class, 'affichage'])->name('affichage.edit');
+
+    // Lot 7 (HL6) : les téléphones où ce compte est enregistré.
+    Route::get('appareils', [AppareilsController::class, 'index'])->name('appareils.index');
+    Route::delete('appareils/{appareil:uuid}', [AppareilsController::class, 'retirer'])->name('appareils.retirer');
 
     // Double authentification : personnel seulement (DA4).
     Route::get('securite', [SecuriteController::class, 'edit'])

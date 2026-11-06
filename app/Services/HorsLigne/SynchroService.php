@@ -42,15 +42,32 @@ class SynchroService
 
     public const ERREUR = 'erreur';
 
-    public function __construct(private RegistreOperations $registre) {}
+    /** @var array<int, bool> profils autorisés pendant ce lot (jeton vérifié une fois) */
+    private array $autorises = [];
+
+    /** @var array<int|string, string> */
+    private array $jetonsProfils = [];
+
+    public function __construct(
+        private RegistreOperations $registre,
+        private AppareilService $appareils,
+    ) {}
 
     /**
+     * `$jetonsProfils` (lot 7, HL6) : pour les gestes d'un autre profil du
+     * téléphone que celui de la session, le jeton de ce profil (auteur_id =>
+     * jeton). Sans jeton valable, ses gestes restent `reporte` — jamais
+     * attribués à un autre.
+     *
      * @param  list<array<string, mixed>>  $operations
+     * @param  array<int|string, string>  $jetonsProfils
      * @return list<Verdict>
      */
-    public function traiter(User $connecte, Appareil $appareil, Horloge $horloge, array $operations): array
+    public function traiter(User $connecte, Appareil $appareil, Horloge $horloge, array $operations, array $jetonsProfils = []): array
     {
         $recuLe = CarbonImmutable::now();
+        $this->autorises = [];
+        $this->jetonsProfils = $jetonsProfils;
 
         return array_map(
             fn (array $operation) => $this->traiterUne($connecte, $appareil, $horloge, $recuLe, $operation),
@@ -80,9 +97,10 @@ class SynchroService
 
         $auteur = User::find((int) ($operation['auteur_id'] ?? 0));
 
-        // Lot 0 : une seule session par appareil, celle de l'auteur. Les
-        // gestes d'un autre profil attendent sa connexion (HL6, lot 7).
-        if ($auteur === null || $auteur->isNot($connecte) || ! $appareil->aPourProfil($auteur)) {
+        // L'auteur est le compte de la session, ou un autre profil de ce
+        // téléphone qui présente son jeton (HL6) ; sinon ses gestes
+        // attendent sa prochaine connexion.
+        if ($auteur === null || ! $appareil->aPourProfil($auteur) || ! $this->autorise($connecte, $appareil, $auteur)) {
             return ['uuid' => $uuid, 'verdict' => self::REPORTE, 'motif' => 'Profil non connecté sur cet appareil.'];
         }
 
@@ -134,6 +152,17 @@ class SynchroService
         }
 
         return $this->executer($contexte, $type, $gestionnaire, $valide, $charge);
+    }
+
+    private function autorise(User $connecte, Appareil $appareil, User $auteur): bool
+    {
+        if ($auteur->is($connecte)) {
+            return true;
+        }
+
+        $id = (int) $auteur->getKey();
+
+        return $this->autorises[$id] ??= $this->appareils->profilParJeton($appareil, $id, $this->jetonsProfils[$id] ?? null) !== null;
     }
 
     /**

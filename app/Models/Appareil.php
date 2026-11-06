@@ -49,6 +49,6 @@ class Appareil extends Model
 
     public function aPourProfil(User $user): bool
     {
-        return $this->profils()->whereKey($user->getKey())->exists();
+        return $this->profils()->whereKey($user->getKey())->wherePivotNull('retire_le')->exists();
     }
 }

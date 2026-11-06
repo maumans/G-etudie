@@ -34,3 +34,14 @@ describe('lireNombre', () => {
         expect(lireNombre('1,2,3')).toBeNull();
     });
 });
+
+describe('formaterOctets (poids d’un pack, A.5)', () => {
+    it('Ko, Mo, Go, jamais « 0 Ko »', async () => {
+        const { formaterOctets } = await import('@/lib/utils');
+
+        expect(formaterOctets(12)).toBe('1\u00A0Ko');
+        expect(formaterOctets(3_458)).toBe('3\u00A0Ko');
+        expect(formaterOctets(4.2 * 1024 * 1024)).toBe('4,2\u00A0Mo');
+        expect(formaterOctets(10 * 1024 ** 3)).toBe('10\u00A0Go');
+    });
+});

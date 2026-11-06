@@ -1,4 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
+import { ChevronsUpDown } from 'lucide-react';
+import { useState } from 'react';
 import type { ReactNode } from 'react';
 import {
     BandeauCopie,
@@ -7,17 +9,21 @@ import {
 } from '@/components/hors-ligne/bandeaux';
 import { BandeauExamenEnCours } from '@/components/examen-blanc/bandeau-examen';
 import { PastilleReseau } from '@/components/hors-ligne/pastille-reseau';
+import {
+    FeuilleProfils,
+    PastilleProfil,
+} from '@/components/hors-ligne/profils-telephone';
 import { LienNavigation } from '@/components/lien-navigation';
 import { Marque } from '@/components/marque';
 import { NAVIGATION_ELEVE } from '@/lib/navigation';
 import { cn } from '@/lib/utils';
-import { edit as monCompte } from '@/routes/compte/profil';
 import { accueil as accueilEleve } from '@/routes/eleve';
 
 /**
  * Habillage de l'espace élève (DESIGN.md § 7) : barre d'onglets en bas sur
  * mobile (Accueil · Cours · Annales · Examens blancs · Moi), barre latérale
- * à partir de 1024 px. Lumineux, chaleureux, tutoiement.
+ * à partir de 1024 px. Lumineux, chaleureux, tutoiement. La pastille du
+ * profil ouvre « Qui révise ? » (profils du téléphone, lot 7).
  */
 export default function EleveLayout({ children }: { children: ReactNode }) {
     const accueil = NAVIGATION_ELEVE[0];
@@ -98,62 +104,69 @@ function BandeauxHorsLigne() {
     );
 }
 
-/** Pastille à l'initiale du prénom : jamais de photo (données minimales). */
-function Pastille({ prenom }: { prenom: string }) {
-    return (
-        <span
-            aria-hidden
-            className="flex size-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-soleil-300 to-soleil-500 text-aide font-semibold text-soleil-900"
-        >
-            {prenom.charAt(0).toUpperCase()}
-        </span>
-    );
-}
-
+/**
+ * La pastille du profil ouvre « Qui révise ? » (lot 7, HL6) : changer de
+ * profil, garder le sien avec un code, Téléchargements, Mon compte.
+ */
 function Initiale() {
     const { auth } = usePage().props;
+    const [ouvert, setOuvert] = useState(false);
 
     if (!auth.user) {
         return null;
     }
 
     return (
-        <Link
-            href={monCompte()}
-            prefetch
-            aria-label="Mon compte"
-            className="rounded-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-        >
-            <Pastille prenom={auth.user.prenom} />
-        </Link>
+        <>
+            <button
+                type="button"
+                onClick={() => setOuvert(true)}
+                aria-label="Qui révise ? Profils de ce téléphone"
+                className="rounded-full outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+            >
+                <PastilleProfil prenom={auth.user.prenom} />
+            </button>
+            <FeuilleProfils ouvert={ouvert} onOuvert={setOuvert} />
+        </>
     );
 }
 
 function CarteEleve({ className }: { className?: string }) {
     const { auth } = usePage().props;
+    const [ouvert, setOuvert] = useState(false);
 
     if (!auth.user) {
         return null;
     }
 
     return (
-        <Link
-            href={monCompte()}
-            prefetch
-            className={cn(
-                'flex items-center gap-3 rounded-controle p-2 transition-colors outline-none hover:bg-ink-900/[0.04] focus-visible:outline-2 focus-visible:outline-ring dark:hover:bg-white/[0.04]',
-                className,
-            )}
-        >
-            <Pastille prenom={auth.user.prenom} />
-            <span className="grid min-w-0 leading-tight">
-                <span className="truncate text-interface font-medium text-ink-900">
-                    {auth.user.prenom}
+        <>
+            <button
+                type="button"
+                onClick={() => setOuvert(true)}
+                className={cn(
+                    'flex w-full items-center gap-3 rounded-controle p-2 text-left transition-colors outline-none hover:bg-ink-900/[0.04] focus-visible:outline-2 focus-visible:outline-ring dark:hover:bg-white/[0.04]',
+                    className,
+                )}
+            >
+                <PastilleProfil prenom={auth.user.prenom} />
+                <span className="sr-only">
+                    Qui révise ? Profils de ce téléphone :
                 </span>
-                <span className="truncate text-meta text-ink-500">
-                    @{auth.user.pseudo}
+                <span className="grid min-w-0 flex-1 leading-tight">
+                    <span className="truncate text-interface font-medium text-ink-900">
+                        {auth.user.prenom}
+                    </span>
+                    <span className="truncate text-meta text-ink-500">
+                        @{auth.user.pseudo}
+                    </span>
                 </span>
-            </span>
-        </Link>
+                <ChevronsUpDown
+                    aria-hidden
+                    className="size-4 shrink-0 text-ink-400"
+                />
+            </button>
+            <FeuilleProfils ouvert={ouvert} onOuvert={setOuvert} />
+        </>
     );
 }

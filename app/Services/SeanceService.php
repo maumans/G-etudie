@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Enums\StatutContenu;
 use App\Models\Maitrise;
+use App\Models\Matiere;
 use App\Models\ProfilEleve;
 use App\Models\Question;
 use App\Models\Seance;
@@ -35,7 +36,9 @@ use Illuminate\Support\Str;
  *
  * **Séances préparées d'avance** (HL4) : il y en a toujours trois
  * (`aVenir`), envoyées à l'appareil, qui les fait hors ligne l'une après
- * l'autre ; « Commencer » en ligne prend la première — la même. Quand une
+ * l'autre ; « Commencer » en ligne prend la première — la même. Lot 7 :
+ * trois de plus **par matière téléchargée** (`aVenir(…, $matiere)`, séances
+ * marquées de leur matière), faites hors ligne depuis le pack. Quand une
  * réponse a été comptée depuis leur préparation, elles sont **remplacées**
  * par des plus fraîches (`remplacee_le`), jamais supprimées : un appareil
  * resté hors ligne peut encore y répondre.
@@ -111,19 +114,19 @@ class SeanceService
      *
      * @return EloquentCollection<int, Seance>
      */
-    public function aVenir(User $eleve, ?ProfilEleve $profil = null): EloquentCollection
+    public function aVenir(User $eleve, ?ProfilEleve $profil = null, ?Matiere $matiere = null): EloquentCollection
     {
         $profil ??= CatalogueEleve::profil($eleve);
 
-        if ($profil === null) {
+        if ($profil === null || ($matiere !== null && ! CatalogueEleve::voitMatiere($profil, $matiere))) {
             return new EloquentCollection;
         }
 
-        return DB::transaction(function () use ($eleve, $profil) {
+        return DB::transaction(function () use ($eleve, $profil, $matiere) {
             // Une demande à la fois par élève : jamais six séances préparées.
             User::query()->whereKey($eleve->id)->lockForUpdate()->first();
 
-            $preparees = $this->preparees($eleve);
+            $preparees = $this->preparees($eleve, $matiere);
             $derniereReponse = Maitrise::query()->where('user_id', $eleve->id)->max('maj_le');
             $perimees = $preparees->contains(fn (Seance $seance) => $seance->duree_minutes !== $profil->objectif_minutes
                 || ($derniereReponse !== null && $seance->genere_le->lessThan(CarbonImmutable::parse($derniereReponse)->startOfSecond())));
@@ -138,7 +141,7 @@ class SeanceService
             $rang = (int) ($preparees->max('rang') ?? 0);
 
             while ($preparees->count() < self::SEANCES_D_AVANCE) {
-                $questions = $this->choisir($eleve, $profil, $dejaPrises);
+                $questions = $this->choisir($eleve, $profil, $dejaPrises, $matiere);
 
                 if ($questions === []) {
                     break;
@@ -150,6 +153,7 @@ class SeanceService
                     'user_id' => $eleve->id,
                     'jour' => null,
                     'rang' => ++$rang,
+                    'matiere_id' => $matiere?->id,
                     'questions' => $questions,
                     'duree_minutes' => $profil->objectif_minutes,
                     'genere_le' => CarbonImmutable::now(),
@@ -161,10 +165,11 @@ class SeanceService
     }
 
     /** @return EloquentCollection<int, Seance> */
-    private function preparees(User $eleve): EloquentCollection
+    private function preparees(User $eleve, ?Matiere $matiere = null): EloquentCollection
     {
         return Seance::query()
             ->where('user_id', $eleve->id)
+            ->where('matiere_id', $matiere?->id)
             ->whereNull('jour')
             ->whereNull('termine_le')
             ->whereNull('remplacee_le')
@@ -235,9 +240,9 @@ class SeanceService
      * @param  list<int>  $exclues
      * @return list<int>
      */
-    private function choisir(User $eleve, ProfilEleve $profil, array $exclues = []): array
+    private function choisir(User $eleve, ProfilEleve $profil, array $exclues = [], ?Matiere $matiere = null): array
     {
-        $questions = CatalogueEleve::questions($profil)->with('notion.chapitre')->orderBy('id')->get();
+        $questions = CatalogueEleve::questions($profil, $matiere)->with('notion.chapitre')->orderBy('id')->get();
 
         if ($questions->isEmpty()) {
             return [];

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\Role;
 use App\Models\User;
+use App\Services\PackService;
 use Illuminate\Database\Seeder;
 use RuntimeException;
 
@@ -61,5 +62,8 @@ class DemoSeeder extends Seeder
         // cours côté élève et les profils d'examen des élèves (lot 2), puis les
         // annales fictives et les signalements (lot 4).
         $this->call([DemoContenuSeeder::class, DemoCoursSeeder::class, DemoEleveSeeder::class, DemoAnnalesSeeder::class, DemoExamensBlancsSeeder::class]);
+
+        // Lot 7 : les packs du contenu de démonstration, prêts à télécharger.
+        app(PackService::class)->genererTout();
     }
 }

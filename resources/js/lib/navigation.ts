@@ -4,6 +4,7 @@ import {
     BookOpen,
     ChartNoAxesCombined,
     CircleUser,
+    Download,
     ClipboardCheck,
     FileQuestion,
     FileText,
@@ -26,6 +27,7 @@ import {
     accueil as accueilEleve,
     cours as coursEleve,
     progression as progressionEleve,
+    telechargements as telechargementsEleve,
 } from '@/routes/eleve';
 import { index as annalesEleve } from '@/routes/eleve/annales';
 import { index as examensBlancs } from '@/routes/eleve/examens-blancs';
@@ -66,6 +68,14 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         icone: ChartPie,
         href: progressionEleve().url,
         actifSous: '/eleve/progression',
+        lateralSeulement: true,
+    },
+    {
+        // Lot 7 (HL5) : sur mobile, depuis « Qui révise ? » (pastille du haut).
+        libelle: 'Téléchargements',
+        icone: Download,
+        href: telechargementsEleve().url,
+        actifSous: '/eleve/telechargements',
         lateralSeulement: true,
     },
     {

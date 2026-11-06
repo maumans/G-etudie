@@ -14,6 +14,8 @@ const ECRANS: Record<string, Copie> = {
     'eleve/accueil': { sujet: 'Accueil', lecture: true },
     'eleve/progression': { sujet: 'Ma progression', lecture: true },
     'compte/affichage': { sujet: 'Affichage', lecture: false },
+    // Lot 7 : la liste des packs ; leur état sur l'appareil, lui, est lu en direct.
+    'eleve/telechargements': { sujet: 'Téléchargements', lecture: true },
 };
 
 export function copieDe(composant: string): Copie {

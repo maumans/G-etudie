@@ -235,9 +235,92 @@
 - En cas d'échec, relever : capture, heure du déploiement et de la coupure.
 - État : à faire (bloqué tant qu'il n'y a pas de préproduction)
 
+### [Lot 7] Télécharger un pack sur réseau mobile faible, interrompu puis repris (A.15 n° 3)
+- Pourquoi : HL5 (`HORS_LIGNE.md` A.5) — une coupure ne fait recommencer
+  qu'un morceau, jamais depuis zéro ; le poids est affiché avant.
+- Matériel : un Android d'entrée de gamme sur données mobiles (2G/3G, ou
+  Wi-Fi bridé), préproduction en HTTPS, un pack d'au moins deux morceaux
+  (une matière avec son vrai contenu, > 500 Ko).
+- Comment le provoquer :
+  1. « Téléchargements » : relever le poids annoncé ; « Télécharger ».
+  2. Pendant la progression, passer en mode avion quelques secondes.
+  3. Revenir ; toucher « Reprendre ».
+  4. Mode avion : ouvrir la matière, une leçon jamais lue, la fiche d'un
+     chapitre, une annale ; faire « M'entraîner » jusqu'au bilan.
+- Quoi observer : « Interrompu » puis « Reprendre » ; la reprise repart du
+  morceau suivant (la barre ne revient pas à zéro) ; à la fin, « Sur le
+  téléphone » ; la consommation de données (réglages Android) proche du
+  poids annoncé ; tout s'ouvre en mode avion (« Lue depuis ton
+  téléchargement »).
+- En cas d'échec, relever : poids annoncé et données consommées, capture
+  au moment de l'interruption, le message affiché.
+- État : à faire (bloqué par D11)
+
 ## 5. Téléphone partagé et profils
 
-*(aucune entrée)*
+### [Lot 7] Deux profils sur le même téléphone, réponses hors ligne des deux (A.15 n° 4)
+- Pourquoi : HL6 (`HORS_LIGNE.md` A.7) — chaque réponse doit arriver au
+  serveur **au nom de son auteur**, même quand la session est celle de
+  l'autre ; le parcours Playwright `parcours-lot7.spec.ts` le vérifie avec
+  `setOffline`, qui ne coupe pas le réseau comme un vrai mode avion.
+- Matériel : un Android d'entrée de gamme, application **installée**,
+  préproduction en HTTPS ; deux comptes élèves (ex. 01 Aïssatou et un
+  compte créé pour l'essai).
+- Comment le provoquer :
+  1. Se connecter avec le premier compte ; toucher la pastille du profil →
+     « Qui révise ? » → « Garde ton profil ici » → code à 4 chiffres, deux fois.
+  2. « Ajouter un profil » → se connecter avec le second compte → choisir
+     son code de la même façon.
+  3. Ouvrir l'accueil des deux profils une fois en ligne (le téléphone y
+     garde les séances préparées).
+  4. Mode avion. Le second profil commence une séance et répond à deux
+     questions.
+  5. Pastille → « Qui révise ? » → le premier profil → son code. Il
+     commence une séance et répond à deux questions.
+  6. Couper le mode avion ; attendre « Tout est envoyé ».
+- Quoi observer : à l'étape 5, le changement de profil se fait sans réseau
+  et sans mot de passe ; l'accueil est bien celui du premier profil. Au
+  retour du réseau, la pastille passe à « Tout est envoyé » ; dans « Ma
+  progression » de chaque profil, ses deux réponses comptent, et pas celles
+  de l'autre ; « Mon compte » affiche le premier profil (la session a suivi).
+- En cas d'échec, relever : l'heure, le prénom affiché après le changement,
+  le contenu de la pastille, une capture de « Ma progression » de chaque
+  profil, et (préproduction) les lignes de `operations_synchronisees`
+  (auteur, verdict) des dernières minutes.
+- État : à faire (bloqué par D11 : pas de service worker sans HTTPS)
+
+### [Lot 7] Code oublié, trop d'essais, ordinateur partagé
+- Pourquoi : HL-D9 — le code local protège l'accès entre frères et sœurs ;
+  l'ordinateur partagé d'une école ne doit rien garder.
+- Matériel : le téléphone de l'essai précédent ; un ordinateur de salle
+  informatique (ou un navigateur ordinaire).
+- Comment le provoquer :
+  1. « Qui révise ? » → un autre profil → taper cinq fois un mauvais code.
+  2. Attendre 30 s, retaper un mauvais code, puis le bon après la minute.
+  3. Sur l'ordinateur : se connecter en cochant « Ordinateur partagé — ne
+     rien garder », ouvrir « Téléchargements », se déconnecter, fermer le
+     navigateur, le rouvrir sur le site.
+- Quoi observer : après 5 erreurs, « Trop d'essais. Réessaie dans 30 s. »,
+  puis une attente qui double ; le bon code passe après l'attente. Sur
+  l'ordinateur : « Ordinateur partagé : rien n'est gardé », aucun bouton
+  « Télécharger » ; après fermeture du navigateur, plus de session, et la
+  page de connexion ne propose aucun profil « Déjà sur ce téléphone ».
+- En cas d'échec, relever : captures, navigateur et version.
+- État : à faire
+
+### [Lot 7] iPhone installé, sept jours sans ouverture (A.15 n° 5)
+- Pourquoi : Safari efface le stockage d'un site **non installé** après
+  sept jours sans visite (A.3.2) ; installé, les packs doivent rester
+  (`storage.persist()` après le premier pack, HL-D11).
+- Matériel : un iPhone (iOS récent), application ajoutée à l'écran
+  d'accueil, préproduction en HTTPS.
+- Comment le provoquer : télécharger un pack ; ne plus ouvrir
+  l'application pendant sept jours ; la rouvrir **en mode avion**.
+- Quoi observer : « Téléchargements » montre le pack « Sur le téléphone » ;
+  une leçon et une annale du pack s'ouvrent sans réseau.
+- En cas d'échec, relever : la version d'iOS, si l'application était bien
+  installée, la date du téléchargement.
+- État : à faire (bloqué par D11)
 
 ## 6. SMS réels — vérification du numéro, récupération du mot de passe
 
