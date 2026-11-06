@@ -15,6 +15,7 @@
 | `DESIGN.md` | Design system « Ardoise », contrats des composants, protocole de vérification visuelle Playwright. |
 | `HORS_LIGNE.md` | Mode hors ligne : spécification complète (partie A), suivi (partie B), décisions HL-D1–HL-D12. |
 | `DEVBOOK.md` | Ce fichier : état du code, historique numéroté des décisions (section 8). |
+| `MISE_EN_PRODUCTION.md` | Mettre en ligne et y rester : serveur, `.env`, commandes de chaque déploiement, file d'attente, planificateur, journaux, sauvegardes, et ce que chaque lot demande au déploiement. Complété à chaque lot. |
 | `A_TESTER.md` | Tous les contrôles manuels en attente (vrais téléphones, coupures réelles, paiements réels). Créé à l'audit (2026-10-30), vide. |
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
@@ -38,7 +39,8 @@
   rechargement, retour du réseau → un seul envoi). ⚠ **Au déploiement :
   `php artisan packs:generer`** après `migrate` et `db:seed`, et le
   planificateur (`schedule:run`) pour la regénération de nuit ; un
-  `queue:work` pour les regénérations à la publication.
+  `queue:work` pour les regénérations à la publication. Tout est dans
+  **`MISE_EN_PRODUCTION.md`** (§ 8, lot 7).
 - **Lot 6 fait** (point 20) : **maîtrise par notion** (scores récents
   pondérés, confiance à 3 réponses), **révision espacée** (1, 3, 7, 14,
   30 jours), **jauge** par matière pondérée par les coefficients saisis,
@@ -1863,38 +1865,10 @@ Toute exception est justifiée dans `AccesParRoleTest::OUVERTES_A_TOUS`.
 
 ## 12. Mise en production — liste à suivre
 
-> Préparée à la clôture du lot 0 ; attend le domaine et l'hébergement (D11).
-> Chaque point se vérifie sur la préproduction avant la production.
-
-1. **HTTPS** sur tout le domaine (certificat valide, redirection du HTTP) :
-   sans lui, pas de service worker, donc ni hors ligne ni installation.
-2. `.env` : `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`,
-   `SESSION_SECURE_COOKIE=true`, `APP_KEY` généré une fois et gardé ;
-   **pas** de `DEMO_MOT_DE_PASSE`. Base MySQL dédiée.
-3. Déploiement, dans l'ordre : `composer install --no-dev --optimize-autoloader`,
-   `npm ci && npm run build` (vérifier l'absence de `public/hot`),
-   `php artisan migrate --force`, **puis** `php artisan db:seed --force`
-   (rôles et permissions seulement : `DemoSeeder` refuse la production),
-   `php artisan optimize`. Vérifié en local : les caches de configuration,
-   de routes et de vues se construisent (51 routes).
-4. Serveur web : `/sw.js` passe par PHP (pas de fichier statique de ce nom),
-   avec ses en-têtes (`Service-Worker-Allowed: /`, `Cache-Control:
-   no-cache`) ; `/build/*` servi avec un cache long (`immutable`), les noms
-   étant hachés ; `/manifest.webmanifest` en `application/manifest+json`.
-5. File d'attente et tâches planifiées : `QUEUE_CONNECTION=database` → un
-   `php artisan queue:work --timeout=900 --tries=1` surveillé (lot 4 :
-   l'import assisté en dépend) et `DB_QUEUE_RETRY_AFTER=960` (au-delà de
-   la durée d'une lecture, sinon un second travailleur reprend le job).
-   `ANTHROPIC_API_KEY` dans `.env` (jamais dans le dépôt) ; sans elle,
-   l'import échoue avec sa raison (pas de lecture simulée en production).
-   Documents originaux sur le disque privé (`storage/app/private/annales`,
-   à sauvegarder avec la base).
-6. SMS : aucun fournisseur (D3) ; en production, `JournalSms` signale
-   seulement l'absence d'envoi — la vérification du numéro et la
-   récupération du mot de passe ne fonctionnent donc pas encore.
-7. Après le premier déploiement : créer le premier administrateur
-   plateforme à la main (`php artisan tinker`, rôle `superadmin`), activer sa
-   double authentification, puis dérouler les contrôles « bloqués tant que
-   le domaine HTTPS n'existe pas » de `A_TESTER.md`.
-
-- [ ] **Lot 6, une fois** : après `migrate` et `db:seed`, `php artisan progression:recalculer` (maîtrises, séries, points et badges des réponses reçues avant le lot 6 ; idempotente).
+> **Déplacée dans `MISE_EN_PRODUCTION.md`** (2026-11-06, à la demande de
+> Maurice) : prérequis du serveur, `.env` de production, premier
+> déploiement pas à pas, file d'attente (Supervisor) et planificateur
+> (cron), déploiements suivants, journaux, sauvegardes, et **ce que chaque
+> lot demande au déploiement** (commandes « une seule fois » comprises :
+> `progression:recalculer` au lot 6, `packs:generer` au lot 7). C'est la
+> seule liste à suivre ; chaque lot la complète (`CLAUDE.md` § 7).

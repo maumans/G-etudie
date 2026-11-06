@@ -3,6 +3,7 @@
 Ce fichier est lu par Claude Code à chaque session. Il dit **comment** on
 travaille ici. Le **quoi** est dans `PLAN_NKARAMOGO.md` et `HORS_LIGNE.md`, le
 **à quoi ça ressemble** dans `DESIGN.md`, et **où on en est** dans `DEVBOOK.md`.
+Le **comment mettre en ligne** est dans `MISE_EN_PRODUCTION.md`.
 Ces fichiers sont la seule référence du projet.
 
 ---
@@ -251,6 +252,11 @@ la case, et inscrire la vérification dans `A_TESTER.md`.
 - `DEVBOOK.md` mis à jour : un point numéroté avec **le constat, la décision,
   la preuve**, et la section 0 « Reprise » rafraîchie.
 - `HORS_LIGNE.md` partie B mise à jour si le lot touche au hors ligne.
+- `MISE_EN_PRODUCTION.md` mis à jour : toute commande « une seule fois »,
+  variable de `.env`, tâche planifiée, travail en file, réglage du serveur
+  web ou contrôle après déploiement que le lot ajoute, dans la section du
+  lot (§ 8) **et** à sa place dans les étapes. Un lot qui n'ajoute rien le
+  dit (« Rien de plus »).
 - Contrôles impossibles ici (vrai téléphone, vraie coupure, vrai paiement)
   inscrits dans `A_TESTER.md`, pas à pas : comment le provoquer, quoi observer,
   quoi relever en cas d'échec.
