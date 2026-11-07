@@ -1278,3 +1278,41 @@ la prolonge sans nouveau composant de base.
   nom accessible ne contenait pas le texte visible (axe,
   `label-content-name-mismatch`) → texte réservé aux lecteurs d'écran
   avant le texte visible ; « 10 240 Mo libres » → « 10 Go ».
+
+### Lot 8 — vitrine finale, annales publiques (2026-11-07)
+
+- **Vitrine** : une section « Essayez une question, **sans compte** » sous
+  les preuves — à gauche le titre en contraste, trois points cochés et le
+  compte à rebours (carte, chiffres en `font-data` 32 px, jours en unité
+  `ink-500`, date en toutes lettres ; absent sans date saisie), à droite
+  la question jouable (`ExerciceQuestion`, ombre `shadow-flottant`,
+  cachet « Exemple » posé sur l'arête) et sa précision en 13 px. Les
+  « annales en accès libre » ferment la section des examens (panneau,
+  lignes de liste). **Tarifs** : deux panneaux, le gratuit en filet simple,
+  l'abonnement cerné de `nimba-500` (2 px) avec ses deux durées en cartes ;
+  l'année scolaire en teinte mandarine en opacité avec « 33 % d'économie »
+  et le seul bouton plein de la section. Partenaires : rangée de logos en
+  gris, seulement s'il y en a. « Installer l'application » rejoint
+  « Dans la poche ». Navigation : « Annales » et « Tarifs » ajoutés.
+- **Annales publiques** (`pages/vitrine/sujets.tsx`) : titre « Les
+  annales, **du CEE au Bac** » ; filtres d'examen et de matière en
+  étiquettes de 36 px (rangées à plat sous 1024 px, colonne de 15 rem au-delà,
+  le filtre actif en `bg-relief` cerné d'encre) ; liste en filets dans une
+  carte (recette « ligne de liste ») ; état vide avec une action.
+- **Sujet public** (`pages/vitrine/sujet.tsx`) : en-tête de l'annale
+  élève (tuile 48 px, titre en contraste) ; une carte par partie, questions
+  numérotées sur pastille d'encre, options lettrées en lignes de 10 px ; sous
+  chaque question, « Corrigé pas à pas en N étapes, réservé aux inscrits »
+  (cadenas, lien mandarine) ; colonne de 20 rem collante : le moment fort
+  `surface-encre` (« Le corrigé, **étape par étape.** »), le partage
+  WhatsApp (bouton `doux`, bulle dessinée au trait, pas de logo de marque),
+  les autres sessions.
+- **Corrigé à la relecture des captures** : contraste du prix par mois
+  (`ink-500` sur la teinte mandarine, refusé par axe → `ink-600`, règle du
+  § 2) ; la capture pleine page laissait blanches les sections
+  `rendu-differe` hors de la fenêtre (la capture force leur rendu, l'élève
+  les voit en défilant).
+- **Poids** : sections sous la ligne de flottaison en
+  `content-visibility: auto` (`rendu-differe`), rendues par React juste
+  après le héros ; la question jouable (moteur de questions et KaTeX)
+  chargée à 400 px de l'écran.

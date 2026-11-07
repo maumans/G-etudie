@@ -38,9 +38,38 @@
         <link rel="manifest" href="/manifest.webmanifest">
 
         @viteReactRefresh
-        @vite(['resources/css/app.css', 'resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+        @vite(\App\Support\Habillages::fichiersVite($page['component']))
+        {{--
+            Référencement et partage (lot 8, App\Support\Seo) : dans le HTML du
+            serveur, parce que WhatsApp et les moteurs lisent les liens sans
+            exécuter le JavaScript.
+        --}}
+        @php($seo ??= null)
+        <meta name="description" content="{{ $seo['description'] ?? \App\Support\Seo::DESCRIPTION }}">
+        @if ($seo)
+            <meta name="robots" content="{{ $seo['robots'] }}">
+            <link rel="canonical" href="{{ $seo['canonique'] }}">
+            <meta property="og:site_name" content="{{ config('app.name') }}">
+            <meta property="og:locale" content="fr_FR">
+            <meta property="og:type" content="{{ $seo['type'] }}">
+            <meta property="og:title" content="{{ $seo['titre_partage'] }}">
+            <meta property="og:description" content="{{ $seo['description'] }}">
+            <meta property="og:url" content="{{ $seo['canonique'] }}">
+            <meta property="og:image" content="{{ $seo['image'] }}">
+            <meta property="og:image:type" content="image/png">
+            <meta property="og:image:width" content="1200">
+            <meta property="og:image:height" content="630">
+            <meta property="og:image:alt" content="{{ $seo['titre_partage'] }}">
+            <meta name="twitter:card" content="summary_large_image">
+            @foreach ($seo['precharger'] as $image)
+                <link rel="preload" as="image" href="{{ $image }}" fetchpriority="high">
+            @endforeach
+            @foreach ($seo['json_ld'] as $donnees)
+                <script type="application/ld+json">{!! json_encode($donnees, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
+            @endforeach
+        @endif
         <x-inertia::head>
-            <title>{{ config('app.name', 'Laravel') }}</title>
+            <title>{{ $seo['titre'] ?? config('app.name', 'Laravel') }}</title>
         </x-inertia::head>
     </head>
     <body class="font-sans antialiased">

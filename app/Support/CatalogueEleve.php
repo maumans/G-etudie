@@ -180,12 +180,15 @@ class CatalogueEleve
     }
 
     /**
+     * Un sujet « en ligne » : publié, pas retiré. Seule définition, partagée
+     * avec les pages publiques (AnnalesPubliques, lot 8).
+     *
      * @template T of Builder<Sujet>
      *
      * @param  T  $requete
      * @return T
      */
-    private static function sujetEnLigne(Builder $requete): Builder
+    public static function sujetEnLigne(Builder $requete): Builder
     {
         return $requete->whereNotNull('version_publiee_id')
             ->where('statut', '!=', StatutContenu::Archive->value);

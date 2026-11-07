@@ -1,5 +1,6 @@
 import { Head, Link } from '@inertiajs/react';
 import {
+    ArrowRight,
     BookOpen,
     Check,
     ChevronDown,
@@ -9,14 +10,33 @@ import {
     WifiOff,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import {
+    lazy,
+    startTransition,
+    Suspense,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 import { ApercuApplication } from '@/components/apercu-application';
+import { Installation } from '@/components/installation';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { CompteARebours } from '@/components/vitrine/compte-a-rebours';
+import { LigneSujet } from '@/components/vitrine/ligne-sujet';
 import { annoncerBientot } from '@/lib/bientot';
+import type { QuestionEleve } from '@/lib/contenu/questions';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
-import { cn } from '@/lib/utils';
+import { cn, formaterGnf } from '@/lib/utils';
+import type { CarteSujet, SessionExamen, Tarifs } from '@/lib/vitrine';
+import { economie, prixMensuel } from '@/lib/vitrine';
 import { login, register } from '@/routes';
+import { index as annales } from '@/routes/vitrine/sujets';
+
+/** Le moteur de questions et KaTeX n'arrivent qu'à l'approche de la question. */
+const QuestionDemo = lazy(() => import('@/components/vitrine/question-demo'));
 
 /** Emplacements d'image de la vitrine (`App\Support\ImagesVitrine`). */
 type Illustrations = Record<'heros' | 'cee' | 'bepc' | 'bac' | 'soir', string>;
@@ -76,6 +96,13 @@ const PREUVES: { titre: string; texte: string; icone: LucideIcon }[] = [
         texte: 'Un cours téléchargé se révise sans réseau.',
         icone: WifiOff,
     },
+];
+
+/** Ce que montre la question jouable (lot 8). */
+const ESSAI: string[] = [
+    'Des indices un par un, qui ne retirent rien',
+    'Le verdict tout de suite : icône, mot et couleur',
+    'Le corrigé pas à pas, à déplier',
 ];
 
 const ETAPES: { titre: string; texte: string }[] = [
@@ -147,7 +174,7 @@ const QUESTIONS: { question: string; reponse: string }[] = [
     {
         question: 'Est-ce gratuit ?',
         reponse:
-            'Les cours et une partie des annales sont gratuits. Les corrigés détaillés complets, les examens blancs illimités, les cours hors ligne et le tuteur feront partie d’un abonnement.',
+            'Les cours, une partie des annales et une matière hors connexion sont gratuits. Les corrigés détaillés de toutes les annales, les examens blancs sans limite et toutes les matières hors connexion font partie de l’abonnement (voir les tarifs).',
     },
     {
         question: 'Faut-il une connexion internet ?',
@@ -176,13 +203,27 @@ const QUESTIONS: { question: string; reponse: string }[] = [
  * héros, si Maurice la fournit, se pose devant l'illustration. Vouvoiement ;
  * aucun chiffre ni témoignage non sourcé.
  */
+type Partenaire = { nom: string; logo: string; url: string | null };
+
 export default function Accueil({
     illustrations,
     photoHeros,
+    compteARebours,
+    questionDemo,
+    sujetsRecents,
+    tarifs,
+    partenaires,
 }: {
     illustrations: Illustrations;
     photoHeros: string | null;
+    compteARebours: SessionExamen[];
+    questionDemo: QuestionEleve;
+    sujetsRecents: CarteSujet[];
+    tarifs: Tarifs;
+    partenaires: Partenaire[];
 }) {
+    const complet = useRenduComplet();
+
     return (
         <>
             <Head title="Préparer le CEE, le BEPC et le Baccalauréat" />
@@ -273,313 +314,687 @@ export default function Accueil({
                 </ul>
             </section>
 
-            {/* Les examens et les matières */}
-            <section
-                aria-labelledby="titre-examens"
-                className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:px-8 lg:py-28"
-            >
-                <EnTeteSection
-                    id="titre-examens"
-                    titre={
-                        <>
-                            Un parcours pour <strong>chaque examen</strong>
-                        </>
-                    }
-                    texte="Du primaire au Baccalauréat unique : les cours, les annales et les examens blancs de votre classe, au programme guinéen."
-                />
-                <ul className="grid gap-5 md:grid-cols-3">
-                    {EXAMENS.map((examen) => (
-                        <li
-                            key={examen.nom}
-                            className="grid content-start overflow-hidden rounded-carte border bg-card shadow-carte"
-                        >
-                            <img
-                                src={illustrations[examen.image]}
-                                alt=""
-                                width={360}
-                                height={220}
-                                loading="lazy"
-                                decoding="async"
-                                className="aspect-[18/11] w-full object-cover"
+            {/* Sous la ligne de flottaison : rendu juste après le premier
+                affichage (lot 8, voir useRenduComplet). */}
+            {complet && (
+                <>
+                    {/* La question jouable, sans compte, et le compte à rebours */}
+                    <section
+                        aria-labelledby="titre-essai"
+                        className="mx-auto grid max-w-7xl items-start gap-10 px-4 pt-20 rendu-differe sm:px-6 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:gap-16 lg:px-8 lg:pt-28"
+                    >
+                        <div className="grid content-start gap-8">
+                            <EnTeteSection
+                                id="titre-essai"
+                                titre={
+                                    <>
+                                        Essayez une question,{' '}
+                                        <strong>sans compte</strong>
+                                    </>
+                                }
+                                texte="Répondez, demandez un indice s’il le faut, puis dépliez le corrigé étape par étape : chaque séance se passe ainsi."
                             />
-                            <span className="grid gap-1 border-t p-5 pb-6">
-                                <span className="text-lg font-semibold">
-                                    {examen.nom}
-                                </span>
-                                <span className="text-aide font-medium text-nimba-700 dark:text-nimba-300">
-                                    {examen.niveau}
-                                </span>
-                                <span className="mt-1.5 text-ink-600">
-                                    {examen.detail}
-                                </span>
-                            </span>
-                        </li>
-                    ))}
-                </ul>
-                <div className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-6">
-                    <p className="text-aide text-ink-500">Les matières</p>
-                    <ul aria-label="Matières" className="flex flex-wrap gap-2">
-                        {MATIERES_VITRINE.map((cle) => {
-                            const matiere = MATIERES[cle];
-
-                            return (
-                                <li
-                                    key={cle}
-                                    className="flex items-center gap-2 rounded-[8px] border bg-card py-1 pr-3 pl-1 text-aide font-medium"
-                                >
-                                    <span
-                                        aria-hidden
-                                        className={cn(
-                                            'flex size-6 items-center justify-center rounded-[6px]',
-                                            matiere.tuile,
-                                        )}
+                            <ul className="grid gap-3">
+                                {ESSAI.map((point) => (
+                                    <li
+                                        key={point}
+                                        className="flex items-start gap-3 text-[0.9375rem] font-medium"
                                     >
-                                        <matiere.icone className="size-3.5" />
-                                    </span>
-                                    {matiere.nom}
-                                </li>
-                            );
-                        })}
-                    </ul>
-                </div>
-            </section>
+                                        <Check
+                                            aria-hidden
+                                            className="mt-0.5 size-[1.125rem] shrink-0 text-nimba-600 dark:text-nimba-400"
+                                        />
+                                        {point}
+                                    </li>
+                                ))}
+                            </ul>
+                            <CompteARebours sessions={compteARebours} />
+                        </div>
+                        <EssaiDiffere question={questionDemo} />
+                    </section>
 
-            {/* Le nom et l'engagement */}
-            <section
-                aria-labelledby="titre-projet"
-                className="mx-auto grid max-w-7xl gap-10 border-t px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16 lg:px-8 lg:py-28"
-            >
-                <h2
-                    id="titre-projet"
-                    className="scroll-mt-28 text-[2rem] leading-[1.05] titre-contraste sm:text-[2.75rem]"
-                >
-                    N'karamögö veut dire <strong>« mon maître ».</strong>
-                </h2>
-                <div className="grid content-start gap-7">
-                    <p className="max-w-[36rem] text-[1.0625rem] leading-relaxed text-ink-600">
-                        Un maître qui explique sans se lasser, disponible le
-                        soir, dans la poche. Et G‑Étudie, c'est la Guinée qui
-                        étudie : à Conakry comme à Kankan, à Labé ou à
-                        Nzérékoré, chaque élève doit avoir les mêmes sujets, les
-                        mêmes corrigés et les mêmes chances le jour de l'examen.
-                    </p>
-                    <ul className="grid gap-3">
-                        {ENGAGEMENTS.map((engagement) => (
-                            <li
-                                key={engagement}
-                                className="flex items-start gap-3 text-[0.9375rem] font-medium"
-                            >
-                                <Check
-                                    aria-hidden
-                                    className="mt-0.5 size-[1.125rem] shrink-0 text-nimba-600 dark:text-nimba-400"
-                                />
-                                {engagement}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            </section>
-
-            {/* De l'inscription au jour de l'examen */}
-            <section aria-labelledby="titre-etapes" className="bg-card">
-                <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-28">
-                    <img
-                        src={illustrations.soir}
-                        alt=""
-                        width={560}
-                        height={460}
-                        loading="lazy"
-                        decoding="async"
-                        className="mx-auto aspect-[28/23] w-full max-w-xl rounded-panneau object-cover lg:max-w-none"
-                    />
-                    <div className="grid gap-9">
+                    {/* Les examens et les matières */}
+                    <section
+                        aria-labelledby="titre-examens"
+                        className="mx-auto grid max-w-7xl gap-10 px-4 py-20 rendu-differe sm:px-6 lg:px-8 lg:py-28"
+                    >
                         <EnTeteSection
-                            id="titre-etapes"
+                            id="titre-examens"
                             titre={
                                 <>
-                                    De l'inscription{' '}
-                                    <strong>au jour de l'examen</strong>
+                                    Un parcours pour{' '}
+                                    <strong>chaque examen</strong>
                                 </>
                             }
+                            texte="Du primaire au Baccalauréat unique : les cours, les annales et les examens blancs de votre classe, au programme guinéen."
                         />
-                        <ol className="grid">
-                            {ETAPES.map((etape, index) => (
+                        <ul className="grid gap-5 md:grid-cols-3">
+                            {EXAMENS.map((examen) => (
                                 <li
-                                    key={etape.titre}
-                                    className="relative grid grid-cols-[2rem_minmax(0,1fr)] gap-4 pb-7 last:pb-0"
+                                    key={examen.nom}
+                                    className="grid content-start overflow-hidden rounded-carte border bg-card shadow-carte"
                                 >
-                                    {index < ETAPES.length - 1 && (
-                                        <span
-                                            aria-hidden
-                                            className="absolute top-9 bottom-1 left-4 w-px bg-border"
-                                        />
-                                    )}
-                                    <span
-                                        aria-hidden
-                                        className="flex size-8 items-center justify-center rounded-full border border-contour bg-background text-aide font-semibold text-ink-900 font-data"
-                                    >
-                                        {index + 1}
-                                    </span>
-                                    <span className="grid gap-1 pt-1">
-                                        <span className="text-[0.9375rem] font-semibold">
-                                            {etape.titre}
+                                    <img
+                                        src={illustrations[examen.image]}
+                                        alt=""
+                                        width={360}
+                                        height={220}
+                                        loading="lazy"
+                                        decoding="async"
+                                        className="aspect-[18/11] w-full object-cover"
+                                    />
+                                    <span className="grid gap-1 border-t p-5 pb-6">
+                                        <span className="text-lg font-semibold">
+                                            {examen.nom}
                                         </span>
-                                        <span className="text-ink-600">
-                                            {etape.texte}
+                                        <span className="text-aide font-medium text-nimba-700 dark:text-nimba-300">
+                                            {examen.niveau}
                                         </span>
-                                    </span>
-                                </li>
-                            ))}
-                        </ol>
-                        <figure className="grid gap-2 border-l-2 border-nimba-500 pl-5">
-                            <blockquote className="text-[1.25rem] leading-snug titre-contraste">
-                                On corrige une tentative,{' '}
-                                <strong>pas un élève.</strong>
-                            </blockquote>
-                            <figcaption className="text-aide text-ink-500">
-                                Le principe de nos corrigés
-                            </figcaption>
-                        </figure>
-                    </div>
-                </div>
-            </section>
-
-            {/* L'application */}
-            <section
-                aria-labelledby="titre-application"
-                className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16 lg:px-8 lg:py-28"
-            >
-                <div className="grid gap-10">
-                    <EnTeteSection
-                        id="titre-application"
-                        titre={
-                            <>
-                                Dans la poche,{' '}
-                                <strong>et partout ailleurs</strong>
-                            </>
-                        }
-                        texte="Téléphone, tablette ou ordinateur : une application web qui s'installe en un geste, sans passer par une boutique, et qui reste légère."
-                    />
-                    <ul className="grid gap-x-8 sm:grid-cols-2">
-                        {ATOUTS.map((atout) => (
-                            <li
-                                key={atout.titre}
-                                className="grid gap-2 border-t py-5"
-                            >
-                                <atout.icone
-                                    aria-hidden
-                                    className="size-[1.125rem] text-nimba-600 dark:text-nimba-400"
-                                />
-                                <span className="text-[0.9375rem] font-semibold">
-                                    {atout.titre}
-                                </span>
-                                <span className="text-aide text-ink-600">
-                                    {atout.texte}
-                                </span>
-                            </li>
-                        ))}
-                    </ul>
-                    <div className="grid gap-1">
-                        <p className="text-aide text-ink-500">Et bientôt</p>
-                        <ul className="grid">
-                            {A_VENIR.map((element) => (
-                                <li
-                                    key={element.titre}
-                                    className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-0.5 border-b py-3.5 last:border-b-0"
-                                >
-                                    <span className="text-interface font-semibold">
-                                        {element.titre}
-                                    </span>
-                                    <Badge
-                                        variant="nimba"
-                                        className="row-span-2 mt-0.5"
-                                    >
-                                        Bientôt
-                                    </Badge>
-                                    <span className="text-aide text-ink-600">
-                                        {element.texte}
+                                        <span className="mt-1.5 text-ink-600">
+                                            {examen.detail}
+                                        </span>
                                     </span>
                                 </li>
                             ))}
                         </ul>
-                    </div>
-                </div>
-                <div className="relative isolate overflow-hidden rounded-panneau bg-nimba-500/[0.1] px-6 pt-12 dark:bg-nimba-400/10">
-                    <Cercles className="absolute top-1/2 left-1/2 -z-10 size-[44rem] -translate-x-1/2 -translate-y-1/2 text-nimba-500/25 dark:text-nimba-400/20" />
-                    <ApercuApplication className="-mb-24 sm:-mb-16" />
-                </div>
-            </section>
+                        <div className="grid gap-3 sm:grid-cols-[auto_minmax(0,1fr)] sm:items-center sm:gap-6">
+                            <p className="text-aide text-ink-500">
+                                Les matières
+                            </p>
+                            <ul
+                                aria-label="Matières"
+                                className="flex flex-wrap gap-2"
+                            >
+                                {MATIERES_VITRINE.map((cle) => {
+                                    const matiere = MATIERES[cle];
 
-            {/* Questions fréquentes */}
-            <section
-                aria-labelledby="titre-questions"
-                className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 sm:px-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16 lg:px-8 lg:pb-28"
-            >
+                                    return (
+                                        <li
+                                            key={cle}
+                                            className="flex items-center gap-2 rounded-[8px] border bg-card py-1 pr-3 pl-1 text-aide font-medium"
+                                        >
+                                            <span
+                                                aria-hidden
+                                                className={cn(
+                                                    'flex size-6 items-center justify-center rounded-[6px]',
+                                                    matiere.tuile,
+                                                )}
+                                            >
+                                                <matiere.icone className="size-3.5" />
+                                            </span>
+                                            {matiere.nom}
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </div>
+                        {sujetsRecents.length > 0 && (
+                            <div className="grid gap-6 rounded-panneau border bg-card p-5 shadow-carte sm:p-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-12">
+                                <div className="grid content-start justify-items-start gap-3">
+                                    <h3 className="text-[1.5rem] leading-tight titre-contraste">
+                                        Les annales,{' '}
+                                        <strong>en accès libre</strong>
+                                    </h3>
+                                    <p className="text-ink-600">
+                                        L’énoncé de chaque sujet se lit sans
+                                        compte ; le corrigé pas à pas attend les
+                                        inscrits.
+                                    </p>
+                                    <Button
+                                        asChild
+                                        variant="outline"
+                                        className="mt-2"
+                                    >
+                                        <Link href={annales()} prefetch>
+                                            Toutes les annales
+                                            <ArrowRight aria-hidden />
+                                        </Link>
+                                    </Button>
+                                </div>
+                                <ul aria-label="Derniers sujets publiés">
+                                    {sujetsRecents.map((sujet) => (
+                                        <LigneSujet
+                                            key={sujet.slug}
+                                            sujet={sujet}
+                                        />
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </section>
+
+                    {/* Le nom et l'engagement */}
+                    <section
+                        aria-labelledby="titre-projet"
+                        className="mx-auto grid max-w-7xl gap-10 border-t px-4 py-20 rendu-differe sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16 lg:px-8 lg:py-28"
+                    >
+                        <h2
+                            id="titre-projet"
+                            className="scroll-mt-28 text-[2rem] leading-[1.05] titre-contraste sm:text-[2.75rem]"
+                        >
+                            N'karamögö veut dire{' '}
+                            <strong>« mon maître ».</strong>
+                        </h2>
+                        <div className="grid content-start gap-7">
+                            <p className="max-w-[36rem] text-[1.0625rem] leading-relaxed text-ink-600">
+                                Un maître qui explique sans se lasser,
+                                disponible le soir, dans la poche. Et G‑Étudie,
+                                c'est la Guinée qui étudie : à Conakry comme à
+                                Kankan, à Labé ou à Nzérékoré, chaque élève doit
+                                avoir les mêmes sujets, les mêmes corrigés et
+                                les mêmes chances le jour de l'examen.
+                            </p>
+                            <ul className="grid gap-3">
+                                {ENGAGEMENTS.map((engagement) => (
+                                    <li
+                                        key={engagement}
+                                        className="flex items-start gap-3 text-[0.9375rem] font-medium"
+                                    >
+                                        <Check
+                                            aria-hidden
+                                            className="mt-0.5 size-[1.125rem] shrink-0 text-nimba-600 dark:text-nimba-400"
+                                        />
+                                        {engagement}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </section>
+
+                    {/* De l'inscription au jour de l'examen */}
+                    <section
+                        aria-labelledby="titre-etapes"
+                        className="bg-card rendu-differe"
+                    >
+                        <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-28">
+                            <img
+                                src={illustrations.soir}
+                                alt=""
+                                width={560}
+                                height={460}
+                                loading="lazy"
+                                decoding="async"
+                                className="mx-auto aspect-[28/23] w-full max-w-xl rounded-panneau object-cover lg:max-w-none"
+                            />
+                            <div className="grid gap-9">
+                                <EnTeteSection
+                                    id="titre-etapes"
+                                    titre={
+                                        <>
+                                            De l'inscription{' '}
+                                            <strong>au jour de l'examen</strong>
+                                        </>
+                                    }
+                                />
+                                <ol className="grid">
+                                    {ETAPES.map((etape, index) => (
+                                        <li
+                                            key={etape.titre}
+                                            className="relative grid grid-cols-[2rem_minmax(0,1fr)] gap-4 pb-7 last:pb-0"
+                                        >
+                                            {index < ETAPES.length - 1 && (
+                                                <span
+                                                    aria-hidden
+                                                    className="absolute top-9 bottom-1 left-4 w-px bg-border"
+                                                />
+                                            )}
+                                            <span
+                                                aria-hidden
+                                                className="flex size-8 items-center justify-center rounded-full border border-contour bg-background text-aide font-semibold text-ink-900 font-data"
+                                            >
+                                                {index + 1}
+                                            </span>
+                                            <span className="grid gap-1 pt-1">
+                                                <span className="text-[0.9375rem] font-semibold">
+                                                    {etape.titre}
+                                                </span>
+                                                <span className="text-ink-600">
+                                                    {etape.texte}
+                                                </span>
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ol>
+                                <figure className="grid gap-2 border-l-2 border-nimba-500 pl-5">
+                                    <blockquote className="text-[1.25rem] leading-snug titre-contraste">
+                                        On corrige une tentative,{' '}
+                                        <strong>pas un élève.</strong>
+                                    </blockquote>
+                                    <figcaption className="text-aide text-ink-500">
+                                        Le principe de nos corrigés
+                                    </figcaption>
+                                </figure>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* L'application */}
+                    <section
+                        aria-labelledby="titre-application"
+                        className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 rendu-differe sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] lg:gap-16 lg:px-8 lg:py-28"
+                    >
+                        <div className="grid gap-10">
+                            <EnTeteSection
+                                id="titre-application"
+                                titre={
+                                    <>
+                                        Dans la poche,{' '}
+                                        <strong>et partout ailleurs</strong>
+                                    </>
+                                }
+                                texte="Téléphone, tablette ou ordinateur : une application web qui s'installe en un geste, sans passer par une boutique, et qui reste légère."
+                            />
+                            <ul className="grid gap-x-8 sm:grid-cols-2">
+                                {ATOUTS.map((atout) => (
+                                    <li
+                                        key={atout.titre}
+                                        className="grid gap-2 border-t py-5"
+                                    >
+                                        <atout.icone
+                                            aria-hidden
+                                            className="size-[1.125rem] text-nimba-600 dark:text-nimba-400"
+                                        />
+                                        <span className="text-[0.9375rem] font-semibold">
+                                            {atout.titre}
+                                        </span>
+                                        <span className="text-aide text-ink-600">
+                                            {atout.texte}
+                                        </span>
+                                    </li>
+                                ))}
+                            </ul>
+                            <div className="grid gap-3">
+                                <p className="text-[0.9375rem] font-semibold">
+                                    Installer l’application sur cet appareil
+                                </p>
+                                <Installation vous />
+                            </div>
+                            <div className="grid gap-1">
+                                <p className="text-aide text-ink-500">
+                                    Et bientôt
+                                </p>
+                                <ul className="grid">
+                                    {A_VENIR.map((element) => (
+                                        <li
+                                            key={element.titre}
+                                            className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-x-4 gap-y-0.5 border-b py-3.5 last:border-b-0"
+                                        >
+                                            <span className="text-interface font-semibold">
+                                                {element.titre}
+                                            </span>
+                                            <Badge
+                                                variant="nimba"
+                                                className="row-span-2 mt-0.5"
+                                            >
+                                                Bientôt
+                                            </Badge>
+                                            <span className="text-aide text-ink-600">
+                                                {element.texte}
+                                            </span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                        <div className="relative isolate overflow-hidden rounded-panneau bg-nimba-500/[0.1] px-6 pt-12 dark:bg-nimba-400/10">
+                            <Cercles className="absolute top-1/2 left-1/2 -z-10 size-[44rem] -translate-x-1/2 -translate-y-1/2 text-nimba-500/25 dark:text-nimba-400/20" />
+                            <ApercuApplication className="-mb-24 sm:-mb-16" />
+                        </div>
+                    </section>
+
+                    {/* Tarifs (D4) */}
+                    <Tarification tarifs={tarifs} />
+
+                    {/* Partenaires réels seulement : liste vide, section absente */}
+                    {partenaires.length > 0 && (
+                        <section
+                            aria-labelledby="titre-partenaires"
+                            className="mx-auto grid max-w-7xl gap-6 px-4 pt-20 sm:px-6 lg:px-8 lg:pt-28"
+                        >
+                            <h2
+                                id="titre-partenaires"
+                                className="text-aide font-medium text-ink-500"
+                            >
+                                Ils accompagnent N’karamögö
+                            </h2>
+                            <ul className="flex flex-wrap items-center gap-x-10 gap-y-6">
+                                {partenaires.map((partenaire) => {
+                                    const logo = (
+                                        <img
+                                            src={partenaire.logo}
+                                            alt={partenaire.nom}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="h-10 w-auto max-w-[10rem] object-contain opacity-80 grayscale transition hover:opacity-100 hover:grayscale-0"
+                                        />
+                                    );
+
+                                    return (
+                                        <li key={partenaire.nom}>
+                                            {partenaire.url ? (
+                                                <a
+                                                    href={partenaire.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {logo}
+                                                </a>
+                                            ) : (
+                                                logo
+                                            )}
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </section>
+                    )}
+
+                    {/* Questions fréquentes */}
+                    <section
+                        aria-labelledby="titre-questions"
+                        className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 rendu-differe sm:px-6 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-16 lg:px-8 lg:pb-28"
+                    >
+                        <EnTeteSection
+                            id="titre-questions"
+                            titre={
+                                <>
+                                    Les questions{' '}
+                                    <strong>qu'on nous pose</strong>
+                                </>
+                            }
+                        />
+                        <div className="border-t">
+                            {QUESTIONS.map((element) => (
+                                <details
+                                    key={element.question}
+                                    className="group border-b"
+                                >
+                                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[0.9375rem] font-semibold outline-none focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+                                        {element.question}
+                                        <ChevronDown
+                                            aria-hidden
+                                            className="size-4 shrink-0 text-ink-500 transition-transform group-open:rotate-180"
+                                        />
+                                    </summary>
+                                    <p className="max-w-[40rem] pb-5 text-ink-600">
+                                        {element.reponse}
+                                    </p>
+                                </details>
+                            ))}
+                        </div>
+                    </section>
+
+                    {/* Appel final */}
+                    <section className="mx-auto max-w-7xl px-4 pb-20 rendu-differe sm:px-6 lg:px-8 lg:pb-28">
+                        <div className="relative isolate grid gap-8 overflow-hidden rounded-panneau surface-encre px-6 py-10 text-white sm:px-10 sm:py-14 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+                            <CouchantEncre className="absolute right-0 bottom-0 -z-10 w-[26rem] max-w-[80%] opacity-90" />
+                            <div className="grid content-start justify-items-start gap-6">
+                                <h2 className="text-[2rem] leading-[1.08] titre-contraste sm:text-[2.75rem]">
+                                    Votre première séance{' '}
+                                    <strong>commence ce soir.</strong>
+                                </h2>
+                                <p className="max-w-md text-white/75">
+                                    Créez votre compte en une minute ; la séance
+                                    du jour vous attend dans votre espace.
+                                </p>
+                                <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
+                                    <Button asChild taille="grande">
+                                        <Link href={register()} prefetch>
+                                            Créer un compte
+                                        </Link>
+                                    </Button>
+                                    <Button
+                                        taille="grande"
+                                        variant="ghost"
+                                        className="text-white/85 hover:bg-white/10 hover:text-white"
+                                        onClick={() =>
+                                            annoncerBientot(
+                                                "L'espace des parents et des enseignants",
+                                            )
+                                        }
+                                    >
+                                        Parent ou enseignant ?
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </>
+            )}
+        </>
+    );
+}
+
+/**
+ * Le héros d'abord, le reste juste après (lot 8, critère Lighthouse) : sans
+ * rendu serveur, l'illustration du héros — le plus grand élément de l'écran
+ * — attend que React ait construit la page. Construire d'abord le seul
+ * haut de page la fait paraître plus tôt sur un téléphone lent ; les
+ * sections suivantes arrivent dans la tâche d'après, avant que l'œil ne
+ * descende. Une adresse avec une ancre (« /#titre-tarifs ») rend tout
+ * d'emblée, pour que le navigateur trouve la section.
+ */
+function useRenduComplet(): boolean {
+    const [complet, setComplet] = useState(
+        () => typeof window !== 'undefined' && window.location.hash !== '',
+    );
+
+    useEffect(() => {
+        if (complet) {
+            return;
+        }
+
+        const image = requestAnimationFrame(() => {
+            window.setTimeout(() => startTransition(() => setComplet(true)));
+        });
+
+        return () => cancelAnimationFrame(image);
+    }, [complet]);
+
+    return complet;
+}
+
+/**
+ * La question jouable, chargée quand le visiteur approche (400 px avant) :
+ * l'accueil ne paie pas le moteur de questions ni KaTeX au premier
+ * affichage. La place est réservée d'avance (pas de saut de mise en page).
+ */
+function EssaiDiffere({ question }: { question: QuestionEleve }) {
+    const repere = useRef<HTMLDivElement>(null);
+    const [visible, setVisible] = useState(false);
+
+    useEffect(() => {
+        const element = repere.current;
+
+        if (!element || typeof IntersectionObserver === 'undefined') {
+            setVisible(true);
+
+            return;
+        }
+
+        const observateur = new IntersectionObserver(
+            (entrees) => {
+                if (entrees.some((entree) => entree.isIntersecting)) {
+                    setVisible(true);
+                    observateur.disconnect();
+                }
+            },
+            { rootMargin: '400px 0px' },
+        );
+        observateur.observe(element);
+
+        return () => observateur.disconnect();
+    }, []);
+
+    const attente = (
+        <div
+            aria-hidden
+            className="grid min-h-[26rem] content-start gap-5 rounded-carte border bg-card p-5 shadow-carte"
+        >
+            <Skeleton className="h-4 w-32" />
+            <Skeleton className="h-16 w-full" />
+            <div className="grid gap-2">
+                {[0, 1, 2, 3].map((n) => (
+                    <Skeleton key={n} className="h-12 w-full" />
+                ))}
+            </div>
+        </div>
+    );
+
+    return (
+        <div ref={repere} className="relative grid gap-3">
+            {question.est_exemple && (
+                <Badge
+                    variant="soleil"
+                    className="absolute -top-3 right-4 z-10"
+                >
+                    Exemple
+                </Badge>
+            )}
+            {visible ? (
+                <Suspense fallback={attente}>
+                    <QuestionDemo question={question} />
+                </Suspense>
+            ) : (
+                attente
+            )}
+            <p className="text-aide text-ink-500">
+                {question.matiere_nom}, {question.notion.toLowerCase()}. Votre
+                réponse reste sur cet appareil.
+            </p>
+        </div>
+    );
+}
+
+/**
+ * Les tarifs en GNF (D4, `config/vitrine.php`) : le gratuit d'un côté,
+ * l'abonnement de l'autre avec ses deux durées. Le paiement ouvre au lot 9 :
+ * « Choisir » l'annonce, sans clic mort.
+ */
+function Tarification({ tarifs }: { tarifs: Tarifs }) {
+    const mensuel = tarifs.formules.find((f) => f.mois === 1);
+
+    return (
+        <section
+            aria-labelledby="titre-tarifs"
+            className="border-y bg-card rendu-differe"
+        >
+            <div className="mx-auto grid max-w-7xl gap-10 px-4 py-20 sm:px-6 lg:px-8 lg:py-28">
                 <EnTeteSection
-                    id="titre-questions"
+                    id="titre-tarifs"
                     titre={
                         <>
-                            Les questions <strong>qu'on nous pose</strong>
+                            Des tarifs <strong>à la portée de chacun</strong>
                         </>
                     }
+                    texte="Commencez gratuitement, sans limite de durée. L’abonnement ajoute les corrigés de toutes les annales, les examens blancs et toutes les matières hors connexion."
                 />
-                <div className="border-t">
-                    {QUESTIONS.map((element) => (
-                        <details
-                            key={element.question}
-                            className="group border-b"
-                        >
-                            <summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-[0.9375rem] font-semibold outline-none focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
-                                {element.question}
-                                <ChevronDown
-                                    aria-hidden
-                                    className="size-4 shrink-0 text-ink-500 transition-transform group-open:rotate-180"
-                                />
-                            </summary>
-                            <p className="max-w-[40rem] pb-5 text-ink-600">
-                                {element.reponse}
+                <div className="grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+                    <div className="grid content-start gap-5 rounded-panneau border bg-background p-6 sm:p-8">
+                        <div className="grid gap-1">
+                            <p className="text-[0.9375rem] font-semibold">
+                                Gratuit
                             </p>
-                        </details>
-                    ))}
-                </div>
-            </section>
-
-            {/* Appel final */}
-            <section className="mx-auto max-w-7xl px-4 pb-20 sm:px-6 lg:px-8 lg:pb-28">
-                <div className="relative isolate grid gap-8 overflow-hidden rounded-panneau surface-encre px-6 py-10 text-white sm:px-10 sm:py-14 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
-                    <CouchantEncre className="absolute right-0 bottom-0 -z-10 w-[26rem] max-w-[80%] opacity-90" />
-                    <div className="grid content-start justify-items-start gap-6">
-                        <h2 className="text-[2rem] leading-[1.08] titre-contraste sm:text-[2.75rem]">
-                            Votre première séance{' '}
-                            <strong>commence ce soir.</strong>
-                        </h2>
-                        <p className="max-w-md text-white/75">
-                            Créez votre compte en une minute ; la séance du jour
-                            vous attend dans votre espace.
-                        </p>
-                        <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
-                            <Button asChild taille="grande">
-                                <Link href={register()} prefetch>
-                                    Créer un compte
-                                </Link>
-                            </Button>
-                            <Button
-                                taille="grande"
-                                variant="ghost"
-                                className="text-white/85 hover:bg-white/10 hover:text-white"
-                                onClick={() =>
-                                    annoncerBientot(
-                                        "L'espace des parents et des enseignants",
-                                    )
-                                }
-                            >
-                                Parent ou enseignant ?
-                            </Button>
+                            <p className="text-[2.25rem] leading-none font-semibold tracking-tight font-data">
+                                {formaterGnf(0)}
+                            </p>
+                            <p className="text-aide text-ink-500">
+                                Pour toujours, sans carte ni paiement.
+                            </p>
                         </div>
+                        <ListeAvantages avantages={tarifs.gratuit} />
+                        <Button asChild variant="outline" className="sm:w-fit">
+                            <Link href={register()} prefetch>
+                                Commencer gratuitement
+                            </Link>
+                        </Button>
+                    </div>
+                    <div className="grid content-start gap-6 rounded-panneau border-2 border-nimba-500 bg-background p-6 sm:p-8">
+                        <div className="grid gap-1">
+                            <p className="text-[0.9375rem] font-semibold">
+                                Abonnement
+                            </p>
+                            <p className="text-aide text-ink-500">
+                                Orange Money, MTN MoMo, ou un code prépayé vendu
+                                en librairie et dans les écoles.
+                            </p>
+                        </div>
+                        <ul className="grid gap-3 sm:grid-cols-2">
+                            {tarifs.formules.map((formule) => {
+                                const reduction = economie(formule, mensuel);
+                                const parMois = prixMensuel(formule);
+
+                                return (
+                                    <li
+                                        key={formule.cle}
+                                        className={cn(
+                                            'grid content-start gap-3 rounded-carte border p-4',
+                                            reduction > 0 &&
+                                                'bg-nimba-500/[0.08] dark:bg-nimba-400/10',
+                                        )}
+                                    >
+                                        <span className="flex flex-wrap items-center justify-between gap-2">
+                                            <span className="text-interface font-semibold">
+                                                {formule.nom}
+                                            </span>
+                                            {reduction > 0 && (
+                                                <Badge variant="nimba">
+                                                    {reduction} % d’économie
+                                                </Badge>
+                                            )}
+                                        </span>
+                                        <span className="grid gap-0.5">
+                                            <span className="text-[1.75rem] leading-none font-semibold tracking-tight font-data">
+                                                {formaterGnf(formule.prix_gnf)}
+                                            </span>
+                                            <span className="text-aide text-ink-600">
+                                                {formule.periode}
+                                                {parMois && `, soit ${parMois}`}
+                                            </span>
+                                        </span>
+                                        <Button
+                                            variant={
+                                                reduction > 0
+                                                    ? 'default'
+                                                    : 'outline'
+                                            }
+                                            taille="compacte"
+                                            onClick={() =>
+                                                annoncerBientot(
+                                                    'Le paiement des abonnements',
+                                                )
+                                            }
+                                        >
+                                            Choisir {formule.nom.toLowerCase()}
+                                        </Button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                        <ListeAvantages avantages={tarifs.abonnement} />
                     </div>
                 </div>
-            </section>
-        </>
+            </div>
+        </section>
+    );
+}
+
+function ListeAvantages({ avantages }: { avantages: string[] }) {
+    return (
+        <ul className="grid gap-2.5">
+            {avantages.map((avantage) => (
+                <li
+                    key={avantage}
+                    className="flex items-start gap-2.5 text-interface"
+                >
+                    <Check
+                        aria-hidden
+                        className="mt-0.5 size-4 shrink-0 text-nimba-600 dark:text-nimba-400"
+                    />
+                    {avantage}
+                </li>
+            ))}
+        </ul>
     );
 }
 

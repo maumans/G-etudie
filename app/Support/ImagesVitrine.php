@@ -42,6 +42,30 @@ class ImagesVitrine
         return $chemin === null ? null : asset($chemin);
     }
 
+    /**
+     * Les partenaires réels (`config('vitrine.partenaires')`, lot 8) dont le
+     * logo existe : un partenaire sans logo trouvé n'est pas montré (jamais
+     * de cadre vide ni de logo inventé).
+     *
+     * @return list<array{nom: string, logo: string, url: string|null}>
+     */
+    public static function partenaires(): array
+    {
+        $partenaires = [];
+
+        foreach ((array) config('vitrine.partenaires', []) as $partenaire) {
+            $logo = self::cheminValide($partenaire['logo'] ?? null);
+            $nom = $partenaire['nom'] ?? null;
+
+            if ($logo !== null && is_string($nom) && $nom !== '') {
+                $url = $partenaire['url'] ?? null;
+                $partenaires[] = ['nom' => $nom, 'logo' => asset($logo), 'url' => is_string($url) && $url !== '' ? $url : null];
+            }
+        }
+
+        return $partenaires;
+    }
+
     /** Le chemin, s'il désigne un fichier de `public/`. */
     private static function cheminValide(mixed $chemin): ?string
     {

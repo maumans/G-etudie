@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-06, lot 7)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-07, lot 8)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -20,11 +20,26 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-06 (lot 7 fait ; lot 0 en attente de D11)
+### État au 2026-11-07 (lot 8 fait sauf son critère Lighthouse ; lot 0 en attente de D11)
 
-- **Dépôt git** : `main` porte les lots 0 à 7. Les lots 3 à 7 ont été
+- **Dépôt git** : `main` porte les lots 0 à 8. Les lots 3 à 8 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 8 fait** (point 22) : **vitrine finale** — question jouable sans
+  compte (indices, verdict, corrigé pas à pas, rien d'envoyé), compte à
+  rebours sur les dates **saisies** par l'équipe, « annales en accès
+  libre », **tarifs en GNF** (Gratuit ; Mensuel 15 000 GNF ; Année
+  scolaire 100 000 GNF, prix proposés par Claude à la demande de Maurice,
+  modifiables dans `config/vitrine.php` / `.env`), partenaires réels
+  seulement, bouton « Installer » ; **annales publiques** `/sujets` et
+  `/sujets/{slug}` (énoncé visible, corrigé réservé aux inscrits ; public
+  **seulement si les droits de publication sont saisis**, D5) ;
+  **référencement** dans le HTML du serveur (titre, description,
+  canonique, Open Graph, JSON-LD), `sitemap.xml`, `robots.txt` ; **cartes
+  de partage WhatsApp** dessinées par GD. **Lighthouse mobile sur
+  l'accueil : accessibilité 100, SEO 100, performance ~81 (médiane, de 73
+  à 83 selon les passages) — critère ≥ 90 non atteint** sans rendu serveur
+  (SSR) : décision demandée à Maurice (point 22, « Reste »).
 - **Lot 7 fait** (point 21) : **packs** (HL5) — une matière se télécharge
   (« Téléchargements », poids affiché avant), par morceaux, reprise après
   coupure, mise à jour **différentielle** ; hors ligne, sa page, ses
@@ -249,8 +264,10 @@
    « Ajouter un profil » → se connecter avec 09 Ousmane ; repasser à
    Aïssatou par son code. Sur un vrai téléphone : `A_TESTER.md` (lot 7),
    après D11.
-8. **Lot 8** : vitrine finale, SEO des annales, cartes de partage,
-   installation (critère : Lighthouse mobile ≥ 90).
+8. **Maurice : décider du rendu serveur (SSR)** pour tenir le critère
+   Lighthouse du lot 8 (performance ~81 sans lui ; point 22) ; puis
+   **lot 9** (abonnements, Orange Money / MTN MoMo, codes prépayés), qui
+   lira les tarifs de `config/vitrine.php`.
 9. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -413,7 +430,7 @@ permission s'exerce (section 7).
 |---|---|
 | Page `/dev/composants` (catalogue Ardoise) | ✅ lot 0, étape 1 (point 4) |
 | Habillages vitrine, élève, back-office, console (coquilles et pages d'entrée) | ✅ lot 0, étape 3 (point 6) |
-| Vitrine finale (démo jouable, compte à rebours, tarifs) | ⬜ lot 8 |
+| Vitrine finale (question jouable, compte à rebours, annales en accès libre, tarifs, partenaires, installation) ; annales publiques `/sujets` et `/sujets/{slug}` ; partage WhatsApp | ✅ lot 8 (point 22) ; critère Lighthouse performance en attente (SSR) |
 | Connexion / inscription par téléphone, vérification du numéro, mot de passe oublié, « Mon compte » | ✅ lot 0, étape 4 (point 7) |
 | « Mon compte » dans l'habillage de chaque espace, onglet « Sécurité » du personnel (double authentification, session, activité), page 403 | ✅ lot 0, étape 5 (point 12) |
 | Socle hors ligne : pastille et feuille « Tes réponses », bandeaux (hors ligne, session expirée, copie datée, iPhone), dialogue « écran indisponible », navigation estompée, installation, page de repli, filet de démarrage | ✅ lot 0, étape 6 (point 13) |
@@ -1715,6 +1732,122 @@ cette question à sa façon. Elle distingue deux notions :
      iPhone sept jours) — bloqués par D11 ; médias des packs avec le premier
      bloc image ; limite de deux appareils d'un compte payant (lot 9).
 
+22. [x] **Lot 8 — vitrine finale, annales publiques (SEO), cartes de
+   partage WhatsApp, installation** (2026-11-07, sur `main`, un commit) —
+   **critère Lighthouse « performance ≥ 90 » non atteint** (voir « Reste »)
+   - **Constat** : la vitrine du lot 0 n'avait ni démonstration jouable, ni
+     compte à rebours, ni tarifs, ni annales publiques ; aucune balise de
+     référencement ni de partage (WhatsApp ne lit pas le JavaScript : une
+     carte de lien doit être dans le HTML du serveur) ; Lighthouse mobile
+     sur l'accueil, dans les conditions de production (gzip, cache, OPcache),
+     donnait **performance 78, accessibilité 100, SEO 92**.
+   - **Décisions** (Maurice, 2026-11-06) : **D5 tenu** — une annale
+     officielle n'est publique que si son champ « Droits de publication »
+     est rempli ; un sujet maison l'est ; un sujet d'exemple est visible
+     mais jamais indexé. **Tarifs** : fixés par Claude, modifiables à tout
+     moment (`config/vitrine.php`, `TARIF_MENSUEL_GNF`, `TARIF_ANNEE_GNF`) —
+     Gratuit ; Mensuel 15 000 GNF (le prix d'environ 1,5 Go de données) ;
+     Année scolaire 100 000 GNF (10 mois, soit 10 000 GNF par mois, 33 %
+     d'économie). **Dépendance `lighthouse` (dev) ajoutée**. **SSR : me
+     demander d'abord** (demande faite à la fin du lot).
+   - **Une autorité par règle** : `AnnalesPubliques` (qui est public, ce
+     qui sort : l'énoncé sans `attendue`, indices, corrigé ni barème) ;
+     `CatalogueEleve::sujetEnLigne` (devenue publique, partagée) ; `Seo`
+     (balises, `indexationPermise` lue par la balise robots **et**
+     `robots.txt`) ; `QuestionDemonstration` (question choisie
+     `VITRINE_QUESTION_DEMO`, sinon l'exemple marqué) ;
+     `ImagesVitrine::partenaires` ; `ImagePartageService` ; côté appareil
+     `lib/vitrine.ts`, `lib/habillages.ts` (miroir PHP
+     `App\Support\Habillages`, jeu d'exemples `tests/fixtures/habillages.json`).
+   - **Écrans** : vitrine (question jouable et compte à rebours, annales en
+     accès libre, tarifs, partenaires, installation, navigation « Annales »
+     et « Tarifs ») ; `/sujets` (filtres par examen et matière, côté
+     serveur) ; `/sujets/{slug}` (énoncé par partie, corrigé réservé,
+     colonne « Le corrigé, étape par étape », partage WhatsApp, autres
+     sessions). `DESIGN.md` § 13, « Lot 8 ». Composant
+     `components/installation.tsx` extrait de « Mon compte › Affichage ».
+   - **Performance** (mesures : `tests/lighthouse/mesurer.mjs`, relais
+     `relais-production.mjs` qui imite Nginx) : habillages chargés **avec
+     leur page** au lieu du paquet de démarrage (écart HL n° 31 : 91 + 116 Ko
+     → 63 Ko compressés + React) ; illustration du héros **préchargée** par
+     le document ; sections sous la ligne de flottaison en
+     `content-visibility: auto` (calcul des styles et mise en page ÷ 2) et
+     rendues par React juste après le héros ; question jouable (moteur et
+     KaTeX) chargée à l'approche. Résultat : **performance ~81** (73 à 83),
+     **accessibilité 100**, **SEO 100**. Essais écartés, mesurés : WebP du
+     héros au lieu du SVG (aucun gain), SVG sans grain (aucun gain),
+     préchargement de la police (pire). Ce qui reste : sans rendu serveur,
+     l'illustration du héros — l'élément le plus grand — attend que React
+     construise la page (bloquer l'illustration donne 90 : c'est le seul
+     obstacle) ; et le décodage de la police variable (~0,5 s de fil
+     principal à ×4).
+   - **Écarts** : `HORS_LIGNE.md` n° 30 (question de la vitrine hors de
+     la file : un visiteur n'est pas un élève) et n° 31 (habillages chargés
+     à la demande, même rattrapage d'échec d'import). Placement : la
+     question jouable est **sous** le héros, pas dedans (PLAN M1 dit
+     « héros ») — le héros garde son seul moment fort (`DESIGN.md` § 4),
+     et la question n'est chargée qu'à l'approche.
+   - **Ajouts** : migration `2026_11_07_090000_add_slug_to_sujets_table`
+     (adresse publique stable, `-2` si prise ; les sujets présents reçoivent
+     la leur) ; routes publiques `vitrine.sujets.index`,
+     `vitrine.sujets.show`, `plan-site`, `robots`, `partage.image.*` ;
+     `public/robots.txt` supprimé (servi par Laravel) ; polices TTF
+     statiques `resources/fonts/` (instances 400 et 700 tirées de la
+     police variable, licence OFL jointe) pour GD ; `config/vitrine.php` :
+     `tarifs`, `partenaires`, `question_demo`, `indexer`
+     (`VITRINE_INDEXER=false` en préproduction) ; script
+     `npm run test:lighthouse`. `MISE_EN_PRODUCTION.md` § 2, § 8 « Lot 8 »,
+     § 9.
+   - **Corrigé en chemin** : FreeType (Windows) n'ouvre pas un chemin non
+     ASCII — le dossier du projet (« N’KARAMÖGÖ ») : la police est copiée
+     dans le dossier temporaire ; la première mesure Lighthouse derrière le
+     relais était **fausse** (98 : les fichiers du build, en adresse
+     absolue vers l'autre port, ne chargeaient pas — seul le HTML était
+     mesuré) : le relais garde l'hôte d'origine.
+   - **Vu avec Playwright** : `ecrans-lot8.spec.ts` — accueil complet,
+     question jouée (verdict et corrigé), liste des annales, sujet public ;
+     360, 768 et 1366 × clair et sombre ; axe sans violation sérieuse,
+     aucun débordement. Corrigé : contraste du prix par mois sur la teinte
+     mandarine (`ink-500` → `ink-600`) ; capture pleine page qui laissait
+     blanches les sections `rendu-differe` (la capture force leur rendu).
+     Plus : « Tarifs » depuis `/sujets` mène à la section ; la question
+     jouable ne met rien dans la file (`operations` vide). Captures
+     `vitrine-accueil` du lot 0 retirées (remplacées par celles du lot 8).
+   - **Preuve** : Pest `AnnalesPubliquesTest` (11 : D5 par la vraie porte du
+     back-office, aucune fuite du corrigé dans le HTML, exemple jamais
+     indexé, maison public, archivé fermé, balises dans le HTML, image
+     1200 × 630 non redessinée, filtres serveur, robots et préproduction),
+     `VitrineFinaleTest` (10 : compte à rebours sur dates saisies et à
+     venir, question choisie ou exemple, tarifs, partenaires, balises,
+     habillages) ; Vitest `vitrine.test.tsx` (18 : habillages sur la
+     fixture, jours restants, date, prix par mois, économie, lien
+     WhatsApp, rendu du compte à rebours), `chargement-page.test.ts`
+     adapté. Totaux : **532 Pest, 359 Vitest, 497 Playwright : 476 passés, 16 captures en écart, 5 parcours non lancés (ils dépendent des captures) — détail dans « Reste »**. `tsc`,
+     `vp check`, Pint, Larastan niveau 7 et `npm run build` passent.
+   - **Reste** : **critère Lighthouse performance ≥ 90** — décision de
+     Maurice sur le **rendu serveur (SSR Inertia)** : la page arrive déjà
+     construite, l'illustration s'affiche sans attendre React (mesuré :
+     sans cette attente, 90) ; coût : un processus Node permanent en
+     production (Supervisor, comme la file), `npm run build:ssr` à chaque
+     déploiement, et chaque page de la vitrine doit pouvoir se construire
+     sans `window`. Puis : mesure PageSpeed sur le vrai domaine, carte
+     WhatsApp et installation sur vrais téléphones (`A_TESTER.md`, lot 8,
+     bloqués par D11). **Passage Playwright complet du 2026-11-07** : les
+     16 écarts sont (1) la liste des annales du back-office à 360 px
+     (2 captures) : la migration des adresses publiques avait d'abord
+     rempli `slug` par Eloquent, qui touche `updated_at` — la liste trie par
+     là, l'ordre de la base de développement a changé. **Migration corrigée**
+     (écriture directe, `updated_at` intact) ; la base de développement,
+     déjà migrée, doit être **refaite par Maurice** (`php artisan
+     migrate:fresh --seed`, refusé à Claude par la protection automatique) ;
+     (2) l'accueil élève (8) et « Ma progression » (6) : la série, le défi et
+     « Reprendre » sont calculés à la vraie date — dérive connue depuis le
+     lot 6, sans rapport avec le lot 8. Après la base refaite :
+     `npx playwright test --workers=1`, relire, puis `--update-snapshots`
+     pour ces écrans. Puis : vraie question de BEPC pour la vitrine
+     (`VITRINE_QUESTION_DEMO`) ; dates des sessions (compte à rebours) ;
+     prix à confirmer avant le lot 9.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -1840,6 +1973,7 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | Groupe | Garde | Fichier |
 |---|---|---|
 | `/` vitrine, `/dev/composants` (hors production) | publiques | `routes/web.php` |
+| `/sujets`, `/sujets/{slug}`, `/sitemap.xml`, `/robots.txt`, `/partage/n-karamogo.png`, `/partage/sujets/{slug}.png` (lot 8) | publiques ; un sujet n'existe que si `AnnalesPubliques` le dit public (404 sinon) | `routes/web.php` |
 | `/accueil` (aiguillage) | `auth`, dérogation | `routes/web.php` |
 | `/eleve` · `/contenu` · `/console` | `auth` + `can:espace.eleve` · `can:espace.contenu` · `can:espace.console` | `routes/eleve.php`, `routes/web.php` |
 | `/eleve/bienvenue` (parcours d'accueil, « Mon examen ») ; `/eleve/cours`, `/eleve/cours/{slug}`, `/eleve/lecons/{uuid}`, `/eleve/chapitres/{id}/fiche`, `POST /eleve/seance`, `/eleve/seances/{uuid}` | `auth` + `can:espace.eleve` ; profil exigé (`ProfilEleveRequis`) ; leçon gardée par `LeconPolicy::lire`, le reste par `CatalogueEleve` (404) | `routes/eleve.php` |

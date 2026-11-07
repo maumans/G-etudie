@@ -135,19 +135,8 @@ for (const gabarit of GABARITS) {
                 );
             });
 
-            test('lot 0 — vitrine', async ({ page }) => {
-                await page.goto('/');
-                await expect(
-                    page.getByRole('heading', { level: 1 }),
-                ).toBeVisible();
-
-                await verifierEtCapturer(
-                    page,
-                    'vitrine-accueil',
-                    gabarit.nom,
-                    theme.nom,
-                );
-            });
+            // La vitrine finale (lot 8) est capturée par ecrans-lot8.spec.ts,
+            // qui fait défiler la page pour charger la question jouable.
 
             for (const ecran of PUBLICS) {
                 test(`lot 0 — ${ecran.ecran}`, async ({ page }) => {

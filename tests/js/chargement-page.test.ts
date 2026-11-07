@@ -80,7 +80,7 @@ describe('chargerPage', () => {
         const { env } = environnement(true);
 
         await expect(chargerPage('inconnue', {}, env)).rejects.toThrow(
-            'Page introuvable : inconnue',
+            'Module introuvable : ./pages/inconnue.tsx',
         );
     });
 

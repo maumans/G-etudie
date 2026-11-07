@@ -5,18 +5,22 @@ import { Button } from '@/components/ui/button';
 import { home, login, register } from '@/routes';
 import { accueil as accueilEleve } from '@/routes/eleve';
 
-/** Ancres des sections de l'accueil public. */
+/**
+ * Navigation publique : les sections de l'accueil (ancres préfixées par
+ * « / » pour fonctionner aussi depuis les pages d'annales) et les annales.
+ */
 const SECTIONS = [
-    { libelle: 'Examens', ancre: '#titre-examens' },
-    { libelle: 'Comment ça marche', ancre: '#titre-etapes' },
-    { libelle: "L'application", ancre: '#titre-application' },
-    { libelle: 'Questions', ancre: '#titre-questions' },
+    { libelle: 'Examens', ancre: '/#titre-examens' },
+    { libelle: 'Annales', ancre: '/sujets' },
+    { libelle: 'Comment ça marche', ancre: '/#titre-etapes' },
+    { libelle: 'Tarifs', ancre: '/#titre-tarifs' },
+    { libelle: 'Questions', ancre: '/#titre-questions' },
 ];
 
 /**
  * Habillage public (DESIGN.md § 7) : le plus expressif, vouvoiement.
- * Navigation en texte au centre, compte à droite. La vitrine
- * finale (démo jouable, compte à rebours, tarifs) arrive au lot 8.
+ * Navigation en texte au centre, compte à droite. Vitrine finale au lot 8
+ * (question jouable, compte à rebours, annales publiques, tarifs).
  */
 export default function VitrineLayout({ children }: { children: ReactNode }) {
     const { auth } = usePage().props;

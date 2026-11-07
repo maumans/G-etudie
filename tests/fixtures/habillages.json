@@ -1,0 +1,17 @@
+{
+    "_": "Page Inertia → habillage (lib/habillages.ts et Habillages.php). null : sans habillage.",
+    "exemples": {
+        "vitrine/accueil": "vitrine",
+        "vitrine/sujet": "vitrine",
+        "eleve/accueil": "eleve",
+        "eleve/seance": null,
+        "eleve/bienvenue": null,
+        "contenu/lecons": "contenu",
+        "console/accueil": "console",
+        "auth/connexion": "connexion",
+        "compte/profil": "compte",
+        "erreur": null,
+        "dev/composants": null,
+        "inconnue": null
+    }
+}

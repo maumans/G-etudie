@@ -173,6 +173,23 @@
   téléphone (gestes ou boutons).
 - État : à faire
 
+### [Lot 8] Installer depuis la vitrine (Android et iPhone)
+- Pourquoi : `beforeinstallprompt` n'existe qu'en HTTPS, sur un vrai
+  navigateur mobile ; Playwright ne le déclenche pas.
+- Matériel : un Android avec Chrome, un iPhone avec Safari ; le domaine
+  HTTPS (D11).
+- Comment le provoquer : ouvrir la vitrine **sans être connecté**,
+  descendre à « Dans la poche, et partout ailleurs » ; Android : toucher
+  « Installer N'karamögö » ; iPhone : suivre la notice (Partager → « Sur
+  l'écran d'accueil »).
+- Quoi observer : l'icône N'karamögö sur l'écran d'accueil ; ouverte, elle
+  démarre sur la connexion puis l'espace élève (`start_url` /eleve), sans
+  barre d'adresse ; revenue sur la vitrine, le bloc dit « Installée sur
+  cet appareil ».
+- En cas d'échec, relever : le navigateur et sa version, une capture du
+  bloc, `chrome://inspect` › Application › Manifest (erreurs).
+- État : à faire (bloqué par D11)
+
 ## 3. Coupures réelles — réseau, courant, batterie
 
 *(aucune entrée)*
@@ -490,6 +507,31 @@
 - En cas d'échec, relever : les captures de « Ma série » chaque jour et
   l'heure du téléphone.
 - État : à faire
+
+### [Lot 8] Lighthouse mobile sur le vrai domaine (critère du lot)
+- Pourquoi : le critère du lot 8 (performance, accessibilité et SEO ≥ 90
+  sur l'accueil, mobile) n'a été mesuré qu'en local, derrière un relais qui
+  imite Nginx ; le vrai serveur, sa latence depuis la Guinée et un CDN
+  changent la performance.
+- Comment le provoquer : pagespeed.web.dev, adresse de la vitrine, onglet
+  « Mobile » ; trois mesures à quelques minutes d'écart.
+- Quoi observer : les trois notes (médiane) ; « Largest Contentful Paint »
+  et « Total Blocking Time » ; comparer aux chiffres du DEVBOOK (point 22).
+- En cas d'échec, relever : le rapport (lien « Partager ») et l'heure.
+- État : à faire (bloqué par D11)
+
+### [Lot 8] Carte de partage dans WhatsApp
+- Pourquoi : WhatsApp lit les balises Open Graph avec son propre robot ;
+  seul un vrai envoi montre la carte telle que les élèves la verront.
+- Comment le provoquer : dans WhatsApp (Android), envoyer à soi-même
+  l'adresse de la vitrine, puis celle d'un sujet public
+  (`/sujets/…`) ; sur la page d'un sujet, toucher « Partager sur WhatsApp ».
+- Quoi observer : sous le lien, l'image orange et noire (1200 × 630), le
+  titre (« Sujet de Mathématiques, BEPC 2024 ») et la description ; le
+  bouton ouvre WhatsApp avec le texte et l'adresse déjà écrits.
+- En cas d'échec, relever : une capture du message ; le résultat de
+  developers.facebook.com/tools/debug sur la même adresse.
+- État : à faire (bloqué par D11 : WhatsApp ne lit pas `localhost`)
 
 ## 7. Paiements réels — Orange Money, MTN MoMo, codes prépayés
 

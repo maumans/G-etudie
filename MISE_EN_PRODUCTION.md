@@ -102,6 +102,12 @@ LOG_LEVEL=warning
 ANTHROPIC_API_KEY=sk-ant-…    # lot 4 : import assisté ; sans elle, l'import échoue avec sa raison
 ANNALES_MODELE=claude-opus-5-5
 
+# Lot 8 — vitrine (facultatives : valeurs par défaut dans config/vitrine.php)
+TARIF_MENSUEL_GNF=15000       # prix de l'abonnement mensuel, en GNF entiers
+TARIF_ANNEE_GNF=100000        # prix de l'année scolaire
+VITRINE_QUESTION_DEMO=        # uuid d'une question publiée à faire jouer sur la vitrine ; vide = la question d'exemple
+VITRINE_INDEXER=true          # false sur une PRÉPRODUCTION : noindex partout, robots.txt fermé
+
 # NE PAS mettre DEMO_MOT_DE_PASSE en production : les comptes de démonstration n'existent pas en production.
 ```
 
@@ -488,6 +494,35 @@ les reconstruit depuis la base.
   téléphone partagé), `appareil.retire`.
 - Abonnements : aucun avant le lot 9 ; chaque élève a **un** pack gratuit.
 
+### Lot 8 — vitrine finale, annales publiques, partage, installation
+
+- **Une seule fois** : rien de plus que `migrate` (la migration
+  `add_slug_to_sujets_table` donne leur adresse publique aux sujets déjà
+  présents). Pas de commande à lancer.
+- **`.env`** (§ 2) : `TARIF_MENSUEL_GNF`, `TARIF_ANNEE_GNF`,
+  `VITRINE_QUESTION_DEMO`, `VITRINE_INDEXER` — toutes facultatives. Après un
+  changement : `php artisan config:cache` (fait par `php artisan optimize`).
+  **Une préproduction met `VITRINE_INDEXER=false`**, sinon Google la
+  référence à la place du vrai site.
+- **`public/robots.txt` n'existe plus** : `/robots.txt` est servi par
+  Laravel (il donne l'adresse absolue de `/sitemap.xml`). Ne pas le
+  recréer en fichier : Nginx le servirait à la place (`try_files $uri`).
+- **Images de partage** : dessinées par GD à la première demande et rangées
+  dans `storage/app/private/partage/` (disque `local`) ; le dossier
+  `storage` doit rester inscriptible par `www-data` (§ 3, étape 9). PHP
+  doit avoir l'extension **GD avec FreeType** (`php -r
+  'var_dump(gd_info()["FreeType Support"]);'` → `true` ; paquet
+  `php8.3-gd`).
+- **Nginx** : rien de plus. Les pages `/sujets/*` et `/partage/*.png`
+  passent par Laravel (`location /`).
+- **D5** : une annale officielle n'est publique qu'une fois le champ
+  « Droits de publication » rempli au back-office. Sans convention, `/sujets`
+  est vide (« Pas encore de sujet publié ici ») : c'est voulu.
+- **Équipe** : saisir la date de la prochaine session de chaque examen
+  (Référentiel › Épreuves) pour le compte à rebours de la vitrine ;
+  choisir une vraie question de BEPC pour la vitrine
+  (`VITRINE_QUESTION_DEMO`).
+
 ---
 
 ## 9. Vérifications après la mise en ligne
@@ -513,6 +548,12 @@ Dans un navigateur, en HTTPS :
    s'ouvre.
 4. Back-office : importer un sujet d'essai ; la ligne passe de « En file » à
    « Vérifier l'annale » en quelques minutes.
+5. (Lot 8) `https://nkaramogo.example/robots.txt` finit par
+   `Sitemap: https://nkaramogo.example/sitemap.xml` ; `/sitemap.xml`
+   s'ouvre ; `/partage/n-karamogo.png` affiche la carte orange et noire ;
+   coller l'adresse de la vitrine dans WhatsApp montre cette carte.
+6. (Lot 8) PageSpeed Insights (pagespeed.web.dev) sur l'accueil, profil
+   mobile : performance, accessibilité et SEO notés dans le DEVBOOK.
 
 Puis dérouler les contrôles « bloqués tant que le domaine HTTPS n'existe
 pas » de `A_TESTER.md` (vrais téléphones, mode avion, deux profils,

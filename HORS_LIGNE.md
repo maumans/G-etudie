@@ -662,6 +662,7 @@ hors ligne ; les packs viennent ensuite.
 | HL5 | Packs | ✅ fait (lot 7, 2026-11-06), sauf les médias (aucun bloc image encore, écart n° 24) et les vrais téléphones (`A_TESTER.md`) | 7 / 7 |
 | HL6 | Profils et session | ✅ fait (lot 7, 2026-11-06) ; contrôles sur vrai téléphone dans `A_TESTER.md` | 4 / 4 |
 | HL7 | Budgets | ✅ mesurés (lot 7, 2026-11-06), B.3 « HL7 » | 2 / 2 |
+| — | Lot 8 (sans lot HL) : vitrine finale, annales publiques, installation depuis la vitrine, habillages chargés avec leur page | ✅ fait (2026-11-07), B.3 « Lot 8 » | 4 / 4 |
 | HL8 | Terrain | ⬜ à faire | 0 / 7 |
 
 ## B.1 Décisions
@@ -1046,6 +1047,30 @@ hors ligne ; les packs viennent ensuite.
   leçons) ; à remesurer avec le vrai contenu des matières phares
   (`php artisan packs:generer` affiche chaque poids).
 
+### Lot 8 (pas de lot HL propre, A.13) — pages publiques et démarrage
+
+- [x] **Les pages publiques restent hors de la liste blanche** (niveau C) :
+  `/`, `/sujets`, `/sujets/{slug}`, `/sitemap.xml`, `/robots.txt`,
+  `/partage/*.png` ne sont ni copiées ni servies hors ligne ; hors ligne,
+  un document public reçoit la page de repli (A.3.7). Rien de personnel
+  n'y est affiché : les copies par utilisateur (`pages-u<id>`) n'en
+  contiennent pas. `config/hors_ligne.php` inchangé.
+- [x] **La question jouable de la vitrine ne passe pas par la file** :
+  un visiteur n'est pas un élève (écart n° 30). Preuve : Playwright
+  `ecrans-lot8.spec.ts`, « la question jouable ne met rien dans la file
+  d'opérations » (base locale `operations` vide après « Vérifier »).
+- [x] **Installer depuis la vitrine** (A.3.2) : le bouton « Installer
+  N'karamögö » (`beforeinstallprompt`), la notice iPhone, ou le menu du
+  navigateur — composant `components/installation.tsx`, partagé avec
+  « Mon compte › Affichage ». Le service worker s'inscrit dès la vitrine
+  (inchangé depuis le lot 0) : un visiteur qui installe a déjà la coquille.
+- [x] **Habillages chargés avec leur page** (écart n° 31) : le rattrapage de
+  l'échec d'import (A.3.3) couvre aussi l'habillage (`chargerModule`) ; le
+  précache du service worker contient leurs fichiers (tout le manifeste
+  Vite) : hors ligne, un écran gardé retrouve son habillage. Preuve :
+  `hors-ligne.spec.ts`, `parcours-lot3.spec.ts` et `parcours-lot7.spec.ts`
+  (mode avion) verts après le changement ; Vitest `chargement-page.test.ts`.
+
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
@@ -1318,6 +1343,22 @@ hors ligne ; les packs viennent ensuite.
     (`useCopieDuDocument`). Et une visite Inertia vers un écran qui n'a
     qu'une copie **de document** (rechargé, adresse tapée) se sert de la
     page rangée dans ce document (`<script data-page>`).
+
+30. **2026-11-07 — Question jouable de la vitrine, sans file.** A.3.5 veut
+    que tout geste élève passe par `enregistrer()`. La question de la
+    vitrine (lot 8, PLAN M1) est jouée par un **visiteur sans compte** :
+    elle est corrigée sur l'appareil pour l'affichage (`ExerciceQuestion`
+    sans `envoyer`), rien n'est rangé ni envoyé — il n'y a pas d'auteur à
+    qui l'attribuer. Le visiteur le lit sous la question (« Votre réponse
+    reste sur cet appareil »).
+31. **2026-11-07 — Habillages chargés à la demande.** Les six habillages
+    (vitrine, élève, back-office, console, connexion, compte) étaient tous
+    dans le paquet de démarrage : la vitrine téléchargeait l'espace élève.
+    Ils arrivent maintenant **avec leur page** (`resolve` de
+    `createInertiaApp`, `lib/habillages.ts`), préchargés par le document
+    (`App\Support\Habillages`, même jeu d'exemples). Le paquet de démarrage
+    passe de 91 + 116 Ko à 63 Ko compressés (+ React). Même rattrapage
+    qu'une page en cas d'échec d'import (A.3.3).
 
 ## B.6 Points de vigilance
 

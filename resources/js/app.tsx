@@ -6,14 +6,9 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { initialiserReglagesAffichage } from '@/hooks/use-reglages-affichage';
-import CompteLayout from '@/layouts/compte-layout';
-import ConnexionLayout from '@/layouts/connexion-layout';
-import ConsoleLayout from '@/layouts/console-layout';
-import ContenuLayout from '@/layouts/contenu-layout';
-import EleveLayout from '@/layouts/eleve-layout';
-import VitrineLayout from '@/layouts/vitrine-layout';
 import { brancherBarreNavigation } from '@/lib/barre-navigation';
-import { chargerPage } from '@/lib/chargement-page';
+import { chargerModule, chargerPage } from '@/lib/chargement-page';
+import { fichierHabillage, habillageDe } from '@/lib/habillages';
 import { demarrerHorsLigne } from '@/lib/hors-ligne';
 
 // Le filet de démarrage de app.blade.php (HORS_LIGNE.md A.3.3) attend ce
@@ -23,6 +18,9 @@ window.__nkaramogoPret = true;
 document
     .getElementById('filet-demarrage')
     ?.style.setProperty('display', 'none');
+
+const pages = import.meta.glob('./pages/**/*.tsx');
+const habillages = import.meta.glob('./layouts/*-layout.tsx');
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -35,38 +33,23 @@ void createInertiaApp({
     title: (title) => (title ? `${title} · ${appName}` : appName),
     // `resolve` fourni ici : le plugin @inertiajs/vite n'injecte alors pas le
     // sien, qui ne rattrape pas l'échec d'import après un déploiement.
-    resolve: (name) =>
-        chargerPage<ResolvedComponent>(
-            name,
-            import.meta.glob('./pages/**/*.tsx'),
-        ),
-    // Un habillage par espace (DESIGN.md § 7), choisi d'après le dossier de
-    // la page.
-    layout: (name) => {
-        switch (true) {
-            case name === 'erreur':
-            case name.startsWith('dev/'):
-            // Plein écran, sans navigation : l'ardoise (DESIGN.md § 6.4) et
-            // le parcours d'accueil portent leur propre cadre.
-            case name === 'eleve/seance':
-            case name === 'eleve/bienvenue':
-                return null;
-            case name.startsWith('vitrine/'):
-                return VitrineLayout;
-            case name.startsWith('eleve/'):
-                return EleveLayout;
-            case name.startsWith('contenu/'):
-                return ContenuLayout;
-            case name.startsWith('console/'):
-                return ConsoleLayout;
-            case name.startsWith('auth/'):
-                return ConnexionLayout;
-            // « Mon compte » : dans l'habillage de l'espace du compte.
-            case name.startsWith('compte/'):
-                return CompteLayout;
-            default:
-                return null;
-        }
+    // L'habillage de l'espace (DESIGN.md § 7) arrive avec la page, à la
+    // demande (lot 8) : la vitrine ne télécharge pas ceux des espaces.
+    resolve: async (name) => {
+        const habillage = habillageDe(name);
+        const [page, layout] = await Promise.all([
+            chargerPage<ResolvedComponent>(name, pages),
+            habillage
+                ? chargerModule<ResolvedComponent>(
+                      fichierHabillage(habillage),
+                      habillages,
+                  )
+                : null,
+        ]);
+
+        (page as { layout?: unknown }).layout = layout ?? undefined;
+
+        return page;
     },
     strictMode: true,
     withApp(app) {

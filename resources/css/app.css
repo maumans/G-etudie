@@ -428,6 +428,15 @@
     background-repeat: no-repeat;
 }
 
+/* Section sous la ligne de flottaison (vitrine, lot 8) : le navigateur ne
+   la met en page et ne la peint qu'à son approche. Sur un Android d'entrée
+   de gamme, c'est la moitié du travail du premier affichage. La hauteur
+   estimée garde la barre de défilement stable ; `auto` retient la vraie. */
+@utility rendu-differe {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 56rem;
+}
+
 /* Trame de points discrète, estompée vers le bas (fonds de héros). */
 @utility trame-points {
     background-image: radial-gradient(var(--trame) 1px, transparent 1px);

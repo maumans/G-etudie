@@ -84,10 +84,23 @@ export async function chargerPage<Composant = unknown>(
     importeurs: Importeurs,
     env: Environnement = environnementNavigateur(),
 ): Promise<Composant> {
-    const importer = importeurs[`./pages/${nom}.tsx`];
+    return chargerModule<Composant>(`./pages/${nom}.tsx`, importeurs, env);
+}
+
+/**
+ * Un module chargé à la demande (page, habillage) : même rattrapage de
+ * l'échec d'import, quelle que soit sa nature (un habillage absent après
+ * un déploiement laisserait le clic sans effet, comme une page absente).
+ */
+export async function chargerModule<Composant = unknown>(
+    cle: string,
+    importeurs: Importeurs,
+    env: Environnement = environnementNavigateur(),
+): Promise<Composant> {
+    const importer = importeurs[cle];
 
     if (!importer) {
-        throw new Error(`Page introuvable : ${nom}`);
+        throw new Error(`Module introuvable : ${cle}`);
     }
 
     let module: ModulePage;

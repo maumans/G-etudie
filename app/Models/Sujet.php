@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
 /**
  * Un sujet d'examen (PLAN M6) : une annale (`officiel`) ou un sujet maison,
@@ -29,6 +30,7 @@ use Illuminate\Support\Carbon;
  *
  * @property int $id
  * @property string $uuid
+ * @property string|null $slug adresse publique (lot 8), stable une fois posée
  * @property int $examen_id
  * @property int|null $serie_id
  * @property int $matiere_id
@@ -58,7 +60,7 @@ use Illuminate\Support\Carbon;
  * @property-read VersionContenu|null $versionPubliee
  * @property-read Collection<int, SujetPartie> $parties
  */
-#[Fillable(['uuid', 'examen_id', 'serie_id', 'matiere_id', 'filiere', 'session', 'type', 'titre', 'duree_minutes', 'coefficient', 'droits', 'document_chemin', 'document_nom', 'document_type', 'document_octets', 'auteur_id', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
+#[Fillable(['uuid', 'slug', 'examen_id', 'serie_id', 'matiere_id', 'filiere', 'session', 'type', 'titre', 'duree_minutes', 'coefficient', 'droits', 'document_chemin', 'document_nom', 'document_type', 'document_octets', 'auteur_id', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
 class Sujet extends Model implements ContenuRelisable
 {
     use EstRelisable;
@@ -81,6 +83,45 @@ class Sujet extends Model implements ContenuRelisable
     public function getRouteKeyName(): string
     {
         return 'uuid';
+    }
+
+    /** Lot 8 : l'adresse publique est posée à la création, puis ne change plus. */
+    protected static function booted(): void
+    {
+        static::saving(function (Sujet $sujet) {
+            if ($sujet->slug === null) {
+                $sujet->slug = self::slugLibre($sujet);
+            }
+        });
+    }
+
+    /**
+     * « bepc-mathematiques-2024 », « bac-se-chimie-2024 », « …-sujet-maison »
+     * pour un sujet de l'équipe ; « -2 », « -3 » si l'adresse est prise.
+     */
+    public static function slugLibre(Sujet $sujet): string
+    {
+        $examen = Examen::query()->find($sujet->examen_id);
+        $serie = $sujet->serie_id === null ? null : Serie::query()->find($sujet->serie_id);
+        $matiere = Matiere::query()->find($sujet->matiere_id);
+
+        $base = Str::slug(implode(' ', array_filter([
+            $examen?->code->value,
+            $serie?->code->value,
+            $matiere?->nom,
+            (string) $sujet->session,
+            $sujet->type === TypeSujet::BlancMaison ? 'sujet maison' : null,
+        ])));
+
+        $slug = $base;
+        $suffixe = 2;
+
+        while (self::query()->where('slug', $slug)->when($sujet->exists, fn ($q) => $q->whereKeyNot($sujet->id))->exists()) {
+            $slug = "{$base}-{$suffixe}";
+            $suffixe++;
+        }
+
+        return $slug;
     }
 
     /** @return BelongsTo<Examen, $this> */
