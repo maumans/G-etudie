@@ -30,6 +30,18 @@ class Habillages
     }
 
     /**
+     * La page est-elle construite par le serveur (SSR, lot 8) ? La vitrine
+     * seulement : publique, lue par les moteurs et par WhatsApp, et mesurée
+     * par Lighthouse. Les espaces connectés restent rendus par le navigateur :
+     * ils dépendent de l'appareil (copies hors ligne, profils du téléphone,
+     * HORS_LIGNE.md) et le service worker les sert hors connexion.
+     */
+    public static function renduServeur(string $page): bool
+    {
+        return self::de($page) === 'vitrine';
+    }
+
+    /**
      * Les fichiers à passer à `@vite` pour une page : l'application, la page,
      * et son habillage s'il en a un.
      *

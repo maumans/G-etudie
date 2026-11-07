@@ -662,7 +662,7 @@ hors ligne ; les packs viennent ensuite.
 | HL5 | Packs | ✅ fait (lot 7, 2026-11-06), sauf les médias (aucun bloc image encore, écart n° 24) et les vrais téléphones (`A_TESTER.md`) | 7 / 7 |
 | HL6 | Profils et session | ✅ fait (lot 7, 2026-11-06) ; contrôles sur vrai téléphone dans `A_TESTER.md` | 4 / 4 |
 | HL7 | Budgets | ✅ mesurés (lot 7, 2026-11-06), B.3 « HL7 » | 2 / 2 |
-| — | Lot 8 (sans lot HL) : vitrine finale, annales publiques, installation depuis la vitrine, habillages chargés avec leur page | ✅ fait (2026-11-07), B.3 « Lot 8 » | 4 / 4 |
+| — | Lot 8 (sans lot HL) : vitrine finale, annales publiques, installation depuis la vitrine, habillages chargés avec leur page, rendu serveur de la vitrine seulement | ✅ fait (2026-11-07), B.3 « Lot 8 » | 5 / 5 |
 | HL8 | Terrain | ⬜ à faire | 0 / 7 |
 
 ## B.1 Décisions
@@ -1070,6 +1070,16 @@ hors ligne ; les packs viennent ensuite.
   Vite) : hors ligne, un écran gardé retrouve son habillage. Preuve :
   `hors-ligne.spec.ts`, `parcours-lot3.spec.ts` et `parcours-lot7.spec.ts`
   (mode avion) verts après le changement ; Vitest `chargement-page.test.ts`.
+- [x] **Rendu serveur de la vitrine seulement** (écart n° 32, DEVBOOK point
+  23) : les pages `vitrine/*` arrivent construites par le serveur ; les
+  espaces connectés, servis hors ligne par le service worker, ne passent
+  jamais par le processus Node (`Habillages::renduServeur`). Sur une page
+  construite par le serveur, les scripts partent après l'affichage ; le
+  filet de démarrage (A.3.3) compte alors ses 12 secondes **à partir du
+  chargement de la page**, pas de son début. Preuve : Pest
+  `RenduServeurTest` (aucun appel pour la connexion et l'espace élève ;
+  processus en panne → page construite par le navigateur, scripts non
+  différés).
 
 ## B.4 Tests
 
@@ -1359,6 +1369,17 @@ hors ligne ; les packs viennent ensuite.
     (`App\Support\Habillages`, même jeu d'exemples). Le paquet de démarrage
     passe de 91 + 116 Ko à 63 Ko compressés (+ React). Même rattrapage
     qu'une page en cas d'échec d'import (A.3.3).
+
+32. **2026-11-07 — Vitrine construite par le serveur, scripts après
+    l'affichage.** Pour tenir le critère Lighthouse du lot 8, la vitrine
+    passe par un rendu serveur (Inertia, processus Node) et, quand ce rendu
+    a réussi, lance ses scripts une fois la page chargée et peinte
+    (`App\Ssr\ScriptsDifferes`). Conséquences pour le hors ligne : le
+    service worker s'inscrit depuis la vitrine **après** l'affichage (au
+    lieu de dès l'analyse du document) ; le filet de démarrage (A.3.3)
+    arme son délai au chargement de la page sur ces pages-là. Rien ne
+    change pour les espaces connectés (aucun rendu serveur, scripts
+    d'emblée). Processus Node absent : comportement d'avant le lot 8.
 
 ## B.6 Points de vigilance
 

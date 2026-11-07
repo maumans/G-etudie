@@ -18,8 +18,9 @@
  *
  * Utilise le Chromium de Playwright (pas de Chrome à installer). Profil
  * mobile de Lighthouse par défaut (Moto G Power, 4G lente simulée,
- * processeur ralenti ×4). Chaque page est mesurée trois fois : la médiane
- * de la performance compte (une mesure isolée varie de quelques points).
+ * processeur ralenti ×4). Chaque page est mesurée trois fois, après un
+ * passage de chauffe non compté : la médiane compte (une mesure isolée
+ * varie de quelques points).
  * Rapports HTML dans `test-results/lighthouse/`.
  *
  * Variables : LIGHTHOUSE_URL (défaut http://127.0.0.1:8000),
@@ -58,14 +59,27 @@ try {
         const scores = { performance: [], accessibility: [], seo: [] };
         let dernier;
 
-        for (let i = 0; i < passages; i++) {
-            const resultat = await lighthouse(url, {
+        const mesurer = () =>
+            lighthouse(url, {
                 port: chrome.port,
                 output: 'html',
                 onlyCategories: categories,
                 locale: 'fr',
                 logLevel: 'error',
             });
+
+        // Un passage de chauffe, non compté : le premier passage d'un Chrome
+        // neuf (processus, caches internes du navigateur, rendu serveur
+        // encore froid) perd 15 à 25 points qu'aucune visite réelle ne perd
+        // sur un serveur en service. Le cache HTTP, lui, est vidé à chaque
+        // passage par Lighthouse : chaque mesure reste une première visite.
+        const chauffe = await mesurer();
+        console.log(
+            `${chemin} (chauffe, non comptée) → performance ${Math.round(chauffe.lhr.categories.performance.score * 100)}`,
+        );
+
+        for (let i = 0; i < passages; i++) {
+            const resultat = await mesurer();
             dernier = resultat;
 
             for (const c of categories) {

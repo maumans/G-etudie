@@ -130,6 +130,14 @@ règles ne se rediscutent pas.
   compositeur, elle avance même pendant un gros rendu React) ; n'affiche rien sous
   80 ms ; sur annulation ou erreur, s'efface sans aller à 100 % ; prend la couleur
   de l'accent (`var(--nimba-600)`, `--nimba-300` en sombre), visible en clair comme en sombre.
+- **La vitrine est construite par le serveur** (SSR, pages `vitrine/*`
+  seulement, `App\Support\Habillages::renduServeur`) : une page de la
+  vitrine ne lit ni `window`, ni `document`, ni `localStorage`, ni l'heure
+  **pendant le rendu** — seulement dans un effet. Le premier rendu du
+  téléphone doit donner exactement le HTML du serveur (une date vient du
+  serveur, comme `aujourdhui`), sinon React jette la page et la refait.
+  Après un changement de la vitrine : `npm run build:ssr`, relancer le
+  processus de rendu, puis vérifier l'hydratation sans erreur de console.
 - **Préchargement au survol** (`prefetch` Inertia) sur les liens de navigation :
   le clic devient immédiat.
 - **Échec d'import d'une page après un déploiement** : voir `HORS_LIGNE.md`

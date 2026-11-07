@@ -12,6 +12,7 @@ use App\Services\HorsLigne\RegistreOperations;
 use App\Services\PackService;
 use App\Services\Sms\EnvoiSms;
 use App\Services\Sms\JournalSms;
+use App\Ssr\PasserelleVitrine;
 use App\Support\Abonnements\AucunAbonnement;
 use App\Support\Abonnements\SourceAbonnements;
 use Carbon\CarbonImmutable;
@@ -25,6 +26,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 use Inertia\ExceptionResponse;
 use Inertia\Inertia;
+use Inertia\Ssr\Gateway;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -49,6 +51,9 @@ class AppServiceProvider extends ServiceProvider
         // Abonnements au lot 9 : d'ici là, personne n'est abonné et chaque
         // élève a son pack gratuit (HL-D3, DroitsPacks).
         $this->app->bind(SourceAbonnements::class, AucunAbonnement::class);
+
+        // Rendu serveur (lot 8) : la vitrine seulement (Habillages::renduServeur).
+        $this->app->bind(Gateway::class, PasserelleVitrine::class);
     }
 
     /**

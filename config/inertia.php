@@ -15,11 +15,17 @@ return [
     |
     */
 
+    // Rendu serveur de la vitrine (lot 8) : App\Ssr\PasserelleVitrine choisit
+    // les pages. Sans processus Node (`php artisan inertia:start-ssr`), la
+    // page est construite par le navigateur, sans erreur.
     'ssr' => [
-        'enabled' => true,
-        'url' => 'http://127.0.0.1:13714',
-        // 'bundle' => base_path('bootstrap/ssr/ssr.mjs'),
-
+        'enabled' => (bool) env('INERTIA_SSR_ENABLED', true),
+        'url' => env('INERTIA_SSR_URL', 'http://127.0.0.1:13714'),
+        // Une seconde au plus : au-delà, mieux vaut la vitrine sans rendu
+        // serveur qu'une vitrine qui attend.
+        'timeout' => (int) env('INERTIA_SSR_TIMEOUT', 1),
+        'ensure_bundle_exists' => true,
+        'throw_on_error' => (bool) env('INERTIA_SSR_THROW_ON_ERROR', false),
     ],
 
     /*

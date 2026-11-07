@@ -515,8 +515,12 @@
   changent la performance.
 - Comment le provoquer : pagespeed.web.dev, adresse de la vitrine, onglet
   « Mobile » ; trois mesures à quelques minutes d'écart.
+- Avant : `curl -s https://<domaine>/ | grep -c data-server-rendered`
+  doit donner 1 (rendu serveur en marche, `MISE_EN_PRODUCTION.md` § 4.3) ;
+  sinon la mesure porte sur la vitrine construite par le navigateur.
 - Quoi observer : les trois notes (médiane) ; « Largest Contentful Paint »
-  et « Total Blocking Time » ; comparer aux chiffres du DEVBOOK (point 22).
+  et « Total Blocking Time » ; comparer aux chiffres du DEVBOOK (points 22
+  et 23 : 92 en local).
 - En cas d'échec, relever : le rapport (lien « Partager ») et l'heure.
 - État : à faire (bloqué par D11)
 

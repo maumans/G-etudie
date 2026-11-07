@@ -40,10 +40,10 @@
 | **HTTPS** | certificat valide sur tout le domaine, HTTP redirigé vers HTTPS | **sans HTTPS, pas de service worker** : ni hors ligne, ni installation, ni packs (`HORS_LIGNE.md` A.3.1) |
 | PHP | 8.3 ou plus récent (développé en 8.4), extensions : `bcmath`, `ctype`, `curl`, `dom`, `fileinfo`, `intl`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, `zip`, `zlib` | `zlib` : poids compressé des packs (lot 7) |
 | Composer | 2.x | |
-| Node.js | 22 LTS ou plus récent (développé en 26), **seulement pour construire** l'interface | |
+| Node.js | 22 LTS ou plus récent (développé en 26) | construire l'interface ; **depuis le lot 8**, faire tourner le rendu serveur de la vitrine (§ 4.3) |
 | MySQL | 8.0 ou plus récent, base `utf8mb4` dédiée | |
 | Nginx | avec compression gzip (ou brotli) | les packs et les réponses JSON sont compressés par le serveur web (lot 7) |
-| Supervisor | | garde la file d'attente vivante (§ 4.1) |
+| Supervisor | | garde vivants la file d'attente (§ 4.1) et le rendu serveur (§ 4.3) |
 | cron | | lance le planificateur chaque minute (§ 4.2) |
 | Clé de l'API Claude | à créer sur console.anthropic.com | import assisté des annales (lot 4) |
 
@@ -108,6 +108,11 @@ TARIF_ANNEE_GNF=100000        # prix de l'année scolaire
 VITRINE_QUESTION_DEMO=        # uuid d'une question publiée à faire jouer sur la vitrine ; vide = la question d'exemple
 VITRINE_INDEXER=true          # false sur une PRÉPRODUCTION : noindex partout, robots.txt fermé
 
+# Lot 8 — rendu serveur de la vitrine (facultatives : valeurs par défaut dans config/inertia.php)
+INERTIA_SSR_ENABLED=true      # false : la vitrine est construite par le navigateur (plus lente, rien ne casse)
+INERTIA_SSR_URL=http://127.0.0.1:13714
+INERTIA_SSR_TIMEOUT=1         # secondes ; au-delà, la page part sans rendu serveur
+
 # NE PAS mettre DEMO_MOT_DE_PASSE en production : les comptes de démonstration n'existent pas en production.
 ```
 
@@ -155,9 +160,14 @@ php artisan key:generate
 
 ```bash
 npm ci
-npm run build
+npm run build:ssr
 test ! -f public/hot && echo "OK : pas de public/hot"
+test -f bootstrap/ssr/ssr.js && echo "OK : rendu serveur construit"
 ```
+
+`npm run build:ssr` construit l'interface (`public/build`) **et** le rendu
+serveur de la vitrine (`bootstrap/ssr/ssr.js`, lot 8). Ensuite, mettre en
+place le service du rendu serveur (§ 4.3).
 
 `public/hot` ne doit **jamais** exister en production : s'il existe, le
 service worker se désinstalle et l'application charge des fichiers
@@ -335,6 +345,45 @@ Vérifier ce qui est planifié :
 php artisan schedule:list
 ```
 
+### 4.3 Le rendu serveur de la vitrine (`inertia:start-ssr`) — depuis le lot 8
+
+Un petit processus Node construit les pages de la vitrine (accueil,
+`/sujets`, `/sujets/…`) avant de les envoyer : l'élève voit la page avant
+que le JavaScript n'arrive, et Google comme WhatsApp lisent la page entière.
+Les espaces connectés ne passent **pas** par lui (ils sont servis hors ligne
+par le service worker).
+
+S'il est arrêté, rien ne casse : la vitrine est construite par le
+navigateur, comme avant le lot 8 — seulement plus lente (Lighthouse
+performance ~80 au lieu de ~92).
+
+`/etc/supervisor/conf.d/nkaramogo-ssr.conf` :
+
+```ini
+[program:nkaramogo-ssr]
+command=php /var/www/nkaramogo/artisan inertia:start-ssr
+directory=/var/www/nkaramogo
+user=www-data
+numprocs=1
+autostart=true
+autorestart=true
+stopwaitsecs=10
+redirect_stderr=true
+stdout_logfile=/var/www/nkaramogo/storage/logs/rendu-serveur.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+```
+
+```bash
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl status nkaramogo-ssr
+php artisan inertia:check-ssr          # « Inertia SSR server is running. »
+```
+
+Il écoute sur `127.0.0.1:13714` : **jamais** ouvert à l'extérieur (pas de
+règle de pare-feu, pas de bloc Nginx).
+
 ---
 
 ## 5. Chaque déploiement suivant
@@ -347,12 +396,13 @@ php artisan down --retry=60
 git pull
 composer install --no-dev --optimize-autoloader
 npm ci
-npm run build
+npm run build:ssr
 test ! -f public/hot && echo "OK : pas de public/hot"
 php artisan migrate --force
 php artisan db:seed --force
 php artisan optimize
 php artisan queue:restart
+php artisan inertia:stop-ssr
 php artisan up
 ```
 
@@ -363,6 +413,11 @@ contient un pack (le § 8 le dit).
 `php artisan queue:restart` est indispensable : sans lui, le travailleur
 continue avec l'**ancien** code. Il finit son travail en cours, puis
 Supervisor le relance avec le nouveau.
+
+`php artisan inertia:stop-ssr` de même (lot 8) : le rendu serveur garde en
+mémoire l'**ancien** `bootstrap/ssr/ssr.js` ; Supervisor le relance avec
+le nouveau. Sans lui, la vitrine sort construite par l'ancienne version et
+le navigateur la reconstruit (plus lente, sans erreur pour le visiteur).
 
 Le hors ligne survit au déploiement : les téléphones gardent leurs réponses
 en file et ne passent à la nouvelle version qu'une fois leur file vide et
@@ -522,6 +577,12 @@ les reconstruit depuis la base.
   (Référentiel › Épreuves) pour le compte à rebours de la vitrine ;
   choisir une vraie question de BEPC pour la vitrine
   (`VITRINE_QUESTION_DEMO`).
+- **Rendu serveur de la vitrine** (ajouté le 2026-11-07, pour le critère
+  Lighthouse) : **une seule fois**, le programme Supervisor
+  `nkaramogo-ssr` (§ 4.3) ; **à chaque déploiement**, `npm run build:ssr`
+  au lieu de `npm run build`, puis `php artisan inertia:stop-ssr` (§ 5).
+  Node.js reste donc installé sur le serveur. Variables `INERTIA_SSR_*`
+  facultatives (§ 2).
 
 ---
 
@@ -533,6 +594,9 @@ Après **chaque** déploiement :
 curl -sI https://nkaramogo.example/up | head -1                      # « 200 »
 curl -sI https://nkaramogo.example/sw.js | grep -iE "content-type|service-worker-allowed|cache-control"
 sudo supervisorctl status nkaramogo-file                            # RUNNING
+sudo supervisorctl status nkaramogo-ssr                             # RUNNING (lot 8)
+php artisan inertia:check-ssr                                        # running
+curl -s https://nkaramogo.example/ | grep -c 'data-server-rendered'  # 1 : la vitrine arrive construite
 php artisan schedule:list                                            # packs:generer à 3 h
 php artisan queue:failed                                             # aucun travail en échec
 test ! -f public/hot && echo "OK : pas de public/hot"
@@ -567,6 +631,7 @@ installation, iPhone).
 |---|---|---|
 | Pages blanches, fichiers `/build/…` introuvables, hors ligne qui ne marche plus | `public/hot` présent | `rm public/hot`, puis `php artisan optimize` |
 | Chaque navigation recharge la page entière (409) | build et version servie différents | `npm run build`, puis `php artisan optimize` |
+| Vitrine lente, `grep data-server-rendered` donne 0 | rendu serveur arrêté, ou `bootstrap/ssr/ssr.js` absent | `sudo supervisorctl status nkaramogo-ssr` ; `npm run build:ssr`, puis `sudo supervisorctl restart nkaramogo-ssr` ; `storage/logs/rendu-serveur.log` |
 | Un import d'annale reste « En file » | travailleur arrêté | `sudo supervisorctl status nkaramogo-file`, `sudo supervisorctl restart nkaramogo-file` |
 | « En préparation » sur un pack qui ne change pas | travailleur arrêté, ou génération en échec | `php artisan queue:failed`, puis `php artisan packs:generer` |
 | Un pack téléchargé n'est pas mis à jour après une correction | travailleur avec l'ancien code | `php artisan queue:restart` |

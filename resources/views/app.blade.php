@@ -37,14 +37,59 @@
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
         <link rel="manifest" href="/manifest.webmanifest">
 
-        @viteReactRefresh
-        @vite(\App\Support\Habillages::fichiersVite($page['component']))
+        {{--
+            L'illustration du héros (le plus grand élément de la vitrine) avant
+            les scripts : placée après, elle attend derrière une quarantaine de
+            fichiers JavaScript sur un réseau lent (lot 8, Lighthouse).
+        --}}
+        @php($seo ??= null)
+        @foreach ($seo['precharger'] ?? [] as $image)
+            <link rel="preload" as="image" href="{{ $image }}" fetchpriority="high">
+        @endforeach
+
+        @if (\App\Ssr\ScriptsDifferes::actifs($page['component']))
+            {{--
+                Page construite par le serveur (lot 8, App\Ssr\ScriptsDifferes) :
+                ses scripts partent une fois la page chargée et affichée. Le
+                filet de démarrage compte ses 12 secondes à partir de là.
+            --}}
+            @vite('resources/css/app.css')
+            {{--
+                Les balises en chaîne JSON, pas dans un <template> : le
+                lecteur anticipé de Chrome lit le HTML d'un <template> et
+                téléchargerait tout de suite les scripts.
+            --}}
+            <script id="scripts-differes">
+                (function () {
+                    var balises = @json(\App\Ssr\ScriptsDifferes::balises($page['component']));
+
+                    function lancer() {
+                        var modele = document.createElement('template');
+                        modele.innerHTML = balises;
+                        modele.content.querySelectorAll('link, script').forEach(function (source) {
+                            var copie = document.createElement(source.tagName);
+                            for (var i = 0; i < source.attributes.length; i++) {
+                                copie.setAttribute(source.attributes[i].name, source.attributes[i].value);
+                            }
+                            document.head.appendChild(copie);
+                        });
+                    }
+                    // Après le chargement **et** une image peinte : le second
+                    // requestAnimationFrame ne tire qu'une fois la page affichée.
+                    addEventListener('load', function () {
+                        requestAnimationFrame(function () { requestAnimationFrame(lancer); });
+                    }, { once: true });
+                })();
+            </script>
+        @else
+            @viteReactRefresh
+            @vite(\App\Support\Habillages::fichiersVite($page['component']))
+        @endif
         {{--
             Référencement et partage (lot 8, App\Support\Seo) : dans le HTML du
             serveur, parce que WhatsApp et les moteurs lisent les liens sans
             exécuter le JavaScript.
         --}}
-        @php($seo ??= null)
         <meta name="description" content="{{ $seo['description'] ?? \App\Support\Seo::DESCRIPTION }}">
         @if ($seo)
             <meta name="robots" content="{{ $seo['robots'] }}">
@@ -61,9 +106,6 @@
             <meta property="og:image:height" content="630">
             <meta property="og:image:alt" content="{{ $seo['titre_partage'] }}">
             <meta name="twitter:card" content="summary_large_image">
-            @foreach ($seo['precharger'] as $image)
-                <link rel="preload" as="image" href="{{ $image }}" fetchpriority="high">
-            @endforeach
             @foreach ($seo['json_ld'] as $donnees)
                 <script type="application/ld+json">{!! json_encode($donnees, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) !!}</script>
             @endforeach
@@ -118,7 +160,13 @@
                     }
                 }, true);
 
-                setTimeout(ouvrir, 12000);
+                // Scripts différés (vitrine construite par le serveur) : ils ne
+                // partent qu'au chargement de la page, le délai aussi.
+                if (document.getElementById('scripts-differes')) {
+                    addEventListener('load', function () { setTimeout(ouvrir, 12000); }, { once: true });
+                } else {
+                    setTimeout(ouvrir, 12000);
+                }
             })();
         </script>
     </body>

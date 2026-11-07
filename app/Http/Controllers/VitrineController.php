@@ -28,6 +28,10 @@ class VitrineController extends Controller
             'illustrations' => $illustrations,
             'photoHeros' => ImagesVitrine::photoHeros(),
             'compteARebours' => self::compteARebours(),
+            // Le jour du serveur (Guinée, UTC) : la page construite par le
+            // serveur et celle hydratée par le téléphone comptent les mêmes
+            // jours, quel que soit le fuseau du téléphone ou l'heure.
+            'aujourdhui' => now()->toDateString(),
             'questionDemo' => QuestionDemonstration::question(),
             'sujetsRecents' => AnnalesPubliques::requete()
                 ->with(['examen', 'serie', 'matiere'])

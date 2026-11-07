@@ -20,7 +20,7 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-07 (lot 8 fait sauf son critère Lighthouse ; lot 0 en attente de D11)
+### État au 2026-11-07 (lot 8 fait, critère Lighthouse tenu par le rendu serveur ; lot 0 en attente de D11)
 
 - **Dépôt git** : `main` porte les lots 0 à 8. Les lots 3 à 8 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
@@ -36,10 +36,13 @@
   **seulement si les droits de publication sont saisis**, D5) ;
   **référencement** dans le HTML du serveur (titre, description,
   canonique, Open Graph, JSON-LD), `sitemap.xml`, `robots.txt` ; **cartes
-  de partage WhatsApp** dessinées par GD. **Lighthouse mobile sur
-  l'accueil : accessibilité 100, SEO 100, performance ~81 (médiane, de 73
-  à 83 selon les passages) — critère ≥ 90 non atteint** sans rendu serveur
-  (SSR) : décision demandée à Maurice (point 22, « Reste »).
+  de partage WhatsApp** dessinées par GD. **Rendu serveur (SSR) de la
+  vitrine** (point 23, accord de Maurice le 2026-11-07) : **Lighthouse
+  mobile sur l'accueil : performance 92 (91, 93, 92), accessibilité 100,
+  SEO 100 — critère ≥ 90 tenu** (mesure locale dans les conditions de
+  production ; PageSpeed sur le vrai domaine après D11). En production :
+  un programme Supervisor de plus (`nkaramogo-ssr`) et `npm run build:ssr`
+  (`MISE_EN_PRODUCTION.md` § 4.3 et § 5).
 - **Lot 7 fait** (point 21) : **packs** (HL5) — une matière se télécharge
   (« Téléchargements », poids affiché avant), par morceaux, reprise après
   coupure, mise à jour **différentielle** ; hors ligne, sa page, ses
@@ -264,10 +267,10 @@
    « Ajouter un profil » → se connecter avec 09 Ousmane ; repasser à
    Aïssatou par son code. Sur un vrai téléphone : `A_TESTER.md` (lot 7),
    après D11.
-8. **Maurice : décider du rendu serveur (SSR)** pour tenir le critère
-   Lighthouse du lot 8 (performance ~81 sans lui ; point 22) ; puis
-   **lot 9** (abonnements, Orange Money / MTN MoMo, codes prépayés), qui
-   lira les tarifs de `config/vitrine.php`.
+8. **Lot 9** (abonnements, Orange Money / MTN MoMo, codes prépayés), qui
+   lira les tarifs de `config/vitrine.php`. Avant : Maurice refait la base
+   de développement (`php artisan migrate:fresh --seed`, point 22,
+   « Reste »).
 9. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -346,7 +349,7 @@ le soir. Utilisateurs principaux : **des mineurs**.
 | Couche | Prévu | Installé | Écart / décision |
 |---|---|---|---|
 | React | React | **react / react-dom 19.3.1**, React Compiler (`babel-plugin-react-compiler` 1.0.0) | — |
-| Inertia (client) | Inertia | **@inertiajs/react 3.9.1**, @inertiajs/vite 3.9.1 | le plugin Vite résout les pages lui-même : un `resolve` maison sera nécessaire pour rattraper l'échec d'import (`HORS_LIGNE.md` A.3.3) |
+| Inertia (client) | Inertia | **@inertiajs/react 3.9.1**, @inertiajs/vite 3.9.1 | le plugin Vite résout les pages lui-même : un `resolve` maison sera nécessaire pour rattraper l'échec d'import (`HORS_LIGNE.md` A.3.3) ; **rendu serveur de la vitrine seulement** (`resources/js/ssr.tsx`, point 23) |
 | Langage | `.js` / `.jsx` (textes de `CLAUDE.md`, `HORS_LIGNE.md`) | **TypeScript 5.9.3** (`.ts` / `.tsx`, `tsc --noEmit` en CI) | DA1 : conserver TypeScript |
 | CSS | Tailwind (+ `tailwind.config`) | **tailwindcss 4.3.3** (`@tailwindcss/vite`), configuration **dans `app.css`** (`@theme`, `@source`), **sans `tailwind.config`** | règle « classes seulement dans le JS/TS » maintenue ; jetons Ardoise dans `@theme` ; variante `dark:` redéfinie pour exclure un sous-arbre `.clair` (étape 1) |
 | Bundler | Vite | **Vite+ 1.4.0** (`vite` remplacé par `@voidzero-dev/vite-plus-core` 1.4.0, Rolldown 1.2.16), commandes `vp dev / build / check / test`, `vite.config.ts` | `optimizeDeps.include` à vérifier sous Vite+ ; laravel-vite-plugin 3.2.0 |
@@ -430,7 +433,7 @@ permission s'exerce (section 7).
 |---|---|
 | Page `/dev/composants` (catalogue Ardoise) | ✅ lot 0, étape 1 (point 4) |
 | Habillages vitrine, élève, back-office, console (coquilles et pages d'entrée) | ✅ lot 0, étape 3 (point 6) |
-| Vitrine finale (question jouable, compte à rebours, annales en accès libre, tarifs, partenaires, installation) ; annales publiques `/sujets` et `/sujets/{slug}` ; partage WhatsApp | ✅ lot 8 (point 22) ; critère Lighthouse performance en attente (SSR) |
+| Vitrine finale (question jouable, compte à rebours, annales en accès libre, tarifs, partenaires, installation) ; annales publiques `/sujets` et `/sujets/{slug}` ; partage WhatsApp | ✅ lot 8 (point 22) ; rendu serveur et critère Lighthouse ✅ (point 23) |
 | Connexion / inscription par téléphone, vérification du numéro, mot de passe oublié, « Mon compte » | ✅ lot 0, étape 4 (point 7) |
 | « Mon compte » dans l'habillage de chaque espace, onglet « Sécurité » du personnel (double authentification, session, activité), page 403 | ✅ lot 0, étape 5 (point 12) |
 | Socle hors ligne : pastille et feuille « Tes réponses », bandeaux (hors ligne, session expirée, copie datée, iPhone), dialogue « écran indisponible », navigation estompée, installation, page de repli, filet de démarrage | ✅ lot 0, étape 6 (point 13) |
@@ -1824,13 +1827,8 @@ cette question à sa façon. Elle distingue deux notions :
      WhatsApp, rendu du compte à rebours), `chargement-page.test.ts`
      adapté. Totaux : **532 Pest, 359 Vitest, 497 Playwright : 476 passés, 16 captures en écart, 5 parcours non lancés (ils dépendent des captures) — détail dans « Reste »**. `tsc`,
      `vp check`, Pint, Larastan niveau 7 et `npm run build` passent.
-   - **Reste** : **critère Lighthouse performance ≥ 90** — décision de
-     Maurice sur le **rendu serveur (SSR Inertia)** : la page arrive déjà
-     construite, l'illustration s'affiche sans attendre React (mesuré :
-     sans cette attente, 90) ; coût : un processus Node permanent en
-     production (Supervisor, comme la file), `npm run build:ssr` à chaque
-     déploiement, et chaque page de la vitrine doit pouvoir se construire
-     sans `window`. Puis : mesure PageSpeed sur le vrai domaine, carte
+   - **Reste** : ~~critère Lighthouse performance ≥ 90~~ — tenu par le
+     rendu serveur (point 23). Puis : mesure PageSpeed sur le vrai domaine, carte
      WhatsApp et installation sur vrais téléphones (`A_TESTER.md`, lot 8,
      bloqués par D11). **Passage Playwright complet du 2026-11-07** : les
      16 écarts sont (1) la liste des annales du back-office à 360 px
@@ -1847,6 +1845,87 @@ cette question à sa façon. Elle distingue deux notions :
      pour ces écrans. Puis : vraie question de BEPC pour la vitrine
      (`VITRINE_QUESTION_DEMO`) ; dates des sessions (compte à rebours) ;
      prix à confirmer avant le lot 9.
+
+23. [x] **Lot 8, suite — rendu serveur (SSR) de la vitrine, critère
+   Lighthouse tenu** (2026-11-07, sur `main`, un commit)
+   - **Constat** : sans rendu serveur, l'illustration du héros (le plus
+     grand élément) attendait que React construise la page : performance
+     ~81 (point 22). Rendu serveur seul : 81-83 encore — Lighthouse simule
+     un réseau lent, et l'illustration y attendait derrière une quarantaine
+     de fichiers JavaScript **préchargés** (balises `modulepreload` et
+     en-tête `Link`) ; le lecteur anticipé de Chrome lit même le HTML d'un
+     `<template>`.
+   - **Décision** (Maurice : « Oui, active le SSR ») : **rendu serveur pour
+     la vitrine seulement** — une règle, `Habillages::renduServeur` (pages
+     `vitrine/*`), appliquée par `App\Ssr\PasserelleVitrine` (la passerelle
+     d'Inertia, liée dans `AppServiceProvider`) : les espaces connectés
+     n'appellent jamais le processus Node (ils dépendent de l'appareil et
+     sont servis hors ligne par le service worker). Navigateur et serveur
+     partagent la résolution des pages et l'enveloppe
+     (`resources/js/application.tsx`), pour un arbre identique ; `ssr.tsx`
+     ne touche pas `window`.
+   - **Ce qui a fait passer la barre** (mesures, médiane de trois après un
+     passage de chauffe) : (1) l'illustration préchargée **avant** les
+     scripts dans `<head>` ; (2) **scripts lancés après l'affichage** sur
+     une page effectivement construite par le serveur
+     (`App\Ssr\ScriptsDifferes` : après `load` et une image peinte ;
+     balises en chaîne JSON, produites par une **copie** de Vite pour
+     qu'elles ne soient ni lues par le lecteur anticipé, ni annoncées dans
+     l'en-tête `Link`) — la page se lit et ses liens marchent sans
+     JavaScript ; (3) **page entière construite par le serveur** (le
+     « héros d'abord, le reste juste après » du point 22, `useRenduComplet`,
+     est retiré : héros seul 87, page entière 90-91 — et Google lit la FAQ
+     et les tarifs) ; (4) une frontière `<Suspense>` par section sous le
+     héros : React hydrate section par section (plus longue tâche 246 →
+     186 ms). Résultat : **92 (91, 93, 92)**, LCP 2,0 s, TBT ~330 ms,
+     accessibilité 100, SEO 100. `/sujets` : performance 96 (SEO 66 en
+     développement : la liste n'a que des sujets d'exemple, donc `noindex`
+     — voulu, point 22).
+   - **Sans processus Node** (arrêté, en panne, plus d'une seconde) : la
+     vitrine part sans rendu serveur, ses scripts **ne sont pas** différés,
+     le navigateur la construit comme avant — testé. `phpunit.xml` coupe le
+     rendu serveur (`INERTIA_SSR_ENABLED=false`) ; les tests le rallument
+     avec un processus simulé.
+   - **Hydratation** : aucun écart serveur / téléphone sur `/`,
+     `/#titre-tarifs` (l'ancre est trouvée), `/sujets`, `/sujets?examen=…`,
+     `/sujets/{slug}`, en clair et en sombre (script Playwright, erreurs de
+     console et d'hydratation). Le compte à rebours compte depuis **le jour
+     du serveur** (prop `aujourdhui`) : sinon un téléphone dans un autre
+     fuseau, ou une visite à minuit, donnait un HTML différent.
+   - **Corrigé en chemin** : l'option `ssr` de `laravel-vite-plugin`
+     bloquait `npm run dev` (Vite ne démarrait plus) — inutile, le plugin
+     Inertia trouve `resources/js/ssr.tsx` seul : retirée ; `export default
+     createInertiaApp(…)` n'est pas reconnu par le plugin (pas de serveur
+     dans le paquet) : `void createInertiaApp(…)`, comme `app.tsx` ; la
+     mesure Lighthouse ajoute un **passage de chauffe** non compté (le
+     premier passage d'un Chrome neuf perd 15 à 30 points qu'aucune visite
+     réelle ne perd ; chaque passage reste une première visite, cache vidé).
+   - **Développement** : `npm run dev` sert aussi le rendu serveur (Vite,
+     `/__inertia_ssr`). Sous Windows il prend de 0,2 à 7 s par page : au-delà
+     d'une seconde (`INERTIA_SSR_TIMEOUT`), la page part construite par le
+     navigateur — normal ; `INERTIA_SSR_TIMEOUT=5` dans `.env` pour le voir
+     à l'œuvre. Sans scripts différés en développement.
+   - **Vu avec Playwright** : `ecrans-lot8.spec.ts` repassé (31 : 360, 768,
+     1366 × clair et sombre, axe, parcours) — captures identiques, sauf
+     `vitrine-accueil-360-sombre` dont la **référence était fausse**
+     (l'illustration « soir », chargée à la demande, n'y était pas encore) :
+     mise à jour. Écrans du lot 0 (connexion, inscription) repassés. Pas de
+     passage complet : les 16 écarts connus du point 22 attendent la base
+     refaite.
+   - **Preuve** : Pest `RenduServeurTest` (4 : vitrine construite par le
+     serveur, une seule requête par page ; connexion et espace élève sans
+     appel ; processus en échec ou injoignable → page construite par le
+     navigateur, scripts non différés ; avec un manifeste Vite d'essai,
+     scripts absents du HTML et de l'en-tête `Link` sur la vitrine, présents
+     sur la connexion). Totaux : **536 Pest, 359 Vitest**. `tsc`,
+     `vp check`, Pint, Larastan niveau 7, `npm run build:ssr` passent ;
+     `php artisan inertia:start-ssr` et `inertia:check-ssr` essayés.
+     `MISE_EN_PRODUCTION.md` : § 1, § 2 (`INERTIA_SSR_*`), § 3,
+     **§ 4.3 (Supervisor `nkaramogo-ssr`)**, § 5 (`npm run build:ssr`,
+     `php artisan inertia:stop-ssr`), § 8 « Lot 8 », § 9, § 10.
+   - **Reste** : PageSpeed sur le vrai domaine (`A_TESTER.md`, lot 8, D11) ;
+     vérifier en production que `curl … | grep -c data-server-rendered`
+     donne 1 (§ 9).
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

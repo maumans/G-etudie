@@ -32,5 +32,8 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <!-- Rendu serveur (lot 8) : jamais d'appel au processus Node dans les
+             tests ; RenduServeurTest l'active avec une réponse simulée. -->
+        <env name="INERTIA_SSR_ENABLED" value="false" force="true"/>
     </php>
 </phpunit>
