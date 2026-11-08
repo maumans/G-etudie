@@ -213,6 +213,7 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
+- **Tests (lot 9)** : **587 Pest, 399 Vitest, 540 Playwright**, verts (point 25). Playwright sur ce poste : `PLAYWRIGHT_PORT=8010` (le 8000 est pris par un autre projet), `--workers=1`, sans `npm run dev`, **avec `php artisan queue:work`** (parcours du lot 4). Les tests ne touchent plus au disque `local` de développement (horloge des captures).
 - **Tests (lot 7)** : **511 Pest, 341 Vitest, 479 Playwright** (écrans des lots 0 à 7, 5 connexions, 7 parcours, socle hors ligne, 3 budgets ; captures sur le build). Dernier passage complet : 478 / 479 — le parcours « deux profils » a échoué une fois (course de session, voir « Pièges ») ; corrigé, puis 8 passages verts de suite. `tsc`, `vp check`, Pint, Larastan niveau 7 et `npm run build` passent. Sur ce poste, lancer
   Playwright en série (`--workers=1`) et sans `npm run dev`.
 - **Tests (lot 6)** : 482 Pest (MySQL `g_etudie_test`, rôles et badges semés une
@@ -2062,21 +2063,40 @@ cette question à sa façon. Elle distingue deux notions :
    - **Données de démonstration** (`DemoAbonnementsSeeder`) : lot de 24
      codes d'exemple (Sékou), Ousmane abonné (un mois payé + une année par
      code), un essai MoMo refusé pour Aïssatou, qui reste gratuite.
-   - **Pas encore fait (session interrompue par la limite d'usage)** : le
-     passage Playwright **complet** des lots 0 à 8 n'a pas été relancé. Les
-     captures de référence des écrans élève à 1366 px (nouvelle entrée
-     « Abonnement » dans la barre latérale), de la console (deux entrées),
-     du lancement d'un examen blanc (lot 5 : ligne « examens gratuits »),
-     de « Téléchargements » (lot 7) et de la fiche d'annale du back-office
-     (lot 4 : « Accès au corrigé ») vont changer : `PLAYWRIGHT_PORT=8010
-     npx playwright test --workers=1`, relire, puis `--update-snapshots`.
-     Suite Pest complète passée avant les derniers ajustements (586 / 587,
-     l'échec corrigé depuis et revérifié seul) ; Vitest 381 + 18 ; Larastan,
-     Pint, `tsc`, `vp check`, `npm run build` verts.
+   - **Passage Playwright complet** (2026-11-08, sur le build, port 8010 —
+     le 8000 est pris par un autre projet) : **539 / 540**, puis les deux
+     parcours restants verts une fois `queue:work` lancé (l'import du lot 4
+     attend un travailleur de file : environnement, pas le lot 9). Captures
+     changées, **toutes relues** et attendues : sécurité du compte en
+     console (deux entrées de menu) ; lot 4 — annales du back-office
+     (« Accès au corrigé »), annale élève en entraînement et signalement
+     (carte « Corrigé réservé », BEPC 2023), liste des annales à 360 px
+     (badges) ; lot 5 — lancement de l'examen blanc à 360 px (« Ton dernier
+     examen blanc gratuit du mois ») ; lot 7 — « Téléchargements » (bouton
+     vers l'abonnement) et « Qui révise ? » (« Mon abonnement ») ; lot 8 —
+     accueil de la vitrine à 360 px (« pour 10 mois » ; l'ancienne référence
+     n'avait pas rendu une illustration différée). Les autres écrans élève
+     (nouvelle entrée de la barre latérale) restent sous le seuil de 1 %.
+   - **Bug préexistant corrigé** (CLAUDE.md § 8) : `SeederDemonstrationTest`
+     sème la démonstration et **récrivait l'instant du semis de la base de
+     développement** (`storage/app/private/demo/horloge.txt`, disque
+     `local` partagé) : après chaque `php artisan test`, les captures
+     lisaient une autre date et « Ma progression » dérivait (une révision
+     devenait due). Décision : `Tests\TestCase` fausse le disque `local`
+     pour tous les tests ; instant du semis rétabli (2026-11-07 06:22,
+     création du premier compte de démonstration) ; le nettoyage du parcours
+     du lot 5 recalcule la progression à cet instant (`HorlogeDemo`), plus à
+     la vraie date. Preuve : Pest complet, fichier inchangé après ; « Ma
+     progression » identique à sa référence après le parcours du lot 5
+     (18 / 18).
+   - **Totaux** : **587 Pest** (vert), **399 Vitest** (381 + 18), **540
+     Playwright** (vert, avec `queue:work`). `tsc`, `vp check`, Pint,
+     Larastan niveau 7 et `npm run build` passent.
    - **Preuve** : Pest `Abonnements/PaiementTest` (14, dont le critère),
      `CodesAccesTest` (8), `DroitsAbonneTest` (8), Unit
      `CodeAccesFormatTest` ; Vitest `code-acces.test.ts`,
-     `hors-ligne/abonnement.test.ts`. Totaux : voir § 0 « Tests (lot 9) ».
+     `hors-ligne/abonnement.test.ts` ; Playwright `ecrans-lot9.spec.ts`
+     (42), `parcours-lot9.spec.ts`.
    - **Reste** : vrai fournisseur et vrai paiement (`A_TESTER.md` § 7,
      bloqué par le choix du fournisseur et D11) ; parents payeurs (lot 11) ;
      licences d'établissement et comptes parrainés (PLAN M16, plus tard) ;

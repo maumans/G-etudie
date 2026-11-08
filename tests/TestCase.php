@@ -4,6 +4,7 @@ namespace Tests;
 
 use Database\Seeders\SocleSeeder;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Fortify\Features;
 use RuntimeException;
 
@@ -26,6 +27,13 @@ abstract class TestCase extends BaseTestCase
         parent::setUp();
 
         $this->withoutVite();
+
+        // Le disque `local` des tests est un disque à part : sans cela, le
+        // semis de démonstration d'un test (SeederDemonstrationTest) récrivait
+        // l'instant du semis de la base de développement (HorlogeDemo,
+        // storage/app/private/demo/horloge.txt), et les captures dérivaient
+        // après chaque `php artisan test` (vu le 2026-11-08, lot 9).
+        Storage::fake('local');
     }
 
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
