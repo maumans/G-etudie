@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
+import { ADRESSE } from '../../playwright.config';
 
 /** Matrice de DESIGN.md § 12 : l'Android d'entrée de gamme est l'appareil de référence. */
 export const GABARITS = [
@@ -168,4 +169,17 @@ export async function repondreAuHasard(page: Page): Promise<void> {
     await expect(
         page.getByRole('button', { name: /^(Continuer|Voir mon bilan)$/ }),
     ).toBeVisible();
+}
+
+/**
+ * Fige les deux horloges d'une capture : celle du navigateur sur `horloge`
+ * (la date affichée), celle du serveur sur l'instant du semis des données
+ * de démonstration (cookie `horloge_demo`, `App\Support\HorlogeDemo`) —
+ * sinon la série, les badges et « À revoir » changent chaque jour.
+ */
+export async function figerHorloges(page: Page, horloge: Date): Promise<void> {
+    await page.clock.setFixedTime(horloge);
+    await page
+        .context()
+        .addCookies([{ name: 'horloge_demo', value: '1', url: ADRESSE }]);
 }

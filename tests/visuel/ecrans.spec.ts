@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { GABARITS, SESSIONS, THEMES, capturer } from './gabarits';
+import {
+    GABARITS,
+    SESSIONS,
+    THEMES,
+    capturer,
+    figerHorloges,
+} from './gabarits';
 
 /**
  * Écrans clés du lot 0, capturés dans chaque gabarit et chaque thème. Une
@@ -101,7 +107,7 @@ for (const gabarit of GABARITS) {
             // « Bonjour » ou « Bonsoir » selon l'heure ; sans cela, la capture
             // de référence changerait chaque jour.
             test.beforeEach(async ({ page }) => {
-                await page.clock.setFixedTime(HORLOGE);
+                await figerHorloges(page, HORLOGE);
             });
 
             test('lot 0 — catalogue des composants', async ({ page }) => {

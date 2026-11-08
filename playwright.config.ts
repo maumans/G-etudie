@@ -8,7 +8,13 @@ import { defineConfig } from '@playwright/test';
  *
  * Elles sont prises sur le build (`npm run build`), jamais sur `npm run dev` :
  * vérifier que public/hot n'existe pas.
+ *
+ * Port : 8000, ou `PLAYWRIGHT_PORT` quand un autre projet l'occupe
+ * (`reuseExistingServer` reprendrait sinon ce projet-là sans rien dire).
  */
+const PORT = process.env.PLAYWRIGHT_PORT ?? '8000';
+export const ADRESSE = `http://127.0.0.1:${PORT}`;
+
 export default defineConfig({
     testDir: 'tests/visuel',
     outputDir: 'test-results',
@@ -24,7 +30,7 @@ export default defineConfig({
         },
     },
     use: {
-        baseURL: 'http://127.0.0.1:8000',
+        baseURL: ADRESSE,
         locale: 'fr-FR',
         timezoneId: 'Africa/Conakry',
     },
@@ -75,8 +81,8 @@ export default defineConfig({
         },
     ],
     webServer: {
-        command: 'php artisan serve --host=127.0.0.1 --port=8000',
-        url: 'http://127.0.0.1:8000/up',
+        command: `php artisan serve --host=127.0.0.1 --port=${PORT}`,
+        url: `${ADRESSE}/up`,
         reuseExistingServer: true,
         timeout: 60_000,
     },

@@ -44,11 +44,11 @@ class TableauDeBordController extends Controller
         return Inertia::render('contenu/accueil', [
             'compteurs' => collect(StatutContenu::cases())
                 ->mapWithKeys(fn (StatutContenu $s) => [$s->value => (int) ($compteurs[$s->value] ?? 0)]),
-            'a_relire' => $relit ? $this->presenter($this->aRelire($user)->latest('updated_at')->limit(5)->get()) : null,
+            'a_relire' => $relit ? $this->presenter($this->aRelire($user)->latest('updated_at')->latest('id')->limit(5)->get()) : null,
             'nombre_a_relire' => $relit ? $this->aRelire($user)->count() : null,
             'a_reprendre' => $redige ? $this->presenter($this->aReprendre($user)) : null,
             'mes_brouillons' => $redige ? $this->presenter(
-                Lecon::query()->where('auteur_id', $user->id)->where('statut', StatutContenu::Brouillon)->latest('updated_at')->limit(4)->get(),
+                Lecon::query()->where('auteur_id', $user->id)->where('statut', StatutContenu::Brouillon)->latest('updated_at')->latest('id')->limit(4)->get(),
             ) : null,
             'couverture' => $this->couverture(),
             'est_exemple' => Lecon::query()->where('est_exemple', true)->exists(),
@@ -87,7 +87,7 @@ class TableauDeBordController extends Controller
             ->where('auteur_id', $user->id)
             ->where('statut', StatutContenu::Brouillon)
             ->with('versions')
-            ->latest('updated_at')
+            ->latest('updated_at')->latest('id')
             ->get()
             ->filter(fn (Lecon $lecon) => $lecon->dernierRenvoi() !== null)
             ->take(4)

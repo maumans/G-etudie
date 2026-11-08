@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Enums\Role;
 use App\Models\User;
 use App\Services\PackService;
+use App\Support\HorlogeDemo;
+use Carbon\CarbonImmutable;
 use Illuminate\Database\Seeder;
 use RuntimeException;
 
@@ -37,6 +39,9 @@ class DemoSeeder extends Seeder
         if (app()->isProduction()) {
             throw new RuntimeException('Les comptes de démonstration ne sont jamais créés en production.');
         }
+
+        // L'instant du semis : les captures d'écran s'y placent (HorlogeDemo).
+        HorlogeDemo::noter(CarbonImmutable::now());
 
         $motDePasse = config('demonstration.mot_de_passe');
 

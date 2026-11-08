@@ -268,9 +268,8 @@
    Aïssatou par son code. Sur un vrai téléphone : `A_TESTER.md` (lot 7),
    après D11.
 8. **Lot 9** (abonnements, Orange Money / MTN MoMo, codes prépayés), qui
-   lira les tarifs de `config/vitrine.php`. Avant : Maurice refait la base
-   de développement (`php artisan migrate:fresh --seed`, point 22,
-   « Reste »).
+   lira les tarifs de `config/vitrine.php`. Base de développement refaite
+   par Maurice le 2026-11-07 ; suite Playwright stabilisée (point 24).
 9. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -1926,6 +1925,54 @@ cette question à sa façon. Elle distingue deux notions :
    - **Reste** : PageSpeed sur le vrai domaine (`A_TESTER.md`, lot 8, D11) ;
      vérifier en production que `curl … | grep -c data-server-rendered`
      donne 1 (§ 9).
+
+24. [x] **Captures stables : horloge du serveur figée, tris départagés**
+   (2026-11-08, sur `main`, un commit)
+   - **Constat** : après la base refaite par Maurice (`migrate:fresh
+     --seed`), passage Playwright complet : 472 réussis, 20 échecs, 5 non
+     lancés. (1) **Accueil élève (8) et « Ma progression » (6)** : les
+     données de démonstration sont datées par rapport au **moment du
+     semis**, le serveur calcule avec la **vraie date** — un jour plus tard,
+     série, badges et « À revoir » changent (le navigateur était déjà figé,
+     pas le serveur). (2) **Annales du back-office (2)** : deux sujets de la
+     même session, semés dans la même seconde, revenaient dans un ordre
+     laissé à la base — **bug de tri** (une liste paginée sans ordre total
+     peut aussi répéter ou sauter une ligne d'une page à l'autre). (3)
+     **Banque de questions (4)** : ordre des dates de modification du
+     nouveau semis — écart légitime. (4) Parcours hors ligne et une annale
+     (2) : **environnement** — MySQL arrêté dans la nuit, puis le port 8000
+     repris par un autre projet de Maurice (« Cargoscope SHILANE ») ; verts
+     une fois relancés sur un autre port.
+   - **Décisions** : `App\Support\HorlogeDemo` (une autorité) note
+     l'instant du semis (`DemoSeeder`, `storage/app/private/demo/horloge.txt` ;
+     à défaut, la création du premier compte de démonstration) ;
+     `FigerHorlogeDemo` traite à cet instant une requête qui porte le
+     cookie `horloge_demo=1` — **en local et en test seulement**, placé
+     **après** l'ouverture de la session (sinon la dernière activité
+     reculerait et la session expirerait pour les requêtes suivantes),
+     horloge rendue après la requête. Côté Playwright, `figerHorloges(page,
+     HORLOGE)` (`tests/visuel/gabarits.ts`) fige le navigateur et pose le
+     cookie, dans tous les `ecrans*.spec.ts`. Tris : départage par `id`
+     dans les annales (back-office, élève, cours, vitrine, liste publique) et
+     le tableau de bord du back-office. Port de Playwright réglable
+     (`PLAYWRIGHT_PORT`, 8000 par défaut) : `reuseExistingServer`
+     reprenait sans rien dire l'application d'un autre projet.
+   - **Limite** : les captures dépendent des données du semis — après un
+     **nouveau** `migrate:fresh --seed` un autre jour de la semaine, la
+     série de l'accueil et de « Ma progression » peut changer une fois :
+     relire puis `--update-snapshots` pour ces écrans. Entre deux semis,
+     elles ne bougent plus.
+   - **Vu avec Playwright** : 18 références remplacées après relecture
+     (accueil élève × 8, progression × 6, banque de questions × 4 :
+     série « Trois soirs », 5 notions à revoir, aucun débordement, sombre
+     lisible) ; repassage sans mise à jour : **97 / 97** sur ces écrans et
+     les annales du back-office ; parcours hors ligne et annale élève verts.
+   - **Preuve** : Pest `HorlogeDemoTest` (5 : instant du semis avec le
+     cookie, vraie heure sans, horloge d'un test respectée, sans effet en
+     production, session enregistrée à la vraie heure en base). Totaux :
+     **541 Pest, 359 Vitest**. `tsc`, `vp check`, Pint, Larastan niveau 7
+     passent. `MISE_EN_PRODUCTION.md` : rien de plus (sans effet en
+     production).
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

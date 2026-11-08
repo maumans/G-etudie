@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Middleware\FigerHorlogeDemo;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\OrdinateurPartage;
 use App\Http\Middleware\SessionCourtePersonnel;
+use App\Support\HorlogeDemo;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,7 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
+        $middleware->encryptCookies(except: ['appearance', 'sidebar_state', HorlogeDemo::COOKIE]);
 
         // Un compte connecté qui ouvre une page d'invité (connexion,
         // inscription) est renvoyé dans son espace.
@@ -36,6 +38,8 @@ return Application::configure(basePath: dirname(__DIR__))
             SessionCourtePersonnel::class,
             OrdinateurPartage::class,
             HandleAppearance::class,
+            // Captures d'écran seulement (développement) : après la session.
+            FigerHorlogeDemo::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
         ]);

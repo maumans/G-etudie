@@ -102,7 +102,7 @@ class CoursController extends Controller
      */
     public static function structure(ProfilEleve $profil, Matiere $matiere): array
     {
-        $sujets = CatalogueEleve::sujets($profil, $matiere)->orderByDesc('session')->get(['uuid', 'titre', 'session', 'type', 'est_exemple', 'examen_id', 'serie_id', 'matiere_id']);
+        $sujets = CatalogueEleve::sujets($profil, $matiere)->orderByDesc('session')->orderByDesc('id')->get(['uuid', 'titre', 'session', 'type', 'est_exemple', 'examen_id', 'serie_id', 'matiere_id']);
         $pack = Pack::query()
             ->where('examen_id', $profil->examen_id)
             ->where('serie_id', $profil->serie_id)

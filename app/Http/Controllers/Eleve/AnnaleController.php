@@ -162,7 +162,7 @@ class AnnaleController extends Controller
 
         RechercheTexte::appliquer($requete, $filtres['recherche'], ['titre', 'matiere.nom']);
 
-        $page = $requete->orderByDesc('session')->orderBy('matiere_id')->paginate(self::PAR_PAGE)->withQueryString();
+        $page = $requete->orderByDesc('session')->orderBy('matiere_id')->orderBy('id')->paginate(self::PAR_PAGE)->withQueryString();
         $ids = collect($page->items())->pluck('id');
         $questions = Question::query()
             ->join('sujet_parties', 'sujet_parties.id', '=', 'questions.sujet_partie_id')

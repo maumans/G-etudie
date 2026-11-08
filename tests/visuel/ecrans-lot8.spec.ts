@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { GABARITS, THEMES, capturer } from './gabarits';
+import { GABARITS, THEMES, capturer, figerHorloges } from './gabarits';
 
 /**
  * Écrans du lot 8 (vitrine finale), sans compte, sur les données de
@@ -105,7 +105,7 @@ for (const gabarit of GABARITS.filter((g) => g.nom !== '412')) {
             });
 
             test.beforeEach(async ({ page }) => {
-                await page.clock.setFixedTime(HORLOGE);
+                await figerHorloges(page, HORLOGE);
             });
 
             for (const ecran of ECRANS) {

@@ -163,8 +163,15 @@ règles ne se rediscutent pas.
 - **Polices auto-hébergées** : une police distante échoue hors ligne.
   Bricolage Grotesque variable (fichier `opsz`), par Fontsource, importée dans
   `app.css`.
-- **Écran qui affiche la date ou l'heure** : figer l'horloge dans sa capture
-  (`page.clock.setFixedTime`), sinon la référence change chaque jour.
+- **Écran qui affiche la date ou l'heure** : figer **les deux** horloges
+  dans sa capture avec `figerHorloges(page, HORLOGE)` (`tests/visuel/gabarits.ts`) :
+  le navigateur sur `HORLOGE`, le serveur sur l'instant du semis de la
+  démonstration (`App\Support\HorlogeDemo`, cookie `horloge_demo`, local
+  seulement) — sinon la série, les badges et « À revoir » changent chaque
+  jour.
+- **Toute liste triée finit par `id`** (`->orderByDesc('session')->orderByDesc('id')`) :
+  deux lignes semées dans la même seconde reviennent sinon dans un ordre
+  laissé à la base, et une liste paginée peut répéter ou sauter une ligne.
 - **`public/hot` oublié** après un `npm run dev` arrêté : le build semble cassé
   et le service worker se désinstalle. Le vérifier avant toute vérification de
   build.

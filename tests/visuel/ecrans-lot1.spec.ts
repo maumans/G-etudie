@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { GABARITS, SESSIONS, THEMES, capturer } from './gabarits';
+import {
+    GABARITS,
+    SESSIONS,
+    THEMES,
+    capturer,
+    figerHorloges,
+} from './gabarits';
 
 /**
  * Écrans du lot 1 (référentiel et back-office contenu), sur les données de
@@ -147,7 +153,7 @@ for (const gabarit of GABARITS) {
             });
 
             test.beforeEach(async ({ page }) => {
-                await page.clock.setFixedTime(HORLOGE);
+                await figerHorloges(page, HORLOGE);
             });
 
             for (const [compte, ecrans] of Object.entries(ECRANS)) {

@@ -1,6 +1,12 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { GABARITS, SESSIONS, THEMES, capturer } from './gabarits';
+import {
+    GABARITS,
+    SESSIONS,
+    THEMES,
+    capturer,
+    figerHorloges,
+} from './gabarits';
 
 /**
  * Écrans du lot 3 (moteur de questions), sur les données de démonstration
@@ -130,7 +136,7 @@ for (const gabarit of GABARITS.filter((g) => g.nom !== '412')) {
             });
 
             test.beforeEach(async ({ page }) => {
-                await page.clock.setFixedTime(HORLOGE);
+                await figerHorloges(page, HORLOGE);
                 await page.route('**/sync/operations', async (route) => {
                     const corps = route.request().postDataJSON() as {
                         operations: { uuid: string }[];

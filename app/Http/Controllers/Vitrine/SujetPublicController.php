@@ -43,7 +43,7 @@ class SujetPublicController extends Controller
             ->when($matiere, fn (Builder $q, Matiere $m) => $q->where('matiere_id', $m->id))
             ->with(['examen', 'serie', 'matiere'])
             ->withCount(['questions' => fn (Builder $q) => $q->whereNotNull('questions.version_publiee_id')])
-            ->orderByDesc('session')->orderBy('matiere_id')
+            ->orderByDesc('session')->orderBy('matiere_id')->orderBy('id')
             ->paginate(self::PAR_PAGE)->withQueryString();
 
         $exemples = collect($page->items())->contains('est_exemple', true);
@@ -89,7 +89,7 @@ class SujetPublicController extends Controller
                 ->where('matiere_id', $sujet->matiere_id)
                 ->where('examen_id', $sujet->examen_id)
                 ->whereKeyNot($sujet->id)
-                ->orderByDesc('session')->limit(4)->get()
+                ->orderByDesc('session')->orderByDesc('id')->limit(4)->get()
                 ->map(AnnalesPubliques::carte(...))->values(),
             'partage' => [
                 'url' => $adresse,

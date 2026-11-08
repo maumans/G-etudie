@@ -303,7 +303,7 @@ class AnnaleController extends Controller
 
         RechercheTexte::appliquer($requete, $filtres['recherche'], ['titre', 'matiere.nom']);
 
-        $sujets = $requete->orderByDesc('session')->orderByDesc('updated_at')->paginate(20)->withQueryString();
+        $sujets = $requete->orderByDesc('session')->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString();
 
         // Ses imports à suivre : en lecture, en échec, ou dont l'annale est
         // encore un brouillon. Une annale envoyée en relecture sort de la

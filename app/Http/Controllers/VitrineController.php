@@ -36,7 +36,7 @@ class VitrineController extends Controller
             'sujetsRecents' => AnnalesPubliques::requete()
                 ->with(['examen', 'serie', 'matiere'])
                 ->withCount(['questions' => fn (Builder $q) => $q->whereNotNull('questions.version_publiee_id')])
-                ->orderByDesc('session')->orderByDesc('publie_le')
+                ->orderByDesc('session')->orderByDesc('publie_le')->orderByDesc('id')
                 ->limit(4)->get()
                 ->map(AnnalesPubliques::carte(...))->values(),
             'tarifs' => config('vitrine.tarifs'),
