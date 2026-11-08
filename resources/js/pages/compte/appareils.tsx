@@ -42,10 +42,13 @@ function iconeDe(libelle: string): LucideIcon {
 export default function Appareils({
     appareils,
     autres = 0,
+    limite_abonne = null,
 }: {
     appareils: AppareilCompte[];
     /** Au-delà des dix plus récents. */
     autres?: number;
+    /** Lot 9 (HL-D8) : abonné, nombre d'appareils actifs et limite. */
+    limite_abonne?: { actifs: number; limite: number; depasse: boolean } | null;
 }) {
     const confirmer = useConfirmer();
     const formule = useFormule();
@@ -68,6 +71,20 @@ export default function Appareils({
     return (
         <div className="mx-auto grid w-full max-w-3xl gap-6">
             <EnteteCompte titre="Appareils" />
+
+            {limite_abonne && (
+                <p
+                    className={
+                        limite_abonne.depasse
+                            ? 'rounded-carte border border-indice-400/50 bg-indice-400/15 p-4 text-interface'
+                            : 'rounded-carte border bg-card p-4 text-aide text-ink-600 shadow-carte'
+                    }
+                >
+                    {limite_abonne.depasse
+                        ? `Ton abonnement vaut pour ${limite_abonne.limite} appareils ; ton compte est ouvert sur ${limite_abonne.actifs}. Retire ceux que tu n’utilises plus pour reprendre tes téléchargements d’abonné.`
+                        : `Ton abonnement vaut pour ${limite_abonne.limite} appareils : ${limite_abonne.actifs} en service.`}
+                </p>
+            )}
 
             <SectionCompte
                 titre={formule(

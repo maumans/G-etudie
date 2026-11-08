@@ -39,8 +39,9 @@ class PackController extends Controller
         $profil = CatalogueEleve::profil($eleve) ?? abort(404);
         $abonne = $this->droits->estAbonne($eleve);
         $gratuit = $this->droits->packGratuit($eleve);
+        $variante = $this->droits->variante($eleve);
 
-        $packs = CatalogueEleve::epreuves($profil)->map(function (Epreuve $epreuve) use ($eleve) {
+        $packs = CatalogueEleve::epreuves($profil)->map(function (Epreuve $epreuve) use ($eleve, $variante) {
             $pack = $this->packs->pour($epreuve)->load(['examen', 'serie', 'matiere']);
 
             // Jamais généré (contenu publié avant le lot 7, ou épreuve
@@ -58,10 +59,10 @@ class PackController extends Controller
                 'matiere' => PresentationCours::matiere($pack->matiere),
                 'phare' => $epreuve->phare,
                 'pret' => $pack->estGenere(),
-                'version' => $pack->version,
+                'version' => $pack->versionPour($variante),
                 'genere_le' => $pack->genere_le?->toIso8601ZuluString(),
-                'taille_octets' => $pack->taille_octets,
-                'taille_sans_images' => $pack->taille_sans_images,
+                'taille_octets' => $pack->taillePour($variante),
+                'taille_sans_images' => $pack->taillePour($variante),
                 'compte' => $pack->compte ?? ['lecons' => 0, 'fiches' => 0, 'annales' => 0],
                 'est_exemple' => $pack->est_exemple,
                 'pris' => $pris !== null,
@@ -76,6 +77,8 @@ class PackController extends Controller
             'abonne' => $abonne,
             'gratuits' => DroitsPacks::GRATUITS,
             'gratuit' => $gratuit?->pack->cle,
+            // Lot 9 (HL-D8) : un abonné ouvert sur trop d'appareils le lit ici.
+            'motif_appareils' => $abonne ? $this->droits->motifAppareils($eleve) : null,
             'packs' => $packs,
         ]);
     }
@@ -96,7 +99,7 @@ class PackController extends Controller
 
         $pris = $this->droits->prendre($request->user(), $pack);
 
-        return $this->json($this->packs->manifeste($pack, $pris->expire_le?->toImmutable()));
+        return $this->json($this->packs->manifeste($pack, $pris->expire_le?->toImmutable(), $this->droits->variante($request->user())));
     }
 
     /** Manifeste pour reprendre ou mettre à jour un pack déjà pris. */
@@ -109,7 +112,7 @@ class PackController extends Controller
             return $this->refus((string) $verdict['motif']);
         }
 
-        return $this->json($this->packs->manifeste($pack, $verdict['expire_le']));
+        return $this->json($this->packs->manifeste($pack, $verdict['expire_le'], $this->droits->variante($request->user())));
     }
 
     /** Un morceau d'une version donnée ; 409 si le pack a changé entre-temps. */
@@ -121,13 +124,15 @@ class PackController extends Controller
             return $refus;
         }
 
-        if ($request->query('version') !== $pack->version) {
-            return $this->versionChangee($pack);
+        $variante = $this->droits->variante($request->user());
+
+        if ($request->query('version') !== $pack->versionPour($variante)) {
+            return $this->versionChangee($pack, $variante);
         }
 
         abort_unless($numero >= 0 && $numero < $pack->morceaux, 404);
 
-        return $this->brut($this->packs->morceau($pack, $numero));
+        return $this->brut($this->packs->morceau($pack, $numero, $variante));
     }
 
     /** Mise à jour différentielle : seulement les éléments demandés (A.5). */
@@ -145,11 +150,13 @@ class PackController extends Controller
             'cles.*' => ['string', 'max:120'],
         ]);
 
-        if ($donnees['version'] !== $pack->version) {
-            return $this->versionChangee($pack);
+        $variante = $this->droits->variante($request->user());
+
+        if ($donnees['version'] !== $pack->versionPour($variante)) {
+            return $this->versionChangee($pack, $variante);
         }
 
-        return $this->brut($this->packs->elements($pack, array_values($donnees['cles'])));
+        return $this->brut($this->packs->elements($pack, array_values($donnees['cles']), $variante));
     }
 
     /** Supprimé du téléphone : la place gratuite se libère (HL-D3). */
@@ -180,11 +187,15 @@ class PackController extends Controller
         return response()->json(['message' => $motif], $statut)->header('Cache-Control', 'no-store');
     }
 
-    private function versionChangee(Pack $pack): JsonResponse
+    /**
+     * Le pack a changé, ou l'élève a changé de variante (abonnement pris ou
+     * terminé) : l'appareil repart du nouveau manifeste.
+     */
+    private function versionChangee(Pack $pack, string $variante): JsonResponse
     {
         return response()->json([
             'message' => 'Ce pack vient d\'être mis à jour.',
-            'version' => $pack->version,
+            'version' => $pack->versionPour($variante),
         ], 409)->header('Cache-Control', 'no-store');
     }
 

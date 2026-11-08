@@ -14,16 +14,22 @@ import {
     Library,
     ListTree,
     ScrollText,
+    ReceiptText,
+    Ticket,
     Timer,
     Wallet,
+    WalletCards,
 } from 'lucide-react';
 import type { EntreeNavigation } from '@/components/lien-navigation';
 import { accueil as accueilConsole } from '@/routes/console';
+import { index as codesConsole } from '@/routes/console/codes';
+import { index as paiementsConsole } from '@/routes/console/paiements';
 import { accueil as accueilContenu } from '@/routes/contenu';
 import { index as indexLecons, relecture } from '@/routes/contenu/lecons';
 import { index as indexQuestions } from '@/routes/contenu/questions';
 import { index as matieresReferentiel } from '@/routes/contenu/referentiel/matieres';
 import {
+    abonnement as abonnementEleve,
     accueil as accueilEleve,
     cours as coursEleve,
     progression as progressionEleve,
@@ -76,6 +82,16 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         icone: Download,
         href: telechargementsEleve().url,
         actifSous: '/eleve/telechargements',
+        lateralSeulement: true,
+    },
+    {
+        // Lot 9 : sur mobile, depuis « Qui révise ? » et les étiquettes
+        // « Avec l'abonnement ».
+        libelle: 'Abonnement',
+        icone: WalletCards,
+        href: abonnementEleve().url,
+        actifSous: '/eleve/abonnement',
+        actifAussiSous: ['/eleve/paiements'],
         lateralSeulement: true,
     },
     {
@@ -149,6 +165,20 @@ export const NAVIGATION_CONSOLE: EntreeNavigation[] = [
         libelle: "Vue d'ensemble",
         icone: LayoutDashboard,
         href: accueilConsole().url,
+    },
+    {
+        libelle: 'Codes prépayés',
+        icone: Ticket,
+        href: codesConsole().url,
+        actifSous: '/console/codes',
+        permission: 'codes.gerer',
+    },
+    {
+        libelle: 'Paiements',
+        icone: ReceiptText,
+        href: paiementsConsole().url,
+        actifSous: '/console/paiements',
+        permission: 'paiements.voir',
     },
     { libelle: 'Activité', icone: Activity },
     { libelle: 'Contenu', icone: Library },

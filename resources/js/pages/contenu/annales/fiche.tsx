@@ -32,6 +32,7 @@ import { Badge } from '@/components/ui/badge';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
 import { Champ } from '@/components/ui/champ';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useConfirmer } from '@/components/ui/confirm-provider';
 import { Input } from '@/components/ui/input';
 import { ListeDeroulante } from '@/components/ui/liste-deroulante';
@@ -45,6 +46,7 @@ import { MATIERES } from '@/lib/matieres';
 import { cn, pluriel } from '@/lib/utils';
 import {
     archiver,
+    corrigeLibre,
     index,
     modifier,
     publier,
@@ -111,6 +113,9 @@ type Props = {
         duree_minutes: number | null;
         coefficient: string | null;
         droits_publication: string | null;
+        /** Lot 9 : corrigé détaillé ouvert aux non-abonnés. */
+        corrige_libre: boolean;
+        corrige_libre_d_office: boolean;
         revision: number;
         document: {
             nom: string | null;
@@ -335,6 +340,7 @@ export default function Fiche({
                         sujet={sujet}
                         modifiable={modifiable}
                     />
+                    <AccesCorrige sujet={sujet} reglable={droits.archiver} />
                     <Section
                         titre="Historique"
                         description={
@@ -1430,6 +1436,63 @@ function Renseignements({
                     Enregistrer
                 </Button>
             </form>
+        </Section>
+    );
+}
+
+/**
+ * Lot 9 : qui lit le corrigé détaillé de cette annale. Les abonnés, toujours ;
+ * les autres élèves si la case est cochée, ou d'office pour la session la plus
+ * récente de l'épreuve (App\Support\DroitsAbonne). Réglage du responsable
+ * pédagogique, hors du circuit de relecture.
+ */
+function AccesCorrige({
+    sujet,
+    reglable,
+}: {
+    sujet: Props['sujet'];
+    reglable: boolean;
+}) {
+    const ouvert = sujet.corrige_libre || sujet.corrige_libre_d_office;
+
+    return (
+        <Section
+            titre="Accès au corrigé"
+            description={
+                sujet.corrige_libre_d_office
+                    ? 'Offert d’office : c’est la session la plus récente de cette épreuve.'
+                    : ouvert
+                      ? 'Offert à tous les élèves, abonnés ou non.'
+                      : 'Réservé aux abonnés. Les autres voient si leur réponse est juste, sans les étapes.'
+            }
+        >
+            {reglable ? (
+                <label className="flex items-start gap-3 text-interface">
+                    <Checkbox
+                        checked={sujet.corrige_libre}
+                        onCheckedChange={(valeur) =>
+                            router.patch(
+                                corrigeLibre(sujet.uuid).url,
+                                { corrige_libre: valeur === true },
+                                { preserveScroll: true },
+                            )
+                        }
+                        className="mt-0.5"
+                    />
+                    <span className="grid gap-0.5">
+                        <span className="font-medium">
+                            Offrir le corrigé à tous
+                        </span>
+                        <span className="text-aide text-ink-500">
+                            Les téléchargements de la matière sont mis à jour.
+                        </span>
+                    </span>
+                </label>
+            ) : (
+                <Badge variant={ouvert ? 'juste' : 'neutre'}>
+                    {ouvert ? 'Corrigé offert' : 'Avec l’abonnement'}
+                </Badge>
+            )}
         </Section>
     );
 }

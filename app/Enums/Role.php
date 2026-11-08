@@ -52,7 +52,7 @@ enum Role: string
     public function permissions(): array
     {
         $permissions = match ($this) {
-            self::Eleve => [Permission::EspaceEleve],
+            self::Eleve => [Permission::EspaceEleve, Permission::SouscrireAbonnement],
             self::Redacteur => [Permission::EspaceContenu, Permission::RedigerContenu, Permission::ImporterAnnales],
             // Le relecteur juge le contenu signalé ; il répond aux élèves.
             self::Relecteur => [Permission::EspaceContenu, Permission::RelireContenu, Permission::TraiterSignalements],
@@ -64,7 +64,7 @@ enum Role: string
                 Permission::AdministrerContenu,
                 Permission::ImporterAnnales,
                 Permission::TraiterSignalements,
-                ...($this === self::Superadmin ? [Permission::EspaceConsole] : []),
+                ...($this === self::Superadmin ? [Permission::EspaceConsole, Permission::GererCodes, Permission::VoirPaiements] : []),
             ],
             // Leurs espaces arrivent au lot 11 : d'ici là, « Mon compte » seulement.
             self::Parent, self::Enseignant, self::GestionnaireEtablissement => [],

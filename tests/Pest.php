@@ -1,9 +1,12 @@
 <?php
 
 use App\Enums\Filiere;
+use App\Enums\FormuleAbonnement;
 use App\Enums\Role;
+use App\Enums\SourceAbonnement;
 use App\Enums\TypeQuestion;
 use App\Enums\TypeSujet;
+use App\Models\Abonnement;
 use App\Models\Chapitre;
 use App\Models\Classe;
 use App\Models\Examen;
@@ -14,6 +17,7 @@ use App\Models\Question;
 use App\Models\Serie;
 use App\Models\Sujet;
 use App\Models\User;
+use App\Services\AbonnementService;
 use App\Services\Annales\SujetService;
 use App\Services\ContenuService;
 use App\Services\HorsLigne\RegistreOperations;
@@ -307,4 +311,13 @@ function annalePubliee(Examen $examen, ?Serie $serie, Matiere $matiere, int $ses
     }
 
     return $sujets->publier($sujets->soumettre($sujet->fresh(), $redacteur), User::factory()->avecRole(Role::Relecteur)->create())->fresh();
+}
+
+/**
+ * Lot 9 : un élève abonné comme dans la réalité, par AbonnementService
+ * (la période commence maintenant, ou à la suite de celle en cours).
+ */
+function abonner(User $eleve, FormuleAbonnement $formule = FormuleAbonnement::Mensuel): Abonnement
+{
+    return app(AbonnementService::class)->activer($eleve, $formule, SourceAbonnement::Code);
 }

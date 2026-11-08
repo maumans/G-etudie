@@ -50,6 +50,8 @@ import { base, enregistrer, useHorsLigne } from '@/lib/hors-ligne';
 import { uuid7 } from '@/lib/hors-ligne/uuid7';
 import { MATIERES } from '@/lib/matieres';
 import { cn, pluriel } from '@/lib/utils';
+import { useExamensRestants } from '@/lib/abonnement';
+import { abonnement } from '@/routes/eleve';
 import { index as mesExamens, show } from '@/routes/eleve/examens-blancs';
 
 /** Toutes les 15 s, et à chaque retour sur l'écran : l'heure est notée. */
@@ -219,6 +221,11 @@ function Lancement({
 }) {
     const connue = dureeConnue(sujet, dureeEpreuve);
     const [choisie, setChoisie] = useState<number>(DUREES_AU_CHOIX[1]);
+    const { auth } = usePage().props;
+    // Lot 9 : deux examens blancs par mois sans abonnement (DroitsAbonne),
+    // décompte complété par ce que l'appareil garde (hors ligne compris).
+    const { restants, pret } = useExamensRestants(base, auth.user?.id ?? 0);
+    const epuise = pret && restants === 0;
     const questions = questionsDuSujet(sujet).length;
     const minutes = connue?.minutes ?? choisie;
 
@@ -319,12 +326,39 @@ function Lancement({
                 </div>
             )}
 
-            <Button
-                className="w-full sm:w-fit"
-                onClick={() => commencer(minutes, connue?.origine ?? 'choisie')}
-            >
-                Commencer l’examen · {formaterDuree(minutes)}
-            </Button>
+            {epuise ? (
+                <div className="grid gap-3 rounded-[12px] bg-white/[0.07] p-4">
+                    <p className="text-interface font-semibold">
+                        Tes deux examens blancs gratuits de ce mois sont faits
+                    </p>
+                    <p className="text-aide text-white/75">
+                        Le compteur repart le 1ᵉʳ du mois. Avec l’abonnement,
+                        les examens blancs sont sans limite.
+                    </p>
+                    <Button asChild className="w-full sm:w-fit">
+                        <Link href={abonnement()}>Voir l’abonnement</Link>
+                    </Button>
+                </div>
+            ) : (
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+                    <Button
+                        className="w-full sm:w-fit"
+                        disabled={!pret}
+                        onClick={() =>
+                            commencer(minutes, connue?.origine ?? 'choisie')
+                        }
+                    >
+                        Commencer l’examen · {formaterDuree(minutes)}
+                    </Button>
+                    {restants !== null && (
+                        <p className="text-meta text-white/65">
+                            {restants > 1
+                                ? `Encore ${restants} examens blancs gratuits ce mois.`
+                                : 'Ton dernier examen blanc gratuit du mois.'}
+                        </p>
+                    )}
+                </div>
+            )}
         </section>
     );
 }

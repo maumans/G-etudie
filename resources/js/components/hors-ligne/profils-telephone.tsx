@@ -4,6 +4,7 @@ import {
     ChevronRight,
     CircleUser,
     Download,
+    WalletCards,
     KeyRound,
     Laptop,
     LockKeyhole,
@@ -33,7 +34,7 @@ import type { ProfilLocal } from '@/lib/hors-ligne/profils';
 import { cn } from '@/lib/utils';
 import { logout } from '@/routes';
 import { edit as monCompte } from '@/routes/compte/profil';
-import { telechargements } from '@/routes/eleve';
+import { abonnement, telechargements } from '@/routes/eleve';
 
 /**
  * Les profils du téléphone (HORS_LIGNE.md A.7, HL6) : « Qui révise ? ».
@@ -478,6 +479,19 @@ export function FeuilleProfils({
                                     onClick={() => fermer(false)}
                                 >
                                     <Download aria-hidden /> Téléchargements
+                                </Link>
+                            </Button>
+                            <Button
+                                asChild
+                                variant="ghost"
+                                ton="neutre"
+                                className="justify-start"
+                            >
+                                <Link
+                                    href={abonnement()}
+                                    onClick={() => fermer(false)}
+                                >
+                                    <WalletCards aria-hidden /> Mon abonnement
                                 </Link>
                             </Button>
                             <Button

@@ -14,6 +14,7 @@ use App\Models\Sujet;
 use App\Models\SujetPartie;
 use App\Models\Tentative;
 use App\Support\CatalogueEleve;
+use App\Support\DroitsAbonne;
 use App\Support\PresentationSujet;
 use App\Support\RechercheTexte;
 use Illuminate\Database\Eloquent\Builder;
@@ -38,6 +39,8 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class AnnaleController extends Controller
 {
     private const PAR_PAGE = 12;
+
+    public function __construct(private DroitsAbonne $droits) {}
 
     public function index(Request $request): Response
     {
@@ -87,6 +90,13 @@ class AnnaleController extends Controller
 
         $sujet->load(['versionPubliee', 'examen', 'serie', 'matiere']);
         $contenu = PresentationSujet::publiee($sujet) ?? abort(404);
+
+        // Lot 9 : le corrigé détaillé est réservé aux abonnés, sauf
+        // l'annale la plus récente et celles que l'équipe a ouvertes.
+        if (! $this->droits->corrigeOuvert($request->user(), $sujet)) {
+            $contenu = PresentationSujet::sansCorrige($contenu);
+        }
+
         $uuids = [];
 
         foreach ($contenu['parties'] as $partie) {
@@ -154,6 +164,7 @@ class AnnaleController extends Controller
      */
     private function sujets(Request $request, ProfilEleve $profil, ?Matiere $matiere, array $filtres, $faites): array
     {
+        $abonne = $this->droits->estAbonne($request->user());
         $requete = CatalogueEleve::sujets($profil, $matiere)
             ->with(['matiere', 'examen', 'serie'])
             ->withCount(['questions' => fn (Builder $q) => $q->whereNotNull('questions.version_publiee_id')])
@@ -181,6 +192,9 @@ class AnnaleController extends Controller
                 'duree_minutes' => $s->duree_minutes,
                 'questions' => (int) $s->getAttribute('questions_count'),
                 'faites' => $questions->where('sujet_id', $s->id)->filter(fn (Question $q) => $faites->has($q->id))->count(),
+                // Lot 9 : « Corrigé offert » ou « Corrigé avec l'abonnement ».
+                'corrige_ouvert' => $abonne || $this->droits->estCorrigeLibre($s),
+                'corrige_libre' => $this->droits->estCorrigeLibre($s),
                 'est_exemple' => $s->est_exemple,
             ])->values(),
             'page' => $page->currentPage(),

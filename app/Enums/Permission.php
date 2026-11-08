@@ -38,6 +38,15 @@ enum Permission: string
     /** Lire la file des signalements des élèves et y répondre (lot 4, PLAN M17). */
     case TraiterSignalements = 'signalements.traiter';
 
+    /** Lot 9 (PLAN M16) : s'abonner, payer par mobile money, utiliser un code prépayé. */
+    case SouscrireAbonnement = 'abonnement.souscrire';
+
+    /** Lot 9 : créer et remettre des lots de codes prépayés, en désactiver (console). */
+    case GererCodes = 'codes.gerer';
+
+    /** Lot 9 : voir les paiements de tous les comptes (assistance, console). */
+    case VoirPaiements = 'paiements.voir';
+
     /** Activer la double authentification sur son compte (DA4 : personnel seulement). */
     case DoubleAuthentification = 'compte.double_authentification';
 }

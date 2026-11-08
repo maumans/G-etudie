@@ -30,6 +30,7 @@ use Illuminate\Support\Str;
  *
  * @property int $id
  * @property string $uuid
+ * @property bool $corrige_libre corrigé détaillé ouvert à tous (lot 9, DroitsAbonne)
  * @property string|null $slug adresse publique (lot 8), stable une fois posée
  * @property int $examen_id
  * @property int|null $serie_id
@@ -60,7 +61,7 @@ use Illuminate\Support\Str;
  * @property-read VersionContenu|null $versionPubliee
  * @property-read Collection<int, SujetPartie> $parties
  */
-#[Fillable(['uuid', 'slug', 'examen_id', 'serie_id', 'matiere_id', 'filiere', 'session', 'type', 'titre', 'duree_minutes', 'coefficient', 'droits', 'document_chemin', 'document_nom', 'document_type', 'document_octets', 'auteur_id', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
+#[Fillable(['uuid', 'slug', 'examen_id', 'serie_id', 'matiere_id', 'filiere', 'session', 'type', 'titre', 'duree_minutes', 'coefficient', 'droits', 'corrige_libre', 'document_chemin', 'document_nom', 'document_type', 'document_octets', 'auteur_id', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
 class Sujet extends Model implements ContenuRelisable
 {
     use EstRelisable;
@@ -76,6 +77,7 @@ class Sujet extends Model implements ContenuRelisable
             'statut' => StatutContenu::class,
             'revision' => 'integer',
             'publie_le' => 'datetime',
+            'corrige_libre' => 'boolean',
             'est_exemple' => 'boolean',
         ];
     }

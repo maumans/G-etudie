@@ -3,6 +3,7 @@
 namespace App\Support;
 
 use App\Models\Pack;
+use App\Models\PackElement;
 use App\Models\PackEleve;
 use App\Models\User;
 use App\Support\Abonnements\SourceAbonnements;
@@ -23,8 +24,11 @@ use Carbon\CarbonImmutable;
  *    à jour, nouveaux packs), pas le fichier déjà sur le téléphone : aucune
  *    protection technique ne rend inviolable un contenu téléchargé (A.5).
  *
- * Les abonnements arrivent au lot 9 (`SourceAbonnements`) ; d'ici là, tout
- * élève est « gratuit ».
+ * Lot 9 : les abonnements viennent d'AbonnementService (`SourceAbonnements`).
+ * Un abonné reçoit la variante **complète** des packs ; les autres, la
+ * variante **libre**, sans les corrigés réservés (DroitsAbonne). Un abonné
+ * dont le compte est en service sur plus de deux appareils (HL-D8) ne prend
+ * ni ne met à jour de pack d'abonné tant qu'il n'en a pas retiré un.
  */
 class DroitsPacks
 {
@@ -32,7 +36,26 @@ class DroitsPacks
 
     public const GRACE_JOURS = 7;
 
-    public function __construct(private SourceAbonnements $abonnements) {}
+    public function __construct(
+        private SourceAbonnements $abonnements,
+        private DroitsAbonne $droitsAbonne,
+    ) {}
+
+    /** La variante du pack qui revient à l'élève : complète pour l'abonné (grâce comprise), libre sinon. */
+    public function variante(User $eleve): string
+    {
+        return $this->expirationAbonne($eleve) !== null ? PackElement::COMPLET : PackElement::LIBRE;
+    }
+
+    /** HL-D8 : la phrase à montrer si le compte abonné tourne sur trop d'appareils, sinon `null`. */
+    public function motifAppareils(User $eleve): ?string
+    {
+        $appareils = $this->droitsAbonne->appareils($eleve);
+
+        return $appareils['depasse']
+            ? "Ton abonnement vaut pour {$appareils['limite']} appareils et ton compte est ouvert sur {$appareils['actifs']}. Retire ceux que tu n'utilises plus dans Mon compte › Appareils."
+            : null;
+    }
 
     public function estDansSonCatalogue(User $eleve, Pack $pack): bool
     {
@@ -79,7 +102,9 @@ class DroitsPacks
         $expiration = $this->expirationAbonne($eleve);
 
         if ($expiration !== null) {
-            return ['permis' => true, 'motif' => null, 'expire_le' => $expiration];
+            $motif = $this->motifAppareils($eleve);
+
+            return ['permis' => $motif === null, 'motif' => $motif, 'expire_le' => $expiration];
         }
 
         $gratuit = $this->packGratuit($eleve);
@@ -117,6 +142,12 @@ class DroitsPacks
         $expiration = $this->expirationAbonne($eleve);
 
         if ($expiration !== null) {
+            $motif = $this->motifAppareils($eleve);
+
+            if ($motif !== null) {
+                return ['permis' => false, 'motif' => $motif, 'expire_le' => CarbonImmutable::instance($pris->expire_le)];
+            }
+
             if (! $pris->expire_le->equalTo($expiration)) {
                 $pris->update(['expire_le' => $expiration]);
             }

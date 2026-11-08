@@ -2,9 +2,11 @@
 
 use App\Enums\ModeTentative;
 use App\Enums\Role;
+use App\Models\Abonnement;
 use App\Models\Chapitre;
 use App\Models\ExamenBlanc;
 use App\Models\Lecon;
+use App\Models\LotCodes;
 use App\Models\Notion;
 use App\Models\Question;
 use App\Models\Tentative;
@@ -121,5 +123,11 @@ test('le cours de démonstration côté élève : fictif, QCM valides, deux él�
         // Ses deux examens blancs (lot 5) : sept réponses, semées une fois.
         ->and(ExamenBlanc::where('user_id', $aissatou->id)->count())->toBe(2)
         ->and(Tentative::where('user_id', $aissatou->id)->where('mode', ModeTentative::ExamenBlanc->value)->count())->toBe(7)
-        ->and(Tentative::where('user_id', $ousmane->id)->count())->toBe(0);
+        ->and(Tentative::where('user_id', $ousmane->id)->count())->toBe(0)
+        // Lot 9 : Ousmane abonné (un mois payé, une année par un code d'un
+        // lot d'exemple), une seule fois malgré deux passages ; Aïssatou
+        // reste gratuite.
+        ->and(Abonnement::where('user_id', $ousmane->id)->count())->toBe(2)
+        ->and(Abonnement::where('user_id', $aissatou->id)->count())->toBe(0)
+        ->and(LotCodes::sole()->est_exemple)->toBeTrue();
 });

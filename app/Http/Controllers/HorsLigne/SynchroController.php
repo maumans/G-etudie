@@ -87,6 +87,9 @@ class SynchroController extends Controller
 
         $reponse = [];
         $packs = Pack::query()->whereIn('cle', array_keys($annonces))->get()->keyBy('cle');
+        // Lot 9 : la version de la variante qui revient à l'élève. Il vient
+        // de s'abonner : « Mise à jour disponible » apporte les corrigés.
+        $variante = $this->droits->variante($request->user());
 
         foreach ($annonces as $cle => $version) {
             $pack = $packs->get($cle);
@@ -99,8 +102,8 @@ class SynchroController extends Controller
 
             $expireLe = $this->droits->pris($request->user(), $pack)?->expire_le?->toIso8601ZuluString();
 
-            if ($pack->version !== $version || $expireLe !== null) {
-                $reponse[$cle] = ['version' => $pack->version, 'expire_le' => $expireLe];
+            if ($pack->versionPour($variante) !== $version || $expireLe !== null) {
+                $reponse[$cle] = ['version' => $pack->versionPour($variante), 'expire_le' => $expireLe];
             }
         }
 

@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-07, lot 8)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-08, lot 9)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -20,11 +20,32 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-07 (lot 8 fait, critère Lighthouse tenu par le rendu serveur ; lot 0 en attente de D11)
+### État au 2026-11-08 (lot 9 fait, critère tenu en simulation ; vrai paiement en attente d'un fournisseur et de D11)
 
-- **Dépôt git** : `main` porte les lots 0 à 8. Les lots 3 à 8 ont été
+- **Dépôt git** : `main` porte les lots 0 à 9. Les lots 3 à 9 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 9 fait** (point 25) : **abonnements** (Mensuel 15 000 GNF / 1 mois,
+  Année scolaire 100 000 GNF / **10 mois**, prix de `config/vitrine.php`),
+  **paiement mobile** Orange Money / MTN MoMo derrière une interface
+  (`PasserellePaiement`) avec une **passerelle simulée** (faux écran
+  d'opérateur, webhook signé envoyé à la vraie route ; refusée en
+  production), **codes prépayés** (console : fabriquer, imprimer, remettre,
+  désactiver ; élève : « J'ai un code » ; seule l'empreinte est gardée).
+  **Ce que l'abonnement ouvre** (`DroitsAbonne`) : corrigés détaillés de
+  toutes les annales (la session la plus récente de chaque épreuve reste
+  offerte, l'équipe peut en offrir d'autres), examens blancs sans limite
+  (deux par mois sinon, décomptés aussi hors ligne), tous les packs ; le
+  pack d'un élève gratuit est une **variante « libre »** sans les corrigés
+  réservés. Deux appareils par abonnement (HL-D8). **Critère tenu** :
+  `PaiementTest` (« webhook rejoué deux fois → un seul abonnement ») et
+  `parcours-lot9.spec.ts` (paiement de bout en bout dans le navigateur,
+  webhook rejoué deux fois). ⚠ **Au déploiement** : `migrate`, `db:seed`,
+  **`php artisan packs:generer`** (variantes), `CODES_ACCES_CLE` dans `.env`
+  (à ne **jamais** changer), planificateur (`paiements:verifier`). En
+  production, le paiement mobile reste **fermé** tant qu'un vrai
+  fournisseur n'est pas branché : seuls les codes ouvrent un abonnement
+  (`MISE_EN_PRODUCTION.md` § 8, lot 9).
 - **Lot 8 fait** (point 22) : **vitrine finale** — question jouable sans
   compte (indices, verdict, corrigé pas à pas, rien d'envoyé), compte à
   rebours sur les dates **saisies** par l'équipe, « annales en accès
@@ -267,13 +288,25 @@
    « Ajouter un profil » → se connecter avec 09 Ousmane ; repasser à
    Aïssatou par son code. Sur un vrai téléphone : `A_TESTER.md` (lot 7),
    après D11.
-8. **Lot 9** (abonnements, Orange Money / MTN MoMo, codes prépayés), qui
-   lira les tarifs de `config/vitrine.php`. Base de développement refaite
-   par Maurice le 2026-11-07 ; suite Playwright stabilisée (point 24).
-9. **Équipe pédagogique** : saisir dans le référentiel le programme
+8. **Maurice : fournisseur de paiement** — choisir Orange Money et MTN
+   MoMo en direct, ou un agrégateur qui couvre les deux ; ouvrir le compte
+   marchand, obtenir la documentation et des **clés de test** : Claude Code
+   écrit alors le pilote (`PasserellePaiement`) en une séance. Puis
+   `A_TESTER.md` § 7 (après D11).
+9. **Maurice : essayer le lot 9** — 01 Aïssatou (gratuite) : « Abonnement »
+   (barre latérale, ou « Qui révise ? » sur mobile), « Payer par mobile
+   money » › Orange Money › un numéro › « Payer » › « Ouvrir l'écran de
+   l'opérateur » › « Valider » (**simulation**) ; avant cela, l'annale BEPC
+   2023 (corrigé réservé) et « Conditions réelles » (il lui reste un examen
+   blanc gratuit ce mois). 09 Ousmane : abonné. 08 Sékou : Console › Codes
+   prépayés (lot d'exemple, imprimer, « Codes remis ») et Paiements.
+   ⚠ Après l'essai, Aïssatou est abonnée : `php artisan migrate:fresh
+   --seed` remet la démonstration à zéro.
+10. **Lot 10** (tuteur N'karamögö, IA), qui lira le quota par abonnement.
+11. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
-10. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
+12. **Hors code, à lancer en parallèle** (sinon l'application sera vide) :
    recrutement des rédacteurs et relecteurs des matières phares, convention avec
    le ministère / la DGECS sur les annales (D5), correction de la plaquette (CEE,
    BEPC, chiffres sourcés), logo vectoriel pour les icônes de l'application,
@@ -1973,6 +2006,84 @@ cette question à sa façon. Elle distingue deux notions :
      **541 Pest, 359 Vitest**. `tsc`, `vp check`, Pint, Larastan niveau 7
      passent. `MISE_EN_PRODUCTION.md` : rien de plus (sans effet en
      production).
+
+25. [x] **Lot 9 — abonnements, Orange Money / MTN MoMo, codes prépayés**
+   (2026-11-08, sur `main`, un commit)
+   - **Constat** : la vitrine affichait les tarifs (lot 8) mais « Choisir »
+     n'ouvrait rien ; `SourceAbonnements` répondait « personne n'est
+     abonné » (`AucunAbonnement`) ; corrigés, examens blancs et packs
+     étaient ouverts à tous sans distinction ; HL-D8 (deux appareils) en
+     attente.
+   - **Décisions** (proposées, acceptées par Maurice le 2026-11-08,
+     « Oui, lance-le ») :
+     - **fournisseur** : interface `PasserellePaiement` et passerelle
+       **simulée** maintenant (critère tenu en simulation) ; le pilote réel
+       quand Maurice aura le compte marchand et les clés de test ;
+     - **gratuit** : le corrigé détaillé de la session la plus récente de
+       chaque épreuve, et ceux que l'équipe coche (« Offrir le corrigé à
+       tous », back-office, responsable pédagogique) ; **deux examens
+       blancs par mois** ; cours, exercices et séances gratuits ;
+     - **pack gratuit** : variante « libre » sans les corrigés réservés
+       (`HORS_LIGNE.md` écart n° 33) ;
+     - **Année scolaire = 10 mois** à partir de l'achat, avec la date de
+       fin affichée (la vitrine dit « pour 10 mois ») ;
+     - numéro **vérifié** exigé pour payer (D3), **pas** pour un code.
+   - **Une autorité par règle** : `AbonnementService` (ouvrir, prolonger
+     à la suite, fin d'abonnement) ; `PaiementService` (lancer, webhook,
+     rattrapage) ; `CodeAccesService` (lots, remise, désactivation,
+     utilisation) ; `App\Support\DroitsAbonne` (corrigé ouvert, examens du
+     mois, appareils) ; `App\Support\CodeAcces` et `lib/code-acces.ts`
+     (format, clé de contrôle, même jeu d'exemples) ; `DroitsPacks`
+     (variante du pack, appareils).
+   - **Sécurité** (CLAUDE.md § 9) : montant lu dans la configuration,
+     jamais du téléphone ; numéro du payeur **chiffré** (deux derniers
+     chiffres à l'écran) ; webhook sans CSRF mais **signé** (HMAC, 401
+     sinon, rien d'enregistré), **idempotent** (unicité de l'événement,
+     verrou sur le paiement, `abonnements.paiement_id` unique), montant
+     différent refusé ; codes : empreinte HMAC seulement, clair chiffré
+     jusqu'à la remise puis effacé (14 jours au plus), 8 essais par 15 min
+     et 30 par heure et par adresse ; journal des accès
+     (`abonnement.active`, `code.utilise`, `lot_codes.*`) sans code
+     complet ; passerelle simulée et faux opérateur refusés en production.
+   - **Écrans** : « Mon abonnement », « Payer », suivi du paiement (relu
+     toutes les 3 s, `usePoll`), faux opérateur (`dev/passerelle`) ;
+     console « Codes prépayés » (liste, fiche, planche d'impression) et
+     « Paiements » ; carte « Corrigé détaillé avec l'abonnement » sur
+     l'annale, badges dans la liste ; quota au lancement de l'examen blanc ;
+     liens « Avec l'abonnement » de « Téléchargements » ; avis HL-D8
+     (Téléchargements, Abonnement, Appareils) ; case « Offrir le corrigé à
+     tous » au back-office ; « Choisir » de la vitrine mène à l'inscription.
+   - **Vu avec Playwright** (`ecrans-lot9.spec.ts`, 7 écrans × 3 gabarits ×
+     2 thèmes, axe, débordement ; `parcours-lot9.spec.ts`) : corrigés à la
+     relecture — « GNF » en double sur les prix, débordement de la console
+     à 360 px (grille sans `grid-cols-1`), sigle « MoMo » trop large pour
+     sa pastille, nombre d'appareils et référence d'opérateur masqués
+     (variables d'un passage à l'autre). Détail : `DESIGN.md` § 13.
+   - **Données de démonstration** (`DemoAbonnementsSeeder`) : lot de 24
+     codes d'exemple (Sékou), Ousmane abonné (un mois payé + une année par
+     code), un essai MoMo refusé pour Aïssatou, qui reste gratuite.
+   - **Pas encore fait (session interrompue par la limite d'usage)** : le
+     passage Playwright **complet** des lots 0 à 8 n'a pas été relancé. Les
+     captures de référence des écrans élève à 1366 px (nouvelle entrée
+     « Abonnement » dans la barre latérale), de la console (deux entrées),
+     du lancement d'un examen blanc (lot 5 : ligne « examens gratuits »),
+     de « Téléchargements » (lot 7) et de la fiche d'annale du back-office
+     (lot 4 : « Accès au corrigé ») vont changer : `PLAYWRIGHT_PORT=8010
+     npx playwright test --workers=1`, relire, puis `--update-snapshots`.
+     Suite Pest complète passée avant les derniers ajustements (586 / 587,
+     l'échec corrigé depuis et revérifié seul) ; Vitest 381 + 18 ; Larastan,
+     Pint, `tsc`, `vp check`, `npm run build` verts.
+   - **Preuve** : Pest `Abonnements/PaiementTest` (14, dont le critère),
+     `CodesAccesTest` (8), `DroitsAbonneTest` (8), Unit
+     `CodeAccesFormatTest` ; Vitest `code-acces.test.ts`,
+     `hors-ligne/abonnement.test.ts`. Totaux : voir § 0 « Tests (lot 9) ».
+   - **Reste** : vrai fournisseur et vrai paiement (`A_TESTER.md` § 7,
+     bloqué par le choix du fournisseur et D11) ; parents payeurs (lot 11) ;
+     licences d'établissement et comptes parrainés (PLAN M16, plus tard) ;
+     revenus détaillés (console, lot 13). Une question d'annale tirée dans
+     la **séance du jour** montre encore son corrigé à un élève gratuit
+     (la règle ne porte que sur la fiche d'annale et le pack) : à trancher
+     avec Maurice si c'est gênant.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

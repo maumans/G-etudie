@@ -1316,3 +1316,45 @@ la prolonge sans nouveau composant de base.
   `content-visibility: auto` (`rendu-differe`), rendues par React juste
   après le héros ; la question jouable (moteur de questions et KaTeX)
   chargée à 400 px de l'écran.
+
+### Lot 9 — abonnement, paiement, codes prépayés (2026-11-08)
+
+- **« Mon abonnement »** (`pages/eleve/abonnement.tsx`) : titre « Ton
+  **abonnement** » ; le moment fort `surface-encre` dit l'état — gratuit :
+  examens blancs restants du mois (chiffre 28 px, deux tirets, le restant
+  en `nimba-400`) et ce qui est offert ; abonné : « Jusqu'au … », jours
+  restants en 36 px, période en segments. Les deux formules en cartes,
+  prix en chiffres `font-data` et unité « GNF · 10 mois » en `ink-500`,
+  date de fin si on paie aujourd'hui ; l'année cernée de `nimba-500` avec
+  « 50 000 GNF d'économie » (calcul honnête : 10 mois au prix mensuel) et
+  le seul bouton plein. Comparaison gratuit / abonnement en deux colonnes à
+  filet. Colonne de 20 rem : « J'ai un code » (tuile mandarine, champ en
+  `font-data` espacé, groupé par quatre à la frappe, faute de frappe dite
+  avant l'envoi, bouton `encre`) et l'historique en filets avec badges de
+  statut (icône absente : le mot et la couleur suffisent, jamais la couleur
+  seule).
+- **Payer** : moyens en deux tuiles radio (sigle sur pastille d'encre,
+  **pas de logo ni d'orange d'opérateur**, § 3 bis), numéro du payeur
+  (`TelephoneInput`), récapitulatif sur `craie-100`, bouton « Payer
+  100 000 GNF » ; à côté, trois étapes numérotées et « Ton code secret
+  reste à toi ».
+- **Suivi du paiement** : en attente, `surface-encre` (téléphone et
+  spinner, montant 32 px, « se met à jour tout seul ») ; reçu, tuile
+  `juste` et deux actions ; non abouti, tuile `faux`, motif, « Réessayer ».
+- **Corrigé réservé** : une carte « Corrigé détaillé avec l'abonnement »
+  (cadenas sur teinte mandarine, bouton `doux`) au-dessus du sujet ; en
+  lecture, « Voir la réponse » remplace « Voir le corrigé » pour les
+  questions à choix. Dans la liste des annales, badges « Corrigé avec
+  l'abonnement » / « Corrigé offert ».
+- **Console** : codes prépayés (trois chiffres clés, lots en lignes de
+  liste, formulaire en colonne de 22 rem, formules en tuiles radio) ; fiche
+  d'un lot (codes à remettre en `surface-encre`, aperçu en pastilles
+  `font-data`, imprimer / CSV / « Codes remis ») ; planche d'impression
+  (`clair`, dix cartes A4 en pointillés) ; paiements (quatre chiffres clés,
+  recherche, filtres de statut en boutons `petite`).
+- **Corrigé à la relecture des captures** : « GNF » en double sur les prix
+  (le séparateur de milliers est une espace insécable : on affiche
+  `formaterNombre` puis l'unité) ; débordement à 360 px de la console
+  (grille sans `grid-cols-1` : la largeur minimale d'un enfant élargissait
+  la page) ; nombre d'appareils et référence d'opérateur masqués dans les
+  captures (ils changent à chaque passage).

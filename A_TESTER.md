@@ -539,7 +539,48 @@
 
 ## 7. Paiements réels — Orange Money, MTN MoMo, codes prépayés
 
-*(aucune entrée)*
+### [Lot 9] Premier paiement réel par Orange Money (puis MTN MoMo)
+- Bloqué par : le choix du fournisseur (compte marchand ou agrégateur), son
+  pilote (`PasserellePaiement`), ses clés de test, et D11 (HTTPS : l'opérateur
+  n'appelle pas `localhost`).
+- Préparer : `PAIEMENT_PASSERELLE=<fournisseur>` en préproduction, l'adresse
+  du webhook déclarée chez l'opérateur, un compte élève au numéro vérifié.
+- Faire : « Mon abonnement » › « Mensuel » › « Payer par mobile money » ›
+  Orange Money › un vrai numéro (le sien ou celui d'un parent) › « Payer ».
+  Sur le téléphone du payeur : confirmer avec le code secret.
+- Observer : l'écran passe seul de « Paiement en attente » à « Paiement
+  reçu » en moins d'une minute ; « Mon abonnement » dit « Abonné » ; Console
+  › Paiements montre la ligne « Payé » ; une annale ancienne montre son
+  corrigé ; « Téléchargements » propose toutes les matières.
+- Puis : refuser un paiement sur le téléphone → l'écran dit « non abouti »,
+  rien n'est ouvert ; laisser une demande sans réponse 30 min → « expirée ».
+- Rejouer le webhook depuis l'espace marchand (s'il le permet) → toujours
+  **un seul** abonnement (critère du lot 9, vérifié ici seulement en
+  simulation).
+- En cas d'échec, relever : la référence de l'opérateur, l'heure, la ligne
+  de `notifications_paiement` (colonne `resultat`), le journal Laravel du
+  moment (« Webhook de paiement … »).
+- État : à faire
+
+### [Lot 9] Codes prépayés imprimés, vendus, saisis sur un vrai téléphone
+- Faire : Console › Codes prépayés › fabriquer 10 codes « Mensuel » ;
+  « Imprimer les cartes » sur une vraie imprimante (A4) ; vérifier que la
+  carte se lit (pas de 0/O ni 1/I) ; « Codes remis ». Sur un Android
+  d'entrée de gamme : « Mon abonnement » › « J'ai un code » › taper le code
+  d'une carte.
+- Observer : le clavier propose les majuscules ; une faute de frappe est
+  signalée avant l'envoi ; le code accepté ouvre l'abonnement ; le même code
+  sur un autre compte est refusé (« déjà utilisé »).
+- En cas d'échec : photo de la carte, capture de l'écran, heure.
+- État : à faire
+
+### [Lot 9] Abonné sur plus de deux téléphones (HL-D8)
+- Faire : un compte abonné connecté sur trois téléphones (ou navigateurs) ;
+  sur le troisième, « Téléchargements » › une matière.
+- Observer : le téléchargement est refusé avec « Ton abonnement vaut pour 2
+  appareils… » ; « Mon compte › Appareils » le dit aussi ; retirer un
+  appareil → le téléchargement repart.
+- État : à faire
 
 ## 7 bis. Import assisté par l'API Claude (clé réelle)
 

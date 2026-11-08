@@ -21,7 +21,9 @@ use Illuminate\Support\Carbon;
  * @property Filiere $filiere
  * @property int $matiere_id
  * @property string|null $version empreinte de ses éléments ; null tant qu'il n'a pas été généré
+ * @property string|null $version_libre version de la variante sans les corrigés réservés (lot 9)
  * @property int $taille_octets
+ * @property int $taille_libre
  * @property int $taille_sans_images
  * @property int $morceaux
  * @property array{lecons?: int, fiches?: int, annales?: int, questions?: int}|null $compte
@@ -31,7 +33,7 @@ use Illuminate\Support\Carbon;
  * @property-read Serie|null $serie
  * @property-read Matiere $matiere
  */
-#[Fillable(['cle', 'examen_id', 'serie_id', 'filiere', 'matiere_id', 'version', 'taille_octets', 'taille_sans_images', 'morceaux', 'compte', 'est_exemple', 'genere_le'])]
+#[Fillable(['cle', 'examen_id', 'serie_id', 'filiere', 'matiere_id', 'version', 'version_libre', 'taille_octets', 'taille_sans_images', 'taille_libre', 'morceaux', 'compte', 'est_exemple', 'genere_le'])]
 class Pack extends Model
 {
     public $timestamps = false;
@@ -45,6 +47,7 @@ class Pack extends Model
             'genere_le' => 'datetime',
             'taille_octets' => 'integer',
             'taille_sans_images' => 'integer',
+            'taille_libre' => 'integer',
             'morceaux' => 'integer',
         ];
     }
@@ -89,6 +92,17 @@ class Pack extends Model
 
     public function estGenere(): bool
     {
-        return $this->version !== null;
+        return $this->version !== null && $this->version_libre !== null;
+    }
+
+    /** Lot 9 : la version que reçoit un élève, selon la variante qui lui revient (DroitsPacks::variante). */
+    public function versionPour(string $variante): ?string
+    {
+        return $variante === PackElement::LIBRE ? $this->version_libre : $this->version;
+    }
+
+    public function taillePour(string $variante): int
+    {
+        return (int) ($variante === PackElement::LIBRE ? $this->taille_libre : $this->taille_octets);
     }
 }

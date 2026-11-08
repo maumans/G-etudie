@@ -89,6 +89,8 @@ Route::middleware('auth')->prefix('contenu')->name('contenu.annales.')->group(fu
     Route::post('annales/{sujet}/renvoyer', [AnnaleController::class, 'renvoyer'])->middleware($relire)->name('renvoyer');
     Route::post('annales/{sujet}/archiver', [AnnaleController::class, 'archiver'])->middleware($administrer)->name('archiver');
     Route::post('annales/{sujet}/restaurer', [AnnaleController::class, 'restaurer'])->middleware($administrer)->name('restaurer');
+    // Lot 9 : corrigé détaillé ouvert aux élèves non abonnés (DroitsAbonne).
+    Route::patch('annales/{sujet}/corrige-libre', [AnnaleController::class, 'corrigeLibre'])->middleware($administrer)->name('corrige-libre');
 
     Route::post('annales/{sujet}/parties', [PartieAnnaleController::class, 'store'])->middleware($rediger)->name('parties.store');
     Route::put('parties/{partie}', [PartieAnnaleController::class, 'update'])->middleware($rediger)->name('parties.update');

@@ -841,8 +841,8 @@ function EssaiDiffere({ question }: { question: QuestionEleve }) {
 
 /**
  * Les tarifs en GNF (D4, `config/vitrine.php`) : le gratuit d'un côté,
- * l'abonnement de l'autre avec ses deux durées. Le paiement ouvre au lot 9 :
- * « Choisir » l'annonce, sans clic mort.
+ * l'abonnement de l'autre avec ses deux durées. « Choisir » mène à
+ * l'inscription ; le paiement se fait ensuite dans « Mon abonnement » (lot 9).
  */
 function Tarification({ tarifs }: { tarifs: Tarifs }) {
     const mensuel = tarifs.formules.find((f) => f.mois === 1);
@@ -926,19 +926,18 @@ function Tarification({ tarifs }: { tarifs: Tarifs }) {
                                             </span>
                                         </span>
                                         <Button
+                                            asChild
                                             variant={
                                                 reduction > 0
                                                     ? 'default'
                                                     : 'outline'
                                             }
                                             taille="compacte"
-                                            onClick={() =>
-                                                annoncerBientot(
-                                                    'Le paiement des abonnements',
-                                                )
-                                            }
                                         >
-                                            Choisir {formule.nom.toLowerCase()}
+                                            <Link href={register()} prefetch>
+                                                Choisir{' '}
+                                                {formule.nom.toLowerCase()}
+                                            </Link>
                                         </Button>
                                     </li>
                                 );

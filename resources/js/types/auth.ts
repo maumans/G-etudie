@@ -31,6 +31,9 @@ export type Permission =
     | 'contenu.administrer'
     | 'annales.importer'
     | 'signalements.traiter'
+    | 'abonnement.souscrire'
+    | 'codes.gerer'
+    | 'paiements.voir'
     | 'compte.double_authentification';
 
 export type Auth = {

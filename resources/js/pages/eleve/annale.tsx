@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
+import { CorrigeReserve } from '@/components/corrige-reserve';
 import { ExamenBlanc } from '@/components/examen-blanc/examen-blanc';
 import { CorrigePasAPas } from '@/components/questions/aides-question';
 import { ExerciceQuestion } from '@/components/questions/exercice-question';
@@ -154,6 +155,10 @@ export default function Annale({
                 <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
                     <div className="grid min-w-0 gap-5">
                         <ChoixMode vue={vue} changer={setVue} />
+
+                        {sujet.corrige_verrouille && vue !== 'examen' && (
+                            <CorrigeReserve />
+                        )}
 
                         {liste.length === 0 ? (
                             <p className="rounded-carte border bg-card p-5 text-ink-600 shadow-carte">
@@ -351,6 +356,7 @@ function Lecture({ sujet }: { sujet: SujetEleve }) {
                                         key={q.uuid}
                                         question={q}
                                         numero={numero}
+                                        reserve={!!sujet.corrige_verrouille}
                                     />
                                 );
                             })}
@@ -380,9 +386,12 @@ function reponseAttendue(question: QuestionEleve): ReponseQuestion | null {
 function QuestionLue({
     question,
     numero,
+    reserve,
 }: {
     question: QuestionEleve;
     numero: number;
+    /** Lot 9 : pas d'étapes de corrigé ; la bonne réponse d'un choix, oui. */
+    reserve: boolean;
 }) {
     const [corrige, setCorrige] = useState(false);
     const avecChoix = ['qcm_une', 'qcm_plusieurs', 'vrai_faux'].includes(
@@ -417,14 +426,14 @@ function QuestionLue({
                             toutVoir
                             className="rounded-carte bg-craie-100/70 p-4 dark:bg-white/[0.03]"
                         />
-                    ) : (
+                    ) : reserve && !avecChoix ? null : (
                         <Button
                             variant="doux"
                             taille="compacte"
                             className="w-fit"
                             onClick={() => setCorrige(true)}
                         >
-                            Voir le corrigé
+                            {reserve ? 'Voir la réponse' : 'Voir le corrigé'}
                         </Button>
                     )}
                 </div>

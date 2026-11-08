@@ -30,6 +30,30 @@ class PresentationSujet
     }
 
     /**
+     * Lot 9 : l'annale sans ses corrigés détaillés (DroitsAbonne). La bonne
+     * réponse reste — l'appareil corrige et dit « juste » ou « faux » —,
+     * les étapes du corrigé partent, et `corrige_verrouille` le dit à
+     * l'écran. Même fonction pour la page en ligne et le pack « libre ».
+     *
+     * @param  array<string, mixed>  $contenu
+     * @return array<string, mixed>
+     */
+    public static function sansCorrige(array $contenu): array
+    {
+        /** @var list<array<string, mixed>> $parties */
+        $parties = $contenu['parties'];
+
+        foreach ($parties as &$partie) {
+            /** @var list<array<string, mixed>> $questions */
+            $questions = $partie['questions'];
+            $partie['questions'] = array_map(fn (array $q) => [...$q, 'corrige' => []], $questions);
+        }
+        unset($partie);
+
+        return [...$contenu, 'parties' => $parties, 'corrige_verrouille' => true];
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public static function depuisVersion(Sujet $sujet, VersionContenu $version): array
@@ -66,6 +90,7 @@ class PresentationSujet
             'duree_minutes' => $structure['duree_minutes'] ?? null,
             'coefficient' => $structure['coefficient'] ?? null,
             'est_exemple' => $sujet->est_exemple,
+            'corrige_verrouille' => false,
             'document' => $sujet->document_chemin === null ? null : [
                 'type' => $sujet->document_type,
                 'octets' => $sujet->document_octets,

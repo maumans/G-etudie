@@ -5,6 +5,7 @@ import {
     FileText,
     Layers,
     ListChecks,
+    Lock,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
@@ -41,6 +42,9 @@ type SujetResume = {
     duree_minutes: number | null;
     questions: number;
     faites: number;
+    /** Lot 9 : corrigé détaillé ouvert à cet élève (abonné, ou corrigé offert). */
+    corrige_ouvert?: boolean;
+    corrige_libre?: boolean;
     est_exemple: boolean;
 };
 
@@ -568,6 +572,14 @@ function LigneSujet({ sujet }: { sujet: SujetResume }) {
                     </Link>
                     {sujet.origine === 'blanc_maison' && (
                         <Badge variant="neutre">Sujet maison</Badge>
+                    )}
+                    {sujet.corrige_ouvert === false && (
+                        <Badge variant="neutre">
+                            <Lock aria-hidden /> Corrigé avec l’abonnement
+                        </Badge>
+                    )}
+                    {sujet.corrige_libre && sujet.corrige_ouvert && (
+                        <Badge variant="juste">Corrigé offert</Badge>
                     )}
                 </p>
                 <p className="truncate text-aide text-ink-500">

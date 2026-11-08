@@ -6,9 +6,8 @@ use App\Models\User;
 use Carbon\CarbonImmutable;
 
 /**
- * D'où vient l'abonnement d'un élève. Les abonnements arrivent au lot 9
- * (PLAN M16) ; d'ici là, `AucunAbonnement`. DroitsPacks ne lit que cette
- * interface : le lot 9 n'aura qu'à fournir la sienne.
+ * D'où vient l'abonnement d'un élève (PLAN M16) : AbonnementService depuis
+ * le lot 9. DroitsPacks et DroitsAbonne ne lisent que cette interface.
  */
 interface SourceAbonnements
 {

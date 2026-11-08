@@ -21,6 +21,8 @@ use App\Models\User;
 use App\Models\VersionContenu;
 use App\Services\Annales\SujetService;
 use App\Services\ContenuService;
+use App\Services\PackService;
+use App\Support\DroitsAbonne;
 use App\Support\Perimetre;
 use App\Support\PresentationQuestion;
 use App\Support\RechercheTexte;
@@ -75,6 +77,9 @@ class AnnaleController extends Controller
                 'duree_minutes' => $sujet->duree_minutes,
                 'coefficient' => $sujet->coefficient,
                 'droits_publication' => $sujet->droits,
+                // Lot 9 : coché par l'équipe, ou d'office (session la plus récente).
+                'corrige_libre' => $sujet->corrige_libre,
+                'corrige_libre_d_office' => ! $sujet->corrige_libre && app(DroitsAbonne::class)->estCorrigeLibre($sujet),
                 'revision' => $sujet->revision,
                 'document' => $sujet->document_chemin === null ? null : [
                     'nom' => $sujet->document_nom,
@@ -251,6 +256,27 @@ class AnnaleController extends Controller
         $this->contenu->archiver($sujet, $request->user());
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Annale retirée : les élèves ne la voient plus.']);
+
+        return to_route('contenu.annales.show', $sujet);
+    }
+
+    /**
+     * Lot 9 : ouvrir (ou refermer) le corrigé détaillé de cette annale aux
+     * élèves non abonnés. Réglage commercial, pas une version : il ne passe
+     * pas par la relecture. Les packs de la matière sont regénérés (le
+     * corrigé change de variante, PackService).
+     */
+    public function corrigeLibre(Request $request, Sujet $sujet, PackService $packs): RedirectResponse
+    {
+        Gate::authorize('archiver', $sujet);
+        $donnees = $request->validate(['corrige_libre' => ['required', 'boolean']]);
+
+        $sujet->update(['corrige_libre' => (bool) $donnees['corrige_libre']]);
+        $packs->aRegenerer($sujet->matiere_id);
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $sujet->corrige_libre
+            ? 'Corrigé ouvert à tous les élèves.'
+            : 'Corrigé réservé aux abonnés.']);
 
         return to_route('contenu.annales.show', $sujet);
     }

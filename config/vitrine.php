@@ -73,7 +73,7 @@ return [
                 'cle' => 'annee',
                 'nom' => 'Année scolaire',
                 'prix_gnf' => (int) env('TARIF_ANNEE_GNF', 100000),
-                'periode' => 'jusqu’aux examens',
+                'periode' => 'pour 10 mois',
                 'mois' => 10,
             ],
         ],

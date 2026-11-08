@@ -1,12 +1,14 @@
 <?php
 
 use App\Enums\Permission;
+use App\Http\Controllers\Eleve\AbonnementController;
 use App\Http\Controllers\Eleve\AccueilController;
 use App\Http\Controllers\Eleve\AnnaleController;
 use App\Http\Controllers\Eleve\CoursController;
 use App\Http\Controllers\Eleve\ExamenBlancController;
 use App\Http\Controllers\Eleve\LeconController;
 use App\Http\Controllers\Eleve\PackController;
+use App\Http\Controllers\Eleve\PaiementController;
 use App\Http\Controllers\Eleve\ParcoursAccueilController;
 use App\Http\Controllers\Eleve\ProgressionController;
 use App\Http\Controllers\Eleve\SeanceController;
@@ -26,6 +28,20 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value])
         Route::get('/', AccueilController::class)->name('accueil');
         Route::get('bienvenue', [ParcoursAccueilController::class, 'edit'])->name('bienvenue');
         Route::put('bienvenue', [ParcoursAccueilController::class, 'update'])->name('bienvenue.update');
+
+        // Lot 9 : abonnement, paiement par mobile money, code prépayé. En
+        // ligne seulement (hors de la liste blanche, HORS_LIGNE.md A.2).
+        Route::middleware('can:'.Permission::SouscrireAbonnement->value)->group(function () {
+            Route::get('abonnement', [AbonnementController::class, 'index'])->name('abonnement');
+            Route::get('abonnement/payer/{formule}', [AbonnementController::class, 'payer'])->name('abonnement.payer');
+            Route::post('abonnement/code', [AbonnementController::class, 'code'])
+                ->middleware('throttle:code-acces')
+                ->name('abonnement.code');
+            Route::post('paiements', [PaiementController::class, 'store'])
+                ->middleware('throttle:paiement')
+                ->name('paiements.store');
+            Route::get('paiements/{paiement}', [PaiementController::class, 'show'])->name('paiements.show');
+        });
 
         Route::middleware(ProfilEleveRequis::class)->group(function () {
             Route::get('cours', [CoursController::class, 'index'])->name('cours');

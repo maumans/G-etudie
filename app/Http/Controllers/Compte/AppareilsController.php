@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Compte;
 use App\Http\Controllers\Controller;
 use App\Models\Appareil;
 use App\Services\HorsLigne\AppareilService;
+use App\Support\DroitsAbonne;
 use App\Support\JournalAcces;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class AppareilsController extends Controller
 
     public function __construct(private AppareilService $appareils) {}
 
-    public function index(Request $request): Response
+    public function index(Request $request, DroitsAbonne $droits): Response
     {
         $user = $request->user();
         $requete = Appareil::query()
@@ -49,6 +50,8 @@ class AppareilsController extends Controller
                 'profils' => $appareil->profils()->wherePivotNull('retire_le')->count(),
             ])->values(),
             'autres' => max(0, $total - $appareils->count()),
+            // Lot 9 (HL-D8) : un abonnement vaut pour deux appareils.
+            'limite_abonne' => $droits->estAbonne($user) ? $droits->appareils($user) : null,
         ]);
     }
 

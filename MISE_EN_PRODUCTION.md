@@ -113,8 +113,18 @@ INERTIA_SSR_ENABLED=true      # false : la vitrine est construite par le navigat
 INERTIA_SSR_URL=http://127.0.0.1:13714
 INERTIA_SSR_TIMEOUT=1         # secondes ; au-delà, la page part sans rendu serveur
 
+# Lot 9 — abonnements et paiements (config/paiements.php)
+PAIEMENT_PASSERELLE=aucune    # « simulee » est REFUSÉE en production ; le nom du vrai fournisseur une fois son pilote écrit
+CODES_ACCES_CLE=…             # clé des codes prépayés (64 caractères au hasard) ; NE JAMAIS LA CHANGER une fois des codes vendus
+PAIEMENT_DELAI_MINUTES=30     # facultatif : au-delà, un paiement non confirmé expire
+
 # NE PAS mettre DEMO_MOT_DE_PASSE en production : les comptes de démonstration n'existent pas en production.
 ```
+
+`CODES_ACCES_CLE` se crée une fois : `php -r 'echo bin2hex(random_bytes(32)), PHP_EOL;'`.
+Elle sert à reconnaître les codes prépayés (seule leur empreinte est
+gardée) : la perdre ou la changer rend **tous** les codes vendus invalides.
+La garder aussi hors du serveur (gestionnaire de mots de passe).
 
 Fournisseur SMS : **aucun pour l'instant** (D3) ; en production, l'envoi
 d'un code est seulement signalé dans le journal. Quand le fournisseur sera
@@ -190,6 +200,7 @@ comptes de démonstration en production.
 ```bash
 php artisan progression:recalculer   # lot 6 : maîtrises, séries, points et badges des réponses déjà reçues
 php artisan packs:generer            # lot 7 : packs hors ligne de toutes les épreuves de l'année
+                                     # lot 9 : à relancer (variante « libre » des packs, sans les corrigés réservés)
 ```
 
 Les deux sont sans danger si on les relance.
@@ -328,6 +339,8 @@ Ce qu'il lance :
 | Tâche | Quand | Lot | Pourquoi |
 |---|---|---|---|
 | `packs:generer` | chaque nuit à 3 h | 7 | filet : un titre de chapitre modifié, une épreuve ajoutée ne regénèrent pas les packs d'eux-mêmes |
+| `paiements:verifier` | toutes les 5 min | 9 | un paiement dont le webhook s'est perdu est redemandé à l'opérateur ; sans réponse au bout de 30 min, il expire |
+| `codes:effacer-oublies` | chaque nuit à 4 h | 9 | les codes prépayés en clair d'un lot jamais marqué « remis » sont effacés au bout de 14 jours |
 
 Une seule ligne dans la crontab de `www-data` :
 
@@ -584,6 +597,39 @@ les reconstruit depuis la base.
   Node.js reste donc installé sur le serveur. Variables `INERTIA_SSR_*`
   facultatives (§ 2).
 
+### Lot 9 — abonnements, paiements mobiles, codes prépayés
+
+- **Une seule fois** : `migrate` (tables `paiements`,
+  `notifications_paiement`, `lots_codes`, `codes_acces`, `abonnements` ;
+  colonnes `sujets.corrige_libre`, `pack_elements.variante`,
+  `packs.version_libre`), `db:seed` (trois permissions nouvelles :
+  `abonnement.souscrire`, `codes.gerer`, `paiements.voir`), puis
+  **`php artisan packs:generer`** : chaque pack gagne sa variante « libre »
+  (sans les corrigés réservés aux abonnés). Tant qu'elle manque, un pack
+  s'affiche « En préparation ».
+- **`.env`** (§ 2) : `CODES_ACCES_CLE` (à créer une fois, **à ne jamais
+  changer**), `PAIEMENT_PASSERELLE`. En production, la passerelle
+  `simulee` est refusée : tant qu'aucun vrai fournisseur n'est branché, le
+  paiement mobile est fermé (l'écran le dit) et **seuls les codes
+  prépayés** ouvrent un abonnement.
+- **Planificateur** (§ 4.2) : `paiements:verifier` toutes les 5 minutes,
+  `codes:effacer-oublies` chaque nuit.
+- **Nginx** : rien de plus. Le webhook (`POST /paiements/notifications/{passerelle}`)
+  passe par Laravel ; pas de jeton CSRF, c'est la **signature** qui fait foi
+  (HMAC). Limité à 120 appels par minute et par adresse.
+- **Vrai fournisseur** (Orange Money, MTN MoMo ou un agrégateur) : son
+  pilote s'écrit dans `app/Services/Paiements` (interface
+  `PasserellePaiement`), s'inscrit dans `Passerelles::PILOTES`, ses clés
+  vont dans `.env` et `config/paiements.php`. Donner à l'opérateur l'adresse
+  du webhook : `https://nkaramogo.example/paiements/notifications/<nom>`.
+  Puis dérouler `A_TESTER.md` § 7.
+- **Codes prépayés** : Console › Codes prépayés › « Fabriquer un lot » ;
+  imprimer les cartes (A4, dix par page) ou télécharger le CSV ; une fois
+  remis au revendeur, « Codes remis » les efface de l'écran. Un lot perdu
+  se **désactive**.
+- Journal des accès : `abonnement.active`, `code.utilise`,
+  `lot_codes.cree`, `lot_codes.remis`, `lot_codes.desactive`.
+
 ---
 
 ## 9. Vérifications après la mise en ligne
@@ -597,7 +643,7 @@ sudo supervisorctl status nkaramogo-file                            # RUNNING
 sudo supervisorctl status nkaramogo-ssr                             # RUNNING (lot 8)
 php artisan inertia:check-ssr                                        # running
 curl -s https://nkaramogo.example/ | grep -c 'data-server-rendered'  # 1 : la vitrine arrive construite
-php artisan schedule:list                                            # packs:generer à 3 h
+php artisan schedule:list                                            # packs:generer à 3 h, paiements:verifier toutes les 5 min (lot 9)
 php artisan queue:failed                                             # aucun travail en échec
 test ! -f public/hot && echo "OK : pas de public/hot"
 ```
@@ -612,11 +658,14 @@ Dans un navigateur, en HTTPS :
    s'ouvre.
 4. Back-office : importer un sujet d'essai ; la ligne passe de « En file » à
    « Vérifier l'annale » en quelques minutes.
-5. (Lot 8) `https://nkaramogo.example/robots.txt` finit par
+5. (Lot 9) Console › Paiements s'ouvre ; un webhook mal signé est refusé :
+   `curl -s -o /dev/null -w "%{http_code}" -X POST https://nkaramogo.example/paiements/notifications/simulee -d '{}'`
+   → `401` (et rien dans `notifications_paiement`).
+6. (Lot 8) `https://nkaramogo.example/robots.txt` finit par
    `Sitemap: https://nkaramogo.example/sitemap.xml` ; `/sitemap.xml`
    s'ouvre ; `/partage/n-karamogo.png` affiche la carte orange et noire ;
    coller l'adresse de la vitrine dans WhatsApp montre cette carte.
-6. (Lot 8) PageSpeed Insights (pagespeed.web.dev) sur l'accueil, profil
+7. (Lot 8) PageSpeed Insights (pagespeed.web.dev) sur l'accueil, profil
    mobile : performance, accessibilité et SEO notés dans le DEVBOOK.
 
 Puis dérouler les contrôles « bloqués tant que le domaine HTTPS n'existe

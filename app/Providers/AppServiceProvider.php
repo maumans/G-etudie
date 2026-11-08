@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Lecon;
 use App\Models\Question;
 use App\Models\Sujet;
+use App\Services\AbonnementService;
 use App\Services\Annales\ExtracteurClaude;
 use App\Services\Annales\ExtracteurSimule;
 use App\Services\Annales\ExtracteurSujet;
@@ -13,7 +14,6 @@ use App\Services\PackService;
 use App\Services\Sms\EnvoiSms;
 use App\Services\Sms\JournalSms;
 use App\Ssr\PasserelleVitrine;
-use App\Support\Abonnements\AucunAbonnement;
 use App\Support\Abonnements\SourceAbonnements;
 use Carbon\CarbonImmutable;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -48,9 +48,9 @@ class AppServiceProvider extends ServiceProvider
         // Une seule liste des types d'opération hors ligne par requête.
         $this->app->singleton(RegistreOperations::class);
 
-        // Abonnements au lot 9 : d'ici là, personne n'est abonné et chaque
-        // élève a son pack gratuit (HL-D3, DroitsPacks).
-        $this->app->bind(SourceAbonnements::class, AucunAbonnement::class);
+        // Lot 9 : les abonnements (paiements, codes prépayés) ; DroitsPacks et
+        // DroitsAbonne ne lisent que cette interface.
+        $this->app->bind(SourceAbonnements::class, AbonnementService::class);
 
         // Rendu serveur (lot 8) : la vitrine seulement (Habillages::renduServeur).
         $this->app->bind(Gateway::class, PasserelleVitrine::class);
@@ -70,6 +70,19 @@ class AppServiceProvider extends ServiceProvider
         // de faire sa séance ne pouvait plus supprimer son compte (429).
         RateLimiter::for('synchro', fn (Request $request) => Limit::perMinute(120)
             ->by('synchro|'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
+
+        // Lot 9 : essais de codes prépayés (deviner un code), par compte et par adresse.
+        RateLimiter::for('code-acces', fn (Request $request) => [
+            Limit::perMinutes(15, 8)->by('code|'.($request->user()?->getAuthIdentifier() ?? 'invite')),
+            Limit::perHour(30)->by('code-ip|'.$request->ip()),
+        ]);
+
+        // Lot 9 : lancements de paiement (chacun sonne le téléphone du payeur).
+        RateLimiter::for('paiement', fn (Request $request) => Limit::perMinutes(10, 5)
+            ->by('paiement|'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
+
+        // Lot 9 : webhooks des opérateurs.
+        RateLimiter::for('webhook-paiement', fn (Request $request) => Limit::perMinute(120)->by('webhook|'.$request->ip()));
 
         RateLimiter::for('basculer-profil', fn (Request $request) => Limit::perMinute(10)
             ->by('basculer|'.$request->ip()));

@@ -33,6 +33,7 @@ import type { PackLocal } from '@/lib/hors-ligne/packs';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import { cn, formaterOctets, pluriel } from '@/lib/utils';
+import { abonnement as pageAbonnement } from '@/routes/eleve';
 import { matiere as pageMatiere } from '@/routes/eleve/cours';
 
 type PackServeur = {
@@ -58,6 +59,8 @@ type Props = {
     abonne: boolean;
     gratuits: number;
     gratuit: string | null;
+    /** Lot 9 (HL-D8) : abonné ouvert sur trop d'appareils. */
+    motif_appareils: string | null;
     packs: PackServeur[];
 };
 
@@ -75,6 +78,7 @@ export default function Telechargements({
     abonne,
     gratuits,
     gratuit,
+    motif_appareils,
     packs,
 }: Props) {
     const { packs: locaux } = usePacksLocaux();
@@ -176,6 +180,17 @@ export default function Telechargements({
 
                 {packs.some((p) => p.est_exemple) && <BandeauExemple />}
 
+                {motif_appareils && (
+                    <p className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-carte border border-indice-400/50 bg-indice-400/15 p-4 text-interface">
+                        <span className="min-w-0 flex-1">
+                            {motif_appareils}
+                        </span>
+                        <Button asChild variant="outline" taille="compacte">
+                            <Link href="/compte/appareils">Mes appareils</Link>
+                        </Button>
+                    </p>
+                )}
+
                 <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
                     <div className="grid min-w-0 gap-4">
                         {partage ? (
@@ -204,6 +219,7 @@ export default function Telechargements({
                                             local={locaux[pack.cle] ?? null}
                                             suivi={suivis[pack.cle] ?? null}
                                             dominant={pack === premier}
+                                            abonne={abonne}
                                             horsLigne={horsLigne}
                                             onTelecharger={() =>
                                                 void lancer(pack)
@@ -253,6 +269,18 @@ export default function Telechargements({
                                       ? `Ton téléchargement gratuit : ${packs.find((p) => p.cle === gratuit)?.matiere.nom ?? 'une matière'}. Supprime-le pour en choisir un autre.`
                                       : `${pluriel(gratuits, 'matière')} au choix, gratuitement. Les autres viendront avec l’abonnement.`}
                             </p>
+                            {!abonne && (
+                                <Button
+                                    asChild
+                                    variant="outline"
+                                    taille="compacte"
+                                    className="w-fit border-white/25 bg-white/5 text-white hover:bg-white/10"
+                                >
+                                    <Link href={pageAbonnement()}>
+                                        Toutes les matières avec l’abonnement
+                                    </Link>
+                                </Button>
+                            )}
                         </section>
 
                         <section className="grid gap-3 rounded-carte border bg-card p-5 shadow-carte">
@@ -300,11 +328,13 @@ function LignePack({
     local,
     suivi,
     dominant,
+    abonne,
     horsLigne,
     onTelecharger,
     onSupprimer,
 }: {
     pack: PackServeur;
+    abonne: boolean;
     local: PackLocal | null;
     suivi: Suivi | null;
     dominant: boolean;
@@ -381,13 +411,26 @@ function LignePack({
                 <Download aria-hidden /> Reprendre
             </Button>
         );
+    } else if (!pack.permis && abonne) {
+        // Lot 9 (HL-D8) : abonné, mais ouvert sur trop d'appareils.
+        etat = (
+            <Badge variant="indice" title={pack.motif ?? undefined}>
+                <Lock aria-hidden /> Retire un appareil
+            </Badge>
+        );
     } else if (!pack.permis) {
         // La phrase complète (place gratuite prise) est dite une fois,
         // dans « Sur ce téléphone » ; ici, une étiquette suffit.
         etat = (
-            <Badge title={pack.motif ?? undefined}>
-                <Lock aria-hidden /> Avec l’abonnement
-            </Badge>
+            <Link
+                href={pageAbonnement()}
+                title={pack.motif ?? undefined}
+                className="rounded-badge outline-none focus-visible:outline-2 focus-visible:outline-ring"
+            >
+                <Badge className="hover:bg-ink-600/[0.14]">
+                    <Lock aria-hidden /> Avec l’abonnement
+                </Badge>
+            </Link>
         );
     } else if (pack.permis && !vide) {
         action = (

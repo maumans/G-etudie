@@ -16,6 +16,7 @@ use App\Models\PackElement;
 use App\Models\ProfilEleve;
 use App\Models\Sujet;
 use App\Support\CatalogueEleve;
+use App\Support\DroitsAbonne;
 use App\Support\PresentationCours;
 use App\Support\PresentationSujet;
 use Carbon\CarbonImmutable;
@@ -43,9 +44,18 @@ use RuntimeException;
  * répartis en **morceaux** d'environ 500 Ko : une coupure ne fait
  * recommencer qu'un morceau. La version du pack est l'empreinte de la liste
  * de ses éléments.
+ *
+ * **Deux variantes** (lot 9) : une annale dont le corrigé est réservé aux
+ * abonnés (DroitsAbonne) a deux éléments sous la même clé — `complet` pour
+ * les abonnés, `libre` sans les étapes du corrigé (PresentationSujet::
+ * sansCorrige). Tout le reste est `commun`. Chaque variante a sa version et
+ * son poids ; les deux éléments d'une annale sont dans le même morceau.
+ * Un élève qui s'abonne ne retélécharge que ces annales-là.
  */
 class PackService
 {
+    public function __construct(private DroitsAbonne $droitsAbonne) {}
+
     /** Taille visée d'un morceau, en octets de JSON brut (A.5). */
     public const TAILLE_MORCEAU = 500_000;
 
@@ -116,26 +126,47 @@ class PackService
     {
         $elements = $this->composer($pack);
 
-        // Répartition en morceaux, dans un ordre stable.
-        uasort($elements, fn (array $a, array $b) => [self::ORDRE_TYPES[$a['type']], $a['cle']] <=> [self::ORDRE_TYPES[$b['type']], $b['cle']]);
+        // Répartition en morceaux, dans un ordre stable, d'après la variante
+        // complète (la libre est plus légère) : l'élément libre d'une annale
+        // prend le morceau de son jumeau complet.
+        uasort($elements, fn (array $a, array $b) => [self::ORDRE_TYPES[$a['type']], $a['cle'], $a['variante']] <=> [self::ORDRE_TYPES[$b['type']], $b['cle'], $b['variante']]);
         $morceau = 0;
         $remplissage = 0;
+        $morceauDe = [];
 
         foreach ($elements as &$element) {
+            if ($element['variante'] === PackElement::LIBRE) {
+                continue;
+            }
+
             if ($remplissage > 0 && $remplissage + $element['taille'] > self::TAILLE_MORCEAU) {
                 $morceau++;
                 $remplissage = 0;
             }
 
             $element['morceau'] = $morceau;
+            $morceauDe[$element['cle']] = $morceau;
             $remplissage += $element['taille'];
         }
         unset($element);
 
-        $version = substr(hash('xxh128', implode('|', array_map(fn (array $e) => $e['cle'].':'.$e['empreinte'], $elements))), 0, 16);
+        foreach ($elements as &$element) {
+            if ($element['variante'] === PackElement::LIBRE) {
+                $element['morceau'] = $morceauDe[$element['cle']];
+            }
+        }
+        unset($element);
 
-        DB::transaction(function () use ($pack, $elements, $version) {
-            $existants = $pack->elements()->get(['id', 'cle', 'empreinte', 'morceau'])->keyBy('cle');
+        $versionDe = fn (string $exclue) => substr(hash('xxh128', implode('|', array_map(
+            fn (array $e) => $e['cle'].':'.$e['empreinte'],
+            array_filter($elements, fn (array $e) => $e['variante'] !== $exclue),
+        ))), 0, 16);
+        $version = $versionDe(PackElement::LIBRE);
+        $versionLibre = $versionDe(PackElement::COMPLET);
+
+        DB::transaction(function () use ($pack, $elements, $version, $versionLibre) {
+            $existants = $pack->elements()->get(['id', 'cle', 'variante', 'empreinte', 'morceau'])
+                ->keyBy(fn (PackElement $e) => $e->cle.'|'.$e->variante);
 
             foreach ($elements as $cle => $complet) {
                 $deja = $existants->get($cle);
@@ -156,16 +187,20 @@ class PackService
             $retires = $existants->keys()->diff(array_keys($elements));
 
             if ($retires->isNotEmpty()) {
-                $pack->elements()->whereIn('cle', $retires->all())->delete();
+                $pack->elements()->whereIn('id', $retires->map(fn (string $cle) => $existants[$cle]->id)->all())->delete();
             }
+
+            $numeros = array_column($elements, 'morceau');
+            $unique = array_filter($elements, fn (array $e) => $e['variante'] !== PackElement::LIBRE);
 
             $pack->update([
                 'version' => $version,
-                'morceaux' => $elements === [] ? 0 : max(array_column($elements, 'morceau')) + 1,
+                'version_libre' => $versionLibre,
+                'morceaux' => $numeros === [] ? 0 : max($numeros) + 1,
                 'compte' => [
-                    'lecons' => count(array_filter($elements, fn (array $e) => $e['type'] === 'lecon')),
-                    'fiches' => count(array_filter($elements, fn (array $e) => $e['type'] === 'fiche')),
-                    'annales' => count(array_filter($elements, fn (array $e) => $e['type'] === 'annale')),
+                    'lecons' => count(array_filter($unique, fn (array $e) => $e['type'] === 'lecon')),
+                    'fiches' => count(array_filter($unique, fn (array $e) => $e['type'] === 'fiche')),
+                    'annales' => count(array_filter($unique, fn (array $e) => $e['type'] === 'annale')),
                 ],
                 'est_exemple' => in_array(true, array_column($elements, 'est_exemple'), true),
                 'genere_le' => CarbonImmutable::now(),
@@ -173,10 +208,14 @@ class PackService
         });
 
         $pack->refresh();
-        $taille = $this->tailleTransferee($pack);
+        $taille = $this->tailleTransferee($pack, PackElement::COMPLET);
         // Pas encore de bloc image dans le format des contenus (HL5, écart
         // n° 24) : les deux poids sont égaux tant qu'un pack n'a pas de média.
-        $pack->update(['taille_octets' => $taille, 'taille_sans_images' => $taille]);
+        $pack->update([
+            'taille_octets' => $taille,
+            'taille_sans_images' => $taille,
+            'taille_libre' => $this->tailleTransferee($pack, PackElement::LIBRE),
+        ]);
 
         return $pack;
     }
@@ -187,7 +226,7 @@ class PackService
      *
      * @return array<string, mixed>
      */
-    public function manifeste(Pack $pack, ?CarbonImmutable $expireLe): array
+    public function manifeste(Pack $pack, ?CarbonImmutable $expireLe, string $variante = PackElement::COMPLET): array
     {
         $pack->loadMissing(['examen', 'serie', 'matiere']);
 
@@ -195,15 +234,16 @@ class PackService
             'pack' => $pack->cle,
             'titre' => $pack->titre(),
             'matiere' => PresentationCours::matiere($pack->matiere),
-            'version' => $pack->version,
+            'version' => $pack->versionPour($variante),
+            'variante' => $variante,
             'genere_le' => $pack->genere_le?->toIso8601ZuluString(),
-            'taille_octets' => $pack->taille_octets,
-            'taille_sans_images' => $pack->taille_sans_images,
+            'taille_octets' => $pack->taillePour($variante),
+            'taille_sans_images' => $pack->taillePour($variante),
             'morceaux' => $pack->morceaux,
             'expire_le' => $expireLe?->toIso8601ZuluString(),
             'est_exemple' => $pack->est_exemple,
             'medias' => [],
-            'elements' => $pack->elements()->orderBy('id')->get(['cle', 'type', 'version', 'empreinte', 'morceau'])
+            'elements' => self::deLaVariante($pack->elements(), $variante)->orderBy('id')->get(['cle', 'type', 'version', 'empreinte', 'morceau'])
                 ->map(fn (PackElement $e) => [$e->cle, $e->empreinte, $e->morceau])->values()->all(),
         ];
     }
@@ -212,9 +252,9 @@ class PackService
      * Un morceau, en JSON déjà assemblé : les props sont gardées en JSON
      * brut et partent telles quelles.
      */
-    public function morceau(Pack $pack, int $numero): string
+    public function morceau(Pack $pack, int $numero, string $variante = PackElement::COMPLET): string
     {
-        return $this->assembler($pack, $pack->elements()->where('morceau', $numero)->orderBy('id')->get());
+        return $this->assembler($pack, $variante, self::deLaVariante($pack->elements(), $variante)->where('morceau', $numero)->orderBy('id')->get());
     }
 
     /**
@@ -223,26 +263,39 @@ class PackService
      *
      * @param  list<string>  $cles
      */
-    public function elements(Pack $pack, array $cles): string
+    public function elements(Pack $pack, array $cles, string $variante = PackElement::COMPLET): string
     {
-        return $this->assembler($pack, $pack->elements()->whereIn('cle', $cles)->orderBy('id')->get());
+        return $this->assembler($pack, $variante, self::deLaVariante($pack->elements(), $variante)->whereIn('cle', $cles)->orderBy('id')->get());
+    }
+
+    /**
+     * Les éléments communs et ceux de la variante.
+     *
+     * @template T of \Illuminate\Database\Eloquent\Relations\HasMany<PackElement, Pack>
+     *
+     * @param  T  $requete
+     * @return T
+     */
+    private static function deLaVariante($requete, string $variante)
+    {
+        return $requete->whereIn('variante', [PackElement::COMMUN, $variante]);
     }
 
     /** @param Collection<int, PackElement> $elements */
-    private function assembler(Pack $pack, Collection $elements): string
+    private function assembler(Pack $pack, string $variante, Collection $elements): string
     {
         $parties = $elements->map(fn (PackElement $e) => '{"cle":'.json_encode($e->cle).',"empreinte":"'.$e->empreinte.'","props":'.$e->props.'}');
 
-        return '{"pack":'.json_encode($pack->cle).',"version":'.json_encode($pack->version).',"elements":['.$parties->implode(',').']}';
+        return '{"pack":'.json_encode($pack->cle).',"version":'.json_encode($pack->versionPour($variante)).',"elements":['.$parties->implode(',').']}';
     }
 
-    /** Poids réellement transféré (compressé, comme par le serveur web) de tous les morceaux. */
-    private function tailleTransferee(Pack $pack): int
+    /** Poids réellement transféré (compressé, comme par le serveur web) de tous les morceaux d'une variante. */
+    private function tailleTransferee(Pack $pack, string $variante): int
     {
         $total = 0;
 
         for ($numero = 0; $numero < $pack->morceaux; $numero++) {
-            $total += strlen((string) gzencode($this->morceau($pack, $numero), 6));
+            $total += strlen((string) gzencode($this->morceau($pack, $numero, $variante), 6));
         }
 
         return $total;
@@ -251,7 +304,7 @@ class PackService
     /**
      * Les éléments du pack, par clé.
      *
-     * @return array<string, array{cle: string, type: string, version: int, empreinte: string, taille: int, props: string, est_exemple: bool}>
+     * @return array<string, array{cle: string, variante: string, type: string, version: int, empreinte: string, taille: int, props: string, est_exemple: bool}>
      */
     private function composer(Pack $pack): array
     {
@@ -260,11 +313,12 @@ class PackService
         $matiere = $pack->matiere;
         $elements = [];
 
-        $ajouter = function (string $type, string $id, int $version, array $props, bool $exemple) use (&$elements) {
+        $ajouter = function (string $type, string $id, int $version, array $props, bool $exemple, string $variante = PackElement::COMMUN) use (&$elements) {
             $json = json_encode($props, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_THROW_ON_ERROR);
             $cle = "{$type}:{$id}";
-            $elements[$cle] = [
+            $elements["{$cle}|{$variante}"] = [
                 'cle' => $cle,
+                'variante' => $variante,
                 'type' => $type,
                 'version' => $version,
                 'empreinte' => hash('xxh128', $json),
@@ -317,10 +371,17 @@ class PackService
                 continue;
             }
 
-            $ajouter('annale', $sujet->uuid, (int) ($contenu['version'] ?? 0), [
-                'sujet' => $contenu,
-                'duree_epreuve' => AnnaleController::dureeEpreuve($sujet),
-            ], $sujet->est_exemple);
+            $duree = AnnaleController::dureeEpreuve($sujet);
+            $version = (int) ($contenu['version'] ?? 0);
+
+            if ($this->droitsAbonne->estCorrigeLibre($sujet)) {
+                $ajouter('annale', $sujet->uuid, $version, ['sujet' => $contenu, 'duree_epreuve' => $duree], $sujet->est_exemple);
+
+                continue;
+            }
+
+            $ajouter('annale', $sujet->uuid, $version, ['sujet' => $contenu, 'duree_epreuve' => $duree], $sujet->est_exemple, PackElement::COMPLET);
+            $ajouter('annale', $sujet->uuid, $version, ['sujet' => PresentationSujet::sansCorrige($contenu), 'duree_epreuve' => $duree], $sujet->est_exemple, PackElement::LIBRE);
         }
 
         return $elements;

@@ -1,0 +1,42 @@
+{
+    "_": "Codes prépayés (lot 9) : App\\Support\\CodeAcces et lib\/code-acces.ts.",
+    "valides": [
+        {
+            "saisie": "K7RD2MXQ9HP3",
+            "normalise": "K7RD2MXQ9HP3"
+        },
+        {
+            "saisie": "ABCDEFGHJKL3",
+            "normalise": "ABCDEFGHJKL3"
+        },
+        {
+            "saisie": "23456789ZZZV",
+            "normalise": "23456789ZZZV"
+        },
+        {
+            "saisie": "QWERTYUPASDQ",
+            "normalise": "QWERTYUPASDQ"
+        },
+        {
+            "saisie": "MNBVCXZLKJHZ",
+            "normalise": "MNBVCXZLKJHZ"
+        },
+        {
+            "saisie": "k7rd-2mxq-9hp3",
+            "normalise": "K7RD2MXQ9HP3"
+        },
+        {
+            "saisie": " ABCD EFGH JKL3 ",
+            "normalise": "ABCDEFGHJKL3"
+        }
+    ],
+    "mal_tapes": [
+        "234A6789ZZZV",
+        "K7RD2MXQ9HP",
+        "K7RD2MXQ9HP3A",
+        "K7RD0MXQ9HPB",
+        "K7RD1MXQ9HPB",
+        "",
+        "ABCD-EFGH-IJKL"
+    ]
+}

@@ -663,6 +663,7 @@ hors ligne ; les packs viennent ensuite.
 | HL6 | Profils et session | ✅ fait (lot 7, 2026-11-06) ; contrôles sur vrai téléphone dans `A_TESTER.md` | 4 / 4 |
 | HL7 | Budgets | ✅ mesurés (lot 7, 2026-11-06), B.3 « HL7 » | 2 / 2 |
 | — | Lot 8 (sans lot HL) : vitrine finale, annales publiques, installation depuis la vitrine, habillages chargés avec leur page, rendu serveur de la vitrine seulement | ✅ fait (2026-11-07), B.3 « Lot 8 » | 5 / 5 |
+| — | Lot 9 (sans lot HL) : abonnements — droits d'abonné des packs (HL-D3, HL-D4) en service, variante « libre » des packs, examens blancs gratuits décomptés hors ligne, deux appareils par abonnement (HL-D8), paiement et code en ligne seulement | ✅ fait (2026-11-08), B.3 « Lot 9 » ; vrai paiement et vrais téléphones dans `A_TESTER.md` | 5 / 5 |
 | HL8 | Terrain | ⬜ à faire | 0 / 7 |
 
 ## B.1 Décisions
@@ -1081,6 +1082,49 @@ hors ligne ; les packs viennent ensuite.
   processus en panne → page construite par le navigateur, scripts non
   différés).
 
+### Lot 9 (pas de lot HL propre, A.13) — abonnements
+
+- [x] **Droits d'abonné des packs en service** (HL-D3, HL-D4) :
+  `SourceAbonnements` est désormais `App\Services\AbonnementService`
+  (fin de la période en cours) ; `DroitsPacks` n'a pas changé de règle :
+  abonné = tous les packs de son examen, expiration fin d'abonnement + 7
+  jours, avancée à chaque synchronisation. Preuve : Pest `PacksTest`
+  (inchangé, vert), `DroitsAbonneTest`.
+- [x] **Variante « libre » des packs** (écart n° 33) : une annale dont le
+  corrigé est réservé aux abonnés a deux éléments sous la même clé —
+  `complet` et `libre` (`PresentationSujet::sansCorrige` : la bonne réponse
+  reste, les étapes partent, `corrige_verrouille` le dit). Chaque variante
+  a sa version (`packs.version`, `packs.version_libre`) ; les deux éléments
+  d'une annale sont dans le même morceau. Le serveur sert à chacun la
+  variante qui lui revient (`DroitsPacks::variante`) ; le battement annonce
+  la version de **sa** variante : un élève qui s'abonne voit « Mise à jour
+  disponible » et ne retélécharge que les annales concernées. L'écran ne
+  sait pas d'où vient l'annale (A.4) : en ligne comme depuis un pack, la
+  même carte « Corrigé détaillé avec l'abonnement ». Preuve : Pest
+  `DroitsAbonneTest` (« le pack libre n'emporte pas les corrigés
+  réservés », manifeste, morceau, 409, battement, différentiel).
+- [x] **Examens blancs gratuits décomptés hors ligne** : deux par mois sans
+  abonnement. Le serveur envoie avec chaque page élève `droits`
+  (`DroitsAbonne::pourAppareil` : abonné, fin, examens reçus ce mois) ; la
+  copie hors ligne de la page le garde ; l'appareil y ajoute les examens
+  commencés ici et pas encore reçus (table `examens_blancs` et opérations
+  `examen_blanc.terminer` en attente, `lib/abonnement.ts`). La limite se
+  tient **au lancement** ; le serveur ne refuse **jamais** la note d'un
+  examen passé (A.1 : rien ne se perd). Horloge de l'appareil acceptée,
+  comme pour l'expiration des packs (A.5). Preuve : Vitest
+  `hors-ligne/abonnement.test.ts`, Pest `DroitsAbonneTest`.
+- [x] **Deux appareils par abonnement** (HL-D8, « révocation, pas de
+  blocage ») : au-delà de deux appareils actifs (contact de moins de 30
+  jours), un abonné ne prend ni ne met à jour de **pack d'abonné** ; tout le
+  reste marche. « Téléchargements », « Mon abonnement » et « Mon compte ›
+  Appareils » le disent et mènent au retrait. Preuve : Pest
+  `DroitsAbonneTest` (HL-D8). Vrais téléphones : `A_TESTER.md` § 7.
+- [x] **Paiement, abonnement, code : niveau C** (A.2) : `/eleve/abonnement`,
+  `/eleve/paiements/…` hors de la liste blanche (`config/hors_ligne.php`
+  inchangé) ; hors ligne, la garde de navigation ouvre « Cet écran demande
+  une connexion » (A.3.7). Aucun geste de paiement ne passe par la file :
+  un paiement se fait en ligne, en direct avec l'opérateur.
+
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
@@ -1380,6 +1424,15 @@ hors ligne ; les packs viennent ensuite.
     arme son délai au chargement de la page sur ces pages-là. Rien ne
     change pour les espaces connectés (aucun rendu serveur, scripts
     d'emblée). Processus Node absent : comportement d'avant le lot 8.
+33. **2026-11-08 — Variantes d'un pack (lot 9).** A.5 veut un pack
+    « identique pour tous » (aucune donnée personnelle). Il le reste —
+    aucun élève derrière —, mais il existe en **deux variantes** selon les
+    droits (abonné ou non), pour que le pack d'un élève gratuit n'emporte
+    pas les corrigés réservés (décision de Maurice du 2026-11-08 : « masquer
+    seulement à l'écran se contourne en deux minutes »). Une seule ligne
+    `packs`, des éléments `commun` / `complet` / `libre` sous la même clé,
+    une version par variante. Coût : la génération compose une annale
+    réservée deux fois ; le poids transféré ne change pas.
 
 ## B.6 Points de vigilance
 

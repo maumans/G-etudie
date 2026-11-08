@@ -39,7 +39,7 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
-            testIgnore: /parcours-lot[12345]\.spec\.ts/,
+            testIgnore: /parcours-lot[123459]\.spec\.ts/,
             dependencies: ['connexion'],
         },
         // Crée puis efface une leçon : après les captures, qu'il ne doit pas
@@ -73,6 +73,13 @@ export default defineConfig({
             name: 'parcours-examen',
             testMatch: /parcours-lot5\.spec\.ts/,
             dependencies: ['parcours-annales'],
+        },
+        // Lot 9 : Ousmane paie l'année, le webhook est rejoué ; le paiement
+        // et son abonnement sont effacés à la fin.
+        {
+            name: 'parcours-paiement',
+            testMatch: /parcours-lot9\.spec\.ts/,
+            dependencies: ['ecrans'],
         },
         {
             name: 'parcours-hors-ligne',

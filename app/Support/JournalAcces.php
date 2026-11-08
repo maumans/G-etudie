@@ -27,6 +27,11 @@ class JournalAcces
         'double_authentification.activee' => 'Double authentification activée',
         'double_authentification.desactivee' => 'Double authentification désactivée',
         'double_authentification.codes_regeneres' => 'Nouveaux codes de secours',
+        'abonnement.active' => 'Abonnement ouvert ou prolongé',
+        'code.utilise' => 'Code prépayé utilisé',
+        'lot_codes.cree' => 'Lot de codes prépayés créé',
+        'lot_codes.remis' => 'Codes d\'un lot remis (effacés de l\'écran)',
+        'lot_codes.desactive' => 'Lot de codes prépayés désactivé',
     ];
 
     public static function libelle(string $action): string

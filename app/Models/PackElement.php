@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $pack_id
  * @property string $cle
+ * @property string $variante `commun`, `complet` (abonnés) ou `libre` (sans les corrigés réservés)
  * @property string $type
  * @property int $version
  * @property string $empreinte
@@ -22,11 +23,20 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $morceau
  * @property string $props JSON
  */
-#[Fillable(['pack_id', 'cle', 'type', 'version', 'empreinte', 'taille', 'morceau', 'props'])]
+#[Fillable(['pack_id', 'cle', 'variante', 'type', 'version', 'empreinte', 'taille', 'morceau', 'props'])]
 #[Hidden(['props'])]
 class PackElement extends Model
 {
     public $timestamps = false;
+
+    /** Élément identique pour tous (leçon, fiche, matière, annale au corrigé libre). */
+    public const COMMUN = 'commun';
+
+    /** Annale au corrigé réservé, avec son corrigé : pour les abonnés. */
+    public const COMPLET = 'complet';
+
+    /** La même annale sans ses corrigés détaillés : pour les autres (lot 9). */
+    public const LIBRE = 'libre';
 
     protected function casts(): array
     {

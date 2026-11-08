@@ -22,6 +22,8 @@ export type SujetEleve = {
     duree_minutes: number | null;
     coefficient: string | null;
     est_exemple: boolean;
+    /** Lot 9 : corrigé détaillé réservé aux abonnés, retiré de cette copie. */
+    corrige_verrouille?: boolean;
     document: {
         type: string | null;
         octets: number | null;

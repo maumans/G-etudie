@@ -52,3 +52,5 @@ require __DIR__.'/contenu.php';
 require __DIR__.'/compte.php';
 
 require __DIR__.'/hors-ligne.php';
+
+require __DIR__.'/paiements.php';
