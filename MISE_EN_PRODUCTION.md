@@ -118,6 +118,14 @@ PAIEMENT_PASSERELLE=aucune    # « simulee » est REFUSÉE en production ; le no
 CODES_ACCES_CLE=…             # clé des codes prépayés (64 caractères au hasard) ; NE JAMAIS LA CHANGER une fois des codes vendus
 PAIEMENT_DELAI_MINUTES=30     # facultatif : au-delà, un paiement non confirmé expire
 
+# Lot 10 — tuteur N'karamögö (config/tuteur.php ; la clé est ANTHROPIC_API_KEY, plus haut)
+TUTEUR_MODELE=claude-sonnet-5-5   # choisi par Maurice ; un autre modèle demande son prix dans config/tuteur.php
+TUTEUR_EFFORT=low                 # premier mot rapide (critère : moins de 3 s)
+TUTEUR_QUOTA_GRATUIT=3            # explications par jour sans abonnement
+TUTEUR_QUOTA_ABONNE=30            # avec abonnement
+TUTEUR_GNF_PAR_DOLLAR=8600        # taux indicatif pour lire les coûts en GNF dans la console
+# TUTEUR_MOTEUR : ne pas le mettre. En production, c'est toujours « claude » ; sans clé, le tuteur se dit fermé.
+
 # NE PAS mettre DEMO_MOT_DE_PASSE en production : les comptes de démonstration n'existent pas en production.
 ```
 
@@ -253,6 +261,9 @@ server {
         fastcgi_pass unix:/run/php/php8.3-fpm.sock;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         include fastcgi_params;
+        # Lot 10 : la réponse du tuteur arrive en flux ; Laravel envoie
+        # « X-Accel-Buffering: no », ce délai laisse finir une longue réponse.
+        fastcgi_read_timeout 120s;
     }
 
     location ~ /\.(?!well-known) { deny all; }
@@ -630,6 +641,35 @@ les reconstruit depuis la base.
 - Journal des accès : `abonnement.active`, `code.utilise`,
   `lot_codes.cree`, `lot_codes.remis`, `lot_codes.desactive`.
 
+### Lot 10 — tuteur N'karamögö (IA)
+
+- **Une seule fois** : `migrate` (tables `conversations_tuteur`,
+  `messages_tuteur`, `explications_tuteur`), `db:seed` (trois permissions
+  nouvelles : `tuteur.utiliser` pour les élèves, `tuteur.journal` pour le
+  responsable pédagogique et l'administrateur, `tuteur.couts` pour
+  l'administrateur). Rien à recalculer.
+- **`.env`** (§ 2) : `ANTHROPIC_API_KEY` (la même que pour l'import des
+  annales) ; facultatifs : `TUTEUR_MODELE`, `TUTEUR_EFFORT`,
+  `TUTEUR_QUOTA_GRATUIT`, `TUTEUR_QUOTA_ABONNE`, `TUTEUR_GNF_PAR_DOLLAR`.
+  Sans clé, le tuteur ne casse rien : chaque demande répond « Le tuteur
+  n'est pas encore ouvert » et ne décompte rien.
+- **Pas de file d'attente** pour le tuteur (écart au PLAN M11, DEVBOOK
+  point 26) : la réponse est diffusée **depuis la requête** (SSE), pour
+  que le premier mot arrive en moins de 3 s. Chaque explication en cours
+  occupe un processus PHP-FPM de 3 à 15 s : compter
+  `pm.max_children` en conséquence (une explication à la fois par élève,
+  8 demandes par minute au plus par élève).
+- **Nginx** : `fastcgi_read_timeout 120s` (§ 3, étape 10) ; ne pas ajouter
+  `text/event-stream` à `gzip_types` (la compression retient le flux).
+  Derrière un CDN : `/eleve/tuteur/*` ni en cache ni compressé.
+- **Planificateur, file** : rien de plus.
+- **Suivi** : Console › Tuteur (coût du mois en dollars et en GNF, part
+  servie par le cache, premier mot médian et 9 sur 10). Fixer une **limite
+  de dépense** dans console.anthropic.com (« Limits ») : elle protège la
+  facture si un quota est mal réglé.
+- **Contrôles** : § 9, point 7 ; `A_TESTER.md`, lot 10 (vraie API, vrai
+  téléphone).
+
 ---
 
 ## 9. Vérifications après la mise en ligne
@@ -643,6 +683,7 @@ sudo supervisorctl status nkaramogo-file                            # RUNNING
 sudo supervisorctl status nkaramogo-ssr                             # RUNNING (lot 8)
 php artisan inertia:check-ssr                                        # running
 curl -s https://nkaramogo.example/ | grep -c 'data-server-rendered'  # 1 : la vitrine arrive construite
+php artisan tinker --execute="echo config('tuteur.moteur'), ' ', config('tuteur.modele');"   # « claude claude-sonnet-5-5 » (lot 10)
 php artisan schedule:list                                            # packs:generer à 3 h, paiements:verifier toutes les 5 min (lot 9)
 php artisan queue:failed                                             # aucun travail en échec
 test ! -f public/hot && echo "OK : pas de public/hot"
@@ -665,7 +706,12 @@ Dans un navigateur, en HTTPS :
    `Sitemap: https://nkaramogo.example/sitemap.xml` ; `/sitemap.xml`
    s'ouvre ; `/partage/n-karamogo.png` affiche la carte orange et noire ;
    coller l'adresse de la vitrine dans WhatsApp montre cette carte.
-7. (Lot 8) PageSpeed Insights (pagespeed.web.dev) sur l'accueil, profil
+7. (Lot 10) Avec un compte élève : une question ratée › « Explique-moi » ;
+   le premier mot arrive en moins de 3 s et s'écrit au fil de l'eau (s'il
+   tombe d'un bloc à la fin, Nginx retient le flux : vérifier
+   `X-Accel-Buffering` et l'absence de `text/event-stream` dans
+   `gzip_types`). Console › Tuteur : la ligne du jour et son coût.
+8. (Lot 8) PageSpeed Insights (pagespeed.web.dev) sur l'accueil, profil
    mobile : performance, accessibilité et SEO notés dans le DEVBOOK.
 
 Puis dérouler les contrôles « bloqués tant que le domaine HTTPS n'existe
@@ -687,4 +733,7 @@ installation, iPhone).
 | Hors ligne indisponible, pas de bouton « Installer » | pas de HTTPS, ou certificat invalide | vérifier le certificat ; le service worker exige HTTPS |
 | Erreur « No application encryption key » | `APP_KEY` vide | restaurer la clé sauvegardée (§ 7) ; ne **jamais** en régénérer une nouvelle en production : toutes les sessions tombent |
 | Les élèves sont déconnectés à chaque visite | `SESSION_SECURE_COOKIE=true` sans HTTPS, ou `APP_URL` en `http://` | corriger `.env`, puis `php artisan optimize` |
+| L'explication du tuteur arrive d'un bloc, après un long blanc | flux retenu par Nginx ou par un proxy (CDN) | `curl -N -i …/eleve/tuteur/demandes` doit montrer `X-Accel-Buffering: no` ; ne pas mettre `text/event-stream` dans `gzip_types` ; sur le CDN, ne pas mettre en cache ni compresser `/eleve/tuteur/*` |
+| « Le tuteur n'est pas encore ouvert sur la plateforme » | `ANTHROPIC_API_KEY` vide | renseigner la clé, puis `php artisan optimize` |
+| « Le tuteur est momentanément fermé » | clé refusée par l'API (révoquée, crédit épuisé) | console.anthropic.com : clé et facturation ; `storage/logs/laravel.log` (« clé de l'API Claude refusée ») |
 | Une modification de `.env` n'est pas prise en compte | configuration en cache | `php artisan optimize` (et `php artisan queue:restart`) |

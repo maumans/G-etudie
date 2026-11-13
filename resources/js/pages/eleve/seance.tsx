@@ -10,6 +10,7 @@ import {
 } from '@/components/questions/aides-question';
 import { EnteteQuestion, VerdictQuestion } from '@/components/questions/commun';
 import { SignalerErreur } from '@/components/signaler-erreur';
+import { BoutonTuteur } from '@/components/tuteur/bouton-tuteur';
 import { SaisieQuestion } from '@/components/questions/saisie-question';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
@@ -461,7 +462,19 @@ function BarreAction({
                             <CorrigePasAPas
                                 key={question.uuid}
                                 etapes={question.corrige}
+                                tuteur={{
+                                    question,
+                                    reponse: tentative.reponse,
+                                }}
                             />
+                            {tentative.verdict !== 'juste' &&
+                                question.corrige.length > 0 && (
+                                    <BoutonTuteur
+                                        key={`tuteur-${question.uuid}`}
+                                        question={question}
+                                        reponse={tentative.reponse}
+                                    />
+                                )}
                             {question.type === 'ouverte' && (
                                 <AutoEvaluation
                                     bareme={question.donnees.bareme ?? []}

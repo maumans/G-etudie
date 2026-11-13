@@ -664,6 +664,7 @@ hors ligne ; les packs viennent ensuite.
 | HL7 | Budgets | ✅ mesurés (lot 7, 2026-11-06), B.3 « HL7 » | 2 / 2 |
 | — | Lot 8 (sans lot HL) : vitrine finale, annales publiques, installation depuis la vitrine, habillages chargés avec leur page, rendu serveur de la vitrine seulement | ✅ fait (2026-11-07), B.3 « Lot 8 » | 5 / 5 |
 | — | Lot 9 (sans lot HL) : abonnements — droits d'abonné des packs (HL-D3, HL-D4) en service, variante « libre » des packs, examens blancs gratuits décomptés hors ligne, deux appareils par abonnement (HL-D8), paiement et code en ligne seulement | ✅ fait (2026-11-08), B.3 « Lot 9 » ; vrai paiement et vrais téléphones dans `A_TESTER.md` | 5 / 5 |
+| — | Lot 10 (sans lot HL) : tuteur N'karamögö en ligne seulement (niveau C), dialogue hors ligne, rien par la file (écart n° 34), panneau chargé à la demande | ✅ fait (2026-11-12), B.3 « Lot 10 » ; vraie API et vrai téléphone dans `A_TESTER.md` § 7 bis | 4 / 4 |
 | HL8 | Terrain | ⬜ à faire | 0 / 7 |
 
 ## B.1 Décisions
@@ -1125,6 +1126,36 @@ hors ligne ; les packs viennent ensuite.
   une connexion » (A.3.7). Aucun geste de paiement ne passe par la file :
   un paiement se fait en ligne, en direct avec l'opérateur.
 
+### Lot 10 (pas de lot HL propre, A.13) — tuteur N'karamögö
+
+- [x] **Tuteur : niveau C** (A.2) : `/eleve/tuteur` et
+  `/eleve/tuteur/…` hors de la liste blanche (`config/hors_ligne.php`
+  inchangé) ; hors ligne, la garde de navigation ouvre « Cet écran demande
+  une connexion » (A.3.7) — depuis la barre latérale comme depuis la carte
+  de l'accueil (lien Inertia). Preuve : liste blanche inchangée, garde
+  existante (`hors-ligne.spec.ts`, inchangé, vert).
+- [x] **« Explique-moi » et « Je ne comprends pas cette étape » sans clic
+  mort** : le bouton vérifie `horsLigneSur()` avant tout et ouvre le même
+  dialogue (`ouvrirEcranIndisponible('connexion_requise')`) ; l'élève reste
+  sur sa séance, son annale ou sa leçon (A.3.7). Une coupure **pendant**
+  la réponse : ce qui est écrit reste, message « La connexion a coupé… » ;
+  le serveur finit la réponse et la garde (`ignore_user_abort`), « Mon
+  tuteur » la montre au retour. Preuve : Vitest `tuteur/flux.test.ts`
+  (réseau absent, flux interrompu) ; vrai téléphone : `A_TESTER.md`
+  § 7 bis.
+- [x] **Rien par la file d'opérations** (écart n° 34) : une demande au
+  tuteur et « Signaler cette réponse » partent en direct, comme un
+  paiement (lot 9). La réponse d'une séance, elle, part toujours par la
+  file (`tentative.enregistrer`) : le tuteur ne lit que la réponse que
+  l'écran lui passe, et ne corrige rien (A.6 : le serveur recorrige).
+- [x] **Poids** (A.11, B.6 « fragment commun ») : le panneau du tuteur
+  (fil, flux, lecteur des formules du texte) est chargé **au premier
+  appui** (`React.lazy`) : la question jouable de la vitrine reste à
+  0,35 Ko (elle importe `ExerciceQuestion`) ; la coquille de l'espace élève
+  ne change pas (la carte de l'accueil est un lien). Preuve : `npm run
+  build` (`feuille-tuteur-*.js` 1,7 Ko, `use-tuteur-*.js` 12,6 Ko à part),
+  `budgets.spec.ts`.
+
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
@@ -1433,6 +1464,17 @@ hors ligne ; les packs viennent ensuite.
     `packs`, des éléments `commun` / `complet` / `libre` sous la même clé,
     une version par variante. Coût : la génération compose une annale
     réservée deux fois ; le poids transféré ne change pas.
+
+34. **2026-11-12 — Le tuteur hors de la file d'opérations (lot 10).**
+    A.3.5 veut que **tout geste élève** passe par `enregistrer()`. Une
+    demande au tuteur n'est pas un geste qu'on peut rejouer plus tard :
+    l'élève attend l'explication maintenant, elle coûte un appel à l'API, et
+    A.2 range déjà le tuteur au niveau C (« en ligne seulement »). La
+    demande part donc en direct (POST, réponse en flux SSE), comme un
+    paiement ; « Signaler cette réponse » aussi (la réponse vient d'être
+    écrite, en ligne). Ce qui compte pour la progression (la réponse à la
+    question) passe toujours par la file. Hors ligne : le dialogue de
+    A.3.7, jamais un clic mort.
 
 ## B.6 Points de vigilance
 

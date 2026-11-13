@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Enums\Espace;
 use App\Enums\Permission;
+use App\Services\Tuteur\TuteurService;
 use App\Support\DroitsAbonne;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -78,6 +79,10 @@ class HandleInertiaRequests extends Middleware
             // Élèves seulement ; calculé à la demande.
             'droits' => fn () => $user !== null && $user->can(Permission::SouscrireAbonnement->value)
                 ? app(DroitsAbonne::class)->pourAppareil($user)
+                : null,
+            // Lot 10 : le quota du jour du tuteur (« Il te reste 2 explications »).
+            'tuteur' => fn () => $user !== null && $user->can(Permission::UtiliserTuteur->value)
+                ? app(TuteurService::class)->quota($user)
                 : null,
             // Lot 7 (HL-D9) : ordinateur partagé, rien n'est gardé sur l'appareil.
             'appareil_partage' => $user !== null && $request->hasSession() && $request->session()->get(OrdinateurPartage::CLE) === true,

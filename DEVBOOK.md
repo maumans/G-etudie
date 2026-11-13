@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-08, lot 9)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-13, lot 10)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -20,11 +20,26 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-08 (lot 9 fait, critère tenu en simulation ; vrai paiement en attente d'un fournisseur et de D11)
+### État au 2026-11-13 (lot 10 fait, critère tenu avec le tuteur simulé ; vraie API en attente de la clé)
 
-- **Dépôt git** : `main` porte les lots 0 à 9. Les lots 3 à 9 ont été
+- **Dépôt git** : `main` porte les lots 0 à 10. Les lots 3 à 10 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 10 fait** (point 26) : **tuteur N'karamögö** — « Explique-moi »
+  sous une question ratée, « Je ne comprends pas cette étape » sur chaque
+  étape d'un corrigé, « Mon tuteur » (question libre dans une de ses
+  matières, conversations, relances). Sonnet 5.5, réponse **en flux** (SSE,
+  sans file : écart au PLAN M11), **ancrée** sur la question, la réponse de
+  l'élève et le corrigé validé ; quota **3 par jour sans abonnement, 30
+  avec** ; cache des premières explications ; refus propres (hors sujet,
+  inadapté) écrits par l'équipe ; rien de personnel envoyé. Back-office ›
+  Tuteur (journal anonyme, questions les plus expliquées, signalements) et
+  Console › Tuteur (coûts). **Sans `ANTHROPIC_API_KEY`, le tuteur est
+  simulé** (« EXEMPLE ») : la vraie API est à essayer (`A_TESTER.md`
+  § 7 bis). ⚠ **Au déploiement** : `migrate`, `db:seed`,
+  `fastcgi_read_timeout 120s` et pas de `text/event-stream` dans
+  `gzip_types` (`MISE_EN_PRODUCTION.md` § 8, lot 10) ; fixer une limite de
+  dépense sur console.anthropic.com.
 - **Lot 9 fait** (point 25) : **abonnements** (Mensuel 15 000 GNF / 1 mois,
   Année scolaire 100 000 GNF / **10 mois**, prix de `config/vitrine.php`),
   **paiement mobile** Orange Money / MTN MoMo derrière une interface
@@ -213,6 +228,10 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
+- **Tests (lot 10)** : **620 Pest, 399 Vitest** ; Playwright : 30 écrans
+  et 2 parcours de plus (572 en tout), verts sur les lots relancés (point
+  26). MySQL de Laragon à redémarrer s'il s'est arrêté (`mysqld.exe
+  --defaults-file=…/my.ini`).
 - **Tests (lot 9)** : **587 Pest, 399 Vitest, 540 Playwright**, verts (point 25). Playwright sur ce poste : `PLAYWRIGHT_PORT=8010` (le 8000 est pris par un autre projet), `--workers=1`, sans `npm run dev`, **avec `php artisan queue:work`** (parcours du lot 4). Les tests ne touchent plus au disque `local` de développement (horloge des captures).
 - **Tests (lot 7)** : **511 Pest, 341 Vitest, 479 Playwright** (écrans des lots 0 à 7, 5 connexions, 7 parcours, socle hors ligne, 3 budgets ; captures sur le build). Dernier passage complet : 478 / 479 — le parcours « deux profils » a échoué une fois (course de session, voir « Pièges ») ; corrigé, puis 8 passages verts de suite. `tsc`, `vp check`, Pint, Larastan niveau 7 et `npm run build` passent. Sur ce poste, lancer
   Playwright en série (`--workers=1`) et sans `npm run dev`.
@@ -303,7 +322,14 @@
    prépayés (lot d'exemple, imprimer, « Codes remis ») et Paiements.
    ⚠ Après l'essai, Aïssatou est abonnée : `php artisan migrate:fresh
    --seed` remet la démonstration à zéro.
-10. **Lot 10** (tuteur N'karamögö, IA), qui lira le quota par abonnement.
+10. **Maurice : essayer le lot 10** — 01 Aïssatou : une séance, répondre
+   faux, « Explique-moi », puis « Encore plus simple » ; sur l'annale BEPC
+   2024 (lecture, « Voir le corrigé »), « Je ne comprends pas cette
+   étape » ; « Mon tuteur » (barre latérale, ou la carte de l'accueil) : une
+   question libre, puis une question sur le football (recentrage). 06 :
+   Back-office › Tuteur. 08 : Console › Tuteur. Avec une clé de l'API :
+   `A_TESTER.md` § 7 bis. **Lot 11** ensuite (parents, enseignants,
+   établissements, devoirs).
 11. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -2104,6 +2130,119 @@ cette question à sa façon. Elle distingue deux notions :
      la **séance du jour** montre encore son corrigé à un élève gratuit
      (la règle ne porte que sur la fiche d'annale et le pack) : à trancher
      avec Maurice si c'est gênant.
+
+26. [x] **Lot 10 — tuteur N'karamögö (IA), quotas, journal, coûts**
+   (2026-11-12 / 13, sur `main`, un commit)
+   - **Constat** : la carte « Ton tuteur » de l'accueil disait « bientôt » ;
+     rien ne permettait d'expliquer un corrigé autrement qu'en le relisant.
+   - **Décisions de Maurice** (2026-11-12, plan accepté) : **Sonnet 5.5**
+     (`claude-sonnet-5-5`, deux fois moins cher qu'Opus, rapide à démarrer ;
+     changeable dans `.env`) ; quota **3 explications par jour sans
+     abonnement, 30 avec** ; tuteur **ancré** sur une question ou une étape
+     de son corrigé, **et** question libre dans une des matières de
+     l'élève ; correction assistée des rédactions de l'examen blanc
+     **reportée** à un lot ultérieur.
+   - **Écart au PLAN M11** (« service en file d'attente ») : une file ne
+     rend pas de premier mot en moins de 3 s ; la réponse est **diffusée
+     depuis la requête** (SSE sur un POST, `X-Accel-Buffering: no`), le
+     journal et le coût s'écrivent à la fin du flux ; la limitation de
+     débit (8 par minute) et un verrou (une explication à la fois par
+     élève) protègent les processus PHP. `HORS_LIGNE.md` écart n° 34 : la
+     demande ne passe pas par la file d'opérations (niveau C).
+   - **Une autorité** : `App\Services\Tuteur\TuteurService` (qui peut
+     demander quoi, contexte, quota, cache, marqueurs, journal, coût) ;
+     moteurs derrière `MoteurTuteur` : `TuteurClaude` (API en flux, effort
+     `low`, cache des consignes et du contexte, repli serveur
+     `fallbacks: default`, `metadata.userID` opaque) et `TuteurSimule`
+     (sans réseau, « EXEMPLE — explication fictive », imite les marqueurs ;
+     jamais en production).
+   - **Ancré sur notre contenu** : le tuteur lit l'énoncé, les choix, la
+     réponse attendue, **la réponse de l'élève**, le **corrigé validé** et
+     la notion (`ContexteTuteur`, `App\Support\BlocsEnTexte`, formules en
+     LaTeX) ; il ne corrige pas autrement (consigne). Une annale au corrigé
+     réservé (`DroitsAbonne`) n'ouvre pas le tuteur (403 « réservé aux
+     abonnés ») : il le dévoilerait. Question libre : la matière et le
+     programme étudié seulement.
+   - **Mineurs** (CLAUDE.md § 9) : rien de personnel envoyé (ni prénom, ni
+     pseudo, ni numéro ; examen seulement) ; ce que tape l'élève est
+     nettoyé (numéros et adresses → « [retiré] », `Confidentialite`) avant
+     d'être envoyé **et** gardé ; consignes : ne rien demander de
+     personnel, renvoyer vers un adulte de confiance en cas de détresse ;
+     **refus propre** : les marqueurs `[HORS_SUJET]` / `[INADAPTE]` sont
+     retenus avant d'être vus et remplacés par une phrase écrite par
+     l'équipe ; un refus du modèle aussi ; rien n'est décompté.
+   - **Cache** : la première explication d'une question (ou d'une étape),
+     à une version et pour une même réponse de l'élève, est servie de
+     nouveau sans appel (`explications_tuteur`) ; jamais une réponse à une
+     phrase tapée.
+   - **Écrans** : « Explique-moi » (séance, leçon, annale) et « Je ne
+     comprends pas cette étape » (chaque étape du corrigé), feuille chargée
+     au premier appui (`React.lazy`) ; « Mon tuteur » (question libre, quota,
+     conversations, relances) ; carte de l'accueil réelle ; Back-office ›
+     Tuteur (journal **anonyme**, les plus expliquées, signalements à
+     classer) ; Console › Tuteur (coût en dollars et en GNF, cache, premier
+     mot médian et 9 sur 10, par jour, par modèle). Entrées de navigation
+     gardées par `tuteur.utiliser`, `tuteur.journal`, `tuteur.couts`.
+   - **Données de démonstration** (`DemoTuteurSeeder`) : 14 conversations
+     d'Aïssatou et d'Ousmane sur deux semaines, par le vrai chemin (tuteur
+     simulé), habillées comme des réponses de l'API, `est_exemple`.
+   - **Bug préexistant corrigé** (CLAUDE.md § 8) :
+     `DemoExamensBlancsSeeder` datait ses deux examens 9 et 2 jours avant le
+     semis : semée après le 9 du mois, la démonstration les mettait dans le
+     même mois et Aïssatou n'avait plus d'examen blanc gratuit (les écrans
+     du lot 5 et « Mon abonnement » échouaient selon le jour du semis). Le
+     premier tombe maintenant toujours le mois précédent.
+   - **Critère tenu** (`parcours-lot10.spec.ts`, build, `php artisan serve`
+     port 8010, tuteur simulé) : « Explique-moi » → **premier mot à 838,
+     887 et 967 ms** sur trois passages (requête partie vers 390 ms :
+     chargement du panneau à la demande ; en-têtes vers 850 ms) ; le
+     texte grandit en plusieurs fois avant la fin ; formules rendues.
+     Un tout premier passage, serveur et cache froids, a donné 2 918 ms :
+     sous le seuil, mais de peu — la mesure avec la vraie API et un vrai
+     réseau reste à faire (`A_TESTER.md` § 7 bis). **Hors sujet** : le
+     recentrage de l'équipe, jamais `[HORS_SUJET]`, le compteur ne bouge
+     pas, pas de relance. Pest : « hors sujet », « contenu inadapté, ou
+     refus du modèle ».
+   - **Vu avec Playwright** (`ecrans-lot10.spec.ts`, 5 écrans × 3
+     gabarits × 2 thèmes, axe et débordement ; la feuille et le
+     recentrage dans le parcours, 3 × 2). Corrigé à la relecture (détail
+     `DESIGN.md` § 13, lot 10) : puce de matière blanche sur blanc en
+     sombre, date trop pâle sur la conversation active, tableau de la
+     console inatteignable au clavier, « Je ne comprends pas cette
+     étape » qui débordait à 360 px (annale du lot 4), tuiles de matière
+     illisibles sur l'encre, « 5 relances » annoncées après un recentrage,
+     quota masqué à tort dans les captures. Le nettoyage du parcours
+     effaçait mal (une conversation sur une question d'exemple est
+     elle-même `est_exemple`) : il efface maintenant par identifiant.
+   - **Passage Playwright** (2026-11-12 / 13, build, port 8010, en série) :
+     un premier passage complet (538 verts) a montré les échecs ci-dessus
+     et ceux des lots 5 et 9 (bug du semis, plus haut) ; après
+     corrections, **verts** : lots 4, 5, 9 et 10 (175), parcours du lot 10,
+     `ecrans.spec.ts`, lot 2, `budgets.spec.ts` et `hors-ligne.spec.ts`
+     (164). Références changées, **toutes relues** et attendues : accueil
+     élève (lots 0 et 2 : carte du tuteur), sécurité du compte en console
+     (entrée « Tuteur »), annale en lecture (lot 4 : boutons du tuteur) ;
+     « Mon abonnement » (lot 9 : dates du nouveau semis, et l'avis HL-D8
+     disparu — l'ancienne référence comptait les appareils accumulés par
+     les passages Playwright). ⚠ Le passage avait été lancé avec
+     `--update-snapshots` sur un filtre de fichiers qui entraînait tous les
+     lots (dépendance `ecrans`) : seules ces références ont bougé, et
+     celles des lots 5 et 9 réécrites à tort ont été remises du dépôt puis
+     recomparées.
+   - **Totaux** : **620 Pest** (vert), **399 Vitest** (vert : 381 + 18 dans
+     `tests/js/tuteur/` ; recompté le 2026-11-13, le total « 399 » du lot 9
+     comptait 18 tests deux fois), Playwright vert sur tout ce qui a été
+     relancé (ci-dessus). `tsc`, `vp check`, Pint, Larastan niveau 7,
+     `npm run build:ssr` passent.
+   - **Preuve** : Pest `Tuteur/TuteurTest` (19), `Tuteur/JournalEtCoutsTuteurTest`
+     (4), Unit `TuteurOutilsTest` (10) ; Vitest `tuteur/texte.test.ts`,
+     `tuteur/flux.test.ts` ; Playwright `ecrans-lot10.spec.ts` (30),
+     `parcours-lot10.spec.ts` (2).
+   - **Reste** : la vraie API (critère des 3 s, refus propres, `A_TESTER.md`
+     § 7 bis, bloqué par la clé) ; correction assistée des rédactions de
+     l'examen blanc (reportée par Maurice) ; « Explique-moi » sur le
+     résultat d'un examen blanc (les questions n'y portent pas encore leur
+     identifiant).
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

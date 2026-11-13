@@ -66,8 +66,9 @@ class DemoSeeder extends Seeder
         // Leçons fictives, écrites et relues par ces comptes (lot 1), puis le
         // cours côté élève et les profils d'examen des élèves (lot 2), puis les
         // annales fictives et les signalements (lot 4), puis un lot de codes
-        // d'exemple et Ousmane abonné (lot 9).
-        $this->call([DemoContenuSeeder::class, DemoCoursSeeder::class, DemoEleveSeeder::class, DemoAnnalesSeeder::class, DemoExamensBlancsSeeder::class, DemoAbonnementsSeeder::class]);
+        // d'exemple et Ousmane abonné (lot 9), puis des conversations
+        // d'exemple avec le tuteur (lot 10).
+        $this->call([DemoContenuSeeder::class, DemoCoursSeeder::class, DemoEleveSeeder::class, DemoAnnalesSeeder::class, DemoExamensBlancsSeeder::class, DemoAbonnementsSeeder::class, DemoTuteurSeeder::class]);
 
         // Lot 7 : les packs du contenu de démonstration, prêts à télécharger.
         app(PackService::class)->genererTout();

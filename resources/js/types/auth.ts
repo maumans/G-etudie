@@ -34,6 +34,9 @@ export type Permission =
     | 'abonnement.souscrire'
     | 'codes.gerer'
     | 'paiements.voir'
+    | 'tuteur.utiliser'
+    | 'tuteur.journal'
+    | 'tuteur.couts'
     | 'compte.double_authentification';
 
 export type Auth = {

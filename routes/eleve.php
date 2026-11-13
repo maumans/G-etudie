@@ -13,6 +13,7 @@ use App\Http\Controllers\Eleve\ParcoursAccueilController;
 use App\Http\Controllers\Eleve\ProgressionController;
 use App\Http\Controllers\Eleve\SeanceController;
 use App\Http\Controllers\Eleve\SignalementController;
+use App\Http\Controllers\Eleve\TuteurController;
 use App\Http\Middleware\ProfilEleveRequis;
 use Illuminate\Support\Facades\Route;
 
@@ -80,5 +81,16 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value])
             Route::get('packs/{pack}/morceaux/{numero}', [PackController::class, 'morceau'])->whereNumber('numero')->name('packs.morceau');
             Route::post('packs/{pack}/elements', [PackController::class, 'elements'])->name('packs.elements');
             Route::delete('packs/{pack}', [PackController::class, 'retirer'])->name('packs.retirer');
+
+            // Lot 10 : le tuteur N'karamögö. En ligne seulement (hors de la
+            // liste blanche, HORS_LIGNE.md A.2) ; la réponse arrive en flux.
+            Route::middleware('can:'.Permission::UtiliserTuteur->value)->group(function () {
+                Route::get('tuteur', [TuteurController::class, 'index'])->name('tuteur');
+                Route::get('tuteur/{conversation}', [TuteurController::class, 'show'])->name('tuteur.show');
+                Route::post('tuteur/demandes', [TuteurController::class, 'demander'])
+                    ->middleware('throttle:tuteur')
+                    ->name('tuteur.demander');
+                Route::post('tuteur/reponses/{message}/signaler', [TuteurController::class, 'signaler'])->name('tuteur.signaler');
+            });
         });
     });

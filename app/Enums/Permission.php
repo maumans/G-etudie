@@ -47,6 +47,15 @@ enum Permission: string
     /** Lot 9 : voir les paiements de tous les comptes (assistance, console). */
     case VoirPaiements = 'paiements.voir';
 
+    /** Lot 10 (PLAN M11) : demander une explication au tuteur N'karamögö (quota par jour). */
+    case UtiliserTuteur = 'tuteur.utiliser';
+
+    /** Lot 10 : lire le journal des échanges avec le tuteur, sans l'identité des élèves (back-office). */
+    case LireJournalTuteur = 'tuteur.journal';
+
+    /** Lot 10 : suivre l'usage et le coût du tuteur (console). */
+    case VoirCoutsTuteur = 'tuteur.couts';
+
     /** Activer la double authentification sur son compte (DA4 : personnel seulement). */
     case DoubleAuthentification = 'compte.double_authentification';
 }

@@ -14,6 +14,7 @@ import {
     Library,
     ListTree,
     ScrollText,
+    Sparkles,
     ReceiptText,
     Ticket,
     Timer,
@@ -24,6 +25,8 @@ import type { EntreeNavigation } from '@/components/lien-navigation';
 import { accueil as accueilConsole } from '@/routes/console';
 import { index as codesConsole } from '@/routes/console/codes';
 import { index as paiementsConsole } from '@/routes/console/paiements';
+import { index as tuteurConsole } from '@/routes/console/tuteur';
+import { index as journalTuteur } from '@/routes/contenu/tuteur';
 import { accueil as accueilContenu } from '@/routes/contenu';
 import { index as indexLecons, relecture } from '@/routes/contenu/lecons';
 import { index as indexQuestions } from '@/routes/contenu/questions';
@@ -34,6 +37,7 @@ import {
     cours as coursEleve,
     progression as progressionEleve,
     telechargements as telechargementsEleve,
+    tuteur as tuteurEleve,
 } from '@/routes/eleve';
 import { index as annalesEleve } from '@/routes/eleve/annales';
 import { index as examensBlancs } from '@/routes/eleve/examens-blancs';
@@ -75,6 +79,16 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         href: progressionEleve().url,
         actifSous: '/eleve/progression',
         lateralSeulement: true,
+    },
+    {
+        // Lot 10 : sur mobile, depuis la carte du tuteur de l'accueil et les
+        // boutons « Explique-moi ».
+        libelle: 'Mon tuteur',
+        icone: Sparkles,
+        href: tuteurEleve().url,
+        actifSous: '/eleve/tuteur',
+        lateralSeulement: true,
+        permission: 'tuteur.utiliser',
     },
     {
         // Lot 7 (HL5) : sur mobile, depuis « Qui révise ? » (pastille du haut).
@@ -147,6 +161,13 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
         actifSous: '/contenu/signalements',
         permission: 'signalements.traiter',
     },
+    {
+        libelle: 'Tuteur',
+        icone: Sparkles,
+        href: journalTuteur().url,
+        actifSous: '/contenu/tuteur',
+        permission: 'tuteur.journal',
+    },
 ];
 
 /** Compte sans espace (parent, enseignant, gestionnaire avant le lot 11). */
@@ -179,6 +200,13 @@ export const NAVIGATION_CONSOLE: EntreeNavigation[] = [
         href: paiementsConsole().url,
         actifSous: '/console/paiements',
         permission: 'paiements.voir',
+    },
+    {
+        libelle: 'Tuteur',
+        icone: Sparkles,
+        href: tuteurConsole().url,
+        actifSous: '/console/tuteur',
+        permission: 'tuteur.couts',
     },
     { libelle: 'Activité', icone: Activity },
     { libelle: 'Contenu', icone: Library },

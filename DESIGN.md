@@ -1358,3 +1358,46 @@ la prolonge sans nouveau composant de base.
   (grille sans `grid-cols-1` : la largeur minimale d'un enfant élargissait
   la page) ; nombre d'appareils et référence d'opérateur masqués dans les
   captures (ils changent à chaque passage).
+
+### Lot 10 — tuteur N'karamögö (2026-11-12)
+
+- **« Explique-moi »** : bouton `doux` (étincelle) sous le corrigé d'une
+  question ratée ou « en partie juste » ; **« Je ne comprends pas cette
+  étape »** : bouton `ghost` mandarine sous chaque étape du corrigé, qui
+  passe à la ligne à 360 px. Hors ligne : le dialogue « Cet écran demande
+  une connexion », jamais un clic mort.
+- **Feuille du tuteur** (`Feuille`, 576 px au plus sur grand écran) : la
+  demande de l'élève en bulle d'encre à droite ; l'explication à gauche,
+  tuile étincelle sur teinte mandarine, rendue comme une leçon
+  (`ContenuBlocs` : formules KaTeX, étapes numérotées) au fil du flux,
+  « Ton tuteur réfléchit… » (trois points mandarine) avant le premier mot ;
+  dessous, relances en boutons `doux` petits (« Encore plus simple », « Un
+  autre exemple »), une question tapée, « Signaler cette réponse » discret,
+  le compteur du jour en 12 px. Un recentrage (hors sujet) : boussole,
+  « recentre la discussion », texte `ink-600`, pas de relance.
+- **« Mon tuteur »** : grand titre en contraste, puis **le moment fort de
+  l'écran**, « Pose ta question » en `surface-encre` (puces de matière
+  avec leur tuile et leur nom, la choisie en blanc `clair`, champ sur
+  verre, bouton plein « Demander au tuteur ») ; « Trois façons de
+  l'appeler » en filets ; colonne de 20 rem : « Aujourd'hui » (chiffre clé,
+  segments, quota) et « Tes conversations » (lignes de liste à tuile de
+  matière). Une conversation ouverte remplace le bloc d'encre par une
+  carte blanche (titre, matière, « Nouvelle question »).
+- **Back-office › Tuteur** : quatre chiffres clés sur une seule plaque à
+  filets, le journal en lignes de liste (badge « Signalée »), « Les plus
+  expliquées » numérotées à l'encre ; la fiche montre la conversation avec
+  le temps du premier mot et « servie du cache », le signalement sur
+  teinte mandarine avec « Classer ».
+- **Console › Tuteur** : quatre chiffres clés (coût en dollars et en GNF,
+  explications, part du cache, premier mot — en framboise au-delà de 3 s),
+  barres empilées par jour (API en mandarine, cache en encre à 25 %),
+  garde-fous en filets, tableau par modèle.
+- **Corrigé à la relecture des captures** : puce de matière choisie
+  blanche sur blanc en sombre (texte `ink-900` devenu clair : classe
+  `clair`) ; date `ink-500` trop pâle sur la conversation active teintée
+  (`ink-600`) ; tableau de la console qui défile sans être atteignable au
+  clavier (`tabIndex`, `role="region"`) ; « Je ne comprends pas cette
+  étape » qui débordait à 360 px (bouton qui ne passait pas à la ligne) ;
+  tuiles de matière illisibles sur l'encre (fond `white/10`) ; quota du
+  jour et objet des conversations sortis du masque des captures (seule la
+  date relative varie).

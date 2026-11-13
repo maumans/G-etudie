@@ -28,7 +28,6 @@ import {
     ProgressionSegments,
 } from '@/components/ui/progression';
 import { useProgressionLocale } from '@/hooks/use-progression-locale';
-import { annoncerBientot } from '@/lib/bientot';
 import { afficherDepuisLaBase, base, horsLigneSur } from '@/lib/hors-ligne';
 import type { Badge, Defi, Points } from '@/lib/motivation';
 import type { Jauge, Serie } from '@/lib/progression/locale';
@@ -46,6 +45,7 @@ import {
 import { matiere as pageMatiere } from '@/routes/eleve/cours';
 import { show as pageLecon } from '@/routes/eleve/lecons';
 import { commencer } from '@/routes/eleve/seance';
+import { tuteur as pageTuteur } from '@/routes/eleve';
 import { show as pageSeance } from '@/routes/eleve/seances';
 
 /** Données du tableau de bord (App\Services\TableauDeBordEleveService). */
@@ -892,7 +892,14 @@ function PremiersPas({
     );
 }
 
+/**
+ * Lot 10 : l'entrée vers le tuteur (« Mon tuteur »), avec ce qui reste
+ * aujourd'hui. Hors ligne, le lien ouvre « Cet écran demande une
+ * connexion » (garde de navigation, HORS_LIGNE.md A.3.7).
+ */
 function CarteTuteur() {
+    const { tuteur: quota } = usePage().props;
+
     return (
         <section className="relative isolate overflow-hidden rounded-carte surface-encre p-5 text-white shadow-releve">
             <div className="flex items-center justify-between gap-3">
@@ -900,26 +907,28 @@ function CarteTuteur() {
                     <Sparkles aria-hidden className="size-4 text-nimba-300" />
                     Ton tuteur N'karamögö
                 </h2>
-                <span className="rounded-full bg-white/12 px-2 py-0.5 text-meta font-medium text-white/85">
-                    bientôt
-                </span>
+                {quota && (
+                    <span
+                        className="rounded-full bg-white/12 px-2 py-0.5 text-meta font-medium text-white/85"
+                        data-capture="variable"
+                    >
+                        {quota.restants} / {quota.limite} aujourd’hui
+                    </span>
+                )}
             </div>
             <p className="mt-2 text-aide text-white/70">
                 Une explication simple, étape par étape, quand un corrigé te
                 bloque.
             </p>
-            <button
-                type="button"
-                onClick={() => annoncerBientot('Le tuteur')}
-                className="mt-4 flex w-full items-center justify-between gap-3 rounded-full bg-white/10 py-2 pr-2 pl-4 text-left text-aide text-white/75 ring-1 ring-white/15 transition-colors outline-none hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white"
+            <Link
+                href={pageTuteur()}
+                className="mt-4 flex w-full items-center justify-between gap-3 rounded-controle bg-white/10 py-2 pr-2 pl-4 text-left text-aide text-white/75 ring-1 ring-white/15 transition-colors outline-none hover:bg-white/15 focus-visible:outline-2 focus-visible:outline-white"
             >
-                <span className="truncate">
-                    Explique-moi la loi d'Ohm simplement…
-                </span>
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-nimba-500 text-white">
+                <span className="truncate">Pose ta question au tuteur…</span>
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-[8px] bg-nimba-500 text-white">
                     <ArrowRight aria-hidden className="size-4" />
                 </span>
-            </button>
+            </Link>
         </section>
     );
 }

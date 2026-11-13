@@ -1,5 +1,12 @@
 import type { Auth } from '@/types/auth';
 
+export type QuotaTuteur = {
+    limite: number;
+    utilises: number;
+    restants: number;
+    abonne: boolean;
+};
+
 declare module 'react' {
     interface InputHTMLAttributes<T> {
         passwordrules?: string;
@@ -19,6 +26,8 @@ declare module '@inertiajs/core' {
             name: string;
             auth: Auth;
             sidebarOpen: boolean;
+            /** Lot 10 : le quota du jour du tuteur (élèves seulement). */
+            tuteur: QuotaTuteur | null;
             [key: string]: unknown;
         };
     }

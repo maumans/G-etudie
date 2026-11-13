@@ -37,9 +37,16 @@ class DemoExamensBlancsSeeder extends Seeder
 
         $sujets = CatalogueEleve::sujets($profil)->with('versionPubliee')->where('est_exemple', true)->orderBy('session')->get();
 
-        // Un premier essai moyen, puis un meilleur la semaine suivante.
+        // Un premier essai moyen le mois dernier, puis un meilleur il y a deux
+        // jours. Le premier tombe **toujours** le mois précédent : semée un
+        // 12 du mois, la démonstration mettait les deux dans le même mois, et
+        // Aïssatou (gratuite, deux examens par mois) n'en avait plus aucun —
+        // les captures des lots 5 et 9 dépendaient du jour du semis.
+        $maintenant = CarbonImmutable::now();
+        $dates = [$maintenant->startOfMonth()->subDays(4), $maintenant->subDays(2)];
+
         foreach ($sujets->take(2)->values() as $rang => $sujet) {
-            $debut = CarbonImmutable::now()->subDays(9 - 7 * $rang)->setTime(16, 0);
+            $debut = $dates[$rang]->setTime(16, 0);
             $examens->terminer(
                 $aissatou,
                 (string) Str::uuid7(),

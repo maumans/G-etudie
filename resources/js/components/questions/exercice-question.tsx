@@ -2,6 +2,7 @@ import { CircleHelp } from 'lucide-react';
 import { useRef } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
 import { SignalerErreur } from '@/components/signaler-erreur';
+import { BoutonTuteur } from '@/components/tuteur/bouton-tuteur';
 import { Button } from '@/components/ui/button';
 import { useTentative } from '@/hooks/use-tentative';
 import type { QuestionEleve } from '@/lib/contenu/questions';
@@ -118,8 +119,23 @@ export function ExerciceQuestion({
                     <CorrigePasAPas
                         etapes={question.corrige}
                         className="border-t pt-4"
+                        tuteur={
+                            envoyer
+                                ? { question, reponse: tentative.reponse }
+                                : undefined
+                        }
                     />
                 )}
+                {/* Lot 10 : chez l'élève seulement, sur une question ratée. */}
+                {envoyer &&
+                    tentative.verifiee &&
+                    tentative.verdict !== 'juste' &&
+                    question.corrige.length > 0 && (
+                        <BoutonTuteur
+                            question={question}
+                            reponse={tentative.reponse}
+                        />
+                    )}
                 {tentative.verifiee && question.type === 'ouverte' && (
                     <AutoEvaluation
                         bareme={question.donnees.bareme ?? []}

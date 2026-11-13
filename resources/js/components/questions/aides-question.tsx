@@ -1,6 +1,7 @@
 import { ChevronDown, Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
+import { BoutonTuteur } from '@/components/tuteur/bouton-tuteur';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import type { DocumentBlocs } from '@/lib/contenu/blocs';
@@ -62,18 +63,28 @@ export function IndicesQuestion({
     );
 }
 
+/** De quoi ouvrir le tuteur sur une question (lot 10). */
+export type AncrageTuteur = {
+    question: { uuid: string; version: number };
+    reponse?: Record<string, unknown> | null;
+};
+
 /**
  * Le corrigé pas à pas (DESIGN.md § 6.4) : étapes numérotées, dévoilées
  * une à une pour que l'élève refasse le chemin ; « Tout voir » d'un geste.
+ * Avec `tuteur` (côté élève, lot 10), chaque étape porte « Je ne comprends
+ * pas cette étape ».
  */
 export function CorrigePasAPas({
     etapes,
     toutVoir = false,
+    tuteur,
     className,
 }: {
     etapes: EtapeCorrige[];
     /** Relecture : toutes les étapes d'emblée. */
     toutVoir?: boolean;
+    tuteur?: AncrageTuteur;
     className?: string;
 }) {
     const [vues, setVues] = useState(
@@ -118,6 +129,13 @@ export function CorrigePasAPas({
                                 doc={etape.blocs}
                                 className="gap-2 text-interface text-ink-600"
                             />
+                            {tuteur && (
+                                <BoutonTuteur
+                                    question={tuteur.question}
+                                    reponse={tuteur.reponse}
+                                    etape={rang}
+                                />
+                            )}
                         </div>
                     </li>
                 ))}

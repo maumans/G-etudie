@@ -13,6 +13,9 @@ use App\Services\HorsLigne\RegistreOperations;
 use App\Services\PackService;
 use App\Services\Sms\EnvoiSms;
 use App\Services\Sms\JournalSms;
+use App\Services\Tuteur\MoteurTuteur;
+use App\Services\Tuteur\TuteurClaude;
+use App\Services\Tuteur\TuteurSimule;
 use App\Ssr\PasserelleVitrine;
 use App\Support\Abonnements\SourceAbonnements;
 use Carbon\CarbonImmutable;
@@ -44,6 +47,12 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ExtracteurSujet::class, fn () => config('annales.extracteur') === 'claude'
             ? new ExtracteurClaude
             : new ExtracteurSimule);
+
+        // Tuteur N'karamögö (lot 10) : l'API Claude, ou le tuteur simulé hors
+        // production (config/tuteur.php).
+        $this->app->bind(MoteurTuteur::class, fn () => config('tuteur.moteur') === 'claude'
+            ? new TuteurClaude
+            : new TuteurSimule(app()->runningUnitTests() ? 0 : 25_000));
 
         // Une seule liste des types d'opération hors ligne par requête.
         $this->app->singleton(RegistreOperations::class);
@@ -83,6 +92,12 @@ class AppServiceProvider extends ServiceProvider
 
         // Lot 9 : webhooks des opérateurs.
         RateLimiter::for('webhook-paiement', fn (Request $request) => Limit::perMinute(120)->by('webhook|'.$request->ip()));
+
+        // Lot 10 : demandes au tuteur (chacune peut coûter un appel à l'API).
+        // Le quota du jour est l'affaire de TuteurService ; ceci arrête une
+        // rafale (double appui, script).
+        RateLimiter::for('tuteur', fn (Request $request) => Limit::perMinute(8)
+            ->by('tuteur|'.($request->user()?->getAuthIdentifier() ?? $request->ip())));
 
         RateLimiter::for('basculer-profil', fn (Request $request) => Limit::perMinute(10)
             ->by('basculer|'.$request->ip()));

@@ -39,7 +39,7 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
-            testIgnore: /parcours-lot[123459]\.spec\.ts/,
+            testIgnore: /parcours-lot(?:[123459]|10)\.spec\.ts/,
             dependencies: ['connexion'],
         },
         // Crée puis efface une leçon : après les captures, qu'il ne doit pas
@@ -79,6 +79,13 @@ export default defineConfig({
         {
             name: 'parcours-paiement',
             testMatch: /parcours-lot9\.spec\.ts/,
+            dependencies: ['ecrans'],
+        },
+        // Lot 10 : Aïssatou demande « Explique-moi » (premier mot sous 3 s),
+        // puis une question hors sujet ; ses conversations sont effacées.
+        {
+            name: 'parcours-tuteur',
+            testMatch: /parcours-lot10\.spec\.ts/,
             dependencies: ['ecrans'],
         },
         {

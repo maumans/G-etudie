@@ -19,6 +19,7 @@ import { CorrigePasAPas } from '@/components/questions/aides-question';
 import { ExerciceQuestion } from '@/components/questions/exercice-question';
 import { SaisieQuestion } from '@/components/questions/saisie-question';
 import { SignalerErreur } from '@/components/signaler-erreur';
+import { BoutonTuteur } from '@/components/tuteur/bouton-tuteur';
 import { Badge } from '@/components/ui/badge';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
@@ -421,11 +422,17 @@ function QuestionLue({
                         />
                     )}
                     {corrige ? (
-                        <CorrigePasAPas
-                            etapes={question.corrige}
-                            toutVoir
-                            className="rounded-carte bg-craie-100/70 p-4 dark:bg-white/[0.03]"
-                        />
+                        <>
+                            <CorrigePasAPas
+                                etapes={question.corrige}
+                                toutVoir
+                                tuteur={{ question }}
+                                className="rounded-carte bg-craie-100/70 p-4 dark:bg-white/[0.03]"
+                            />
+                            {question.corrige.length > 0 && (
+                                <BoutonTuteur question={question} />
+                            )}
+                        </>
                     ) : reserve && !avecChoix ? null : (
                         <Button
                             variant="doux"
