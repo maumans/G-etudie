@@ -231,7 +231,13 @@
 - **Tests (lot 10)** : **620 Pest, 399 Vitest** ; Playwright : 30 écrans
   et 2 parcours de plus (572 en tout), verts sur les lots relancés (point
   26). MySQL de Laragon à redémarrer s'il s'est arrêté (`mysqld.exe
-  --defaults-file=…/my.ini`).
+  --defaults-file=…/my.ini`). ⚠ **Une clé de l'API est dans `.env`**
+  (2026-11-13) : en développement, le tuteur et l'import des annales
+  appellent la vraie API (facturée). Les tests PHP et le serveur que lance
+  Playwright restent simulés ; pour les parcours, arrêter tout `php artisan
+  serve` déjà ouvert sur le port (il garderait le mode réel) et lancer la
+  file avec `ANNALES_EXTRACTEUR=simule php artisan queue:work` (parcours du
+  lot 4).
 - **Tests (lot 9)** : **587 Pest, 399 Vitest, 540 Playwright**, verts (point 25). Playwright sur ce poste : `PLAYWRIGHT_PORT=8010` (le 8000 est pris par un autre projet), `--workers=1`, sans `npm run dev`, **avec `php artisan queue:work`** (parcours du lot 4). Les tests ne touchent plus au disque `local` de développement (horloge des captures).
 - **Tests (lot 7)** : **511 Pest, 341 Vitest, 479 Playwright** (écrans des lots 0 à 7, 5 connexions, 7 parcours, socle hors ligne, 3 budgets ; captures sur le build). Dernier passage complet : 478 / 479 — le parcours « deux profils » a échoué une fois (course de session, voir « Pièges ») ; corrigé, puis 8 passages verts de suite. `tsc`, `vp check`, Pint, Larastan niveau 7 et `npm run build` passent. Sur ce poste, lancer
   Playwright en série (`--workers=1`) et sans `npm run dev`.
@@ -2238,8 +2244,19 @@ cette question à sa façon. Elle distingue deux notions :
      (4), Unit `TuteurOutilsTest` (10) ; Vitest `tuteur/texte.test.ts`,
      `tuteur/flux.test.ts` ; Playwright `ecrans-lot10.spec.ts` (30),
      `parcours-lot10.spec.ts` (2).
+   - **Première clé branchée** (2026-11-13) : l'API accepte la clé de
+     Maurice mais le compte n'a **pas de crédit** (« credit balance is too
+     low »). Corrigé en chemin : ce refus (400, comme une demande mal
+     formée) faisait lire à l'élève « Reformule-la plus court » et au
+     rédacteur « format ou taille refusés » ; `App\Support\ErreursApiClaude`
+     le reconnaît : « Le tuteur est momentanément fermé » pour l'élève,
+     « Le crédit de l'API Claude est épuisé : rechargez-le… » pour l'import,
+     une ligne d'erreur dans le journal. Et, la clé présente faisant passer
+     tuteur et import en mode réel, `phpunit.xml` (clé vide, moteurs
+     simulés, `force`) et le serveur lancé par Playwright (`webServer.env`)
+     imposent le mode simulé : aucun test ne paie un appel.
    - **Reste** : la vraie API (critère des 3 s, refus propres, `A_TESTER.md`
-     § 7 bis, bloqué par la clé) ; correction assistée des rédactions de
+     § 7 bis, **bloqué par le crédit**) ; correction assistée des rédactions de
      l'examen blanc (reportée par Maurice) ; « Explique-moi » sur le
      résultat d'un examen blanc (les questions n'y portent pas encore leur
      identifiant).
@@ -2248,6 +2265,12 @@ cette question à sa façon. Elle distingue deux notions :
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
 ### Points ouverts
+
+- **`CodesAccesTest` fragile** (vu le 2026-11-13) : un échec à la ligne
+  105 dans un passage complet de Pest, vert seul et au passage complet
+  suivant (621 / 621). Probablement le compteur de la limite d'essais des
+  codes (`throttle:code-acces`) qui survit d'un test à l'autre. À
+  reproduire et corriger.
 
 - **Matières phares** (D1) : choisies au lot 1 par Claude Code à la demande
   de Maurice (`ReferentielSeeder::PHARES`, point 15) ; à faire confirmer par

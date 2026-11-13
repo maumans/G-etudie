@@ -96,6 +96,11 @@ export default defineConfig({
     ],
     webServer: {
         command: `php artisan serve --host=127.0.0.1 --port=${PORT}`,
+        // Lot 10 : les captures et les parcours ne paient jamais un appel à
+        // l'API Claude, même avec une clé dans .env (tuteur et import simulés).
+        // Ne vaut que pour un serveur lancé par Playwright : un serveur déjà
+        // ouvert sur ce port garde son .env (`reuseExistingServer`).
+        env: { TUTEUR_MOTEUR: 'simule', ANNALES_EXTRACTEUR: 'simule' },
         url: `${ADRESSE}/up`,
         reuseExistingServer: true,
         timeout: 60_000,

@@ -629,7 +629,11 @@
 - En cas d'échec, relever : les deux chiffres de la console, l'heure,
   `storage/logs/laravel.log` (lignes « Tuteur : »), le réseau du téléphone ;
   essayer `TUTEUR_EFFORT=low` (déjà le défaut) puis un autre modèle.
-- État : à faire (clé à créer par Maurice)
+- État : **bloqué — crédit de l'API épuisé** (2026-11-13). La clé de
+  Maurice est dans `.env` et l'API l'**accepte** (appel gratuit de comptage
+  de jetons : pas d'erreur d'authentification), mais répond « Your credit
+  balance is too low ». À reprendre après un achat de crédits
+  (console.anthropic.com › Plans & Billing), avec une limite de dépense.
 
 ### [Lot 10] Refus propres avec la vraie API : hors sujet, contenu inadapté, détresse
 - Pourquoi : PLAN M11 et § 10 (mineurs) ; avec le tuteur simulé, seuls des

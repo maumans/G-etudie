@@ -13,6 +13,7 @@ use Anthropic\Core\Exceptions\AuthenticationException;
 use Anthropic\Core\Exceptions\BadRequestException;
 use Anthropic\Core\Exceptions\RateLimitException;
 use Anthropic\Lib\Streaming\MessageAccumulator;
+use App\Support\ErreursApiClaude;
 use Closure;
 use Illuminate\Support\Facades\Log;
 
@@ -83,6 +84,12 @@ class TuteurClaude implements MoteurTuteur
         } catch (RateLimitException) {
             throw new TuteurIndisponible('Beaucoup d’élèves demandent le tuteur en ce moment. Réessaie dans une minute.');
         } catch (BadRequestException $e) {
+            if (ErreursApiClaude::creditEpuise($e->getMessage())) {
+                Log::error('Tuteur : crédit de l’API Claude épuisé (console.anthropic.com › Plans & Billing).');
+
+                throw new TuteurIndisponible('Le tuteur est momentanément fermé. Réessaie plus tard.');
+            }
+
             Log::warning('Tuteur : demande refusée par l’API', ['message' => $e->getMessage()]);
 
             throw new TuteurIndisponible('Le tuteur n’a pas pu lire cette demande. Reformule-la plus court.');

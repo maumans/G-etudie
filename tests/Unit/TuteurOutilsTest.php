@@ -7,6 +7,7 @@ use App\Services\Tuteur\ReponseMoteur;
 use App\Services\Tuteur\RequeteTuteur;
 use App\Services\Tuteur\TuteurSimule;
 use App\Support\BlocsEnTexte;
+use App\Support\ErreursApiClaude;
 use App\Support\TexteEnBlocs;
 use Tests\TestCase;
 
@@ -69,4 +70,9 @@ test('les consignes nomment les deux marqueurs et protègent l’élève', funct
         ->toContain('Le corrigé validé fait foi')
         ->toContain('Ne demande jamais son nom')
         ->toContain('adulte de confiance');
+});
+
+test('un compte sans crédit se reconnaît dans le refus de l’API', function () {
+    expect(ErreursApiClaude::creditEpuise('Your credit balance is too low to access the Anthropic API.'))->toBeTrue()
+        ->and(ErreursApiClaude::creditEpuise('messages: text content blocks must be non-empty'))->toBeFalse();
 });

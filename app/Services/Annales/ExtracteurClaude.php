@@ -12,6 +12,7 @@ use Anthropic\Core\Exceptions\BadRequestException;
 use Anthropic\Core\Exceptions\RateLimitException;
 use Anthropic\Lib\Streaming\MessageAccumulator;
 use App\Models\ImportSujet;
+use App\Support\ErreursApiClaude;
 use Illuminate\Support\Facades\Log;
 
 /**
@@ -101,6 +102,12 @@ class ExtracteurClaude implements ExtracteurSujet
         } catch (RateLimitException) {
             throw new ExtractionImpossible('Trop de lectures en même temps : relancez dans quelques minutes.');
         } catch (BadRequestException $e) {
+            if (ErreursApiClaude::creditEpuise($e->getMessage())) {
+                Log::error('Import de sujet : crédit de l\'API Claude épuisé.', ['import' => $import->uuid]);
+
+                throw new ExtractionImpossible('Le crédit de l\'API Claude est épuisé : rechargez-le sur console.anthropic.com (Plans & Billing), puis relancez la lecture.');
+            }
+
             Log::warning('Import de sujet refusé par l\'API', ['import' => $import->uuid, 'message' => $e->getMessage()]);
 
             throw new ExtractionImpossible('Le document n\'a pas pu être lu (format ou taille refusés).');
