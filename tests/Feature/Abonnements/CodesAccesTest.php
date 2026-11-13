@@ -101,7 +101,11 @@ test('code mal tapé, inconnu, ou d\'un lot désactivé : refusé avec une phras
     [$lot, $codes] = lotParLaConsole($this->admin);
     $inconnu = FormatCode::generer();
 
-    $this->actingAs($this->eleve)->post(route('eleve.abonnement.code'), ['code' => substr($codes[0], 0, 11).'Z'])
+    // Le dernier caractère changé pour un autre (jamais le même : un code
+    // qui finissait déjà par « Z » restait juste, une fois sur trente).
+    $malTape = substr($codes[0], 0, 11).(str_ends_with($codes[0], 'Z') ? 'Y' : 'Z');
+
+    $this->actingAs($this->eleve)->post(route('eleve.abonnement.code'), ['code' => $malTape])
         ->assertSessionHasErrors('code');
     $this->post(route('eleve.abonnement.code'), ['code' => $inconnu])
         ->assertSessionHasErrors(['code' => 'Ce code n\'existe pas. Vérifie-le, ou demande à celui qui te l\'a vendu.']);

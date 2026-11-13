@@ -2266,11 +2266,11 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
 ### Points ouverts
 
-- **`CodesAccesTest` fragile** (vu le 2026-11-13) : un échec à la ligne
-  105 dans un passage complet de Pest, vert seul et au passage complet
-  suivant (621 / 621). Probablement le compteur de la limite d'essais des
-  codes (`throttle:code-acces`) qui survit d'un test à l'autre. À
-  reproduire et corriger.
+- [x] **`CodesAccesTest` fragile — corrigé** (2026-11-13) : un échec à la
+  ligne 105 dans un passage complet. Cause : le code « mal tapé » était le
+  vrai code dont le dernier caractère devenait « Z » ; un code qui finissait
+  déjà par « Z » restait juste (une fois sur trente). Le caractère change
+  maintenant toujours.
 
 - **Matières phares** (D1) : choisies au lot 1 par Claude Code à la demande
   de Maurice (`ReferentielSeeder::PHARES`, point 15) ; à faire confirmer par
