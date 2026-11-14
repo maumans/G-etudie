@@ -1,5 +1,11 @@
 /** Les espaces connectés, dans l'ordre de App\Enums\Espace. */
-export type Espace = 'console' | 'contenu' | 'eleve';
+export type Espace =
+    | 'console'
+    | 'contenu'
+    | 'etablissement'
+    | 'enseignant'
+    | 'parent'
+    | 'eleve';
 
 /**
  * Le compte connecté tel que le partage HandleInertiaRequests : données
@@ -10,7 +16,7 @@ export type User = {
     prenom: string;
     pseudo: string;
     numero_verifie: boolean;
-    /** Espace d'arrivée ; `null` : « Mon compte » seulement (parent, enseignant… avant le lot 11). */
+    /** Espace d'arrivée ; `null` : « Mon compte » seulement (compte sans espace). */
     espace: Espace | null;
     /** Espaces que le compte peut ouvrir. */
     espaces: Espace[];
@@ -37,6 +43,15 @@ export type Permission =
     | 'tuteur.utiliser'
     | 'tuteur.journal'
     | 'tuteur.couts'
+    // Lot 11.
+    | 'espace.parent'
+    | 'espace.enseignant'
+    | 'espace.etablissement'
+    | 'groupes.gerer'
+    | 'groupes.rejoindre'
+    | 'parents.inviter'
+    | 'etablissement.gerer'
+    | 'etablissements.administrer'
     | 'compte.double_authentification';
 
 export type Auth = {

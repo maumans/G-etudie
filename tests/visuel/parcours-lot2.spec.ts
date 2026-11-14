@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { THEMES, capturer, repondreAuHasard } from './gabarits';
+import {
+    THEMES,
+    capturer,
+    passerEtapeEtablissement,
+    repondreAuHasard,
+} from './gabarits';
 
 /**
  * Critère d'acceptation du lot 2 (PLAN § 12) : **un nouvel élève fait son
@@ -95,6 +100,7 @@ test('un nouvel élève fait son premier exercice en moins de 60 s après son in
     ).toBeVisible(ATTENTE);
     await page.getByRole('radio', { name: /^BEPC/ }).click();
     await page.getByRole('button', { name: 'Continuer' }).click();
+    await passerEtapeEtablissement(page);
     await expect(
         page.getByRole('heading', { name: /Combien de temps/ }),
     ).toBeVisible();

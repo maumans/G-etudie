@@ -3,8 +3,11 @@
 namespace App\Services;
 
 use App\Enums\EtatLecon;
+use App\Models\Devoir;
+use App\Models\Groupe;
 use App\Models\Lecon;
 use App\Models\Matiere;
+use App\Models\MembreGroupe;
 use App\Models\ProfilEleve;
 use App\Models\ProgressionLecon;
 use App\Models\Question;
@@ -67,6 +70,36 @@ class TableauDeBordEleveService
             })->values()->all(),
             'reprendre' => $this->reprendre($lecons, $progressions),
             'premiers_pas' => $this->premiersPas($eleve, $progressions),
+            'devoirs' => $this->devoirs($eleve),
+        ];
+    }
+
+    /**
+     * Lot 11 : les devoirs pas encore rendus de ses groupes (le prochain à
+     * rendre d'abord) ; `groupes` = 0 : la carte propose d'en rejoindre un.
+     *
+     * @return array{groupes: int, a_faire: int, prochain: array{titre: string, echeance_le: string}|null}
+     */
+    private function devoirs(User $eleve): array
+    {
+        $groupes = Groupe::query()->ouverts()
+            ->whereIn('id', MembreGroupe::query()->actifs()->where('eleve_id', $eleve->id)->select('groupe_id'))
+            ->pluck('id');
+        $aFaire = Devoir::query()
+            ->whereIn('groupe_id', $groupes)
+            ->whereNotIn('id', Seance::query()->where('user_id', $eleve->id)->whereNotNull('devoir_id')->whereNotNull('termine_le')->select('devoir_id'))
+            ->orderBy('echeance_le')
+            ->orderBy('id')
+            ->get(['id', 'titre', 'echeance_le']);
+        $prochain = $aFaire->first();
+
+        return [
+            'groupes' => $groupes->count(),
+            'a_faire' => $aFaire->count(),
+            'prochain' => $prochain === null ? null : [
+                'titre' => $prochain->titre,
+                'echeance_le' => $prochain->echeance_le->toIso8601ZuluString(),
+            ],
         ];
     }
 
@@ -98,6 +131,7 @@ class TableauDeBordEleveService
         $prochaine = $enCours ?? $this->seances->aVenir($eleve, $profil)->first();
         $termineeAujourdhui = Seance::query()
             ->where('user_id', $eleve->id)
+            ->whereNull('devoir_id')
             ->whereDate('jour', CarbonImmutable::today())
             ->whereNotNull('termine_le')
             ->exists();

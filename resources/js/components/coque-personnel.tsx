@@ -1,7 +1,10 @@
 import { Link, usePage } from '@inertiajs/react';
 import {
+    Building2,
     CircleUser,
     GraduationCap,
+    HeartHandshake,
+    Presentation,
     LayoutDashboard,
     Library,
     LogOut,
@@ -26,6 +29,9 @@ import { edit as monCompte } from '@/routes/compte/profil';
 import { accueil as accueilConsole } from '@/routes/console';
 import { accueil as accueilContenu } from '@/routes/contenu';
 import { accueil as accueilEleve } from '@/routes/eleve';
+import { accueil as accueilEnseignant } from '@/routes/enseignant';
+import { accueil as accueilEtablissement } from '@/routes/etablissement';
+import { accueil as accueilParent } from '@/routes/parent';
 import type { Espace } from '@/types';
 
 /** Raccourcis vers les autres espaces du compte (l'administrateur plateforme ouvre aussi le back-office). */
@@ -47,6 +53,22 @@ const ESPACES: Record<
         libelle: 'Espace élève',
         href: accueilEleve().url,
         icone: GraduationCap,
+    },
+    // Lot 11.
+    etablissement: {
+        libelle: 'Espace établissement',
+        href: accueilEtablissement().url,
+        icone: Building2,
+    },
+    enseignant: {
+        libelle: 'Espace enseignant',
+        href: accueilEnseignant().url,
+        icone: Presentation,
+    },
+    parent: {
+        libelle: 'Espace parent',
+        href: accueilParent().url,
+        icone: HeartHandshake,
     },
 };
 
@@ -79,7 +101,7 @@ export function CoquePersonnel({
                     key={entree.libelle}
                     entree={entree}
                     variante="dense"
-                    exact={entree === accueil}
+                    exact={entree === accueil && !entree.actifAussiSous}
                 />
             ))}
         </nav>

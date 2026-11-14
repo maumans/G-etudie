@@ -1,7 +1,11 @@
 import { gzipSync } from 'node:zlib';
 import { expect, test } from '@playwright/test';
 import type { Page, Response } from '@playwright/test';
-import { SESSIONS, repondreAuHasard } from './gabarits';
+import {
+    SESSIONS,
+    passerEtapeEtablissement,
+    repondreAuHasard,
+} from './gabarits';
 
 /**
  * HORS_LIGNE.md A.11 et A.14 n° 25 (lot 7, HL7) : les budgets de poids,
@@ -130,6 +134,7 @@ test('une tentative < 2 Ko ; un lot de 50 tentatives < 40 Ko compressé', async 
         .click({ timeout: 30_000 });
     await page.getByRole('radio', { name: /^BEPC/ }).click();
     await page.getByRole('button', { name: 'Continuer' }).click();
+    await passerEtapeEtablissement(page);
     await page.getByRole('radio', { name: /10 min/ }).click();
     await page
         .getByRole('button', { name: 'Faire mon premier exercice' })

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 import type { BrowserContext, Page } from '@playwright/test';
-import { repondreAuHasard } from './gabarits';
+import { passerEtapeEtablissement, repondreAuHasard } from './gabarits';
 
 /**
  * Critère du lot 7 (PLAN § 12, HORS_LIGNE.md HL5 et HL6), par les vrais
@@ -164,6 +164,7 @@ async function inscrire(page: Page, prenom: string): Promise<void> {
     await page.getByRole('link', { name: 'Plus tard' }).click(ATTENTE);
     await page.getByRole('radio', { name: /^BEPC/ }).click();
     await page.getByRole('button', { name: 'Continuer' }).click();
+    await passerEtapeEtablissement(page);
     await page.getByRole('radio', { name: /10 min/ }).click();
     await page
         .getByRole('button', { name: 'Faire mon premier exercice' })

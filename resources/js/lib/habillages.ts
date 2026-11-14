@@ -14,6 +14,9 @@ export type Habillage =
     | 'eleve'
     | 'contenu'
     | 'console'
+    | 'parent'
+    | 'enseignant'
+    | 'etablissement'
     | 'connexion'
     | 'compte';
 
@@ -34,6 +37,13 @@ export function habillageDe(page: string): Habillage | null {
             return 'contenu';
         case page.startsWith('console/'):
             return 'console';
+        // Lot 11.
+        case page.startsWith('parent/'):
+            return 'parent';
+        case page.startsWith('enseignant/'):
+            return 'enseignant';
+        case page.startsWith('etablissement/'):
+            return 'etablissement';
         case page.startsWith('auth/'):
             return 'connexion';
         // « Mon compte » : dans l'habillage de l'espace du compte.

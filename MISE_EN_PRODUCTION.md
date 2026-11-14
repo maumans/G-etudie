@@ -670,6 +670,28 @@ les reconstruit depuis la base.
 - **Contrôles** : § 9, point 7 ; `A_TESTER.md`, lot 10 (vraie API, vrai
   téléphone).
 
+### Lot 11 — parents, enseignants, établissements, devoirs
+
+- **Une seule fois** : `migrate` (tables `liens_parents`, `codes_liaison`,
+  `rattachements_etablissement`, `groupes`, `membres_groupes`, `devoirs`,
+  `devoirs_questions`, `licences_etablissement` ; colonnes
+  `seances.devoir_id`, `abonnements.licence_id`,
+  `paiements.beneficiaire_id`, `etablissements.est_exemple`), puis
+  `db:seed` (huit permissions nouvelles, et les espaces des rôles parent,
+  enseignant et gestionnaire). Rien à recalculer, aucun pack à regénérer.
+- **Session** : l'enseignant et le gestionnaire d'établissement sont
+  désormais du **personnel** (décision 4) : session de 12 h, double
+  authentification proposée. Au premier déploiement, leurs sessions
+  ouvertes de plus de 12 h se ferment (ils se reconnectent) ; le parent
+  garde ses 30 jours.
+- **`.env`, planificateur, file, Nginx** : rien de plus.
+- **Premier partenaire** : Console › Établissements › « Nouvel
+  établissement », puis « Nommer un gestionnaire » (prénom, numéro) : le
+  mot de passe provisoire s'affiche **une fois**, à transmettre de vive
+  voix ; puis « Accorder une licence » (places, dates, référence du
+  contrat signé). Le gestionnaire rattache ensuite ses enseignants.
+- **Contrôles** : § 9, point 9 ; `A_TESTER.md`, lot 11.
+
 ---
 
 ## 9. Vérifications après la mise en ligne
@@ -713,6 +735,10 @@ Dans un navigateur, en HTTPS :
    `gzip_types`). Console › Tuteur : la ligne du jour et son coût.
 8. (Lot 8) PageSpeed Insights (pagespeed.web.dev) sur l'accueil, profil
    mobile : performance, accessibilité et SEO notés dans le DEVBOOK.
+9. (Lot 11) Console › Établissements s'ouvre ; avec un compte enseignant
+   de test : créer un groupe, le rejoindre avec un compte élève de test
+   (code du groupe), et voir l'élève dans le groupe ; un second
+   enseignant reçoit **404** sur l'adresse de ce groupe.
 
 Puis dérouler les contrôles « bloqués tant que le domaine HTTPS n'existe
 pas » de `A_TESTER.md` (vrais téléphones, mode avion, deux profils,

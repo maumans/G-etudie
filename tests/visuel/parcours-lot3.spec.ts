@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { THEMES, capturer, repondreAuHasard } from './gabarits';
+import {
+    THEMES,
+    capturer,
+    passerEtapeEtablissement,
+    repondreAuHasard,
+} from './gabarits';
 
 /**
  * HORS_LIGNE.md A.14 n° 24 (lot 3, HL2) : **mode avion, séance complète,
@@ -119,6 +124,7 @@ test('mode avion : séance complète, rechargement, retour du réseau → un seu
     await page.getByRole('link', { name: 'Plus tard' }).click(ATTENTE);
     await page.getByRole('radio', { name: /^BEPC/ }).click();
     await page.getByRole('button', { name: 'Continuer' }).click();
+    await passerEtapeEtablissement(page);
     await page.getByRole('radio', { name: /30 min/ }).click();
     await page
         .getByRole('button', { name: 'Faire mon premier exercice' })

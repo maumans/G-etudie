@@ -15,6 +15,7 @@ import {
     ShieldAlert,
     Sparkles,
     Target,
+    UsersRound,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import type { SegmentJauge } from '@/components/jauge-preparation';
@@ -47,6 +48,8 @@ import { show as pageLecon } from '@/routes/eleve/lecons';
 import { commencer } from '@/routes/eleve/seance';
 import { tuteur as pageTuteur } from '@/routes/eleve';
 import { show as pageSeance } from '@/routes/eleve/seances';
+import { index as groupesEleve } from '@/routes/eleve/groupes';
+import { formaterJour } from '@/lib/dates';
 
 /** Données du tableau de bord (App\Services\TableauDeBordEleveService). */
 type Tableau = {
@@ -88,6 +91,12 @@ type Tableau = {
         minutes_restantes: number;
         etat: 'comprise' | 'a_revoir' | null;
     }[];
+    /** Lot 11 : les devoirs de ses groupes. */
+    devoirs: {
+        groupes: number;
+        a_faire: number;
+        prochain: { titre: string; echeance_le: string } | null;
+    };
     premiers_pas: {
         cle: 'profil' | 'exercice' | 'lecon' | 'seance';
         fait: boolean;
@@ -453,6 +462,7 @@ export default function Accueil({
                                 </span>
                             </p>
                         </Carte>
+                        <CarteDevoirs devoirs={tableau.devoirs} />
                         <CarteTuteur />
                     </div>
                 </div>
@@ -897,6 +907,53 @@ function PremiersPas({
  * aujourd'hui. Hors ligne, le lien ouvre « Cet écran demande une
  * connexion » (garde de navigation, HORS_LIGNE.md A.3.7).
  */
+/** Lot 11 : « Mes groupes » sur mobile passe par cette carte. */
+function CarteDevoirs({ devoirs }: { devoirs: Tableau['devoirs'] }) {
+    return (
+        <Carte className="grid gap-3">
+            <div className="flex items-center justify-between gap-3">
+                <h2 className="text-[0.9375rem]">Mes devoirs</h2>
+                {devoirs.a_faire > 0 && (
+                    <span className="rounded-badge bg-nimba-600/[0.10] px-2 text-meta font-medium text-nimba-700 dark:bg-nimba-300/15 dark:text-nimba-300">
+                        {devoirs.a_faire} à faire
+                    </span>
+                )}
+            </div>
+            <Link
+                href={groupesEleve()}
+                className="flex items-center gap-3 rounded-controle outline-none focus-visible:outline-2 focus-visible:outline-ring"
+            >
+                <span
+                    aria-hidden
+                    className="flex size-10 shrink-0 items-center justify-center rounded-[12px] bg-nimba-500/[0.12] text-nimba-700 dark:bg-nimba-400/15 dark:text-nimba-300"
+                >
+                    <UsersRound className="size-5" />
+                </span>
+                <span className="grid min-w-0 flex-1 gap-0.5">
+                    <span className="truncate font-semibold">
+                        {devoirs.prochain
+                            ? devoirs.prochain.titre
+                            : devoirs.groupes === 0
+                              ? 'Rejoindre le groupe de ma classe'
+                              : 'Rien à rendre'}
+                    </span>
+                    <span className="truncate text-aide text-ink-500">
+                        {devoirs.prochain
+                            ? `À rendre le ${formaterJour(devoirs.prochain.echeance_le)}`
+                            : devoirs.groupes === 0
+                              ? 'Avec le code donné par ton enseignant'
+                              : 'Tes groupes et tes devoirs rendus'}
+                    </span>
+                </span>
+                <ChevronRight
+                    aria-hidden
+                    className="size-4 shrink-0 text-ink-400"
+                />
+            </Link>
+        </Carte>
+    );
+}
+
 function CarteTuteur() {
     const { tuteur: quota } = usePage().props;
 

@@ -665,6 +665,7 @@ hors ligne ; les packs viennent ensuite.
 | — | Lot 8 (sans lot HL) : vitrine finale, annales publiques, installation depuis la vitrine, habillages chargés avec leur page, rendu serveur de la vitrine seulement | ✅ fait (2026-11-07), B.3 « Lot 8 » | 5 / 5 |
 | — | Lot 9 (sans lot HL) : abonnements — droits d'abonné des packs (HL-D3, HL-D4) en service, variante « libre » des packs, examens blancs gratuits décomptés hors ligne, deux appareils par abonnement (HL-D8), paiement et code en ligne seulement | ✅ fait (2026-11-08), B.3 « Lot 9 » ; vrai paiement et vrais téléphones dans `A_TESTER.md` | 5 / 5 |
 | — | Lot 10 (sans lot HL) : tuteur N'karamögö en ligne seulement (niveau C), dialogue hors ligne, rien par la file (écart n° 34), panneau chargé à la demande | ✅ fait (2026-11-12), B.3 « Lot 10 » ; vraie API et vrai téléphone dans `A_TESTER.md` § 7 bis | 4 / 4 |
+| — | Lot 11 (sans lot HL) : espaces parent, enseignant, établissement en ligne seulement (niveau C) ; devoir = séance, réponses par la file ; rejoindre un groupe et lier un parent en direct | ✅ fait (2026-11-13), B.3 « Lot 11 » ; vrais téléphones dans `A_TESTER.md` | 4 / 4 |
 | HL8 | Terrain | ⬜ à faire | 0 / 7 |
 
 ## B.1 Décisions
@@ -1156,6 +1157,37 @@ hors ligne ; les packs viennent ensuite.
   build` (`feuille-tuteur-*.js` 1,7 Ko, `use-tuteur-*.js` 12,6 Ko à part),
   `budgets.spec.ts`.
 
+### Lot 11 (pas de lot HL propre, A.13) — parents, enseignants, établissements, devoirs
+
+- [x] **Niveau C** (A.2 : « liaison parent · groupes et devoirs ») :
+  `/parent/…`, `/enseignant/…`, `/etablissement/…`, `/eleve/groupes`,
+  `/compte/parents` et `/console/etablissements/…` hors de la liste
+  blanche (`config/hors_ligne.php` inchangé) ; hors ligne, la garde de
+  navigation ouvre « Cet écran demande une connexion » (A.3.7), depuis la
+  barre latérale comme depuis la carte « Mes devoirs » de l'accueil élève
+  (lien Inertia). Preuve : liste blanche inchangée, garde existante
+  (`hors-ligne.spec.ts`, inchangé).
+- [x] **Un devoir est une séance** (écart n° 35) : « Commencer » (en
+  ligne) crée **une fois** la séance du devoir (`seances.devoir_id`,
+  unique par élève et devoir) et ouvre `/eleve/seances/{uuid}`, déjà
+  gardé ; ses réponses partent par `tentative.enregistrer`, sa fin par
+  `seance.terminer` — les mêmes services qu'une séance du jour, le serveur
+  recorrige (A.6). Une fois commencé, le devoir se finit en mode avion ;
+  rendu après l'échéance : accepté, marqué « en retard ». La séance d'un
+  devoir n'est **jamais** la séance du jour (`SeanceService::enCours`,
+  séances préparées, « séance faite aujourd'hui » l'excluent). Preuve :
+  Pest `Organisation/GroupesEtDevoirsTest` (« un devoir de questions
+  publiées ; l'élève le fait comme une séance, par la file »). Vrai
+  téléphone : `A_TESTER.md` § 4, lot 11.
+- [x] **Rejoindre un groupe, lier un parent, payer pour un enfant :
+  en direct** (comme un paiement, lot 9) : ce sont des gestes de compte,
+  limités en débit (`throttle:code-groupe`, `throttle:code-liaison`), dont
+  la réponse (le groupe existe-t-il ? le code est-il valable ?) n'a de sens
+  qu'en ligne. Rien n'entre dans la file d'opérations.
+- [x] **Données minimales** : la copie hors ligne de la séance d'un devoir
+  porte son titre, le nom du groupe et l'échéance, jamais les autres
+  élèves ; un élève ne voit jamais la liste de son groupe (décision 5).
+
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
@@ -1475,6 +1507,14 @@ hors ligne ; les packs viennent ensuite.
     écrite, en ligne). Ce qui compte pour la progression (la réponse à la
     question) passe toujours par la file. Hors ligne : le dialogue de
     A.3.7, jamais un clic mort.
+
+35. **2026-11-13 — Pas d'opération `devoir.*` (lot 11).** PLAN § 6 prévoit
+    une table `rendus_devoirs`. Le rendu d'un devoir est **la séance du
+    devoir** (`seances.devoir_id`) : ses réponses et sa fin passent déjà
+    par `tentative.enregistrer` et `seance.terminer`, recorrigées par le
+    serveur. Une table de rendus et une opération `devoir.rendre`
+    auraient fait deux autorités pour le même geste (CLAUDE.md § 3). « Où
+    en est chaque élève » se lit sur sa séance (`DevoirService::etats`).
 
 ## B.6 Points de vigilance
 

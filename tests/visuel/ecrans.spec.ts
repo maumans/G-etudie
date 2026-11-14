@@ -29,7 +29,12 @@ const HORLOGE = new Date('2026-10-29T10:00:00Z');
  * titre attendu, statut HTTP attendu (200 par défaut).
  */
 const CONNECTES: Record<
-    Exclude<keyof typeof SESSIONS, 'pedagogie' | 'ousmane'>,
+    // Lot 11 : les espaces parent, enseignant et établissement ont leurs
+    // propres captures (ecrans-lot11.spec.ts).
+    Exclude<
+        keyof typeof SESSIONS,
+        'pedagogie' | 'ousmane' | 'parent' | 'enseignant' | 'etablissement'
+    >,
     {
         adresse: string;
         ecran: string;

@@ -5,7 +5,7 @@ namespace App\Enums;
 use App\Models\User;
 
 /**
- * Les trois espaces connectés (DESIGN.md § 7) et la seule réponse à « où
+ * Les espaces connectés (DESIGN.md § 7) et la seule réponse à « où
  * arrive ce compte ? ». Les cas sont rangés par priorité : un compte qui
  * ouvre plusieurs espaces arrive dans le premier (l'administrateur
  * plateforme dans la console).
@@ -14,6 +14,10 @@ enum Espace: string
 {
     case Console = 'console';
     case Contenu = 'contenu';
+    // Lot 11.
+    case Etablissement = 'etablissement';
+    case Enseignant = 'enseignant';
+    case Parent = 'parent';
     case Eleve = 'eleve';
 
     public function permission(): Permission
@@ -21,6 +25,9 @@ enum Espace: string
         return match ($this) {
             self::Console => Permission::EspaceConsole,
             self::Contenu => Permission::EspaceContenu,
+            self::Etablissement => Permission::EspaceEtablissement,
+            self::Enseignant => Permission::EspaceEnseignant,
+            self::Parent => Permission::EspaceParent,
             self::Eleve => Permission::EspaceEleve,
         };
     }

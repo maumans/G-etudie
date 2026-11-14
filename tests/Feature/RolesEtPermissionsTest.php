@@ -62,9 +62,10 @@ test('après connexion, chaque rôle arrive dans son espace', function (Role $ro
     [Role::Relecteur, '/contenu'],
     [Role::AdminContenu, '/contenu'],
     [Role::Superadmin, '/console'],
-    [Role::Parent, '/compte/profil'],
-    [Role::Enseignant, '/compte/profil'],
-    [Role::GestionnaireEtablissement, '/compte/profil'],
+    // Lot 11 : leurs espaces.
+    [Role::Parent, '/parent'],
+    [Role::Enseignant, '/enseignant'],
+    [Role::GestionnaireEtablissement, '/etablissement'],
 ]);
 
 test('un compte connecté qui ouvre la page de connexion retourne dans son espace', function () {

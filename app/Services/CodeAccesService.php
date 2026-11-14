@@ -94,15 +94,17 @@ class CodeAccesService
      *
      * @throws CodeRefuse avec la phrase à montrer
      */
-    public function utiliser(User $eleve, string $saisie): Abonnement
+    public function utiliser(User $eleve, string $saisie, ?User $auteur = null): Abonnement
     {
+        // Lot 11 : `$auteur`, le parent qui saisit le code de son enfant (journal).
+        $auteur ??= $eleve;
         $code = FormatCode::normaliser($saisie);
 
         if ($code === null) {
             throw new CodeRefuse('Ce code est mal tapé : vérifie chaque caractère (12 lettres et chiffres).');
         }
 
-        return DB::transaction(function () use ($eleve, $code) {
+        return DB::transaction(function () use ($eleve, $code, $auteur) {
             $ligne = CodeAcces::query()->with('lot')
                 ->where('empreinte', FormatCode::empreinte($code))
                 ->lockForUpdate()
@@ -123,7 +125,7 @@ class CodeAccesService
             }
 
             $ligne->update(['utilise_par' => $eleve->id, 'utilise_le' => CarbonImmutable::now()]);
-            JournalAcces::consigner('code.utilise', $ligne, ['lot' => $ligne->lot->uuid, 'fin' => $ligne->fin], $eleve);
+            JournalAcces::consigner('code.utilise', $ligne, ['lot' => $ligne->lot->uuid, 'fin' => $ligne->fin, 'eleve_id' => $eleve->id], $auteur);
 
             return $this->abonnements->activer($eleve, $ligne->lot->formule, SourceAbonnement::Code, codeId: $ligne->id, exemple: $ligne->lot->est_exemple);
         });

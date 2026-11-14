@@ -56,6 +56,30 @@ enum Permission: string
     /** Lot 10 : suivre l'usage et le coût du tuteur (console). */
     case VoirCoutsTuteur = 'tuteur.couts';
 
+    /** Lot 11 (PLAN M15) : entrer dans l'espace parent (suivre ses enfants, en lecture seule). */
+    case EspaceParent = 'espace.parent';
+
+    /** Lot 11 (PLAN M14) : entrer dans l'espace enseignant (ses groupes, ses devoirs). */
+    case EspaceEnseignant = 'espace.enseignant';
+
+    /** Lot 11 (PLAN M14) : entrer dans l'espace établissement (enseignants, licences, rapport). */
+    case EspaceEtablissement = 'espace.etablissement';
+
+    /** Lot 11 : créer des groupes, y donner des devoirs, en retirer un élève. */
+    case GererGroupes = 'groupes.gerer';
+
+    /** Lot 11 : rejoindre le groupe de son enseignant par son code, faire ses devoirs. */
+    case RejoindreGroupe = 'groupes.rejoindre';
+
+    /** Lot 11 : donner un code de liaison à son parent, retirer un parent. */
+    case InviterParent = 'parents.inviter';
+
+    /** Lot 11 : rattacher des enseignants à son établissement, attribuer ses licences. */
+    case GererEtablissement = 'etablissement.gerer';
+
+    /** Lot 11 : créer les établissements, nommer leurs gestionnaires, accorder des licences (console). */
+    case AdministrerEtablissements = 'etablissements.administrer';
+
     /** Activer la double authentification sur son compte (DA4 : personnel seulement). */
     case DoubleAuthentification = 'compte.double_authentification';
 }

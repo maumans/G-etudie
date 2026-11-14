@@ -16,6 +16,7 @@ use App\Support\BlocsContenu;
 use App\Support\CatalogueEleve;
 use App\Support\FormatQuestion;
 use Database\Seeders\DatabaseSeeder;
+use Database\Seeders\DemoOrganisationSeeder;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role as ModeleRole;
@@ -28,7 +29,8 @@ test('un compte de démonstration par rôle, créé une fois, numéro vérifié'
     $this->seed(DatabaseSeeder::class);
     $this->seed(DatabaseSeeder::class);
 
-    expect(User::count())->toBe(count(DemoSeeder::COMPTES));
+    // Lot 11 : plus les élèves d'exemple du groupe de démonstration.
+    expect(User::count())->toBe(count(DemoSeeder::COMPTES) + count(DemoOrganisationSeeder::ELEVES_EXEMPLE));
 
     foreach (DemoSeeder::COMPTES as $compte) {
         $user = User::where('telephone', $compte['telephone'])->sole();

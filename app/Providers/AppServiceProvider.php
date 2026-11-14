@@ -102,6 +102,17 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('basculer-profil', fn (Request $request) => Limit::perMinute(10)
             ->by('basculer|'.$request->ip()));
 
+        // Lot 11 : codes de liaison parent (six chiffres) et codes de groupe :
+        // deviner un code ne doit pas être possible.
+        RateLimiter::for('code-liaison', fn (Request $request) => [
+            Limit::perMinutes(15, 8)->by('liaison|'.($request->user()?->getAuthIdentifier() ?? 'invite')),
+            Limit::perHour(30)->by('liaison-ip|'.$request->ip()),
+        ]);
+        RateLimiter::for('code-groupe', fn (Request $request) => [
+            Limit::perMinutes(15, 10)->by('groupe|'.($request->user()?->getAuthIdentifier() ?? 'invite')),
+            Limit::perHour(40)->by('groupe-ip|'.$request->ip()),
+        ]);
+
         $this->regenererLesPacks();
 
         // Noms courts et stables dans les colonnes polymorphes

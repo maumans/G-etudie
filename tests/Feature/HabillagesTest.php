@@ -23,6 +23,10 @@ test('chaque espace s\'ouvre au rôle qui y travaille', function (Role $role, st
     [Role::Eleve, '/eleve', 'eleve/accueil'],
     [Role::Redacteur, '/contenu', 'contenu/accueil'],
     [Role::Superadmin, '/console', 'console/accueil'],
+    // Lot 11.
+    [Role::Parent, '/parent', 'parent/accueil'],
+    [Role::Enseignant, '/enseignant', 'enseignant/accueil'],
+    [Role::GestionnaireEtablissement, '/etablissement', 'etablissement/accueil'],
 ]);
 
 test('« Mon compte » prend l\'habillage de l\'espace du compte', function (Role $role, ?string $espace) {
@@ -36,7 +40,10 @@ test('« Mon compte » prend l\'habillage de l\'espace du compte', function (Rol
     [Role::Eleve, 'eleve'],
     [Role::Relecteur, 'contenu'],
     [Role::Superadmin, 'console'],
-    [Role::Parent, null],
+    // Lot 11 : chacun a désormais son espace.
+    [Role::Parent, 'parent'],
+    [Role::Enseignant, 'enseignant'],
+    [Role::GestionnaireEtablissement, 'etablissement'],
 ]);
 
 test('après connexion, on passe par l\'aiguillage', function () {

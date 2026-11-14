@@ -32,6 +32,17 @@ class JournalAcces
         'lot_codes.cree' => 'Lot de codes prépayés créé',
         'lot_codes.remis' => 'Codes d\'un lot remis (effacés de l\'écran)',
         'lot_codes.desactive' => 'Lot de codes prépayés désactivé',
+        // Lot 11.
+        'parent.lie' => 'Parent lié à un élève (code de liaison)',
+        'parent.delie' => 'Lien parent retiré',
+        'etablissement.cree' => 'Établissement créé',
+        'etablissement.rattache' => 'Compte rattaché à un établissement',
+        'etablissement.retire' => 'Compte retiré d\'un établissement',
+        'compte.ouvert_par_etablissement' => 'Compte du personnel ouvert (mot de passe provisoire)',
+        'licence.accordee' => 'Licence d\'établissement accordée',
+        'licence.attribuee' => 'Place de licence attribuée à un élève',
+        'licence.reprise' => 'Place de licence reprise',
+        'groupe.eleve_retire' => 'Élève retiré d\'un groupe',
     ];
 
     public static function libelle(string $action): string

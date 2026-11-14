@@ -5,6 +5,11 @@ namespace App\Support;
 use App\Enums\Permission;
 use App\Enums\Role;
 use App\Models\Contracts\ContenuRelisable;
+use App\Models\Etablissement;
+use App\Models\Groupe;
+use App\Models\LienParent;
+use App\Models\MembreGroupe;
+use App\Models\RattachementEtablissement;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -18,8 +23,13 @@ use Illuminate\Database\Eloquent\Builder;
  *    rattachement, jamais le seul périmètre de consultation.
  *
  * Lot 0 : un élève se voit lui-même ; l'administrateur plateforme consulte
- * tous les élèves sans être rattaché à aucun. Les liens parent ↔ enfant,
- * groupe et établissement s'ajoutent ici au lot 11.
+ * tous les élèves sans être rattaché à aucun.
+ *
+ * Lot 11 : un parent est rattaché à ses enfants (lien actif) ; un enseignant
+ * aux élèves présents dans ses groupes ouverts ; un gestionnaire aux élèves
+ * présents dans les groupes ouverts de son établissement. Les groupes se
+ * consultent par la même règle (`groupesConsultables`) ; seul l'enseignant
+ * du groupe y agit (devoirs, retirer un élève).
  *
  * Lot 1, contenu : tout le personnel du back-office consulte tout le
  * catalogue ; on n'agit que sur ce à quoi on est rattaché. Une leçon est
@@ -64,7 +74,122 @@ class Perimetre
      */
     private static function elevesRattaches(User $acteur): array
     {
-        return $acteur->hasRole(Role::Eleve) ? [$acteur->getKey()] : [];
+        $ids = $acteur->hasRole(Role::Eleve) ? [$acteur->getKey()] : [];
+
+        if ($acteur->hasRole(Role::Parent)) {
+            $ids = [...$ids, ...self::enfants($acteur)->pluck('users.id')->all()];
+        }
+
+        if ($acteur->hasRole(Role::Enseignant) || $acteur->hasRole(Role::GestionnaireEtablissement)) {
+            $groupes = self::groupesConsultables($acteur)->ouverts()->select('id');
+            $ids = [...$ids, ...MembreGroupe::query()->actifs()->whereIn('groupe_id', $groupes)->pluck('eleve_id')->all()];
+        }
+
+        return array_values(array_unique(array_map('intval', $ids)));
+    }
+
+    /**
+     * Les enfants d'un parent (liens actifs).
+     *
+     * @return Builder<User>
+     */
+    public static function enfants(User $parent): Builder
+    {
+        return User::query()->role(Role::Eleve)->whereIn('users.id', LienParent::query()
+            ->actifs()
+            ->where('parent_id', $parent->getKey())
+            ->select('eleve_id'));
+    }
+
+    public static function estParentDe(User $parent, User $eleve): bool
+    {
+        return $parent->hasRole(Role::Parent)
+            && LienParent::query()->actifs()->where('parent_id', $parent->getKey())->where('eleve_id', $eleve->getKey())->exists();
+    }
+
+    /**
+     * Établissements auxquels le compte est rattaché comme gestionnaire.
+     *
+     * @return Builder<Etablissement>
+     */
+    public static function etablissementsGeres(User $acteur): Builder
+    {
+        return Etablissement::query()->whereIn('id', self::rattachements($acteur, Role::GestionnaireEtablissement));
+    }
+
+    public static function peutGererEtablissement(User $acteur, Etablissement $etablissement): bool
+    {
+        return $acteur->can(Permission::GererEtablissement->value)
+            && self::etablissementsGeres($acteur)->whereKey($etablissement->getKey())->exists();
+    }
+
+    /**
+     * Établissements où le compte enseigne.
+     *
+     * @return Builder<Etablissement>
+     */
+    public static function etablissementsEnseignes(User $acteur): Builder
+    {
+        return Etablissement::query()->whereIn('id', self::rattachements($acteur, Role::Enseignant));
+    }
+
+    /** @return Builder<RattachementEtablissement> */
+    private static function rattachements(User $acteur, Role $role): Builder
+    {
+        return RattachementEtablissement::query()
+            ->actifs()
+            ->where('user_id', $acteur->getKey())
+            ->where('role', $role->value)
+            ->select('etablissement_id');
+    }
+
+    /**
+     * Groupes que ce compte peut consulter (archivés compris) : l'enseignant
+     * les siens ; le gestionnaire ceux de son établissement ; l'élève ceux où
+     * il est présent ; l'administrateur plateforme tous.
+     *
+     * @return Builder<Groupe>
+     */
+    public static function groupesConsultables(User $acteur): Builder
+    {
+        $groupes = Groupe::query();
+
+        if ($acteur->hasRole(Role::Superadmin)) {
+            return $groupes;
+        }
+
+        // Groupé : le OU ne doit pas sortir de la closure (CLAUDE.md § 4).
+        return $groupes->where(function (Builder $requete) use ($acteur) {
+            $requete->whereRaw('1 = 0');
+
+            if ($acteur->hasRole(Role::Enseignant)) {
+                $requete->orWhere('enseignant_id', $acteur->getKey());
+            }
+
+            if ($acteur->hasRole(Role::GestionnaireEtablissement)) {
+                $requete->orWhereIn('etablissement_id', self::rattachements($acteur, Role::GestionnaireEtablissement));
+            }
+
+            if ($acteur->hasRole(Role::Eleve)) {
+                $requete->orWhereIn('id', MembreGroupe::query()->actifs()->where('eleve_id', $acteur->getKey())->select('groupe_id'));
+            }
+        });
+    }
+
+    public static function peutConsulterGroupe(User $acteur, Groupe $groupe): bool
+    {
+        return self::groupesConsultables($acteur)->whereKey($groupe->getKey())->exists();
+    }
+
+    /** Donner un devoir, retirer un élève, archiver : l'enseignant du groupe seulement. */
+    public static function peutGererGroupe(User $acteur, Groupe $groupe): bool
+    {
+        return $acteur->can(Permission::GererGroupes->value) && $groupe->enseignant_id === $acteur->getKey();
+    }
+
+    public static function estMembre(User $eleve, Groupe $groupe): bool
+    {
+        return MembreGroupe::query()->actifs()->where('groupe_id', $groupe->getKey())->where('eleve_id', $eleve->getKey())->exists();
     }
 
     /**

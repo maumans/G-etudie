@@ -23,11 +23,12 @@ use Illuminate\Support\Carbon;
  * @property SourceAbonnement $source
  * @property int|null $paiement_id
  * @property int|null $code_acces_id
+ * @property int|null $licence_id lot 11 : place d'une licence d'établissement
  * @property bool $est_exemple
  * @property-read User $user
  * @property-read Paiement|null $paiement
  */
-#[Fillable(['user_id', 'formule', 'debut', 'fin', 'source', 'paiement_id', 'code_acces_id', 'est_exemple'])]
+#[Fillable(['user_id', 'formule', 'debut', 'fin', 'source', 'paiement_id', 'code_acces_id', 'licence_id', 'est_exemple'])]
 class Abonnement extends Model
 {
     protected function casts(): array

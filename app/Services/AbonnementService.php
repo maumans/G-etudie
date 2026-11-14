@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\FormuleAbonnement;
 use App\Enums\SourceAbonnement;
 use App\Models\Abonnement;
+use App\Models\LicenceEtablissement;
 use App\Models\User;
 use App\Support\Abonnements\SourceAbonnements;
 use App\Support\JournalAcces;
@@ -88,6 +89,48 @@ class AbonnementService implements SourceAbonnements
     }
 
     /**
+     * Lot 11 : une place de licence d'établissement — de maintenant à la fin
+     * de la licence (pas à la suite d'un abonnement payé : la licence est
+     * celle de l'école, son calendrier est le sien). La formule « Année »
+     * n'est qu'une étiquette : `source` dit d'où vient la période.
+     */
+    public function activerLicence(User $eleve, LicenceEtablissement $licence): Abonnement
+    {
+        return DB::transaction(function () use ($eleve, $licence) {
+            User::query()->whereKey($eleve->id)->lockForUpdate()->first();
+
+            $abonnement = Abonnement::create([
+                'user_id' => $eleve->id,
+                'formule' => FormuleAbonnement::Annee->value,
+                'debut' => CarbonImmutable::now(),
+                'fin' => $licence->fin,
+                'source' => SourceAbonnement::Licence->value,
+                'licence_id' => $licence->id,
+                'est_exemple' => $licence->est_exemple,
+            ]);
+
+            JournalAcces::consigner('abonnement.active', $abonnement, [
+                'source' => SourceAbonnement::Licence->value,
+                'fin' => $abonnement->fin->toDateString(),
+            ], $eleve);
+
+            return $abonnement;
+        });
+    }
+
+    /** La place est reprise : la période de cette licence s'arrête maintenant. Renvoie le nombre de périodes arrêtées. */
+    public function arreterLicence(User $eleve, LicenceEtablissement $licence): int
+    {
+        $maintenant = CarbonImmutable::now();
+
+        return Abonnement::query()
+            ->where('licence_id', $licence->id)
+            ->where('user_id', $eleve->id)
+            ->where('fin', '>', $maintenant)
+            ->update(['fin' => $maintenant]);
+    }
+
+    /**
      * L'état à montrer à l'élève (« Mon abonnement »).
      *
      * @return array{abonne: bool, formule: string|null, debut: string|null, fin: string|null, jours_restants: int|null, est_exemple: bool}
@@ -99,7 +142,7 @@ class AbonnementService implements SourceAbonnements
 
         return [
             'abonne' => $fin !== null,
-            'formule' => $courant?->formule->nom(),
+            'formule' => $courant?->source === SourceAbonnement::Licence ? SourceAbonnement::Licence->libelle() : $courant?->formule->nom(),
             'debut' => $courant?->debut->toIso8601ZuluString(),
             'fin' => $fin?->toIso8601ZuluString(),
             'jours_restants' => $fin === null ? null : (int) ceil(CarbonImmutable::now()->diffInHours($fin) / 24),

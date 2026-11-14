@@ -273,6 +273,26 @@
   au moment de l'interruption, le message affiché.
 - État : à faire (bloqué par D11)
 
+### [Lot 11] Un devoir commencé en ligne, fini en mode avion
+- Pourquoi : `HORS_LIGNE.md` B.3 « Lot 11 » et écart n° 35 : un devoir est
+  une séance ; ses réponses passent par la file et ne se perdent pas.
+- Matériel : un Android d'entrée de gamme avec l'application installée
+  (HTTPS, D11), un compte élève de test membre d'un groupe, un compte
+  enseignant de test ; un ordinateur pour l'enseignant.
+- Comment le provoquer : 1. l'enseignant donne un devoir de 5 questions ;
+  2. sur le téléphone, accueil › « Mes devoirs » › « Commencer » ;
+  répondre à 2 questions ; 3. mode avion ; répondre aux 3 autres ; fermer
+  l'application, la rouvrir (toujours en mode avion), finir si besoin ;
+  4. couper le mode avion, attendre « Tout est envoyé » ; 5. l'enseignant
+  ouvre le devoir.
+- Quoi observer : aucune réponse perdue ; « Devoir rendu » sur le
+  téléphone ; chez l'enseignant, « Rendu », 5/5 réponses, le score ; la
+  séance du jour de l'élève n'a pas changé. Hors ligne, « Mes groupes »
+  ouvre le dialogue « Cet écran demande une connexion ».
+- En cas d'échec, relever : capture, heure, pastille réseau, nombre de
+  réponses en attente, l'état du devoir chez l'enseignant.
+- État : à faire (après D11)
+
 ## 5. Téléphone partagé et profils
 
 ### [Lot 7] Deux profils sur le même téléphone, réponses hors ligne des deux (A.15 n° 4)
@@ -580,6 +600,37 @@
 - Observer : le téléchargement est refusé avec « Ton abonnement vaut pour 2
   appareils… » ; « Mon compte › Appareils » le dit aussi ; retirer un
   appareil → le téléchargement repart.
+- État : à faire
+
+### [Lot 11] Un parent lie son enfant, puis paie son abonnement
+- Pourquoi : PLAN M15, décisions 1 et 2 : c'est l'élève qui consent (code
+  de six chiffres) ; le paiement est celui du parent, l'abonnement celui de
+  l'enfant.
+- Matériel : deux vrais téléphones (l'élève, le parent), un compte parent
+  au numéro vérifié, le fournisseur de paiement branché (§ 7).
+- Comment le provoquer : 1. l'élève : « Moi » › « Parents » › « Créer un
+  code » ; 2. il dit le code au parent, qui le saisit dans son espace ;
+  3. le parent : la fiche de l'enfant › « Payer son abonnement » ›
+  Mensuel › Orange Money › son numéro › « Payer » ; 4. confirmer sur son
+  téléphone ; 5. l'élève rouvre l'application.
+- Quoi observer : le lien se fait du premier coup ; le parent voit le
+  temps de la semaine, la jauge, les examens blancs (jamais les réponses
+  ni le tuteur) ; l'écran du paiement passe à « reçu » sans recharger ;
+  l'élève est abonné ; le parent ne l'est pas. Un second essai du même
+  code est refusé.
+- En cas d'échec, relever : la référence du paiement (Console ›
+  Paiements), l'heure, ce que montre chaque téléphone.
+- État : à faire (bloqué par le fournisseur de paiement et D11)
+
+### [Lot 11] Session de 12 h d'un enseignant
+- Pourquoi : décision 4 du lot 11 : l'enseignant et le gestionnaire voient
+  les données de nombreux mineurs ; ils sont traités comme le personnel.
+- Matériel : un téléphone ou un ordinateur, un compte enseignant de test.
+- Comment le provoquer : se connecter le matin (« Se souvenir de moi »
+  coché), revenir 13 h plus tard.
+- Quoi observer : retour à la connexion avec « Session terminée : par
+  sécurité… » ; « Mon compte » propose la double authentification.
+- En cas d'échec, relever : l'heure de connexion, l'heure du retour.
 - État : à faire
 
 ## 7 bis. Import assisté par l'API Claude (clé réelle)

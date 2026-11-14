@@ -86,3 +86,22 @@ preparation(
         await page.context().storageState({ path: SESSIONS.console });
     },
 );
+
+// Lot 11 : les trois espaces adultes.
+for (const [nom, numero, espace, session] of [
+    ['du parent', '600000002', 'parent', SESSIONS.parent],
+    ["de l'enseignante", '600000003', 'enseignant', SESSIONS.enseignant],
+    [
+        "de la gestionnaire d'établissement",
+        '600000007',
+        'etablissement',
+        SESSIONS.etablissement,
+    ],
+] as const) {
+    preparation(`connexion ${nom} de démonstration`, async ({ page }) => {
+        await seConnecter(page, numero);
+
+        await expect(page).toHaveURL(new RegExp(`/${espace}$`), ATTENTE);
+        await page.context().storageState({ path: session });
+    });
+}

@@ -35,13 +35,15 @@ enum Role: string
      * Rôles du back-office contenu et de la console : double authentification
      * proposée (DA4) et session limitée à 12 h (HL-D10).
      *
-     * Parent, enseignant et gestionnaire n'ont pas encore d'espace (lot 11) :
-     * leur session suit celle des élèves jusque-là (DEVBOOK, points ouverts).
+     * Lot 11 (décision 4) : l'enseignant et le gestionnaire d'établissement
+     * en sont aussi — ils voient les données de nombreux mineurs. Le parent
+     * garde la session de 30 jours des élèves.
      */
     public function estPersonnel(): bool
     {
         return match ($this) {
-            self::Redacteur, self::Relecteur, self::AdminContenu, self::Superadmin => true,
+            self::Redacteur, self::Relecteur, self::AdminContenu, self::Superadmin,
+            self::Enseignant, self::GestionnaireEtablissement => true,
             default => false,
         };
     }
@@ -52,7 +54,17 @@ enum Role: string
     public function permissions(): array
     {
         $permissions = match ($this) {
-            self::Eleve => [Permission::EspaceEleve, Permission::SouscrireAbonnement, Permission::UtiliserTuteur],
+            self::Eleve => [
+                Permission::EspaceEleve,
+                Permission::SouscrireAbonnement,
+                Permission::UtiliserTuteur,
+                Permission::RejoindreGroupe,
+                Permission::InviterParent,
+            ],
+            // Lot 11 : le parent paie aussi l'abonnement de ses enfants.
+            self::Parent => [Permission::EspaceParent, Permission::SouscrireAbonnement],
+            self::Enseignant => [Permission::EspaceEnseignant, Permission::GererGroupes],
+            self::GestionnaireEtablissement => [Permission::EspaceEtablissement, Permission::GererEtablissement],
             self::Redacteur => [Permission::EspaceContenu, Permission::RedigerContenu, Permission::ImporterAnnales],
             // Le relecteur juge le contenu signalé ; il répond aux élèves.
             self::Relecteur => [Permission::EspaceContenu, Permission::RelireContenu, Permission::TraiterSignalements],
@@ -65,10 +77,8 @@ enum Role: string
                 Permission::ImporterAnnales,
                 Permission::TraiterSignalements,
                 Permission::LireJournalTuteur,
-                ...($this === self::Superadmin ? [Permission::EspaceConsole, Permission::GererCodes, Permission::VoirPaiements, Permission::VoirCoutsTuteur] : []),
+                ...($this === self::Superadmin ? [Permission::EspaceConsole, Permission::GererCodes, Permission::VoirPaiements, Permission::VoirCoutsTuteur, Permission::AdministrerEtablissements] : []),
             ],
-            // Leurs espaces arrivent au lot 11 : d'ici là, « Mon compte » seulement.
-            self::Parent, self::Enseignant, self::GestionnaireEtablissement => [],
         };
 
         if ($this->estPersonnel()) {

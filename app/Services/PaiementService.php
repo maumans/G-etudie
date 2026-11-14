@@ -42,11 +42,19 @@ class PaiementService
         private AbonnementService $abonnements,
     ) {}
 
-    /** @throws PaiementRefuse */
-    public function initier(User $eleve, FormuleAbonnement $formule, MoyenPaiement $moyen, string $numeroSaisi): Paiement
+    /**
+     * Lance un paiement. `$beneficiaire` (lot 11) : l'enfant dont un parent
+     * paie l'abonnement — le contrôleur a vérifié le lien (Perimetre) ; sans
+     * lui, le payeur s'abonne lui-même.
+     *
+     * @throws PaiementRefuse
+     */
+    public function initier(User $eleve, FormuleAbonnement $formule, MoyenPaiement $moyen, string $numeroSaisi, ?User $beneficiaire = null): Paiement
     {
         if (! $eleve->telephoneVerifie()) {
-            throw new PaiementRefuse('Vérifie d\'abord ton numéro : c\'est lui qui protège ton abonnement.');
+            throw new PaiementRefuse($beneficiaire === null
+                ? 'Vérifie d\'abord ton numéro : c\'est lui qui protège ton abonnement.'
+                : 'Vérifiez d\'abord votre numéro (Mon compte) : c\'est lui qui protège le paiement.');
         }
 
         $numero = Telephone::normaliser($numeroSaisi) ?? throw new PaiementRefuse('Ce numéro ne ressemble pas à un numéro guinéen (6xx xx xx xx).');
@@ -61,6 +69,7 @@ class PaiementService
         $paiement = Paiement::create([
             'uuid' => (string) Str::uuid7(),
             'user_id' => $eleve->id,
+            'beneficiaire_id' => $beneficiaire?->id,
             'formule' => $formule->value,
             'montant_gnf' => $formule->prixGnf(),
             'moyen' => $moyen->value,
@@ -197,7 +206,7 @@ class PaiementService
         ]);
 
         if ($statut === StatutPaiement::Reussi) {
-            $this->abonnements->activer($paiement->user, $paiement->formule, SourceAbonnement::Paiement, paiementId: $paiement->id);
+            $this->abonnements->activer($paiement->eleveAbonne(), $paiement->formule, SourceAbonnement::Paiement, paiementId: $paiement->id);
         }
 
         return $resultat ?? $statut->value;

@@ -1,5 +1,10 @@
 import {
     Activity,
+    Building2,
+    ClipboardList,
+    HeartHandshake,
+    Presentation,
+    UsersRound,
     ChartPie,
     BookOpen,
     ChartNoAxesCombined,
@@ -26,6 +31,14 @@ import { accueil as accueilConsole } from '@/routes/console';
 import { index as codesConsole } from '@/routes/console/codes';
 import { index as paiementsConsole } from '@/routes/console/paiements';
 import { index as tuteurConsole } from '@/routes/console/tuteur';
+import { index as etablissementsConsole } from '@/routes/console/etablissements';
+import { index as groupesEleve } from '@/routes/eleve/groupes';
+import { accueil as accueilEnseignant } from '@/routes/enseignant';
+import {
+    accueil as accueilEtablissement,
+    licences as licencesEtablissement,
+} from '@/routes/etablissement';
+import { accueil as accueilParent } from '@/routes/parent';
 import { index as journalTuteur } from '@/routes/contenu/tuteur';
 import { accueil as accueilContenu } from '@/routes/contenu';
 import { index as indexLecons, relecture } from '@/routes/contenu/lecons';
@@ -89,6 +102,15 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         actifSous: '/eleve/tuteur',
         lateralSeulement: true,
         permission: 'tuteur.utiliser',
+    },
+    {
+        // Lot 11 : sur mobile, depuis la carte « Mes devoirs » de l'accueil.
+        libelle: 'Mes groupes',
+        icone: UsersRound,
+        href: groupesEleve().url,
+        actifSous: '/eleve/groupes',
+        lateralSeulement: true,
+        permission: 'groupes.rejoindre',
     },
     {
         // Lot 7 (HL5) : sur mobile, depuis « Qui révise ? » (pastille du haut).
@@ -170,7 +192,49 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
     },
 ];
 
-/** Compte sans espace (parent, enseignant, gestionnaire avant le lot 11). */
+/** Lot 11 : espace parent. */
+export const NAVIGATION_PARENT: EntreeNavigation[] = [
+    {
+        libelle: 'Mes enfants',
+        icone: HeartHandshake,
+        href: accueilParent().url,
+        actifAussiSous: ['/parent/enfants', '/parent/paiements'],
+    },
+    {
+        libelle: 'Mon compte',
+        icone: CircleUser,
+        href: monCompte().url,
+        actifSous: '/compte',
+    },
+];
+
+/** Lot 11 : espace enseignant. */
+export const NAVIGATION_ENSEIGNANT: EntreeNavigation[] = [
+    {
+        libelle: 'Mes groupes',
+        icone: Presentation,
+        href: accueilEnseignant().url,
+        actifAussiSous: ['/enseignant/groupes', '/enseignant/devoirs'],
+    },
+];
+
+/** Lot 11 : espace établissement (gestionnaire). */
+export const NAVIGATION_ETABLISSEMENT: EntreeNavigation[] = [
+    {
+        libelle: 'Rapport de préparation',
+        icone: Building2,
+        href: accueilEtablissement().url,
+        actifAussiSous: ['/etablissement/groupes'],
+    },
+    {
+        libelle: 'Licences',
+        icone: ClipboardList,
+        href: licencesEtablissement().url,
+        actifSous: '/etablissement/licences',
+    },
+];
+
+/** Compte sans espace. */
 export const NAVIGATION_COMPTE: EntreeNavigation[] = [
     {
         libelle: 'Mon compte',
@@ -193,6 +257,13 @@ export const NAVIGATION_CONSOLE: EntreeNavigation[] = [
         href: codesConsole().url,
         actifSous: '/console/codes',
         permission: 'codes.gerer',
+    },
+    {
+        libelle: 'Établissements',
+        icone: Building2,
+        href: etablissementsConsole().url,
+        actifSous: '/console/etablissements',
+        permission: 'etablissements.administrer',
     },
     {
         libelle: 'Paiements',

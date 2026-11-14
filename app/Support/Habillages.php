@@ -23,6 +23,10 @@ class Habillages
             str_starts_with($page, 'eleve/') => 'eleve',
             str_starts_with($page, 'contenu/') => 'contenu',
             str_starts_with($page, 'console/') => 'console',
+            // Lot 11.
+            str_starts_with($page, 'parent/') => 'parent',
+            str_starts_with($page, 'enseignant/') => 'enseignant',
+            str_starts_with($page, 'etablissement/') => 'etablissement',
             str_starts_with($page, 'auth/') => 'connexion',
             str_starts_with($page, 'compte/') => 'compte',
             default => null,

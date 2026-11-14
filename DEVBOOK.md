@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-13, lot 10)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-14, lot 11)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -20,11 +20,25 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-13 (lot 10 fait, critère tenu avec le tuteur simulé ; vraie API en attente de la clé)
+### État au 2026-11-14 (lot 11 fait, critère tenu ; lot 10 : vraie API en attente du crédit)
 
-- **Dépôt git** : `main` porte les lots 0 à 10. Les lots 3 à 10 ont été
+- **Dépôt git** : `main` porte les lots 0 à 11. Les lots 3 à 11 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 11 fait** (point 27) : **trois espaces de plus**. **Parent** : il
+  suit ses enfants en lecture seule (temps de révision de la semaine,
+  jauge, matières, examens blancs) et **paie leur abonnement** ; le lien
+  naît d'un **code de six chiffres que l'élève donne** (« Mon compte ›
+  Parents », 24 h, une fois). **Enseignant** : ses groupes (code de
+  groupe à annoncer en classe), **les notions faibles de sa classe**
+  (critère), qui travaille, les **devoirs** (questions publiées, échéance)
+  et qui a rendu. **Établissement** : rapport de préparation par groupe,
+  enseignants rattachés, **licences** (places attribuées aux élèves).
+  **Console › Établissements** : créer, nommer le gestionnaire (mot de
+  passe provisoire montré une fois), accorder une licence. Un devoir **est
+  une séance** (réponses par la file). Enseignant et gestionnaire passent
+  en **session de 12 h** (personnel). ⚠ **Au déploiement** : `migrate`,
+  `db:seed` (`MISE_EN_PRODUCTION.md` § 8, lot 11).
 - **Lot 10 fait** (point 26) : **tuteur N'karamögö** — « Explique-moi »
   sous une question ratée, « Je ne comprends pas cette étape » sur chaque
   étape d'un corrigé, « Mon tuteur » (question libre dans une de ses
@@ -261,8 +275,11 @@
   `main`. Liste de mise en production : section 12.
 - **Fabrique** : un élève de `User::factory()` a fini son parcours (BEPC,
   15 min) ; `->sansProfil()` pour un élève qui vient de s'inscrire.
-- **Comptes sans espace** : parent, enseignant et gestionnaire n'ouvrent que
-  « Mon compte » jusqu'au lot 11.
+- **Espaces** (lot 11) : élève, parent (02 Mamadou, suit Aïssatou),
+  enseignante (03 Fatoumata, groupe 10e A, code `KAFE47`), gestionnaire
+  (07 Mariama, Collège exemple de Ratoma), back-office, console. Cinq
+  élèves d'exemple (`DemoOrganisationSeeder::ELEVES_EXEMPLE`, +224 600 00
+  01 01 à 05, **sans mot de passe utilisable**) peuplent la 10e A.
 - **Lancer l'application** : `.claude/launch.json` déclare `laravel`
   (`php artisan serve`, port 8000) et `vite` (`npm run dev`, port 5173).
   Base : `php artisan migrate:fresh` puis `php artisan db:seed` — rôles et
@@ -334,8 +351,17 @@
    étape » ; « Mon tuteur » (barre latérale, ou la carte de l'accueil) : une
    question libre, puis une question sur le football (recentrage). 06 :
    Back-office › Tuteur. 08 : Console › Tuteur. Avec une clé de l'API :
-   `A_TESTER.md` § 7 bis. **Lot 11** ensuite (parents, enseignants,
-   établissements, devoirs).
+   `A_TESTER.md` § 7 bis.
+10 bis. **Maurice : essayer le lot 11** — 03 Fatoumata : « Mes groupes »
+   › 10e A (notions à retravailler, élèves, code), « Donner un devoir »
+   (choisir 3 questions, échéance), puis le devoir « Le théorème de
+   Pythagore » (3 rendus sur 6). 01 Aïssatou : accueil › « Mes devoirs »
+   › « Commencer », répondre, « Devoir rendu » ; « Moi › Parents » ›
+   « Créer un code ». 02 Mamadou : la fiche d'Aïssatou, « Payer son
+   abonnement » (simulation) ; « Suivre un autre enfant » avec le code.
+   07 Mariama : le rapport, « Licences » › « Attribuer ». 08 Sékou :
+   Console › Établissements. **Lot 12** ensuite (culture générale,
+   ressources externes, communauté encadrée).
 11. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -462,7 +488,7 @@ Détail dans `PLAN_NKARAMOGO.md` § 6.
 | Comptes | `users` (téléphone, prénom, pseudo, nom et e-mail facultatifs, `telephone_verifie_le`, `desactive_le`), `codes_sms` | ✅ lot 0, étape 4 |
 | Élève | `profils_eleves`, `progressions_lecons`, `seances`, `tentatives` ✅ lot 2 ; `liens_parents`, `maitrises`, `examens_blancs`, `series_jours`, badges, défis | 🟡 lots 5, 6, 11 |
 | Contenu (élève) | `questions` (QCM à une réponse au lot 2, conçue pour tous les types), `examens.date_prochaine_session`, `etablissements` (vide) | ✅ lot 2 |
-| Organisation | `etablissements`, `groupes`, `devoirs`, `abonnements`, `paiements`, `codes_acces`, `conversations_tuteur` | ⬜ prévu (lots 9 à 11) |
+| Organisation | `abonnements`, `paiements`, `codes_acces` ✅ lot 9 ; `conversations_tuteur` ✅ lot 10 ; `etablissements`, `liens_parents`, `codes_liaison`, `rattachements_etablissement`, `groupes`, `membres_groupes`, `devoirs`, `devoirs_questions`, `licences_etablissement` ✅ lot 11 | ✅ lots 9 à 11 |
 | Audit | `journal_acces_plateforme` (écrit par `App\Support\JournalAcces`) | ✅ lot 0, étape 4 |
 | Hors ligne | `appareils`, `appareil_profils`, `operations_synchronisees` | ✅ lot 0, étape 6 |
 
@@ -2261,6 +2287,130 @@ cette question à sa façon. Elle distingue deux notions :
      résultat d'un examen blanc (les questions n'y portent pas encore leur
      identifiant).
 
+27. [x] **Lot 11 — parents, enseignants, établissements, devoirs**
+   (2026-11-13 / 14, sur `main`, un commit)
+   - **Constat** : parent, enseignant et gestionnaire n'ouvraient que
+     « Mon compte » ; `Perimetre` ne connaissait que l'élève et
+     l'administrateur ; « parents payeurs » et licences étaient reportés
+     (lot 9, point 25).
+   - **Décisions de Maurice** (2026-11-13, plan accepté tel quel) :
+     1. liaison parent par un **code que l'élève génère** (6 chiffres,
+        24 h, une fois, empreinte HMAC seulement ; deux parents au plus) ;
+     2. **le parent paie** l'abonnement de son enfant (même
+        `PaiementService`, `paiements.beneficiaire_id`) et peut saisir un
+        code prépayé pour lui ;
+     3. établissement : **rapport, enseignants, licences accordées par la
+        console** ; **pas de comptes élèves créés en lot** (numéros de
+        mineurs saisis par l'école, D9) ;
+     4. enseignant et gestionnaire = **personnel** (12 h, double
+        authentification proposée) ; le parent garde 30 jours ;
+     5. l'enseignant voit **prénom et pseudo** ; les élèves d'un groupe ne
+        se voient pas entre eux ;
+     6. un devoir = des **questions publiées** ; rendu en retard accepté,
+        marqué ;
+     7. résumé hebdomadaire au parent par SMS/WhatsApp **reporté** (pas de
+        fournisseur, D3).
+   - **Une autorité** : `App\Support\Perimetre` répond désormais pour
+     tous : enfants d'un parent (`enfants`, `estParentDe`), groupes
+     consultables (enseignant : les siens ; gestionnaire : ceux de son
+     établissement ; élève : ceux où il est ; administrateur : tous),
+     `peutGererGroupe` (l'enseignant du groupe seulement),
+     `etablissementsGeres`, `elevesConsultables` (élèves présents dans les
+     groupes ouverts). La maîtrise d'une classe vient de `MaitriseService`
+     (`jaugesDuGroupe`, `notionsFaibles`, même pondération que `jauge()`,
+     factorisée dans `ponderer()`) ; les abonnements de licence de
+     `AbonnementService` (`activerLicence`, `arreterLicence`).
+   - **Services** (`app/Services/Organisation`) : `LiaisonParentService`,
+     `GroupeService` (code de 6 caractères sans signes ambigus, examen,
+     série et filière de l'élève exigés, 5 groupes par élève, un élève
+     retiré ne revient pas seul), `DevoirService` (création, « Commencer »
+     → séance unique, état de chaque élève), `EtablissementService`
+     (établissement, rattachement — ouvre le compte du personnel avec un
+     mot de passe provisoire montré une fois, refuse un numéro d'élève ou
+     de parent —, licences, places sous verrou), `SuiviService` (ce que
+     lisent les trois espaces). Refus métier : `GesteRefuse` → erreur de
+     formulaire. Policies `GroupePolicy`, `DevoirPolicy` (**404**) ; fiche
+     d'un enfant : `Perimetre::estParentDe` (404).
+   - **Écart au PLAN § 6** (`HORS_LIGNE.md` écart n° 35) : pas de table
+     `rendus_devoirs` ; **le rendu est la séance du devoir**
+     (`seances.devoir_id`, unique par élève) — réponses par
+     `tentative.enregistrer`, fin par `seance.terminer`. La séance d'un
+     devoir n'est jamais la séance du jour (`enCours`, séances préparées,
+     « faite aujourd'hui » l'excluent).
+   - **Permissions** (`App\Enums\Permission`) : `espace.parent`,
+     `espace.enseignant`, `espace.etablissement`, `groupes.gerer`,
+     `groupes.rejoindre`, `parents.inviter`, `etablissement.gerer`,
+     `etablissements.administrer` ; le parent reçoit aussi
+     `abonnement.souscrire`. `Espace` : établissement, enseignant, parent
+     (aiguillage après connexion). Toutes les routes nouvelles portent
+     leur `can:` (`routes/organisation.php`, `AccesParRoleTest` vert sans
+     dérogation nouvelle). Limites de débit : `code-liaison`,
+     `code-groupe`. Journal des accès : liens parent, rattachements,
+     comptes ouverts, licences, élève retiré d'un groupe.
+   - **Écrans** (DESIGN.md § 13, lot 11) : parent (accueil, enfant,
+     abonnement, paiement), enseignant (accueil, groupe, nouveau devoir,
+     devoir), établissement (rapport, groupe, licences), élève (« Mes
+     groupes », carte « Mes devoirs » de l'accueil, titre et bilan de la
+     séance d'un devoir, « Mon compte › Parents »), console
+     (établissements, fiche). Tous en ligne seulement (niveau C).
+   - **Démonstration** (`DemoOrganisationSeeder`) : Collège exemple de
+     Ratoma, licence de 40 places, la 10e A (Aïssatou + cinq élèves
+     d'exemple qui ont répondu par `TentativeService`), deux devoirs (un
+     échu rendu par trois élèves, un à rendre), Mamadou lié à Aïssatou ;
+     tout `est_exemple`.
+   - **Critère tenu** : Pest `Organisation/GroupesEtDevoirsTest`
+     (« critère du lot 11 ») — la 10e A ne montre que la notion travaillée
+     par **ses** élèves (moyenne 30 %, 2 fragiles), jamais celle d'un élève
+     de la 10e B (5 %) ; le groupe d'un collègue répond **404** (fiche et
+     retrait d'un élève) ; capture `enseignant-groupe` (six notions de la
+     démonstration, la plus faible d'abord).
+   - **Tests ajoutés** : Pest `Organisation/GroupesEtDevoirsTest` (8),
+     `Organisation/ParentsTest` (7), `Organisation/EtablissementsTest` (6),
+     `PerimetreTest` (+2) ; Vitest `suivi.test.tsx` (6) et la table des
+     habillages (+3) ; Playwright `ecrans-lot11.spec.ts` (14 écrans × 3
+     gabarits × 2 thèmes, axe et débordement). Tests du lot 10 et
+     d'avant mis à jour : espaces des rôles (`AccesParRoleTest`,
+     `RolesEtPermissionsTest`, `HabillagesTest`), permissions de l'élève
+     (`ConnexionTest`), comptes semés (`SeederDemonstrationTest`).
+   - **Vu avec Playwright** (`ecrans-lot11.spec.ts`, 14 écrans × 3 gabarits
+     × 2 thèmes, axe et débordement, 84 captures) : corrigé à la relecture
+     (détail DESIGN.md § 13, lot 11) — tuiles de chiffres trop hautes,
+     accord « sur 1 qui l'a travaillée », sous-titres de devoirs tronqués,
+     semaine de révision illisible à petites minutes, débordement à 360 px
+     (licences), dates de licence serrées (console), « À rendre il y a
+     2 jours » (→ « Échu il y a 2 jours »).
+   - **Passage Playwright complet** (2026-11-14, build, port 8010, en
+     série) : lancé plusieurs fois à cause de deux coupures de MySQL sans
+     rapport avec le lot (le poste a tourné plus de six heures d'affilée).
+     Un vrai écart trouvé au passage : un **nouvel élève inscrit tombe
+     maintenant sur l'étape « Ton établissement »** du parcours d'accueil,
+     puisque `DemoOrganisationSeeder` crée le premier établissement de la
+     base (`eleve/bienvenue.tsx` : cette étape n'existait pas tant que la
+     liste était vide, PLAN § 6). Corrigé dans les quatre parcours qui
+     inscrivent un élève neuf (`budgets.spec.ts`,
+     `parcours-lot2/lot3/lot7.spec.ts`) par une étape commune,
+     `passerEtapeEtablissement()` (`gabarits.ts`) : elle franchit l'étape
+     sans rien choisir si elle apparaît, ne fait rien sinon — le même
+     comportement attendra les écoles réelles après D11.
+   - **Bug préexistant trouvé et corrigé en chemin** (CLAUDE.md § 8) :
+     deux captures de `parcours-lot2.spec.ts` et `parcours-lot3.spec.ts`
+     (`seance-verdict`, `seance-ouverte-evaluee`) n'avaient jamais été
+     rafraîchies depuis que le lot 10 a ajouté « Explique-moi » et « Je ne
+     comprends pas cette étape » sous un corrigé : les références
+     montraient encore l'écran d'avant le lot 10. Sans rapport avec le
+     lot 11 ; mises à jour avec les autres.
+   - **Totaux** : **649 Pest** (vert), **408 Vitest** (vert), **667
+     Playwright** (vert : connexion 8, écrans 651, les sept parcours de
+     bout en bout 8 — `parcours-lot4.spec.ts` exige la file
+     (`ANNALES_EXTRACTEUR=simule php artisan queue:work`), sans quoi
+     l'import tente la vraie API et échoue faute de crédit (point 26)).
+     `tsc`, `vp check`, Pint, Larastan niveau 7 et `npm run build`
+     passent.
+   - **Reste** : résumé hebdomadaire au parent (SMS/WhatsApp, D3) ;
+     création de comptes élèves en lot (refusée pour l'instant, D9) ;
+     communauté du groupe (lot 12) ; vrai paiement par un parent et devoir
+     en mode avion sur vrai téléphone (`A_TESTER.md`, lot 11).
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -2317,10 +2467,13 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
   passe** : l'écran dit « demande de l'aide à ton enseignant ou à
   N'karamögö » ; le canal d'assistance (et l'écran administrateur qui
   réinitialise un mot de passe) reste à définir.
-- **Espaces parent, enseignant, gestionnaire** (lot 11) : d'ici là, ces
-  comptes n'ouvrent que « Mon compte ». Décider alors si enseignants et
-  gestionnaires (qui verront des données d'élèves) prennent la session de
-  12 h et la double authentification du personnel.
+- [x] **Espaces parent, enseignant, gestionnaire** : faits au lot 11
+  (point 27) ; enseignants et gestionnaires prennent la session de 12 h et
+  la double authentification du personnel.
+- **Résumé hebdomadaire au parent** (PLAN M15) : par SMS ou WhatsApp,
+  quand un fournisseur sera choisi (D3).
+- **Comptes élèves créés par l'école** : refusés au lot 11 (numéros de
+  mineurs saisis par un tiers) ; à revoir avec D9.
 - **Changement de mot de passe** : les autres sessions ouvertes ne sont pas
   fermées (pas de `AuthenticateSession`) ; à décider avec l'étape 6 (appareils
   enregistrés, révocation).

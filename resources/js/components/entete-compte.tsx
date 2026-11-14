@@ -3,6 +3,7 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn } from '@/lib/utils';
 import { edit as affichage } from '@/routes/compte/affichage';
 import { index as appareils } from '@/routes/compte/appareils';
+import { index as parents } from '@/routes/compte/parents';
 import { edit as motDePasse } from '@/routes/compte/mot-de-passe';
 import { edit as numero } from '@/routes/compte/numero';
 import { edit as profil } from '@/routes/compte/profil';
@@ -20,6 +21,9 @@ const ONGLETS = [
 /** Double authentification : onglet du personnel seulement (DA4). */
 const ONGLET_SECURITE = { libelle: 'Sécurité', href: securite().url };
 
+/** Lot 11 : l'élève donne un code à son parent (décision 1). */
+const ONGLET_PARENTS = { libelle: 'Parents', href: parents().url };
+
 /**
  * En-tête des pages « Mon compte » : titre et onglets. En grille sur mobile —
  * une liste qui défile cacherait un onglet. Tutoiement pour l'élève,
@@ -28,9 +32,13 @@ const ONGLET_SECURITE = { libelle: 'Sécurité', href: securite().url };
 export function EnteteCompte({ titre }: { titre: string }) {
     const { isCurrentUrl } = useCurrentUrl();
     const { auth } = usePage().props;
-    const onglets = auth.user?.double_authentification
-        ? [...ONGLETS, ONGLET_SECURITE]
-        : ONGLETS;
+    const onglets = [
+        ...ONGLETS,
+        ...(auth.user?.permissions.includes('parents.inviter')
+            ? [ONGLET_PARENTS]
+            : []),
+        ...(auth.user?.double_authentification ? [ONGLET_SECURITE] : []),
+    ];
     const formule = useFormule();
     const cinqOnglets = onglets.length === 5;
     const sixOnglets = onglets.length === 6;

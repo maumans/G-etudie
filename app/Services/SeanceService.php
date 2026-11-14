@@ -67,6 +67,8 @@ class SeanceService
     {
         return Seance::query()
             ->where('user_id', $eleve->id)
+            // Lot 11 : la séance d'un devoir n'est jamais la séance du jour.
+            ->whereNull('devoir_id')
             ->whereDate('jour', CarbonImmutable::today())
             ->whereNull('termine_le')
             ->latest('id')
@@ -170,6 +172,7 @@ class SeanceService
         return Seance::query()
             ->where('user_id', $eleve->id)
             ->where('matiere_id', $matiere?->id)
+            ->whereNull('devoir_id')
             ->whereNull('jour')
             ->whereNull('termine_le')
             ->whereNull('remplacee_le')
@@ -201,17 +204,26 @@ class SeanceService
      * route en ligne et celles que l'appareil range pour la faire hors
      * ligne (A.4 : l'écran ne sait pas d'où elles viennent).
      *
-     * @return array{seance: array{uuid: string, duree_minutes: int, terminee: bool}, questions: list<array<string, mixed>>, reponses: list<array<string, mixed>>}
+     * Lot 11 : la séance d'un devoir porte son titre, son groupe et son
+     * échéance (`devoir`, sinon `null`).
+     *
+     * @return array{seance: array{uuid: string, duree_minutes: int, terminee: bool, devoir: array{titre: string, groupe: string, echeance_le: string}|null}, questions: list<array<string, mixed>>, reponses: list<array<string, mixed>>}
      */
     public function props(Seance $seance): array
     {
         $uuids = Question::query()->whereKey($seance->questions)->pluck('uuid', 'id');
+        $devoir = $seance->devoir_id === null ? null : $seance->devoir()->with('groupe')->first();
 
         return [
             'seance' => [
                 'uuid' => $seance->uuid,
                 'duree_minutes' => $seance->duree_minutes,
                 'terminee' => $seance->termine_le !== null,
+                'devoir' => $devoir === null ? null : [
+                    'titre' => $devoir->titre,
+                    'groupe' => $devoir->groupe->nom,
+                    'echeance_le' => $devoir->echeance_le->toIso8601ZuluString(),
+                ],
             ],
             'questions' => $this->questionsDe($seance),
             // Réponses déjà reçues par le serveur : la séance reprend là où

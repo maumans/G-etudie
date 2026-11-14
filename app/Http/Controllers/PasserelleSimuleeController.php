@@ -36,7 +36,10 @@ class PasserelleSimuleeController extends Controller
             'webhook' => route('paiements.notifications', PasserelleSimulee::NOM),
             'accepter' => $passerelle->notification($paiement, true, evenement: 'EVT-'.$reference.'-OK'),
             'refuser' => $passerelle->notification($paiement, false, evenement: 'EVT-'.$reference.'-KO'),
-            'retour' => route('eleve.paiements.show', $paiement),
+            // Lot 11 : un parent revient à son propre écran du paiement.
+            'retour' => $paiement->beneficiaire_id === null
+                ? route('eleve.paiements.show', $paiement)
+                : route('parent.paiements.show', $paiement),
         ]);
     }
 }

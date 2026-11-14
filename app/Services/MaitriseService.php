@@ -151,21 +151,127 @@ class MaitriseService
     public function jauge(ProfilEleve $profil): array
     {
         $matieres = $this->parMatiere($profil);
-        $tousCoefficients = $matieres->every(fn (array $matiere) => $matiere['coefficient'] !== null);
+
+        return [
+            'pourcentage' => self::ponderer($matieres->all()),
+            'matieres' => array_values($matieres->map(fn (array $matiere) => ['cle' => $matiere['cle'], 'maitrise' => $matiere['maitrise']])->all()),
+            'calcule_le' => CarbonImmutable::now()->toIso8601ZuluString('millisecond'),
+        ];
+    }
+
+    /**
+     * La jauge d'une matière à l'autre : pondérée par les coefficients s'ils
+     * sont tous saisis, sinon simple.
+     *
+     * @param  array<int, array{coefficient: float|null, maitrise: int}>  $matieres
+     */
+    private static function ponderer(array $matieres): int
+    {
+        $tousCoefficients = array_all($matieres, fn (array $matiere) => $matiere['coefficient'] !== null);
         $somme = 0.0;
         $poids = 0.0;
 
         foreach ($matieres as $matiere) {
-            $coefficient = $tousCoefficients ? $matiere['coefficient'] : 1.0;
+            $coefficient = $tousCoefficients ? (float) $matiere['coefficient'] : 1.0;
             $somme += $matiere['maitrise'] * $coefficient;
             $poids += $coefficient;
         }
 
-        return [
-            'pourcentage' => $poids > 0 ? (int) round($somme / $poids) : 0,
-            'matieres' => array_values($matieres->map(fn (array $matiere) => ['cle' => $matiere['cle'], 'maitrise' => $matiere['maitrise']])->all()),
-            'calcule_le' => CarbonImmutable::now()->toIso8601ZuluString('millisecond'),
-        ];
+        return $poids > 0 ? (int) round($somme / $poids) : 0;
+    }
+
+    /**
+     * Lot 11 : la jauge de chaque élève d'un groupe, par la même règle que
+     * `jauge()`, en quelques requêtes (le profil type du groupe donne les
+     * matières et les notions ; les élèves d'un groupe ont son examen, sa
+     * série et sa filière).
+     *
+     * @param  list<int>  $eleves
+     * @return array<int, int> élève => pourcentage
+     */
+    public function jaugesDuGroupe(ProfilEleve $type, array $eleves): array
+    {
+        if ($eleves === []) {
+            return [];
+        }
+
+        $epreuves = CatalogueEleve::epreuves($type);
+        $notions = $this->notionsEvaluables($type);
+        $scores = Maitrise::query()
+            ->whereIn('user_id', $eleves)
+            ->whereIn('notion_id', $notions->pluck('id')->all())
+            ->get(['user_id', 'notion_id', 'score'])
+            ->groupBy('user_id');
+        $jauges = [];
+
+        foreach ($eleves as $eleve) {
+            $siens = ($scores->get($eleve) ?? collect())->keyBy('notion_id');
+            $matieres = $epreuves->map(function (Epreuve $epreuve) use ($notions, $siens) {
+                $notes = $notions
+                    ->filter(fn (Notion $notion) => $notion->chapitre->matiere_id === $epreuve->matiere_id)
+                    ->map(fn (Notion $notion) => $siens->get($notion->id)->score ?? 0);
+
+                return [
+                    'coefficient' => $epreuve->coefficient === null ? null : (float) $epreuve->coefficient,
+                    'maitrise' => $notes->isEmpty() ? 0 : (int) round($notes->avg()),
+                ];
+            });
+            $jauges[$eleve] = self::ponderer($matieres->all());
+        }
+
+        return $jauges;
+    }
+
+    /**
+     * Lot 11 (critère : « un enseignant voit les notions faibles de sa
+     * classe ») : pour chaque notion du groupe travaillée par au moins un de
+     * ses élèves, la maîtrise moyenne de ceux qui l'ont travaillée, combien
+     * sont fragiles (sous SEUIL_FRAGILE) et combien ne l'ont jamais
+     * travaillée. Les plus faibles d'abord ; une notion maîtrisée en moyenne
+     * n'y figure pas. Seuls les élèves passés en argument comptent : la
+     * question « lesquels ? » est celle de Perimetre.
+     *
+     * @param  list<int>  $eleves
+     * @return list<array{notion_id: int, notion: string, chapitre: string, matiere: string, cle: string, moyenne: int, travaillee_par: int, fragiles: int, jamais: int}>
+     */
+    public function notionsFaibles(ProfilEleve $type, array $eleves, int $limite = 8): array
+    {
+        if ($eleves === []) {
+            return [];
+        }
+
+        $notions = Notion::query()
+            ->whereIn('id', CatalogueEleve::questions($type)->select('notion_id'))
+            ->with('chapitre.matiere')
+            ->get()
+            ->keyBy('id');
+        $lignes = Maitrise::query()
+            ->whereIn('user_id', $eleves)
+            ->whereIn('notion_id', $notions->keys())
+            ->get(['user_id', 'notion_id', 'score'])
+            ->groupBy('notion_id');
+        $total = count($eleves);
+
+        return array_values($lignes
+            ->map(function (Collection $maitrises, int $notionId) use ($notions, $total) {
+                $notion = $notions->get($notionId);
+
+                return [
+                    'notion_id' => $notionId,
+                    'notion' => $notion->titre,
+                    'chapitre' => $notion->chapitre->titre,
+                    'matiere' => $notion->chapitre->matiere->nom,
+                    'cle' => $notion->chapitre->matiere->teinte->value,
+                    'moyenne' => (int) round($maitrises->avg('score')),
+                    'travaillee_par' => $maitrises->count(),
+                    'fragiles' => $maitrises->filter(fn (Maitrise $maitrise) => $maitrise->score < self::SEUIL_FRAGILE)->count(),
+                    'jamais' => $total - $maitrises->count(),
+                ];
+            })
+            ->filter(fn (array $ligne) => $ligne['moyenne'] < self::SEUIL_MAITRISEE)
+            ->sortBy([['moyenne', 'asc'], ['fragiles', 'desc'], ['notion_id', 'asc']])
+            ->take($limite)
+            ->all());
     }
 
     /**

@@ -20,7 +20,8 @@ use Illuminate\Support\Carbon;
  *
  * @property int $id
  * @property string $uuid
- * @property int $user_id
+ * @property int $user_id le payeur
+ * @property int|null $beneficiaire_id lot 11 : l'enfant dont un parent paie l'abonnement (sinon le payeur lui-même)
  * @property FormuleAbonnement $formule
  * @property int $montant_gnf
  * @property MoyenPaiement $moyen
@@ -37,7 +38,7 @@ use Illuminate\Support\Carbon;
  * @property-read User $user
  * @property-read Abonnement|null $abonnement
  */
-#[Fillable(['uuid', 'user_id', 'formule', 'montant_gnf', 'moyen', 'passerelle', 'numero_payeur', 'numero_fin', 'reference_operateur', 'statut', 'motif_echec', 'url_paiement', 'initie_le', 'conclu_le', 'expire_le'])]
+#[Fillable(['uuid', 'user_id', 'beneficiaire_id', 'formule', 'montant_gnf', 'moyen', 'passerelle', 'numero_payeur', 'numero_fin', 'reference_operateur', 'statut', 'motif_echec', 'url_paiement', 'initie_le', 'conclu_le', 'expire_le'])]
 #[Hidden(['numero_payeur'])]
 class Paiement extends Model
 {
@@ -64,6 +65,18 @@ class Paiement extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** @return BelongsTo<User, $this> */
+    public function beneficiaire(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'beneficiaire_id');
+    }
+
+    /** L'élève que ce paiement abonne : l'enfant d'un parent payeur, sinon le payeur. */
+    public function eleveAbonne(): User
+    {
+        return $this->beneficiaire ?? $this->user;
     }
 
     /** @return HasOne<Abonnement, $this> */

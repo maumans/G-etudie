@@ -56,3 +56,6 @@ require __DIR__.'/hors-ligne.php';
 require __DIR__.'/paiements.php';
 
 require __DIR__.'/tuteur.php';
+
+// Lot 11 : parents, enseignants, établissements (et la console des établissements).
+require __DIR__.'/organisation.php';

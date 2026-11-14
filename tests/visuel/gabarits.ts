@@ -83,6 +83,10 @@ export const SESSIONS = {
     /** Responsable pédagogique : référentiel et relecture (lot 1). */
     pedagogie: 'tests/visuel/.auth/pedagogie.json',
     console: 'tests/visuel/.auth/console.json',
+    /** Lot 11 : parent (02), enseignante (03), gestionnaire d'établissement (07). */
+    parent: 'tests/visuel/.auth/parent.json',
+    enseignant: 'tests/visuel/.auth/enseignant.json',
+    etablissement: 'tests/visuel/.auth/etablissement.json',
 } as const;
 
 /**
@@ -123,6 +127,22 @@ export async function capturer(
             mask: [page.locator('[data-capture="variable"]')],
         },
     );
+}
+
+/**
+ * Lot 11 : depuis qu'un établissement existe (démonstration, puis les
+ * vrais partenaires), le parcours d'accueil ajoute une étape facultative
+ * entre l'examen (et la série, pour le Bac) et l'objectif du soir
+ * (`eleve/bienvenue.tsx`, `etablissements.length > 0`). Ce pas la
+ * franchit sans rien choisir ; sur une base sans établissement, elle
+ * n'apparaît pas et ce pas ne fait rien.
+ */
+export async function passerEtapeEtablissement(page: Page): Promise<void> {
+    const etablissement = page.getByRole('heading', { name: /établissement/ });
+
+    if (await etablissement.isVisible().catch(() => false)) {
+        await page.getByRole('button', { name: 'Continuer' }).click();
+    }
 }
 
 /**

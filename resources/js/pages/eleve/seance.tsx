@@ -1,5 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
-import { BookOpen, CloudUpload, Flame, House, X } from 'lucide-react';
+import {
+    BookOpen,
+    CloudUpload,
+    Flame,
+    House,
+    UsersRound,
+    X,
+} from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
 import { PastilleReseau } from '@/components/hors-ligne/pastille-reseau';
@@ -22,6 +29,7 @@ import type { QuestionEleve, ReponseQuestion } from '@/lib/contenu/questions';
 import { base, enregistrer, useHorsLigne } from '@/lib/hors-ligne';
 import { marquerSeanceTerminee } from '@/lib/progression/locale';
 import { accueil, cours } from '@/routes/eleve';
+import { index as groupesEleve } from '@/routes/eleve/groupes';
 
 /** Une réponse de la séance : reçue par le serveur, ou encore dans la file. */
 type Reponse = {
@@ -34,7 +42,13 @@ type Reponse = {
 };
 
 type Props = {
-    seance: { uuid: string; duree_minutes: number; terminee: boolean };
+    seance: {
+        uuid: string;
+        duree_minutes: number;
+        terminee: boolean;
+        /** Lot 11 : la séance d'un devoir (titre, groupe, échéance). */
+        devoir?: { titre: string; groupe: string; echeance_le: string } | null;
+    };
     questions: QuestionEleve[];
     reponses: Reponse[];
 };
@@ -211,13 +225,23 @@ export default function Seance({ seance, questions, reponses }: Props) {
 
     return (
         <>
-            <Head title="Séance du jour" />
+            <Head
+                title={
+                    seance.devoir
+                        ? `Devoir · ${seance.devoir.titre}`
+                        : 'Séance du jour'
+                }
+            />
             <div className="flex min-h-dvh flex-col bg-background">
                 <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur-md">
                     <div className="mx-auto flex h-14 w-full max-w-2xl items-center gap-3 px-4">
                         <Link
-                            href={accueil()}
-                            aria-label="Quitter la séance"
+                            href={seance.devoir ? groupesEleve() : accueil()}
+                            aria-label={
+                                seance.devoir
+                                    ? 'Quitter le devoir'
+                                    : 'Quitter la séance'
+                            }
                             className="-ml-2 flex size-10 shrink-0 items-center justify-center rounded-full text-ink-600 outline-none hover:bg-ink-900/[0.05] hover:text-ink-900 focus-visible:outline-2 focus-visible:outline-ring dark:hover:bg-white/[0.06]"
                         >
                             <X aria-hidden className="size-5" />
@@ -248,6 +272,7 @@ export default function Seance({ seance, questions, reponses }: Props) {
                             enPartie={enPartie}
                             total={questions.length}
                             duree={seance.duree_minutes}
+                            devoir={seance.devoir ?? null}
                         />
                     </main>
                 ) : (
@@ -529,11 +554,13 @@ function Bilan({
     enPartie,
     total,
     duree,
+    devoir,
 }: {
     justes: number;
     enPartie: number;
     total: number;
     duree: number;
+    devoir: NonNullable<Props['seance']['devoir']> | null;
 }) {
     const { enAttente } = useHorsLigne();
     const pourcentage = Math.round((justes / Math.max(1, total)) * 100);
@@ -548,10 +575,13 @@ function Bilan({
             </span>
             <div className="grid gap-2">
                 <h1 className="text-[1.75rem] leading-tight titre-contraste">
-                    Séance terminée. <strong>Bravo.</strong>
+                    {devoir ? 'Devoir rendu.' : 'Séance terminée.'}{' '}
+                    <strong>Bravo.</strong>
                 </h1>
                 <p className="text-ink-600">
-                    Ta séance de {duree} minutes compte pour ta série de jours.
+                    {devoir
+                        ? `« ${devoir.titre} » part chez ton enseignant (${devoir.groupe}).`
+                        : `Ta séance de ${duree} minutes compte pour ta série de jours.`}
                 </p>
             </div>
             <div className="grid justify-items-center gap-1">
@@ -586,7 +616,19 @@ function Bilan({
                 </p>
             )}
             <div className="grid w-full max-w-xs gap-2.5">
-                <Button asChild taille="grande">
+                {devoir && (
+                    <Button asChild taille="grande">
+                        <Link href={groupesEleve()}>
+                            <UsersRound aria-hidden />
+                            Mes autres devoirs
+                        </Link>
+                    </Button>
+                )}
+                <Button
+                    asChild
+                    taille="grande"
+                    variant={devoir ? 'outline' : 'default'}
+                >
                     <Link href={accueil()}>
                         <House aria-hidden />
                         Retour à l'accueil

@@ -1401,3 +1401,63 @@ la prolonge sans nouveau composant de base.
   tuiles de matière illisibles sur l'encre (fond `white/10`) ; quota du
   jour et objet des conversations sortis du masque des captures (seule la
   date relative varie).
+
+### Lot 11 — parents, enseignants, établissements, devoirs (2026-11-13)
+
+- **Trois espaces adultes** dans la coque du personnel (`CoquePersonnel`,
+  barre latérale claire, vouvoiement) : « Espace parent », « Espace
+  enseignant », « Espace établissement ». Briques communes dans
+  `components/suivi/` : `EnteteEcran` (méta + `titre-contraste`),
+  `TuileChiffre` (tuile mandarine 40 px à gauche, chiffre 700 en
+  `font-data`), `ListeNotionsFaibles`, `SemaineRevision`, `Initiale`
+  (pastille d'encre, jamais de photo), `LigneLien`.
+- **Le groupe** (enseignant, et gestionnaire en lecture seule,
+  `VueSuiviGroupe`) : quatre chiffres clés ; **« Notions à retravailler en
+  classe »** en premier (tuile de matière, notion, chapitre en teinte de
+  matière, maîtrise moyenne, barre fine de la matière, « 3 élèves
+  fragiles » en framboise, « jamais travaillée ») — c'est le critère du
+  lot ; les élèves en lignes (initiale, prénom, pseudo, activité, jauge en
+  barre fine, « Inactif » en badge indice) ; colonne de 20 rem : le
+  **code du groupe** en `surface-encre` (le moment fort : c'est ce qu'on
+  annonce en classe, en `font-data` espacé, « Copier le code ») et les
+  devoirs (badge « 3/6 rendus », vert quand tout est rendu).
+- **Nouveau devoir** : la liste des questions publiées en filets (tuile de
+  matière, extrait sur deux lignes, notion), filtres par matière en
+  boutons `petite` (pastille de la matière), un rond numéroté dit l'ordre
+  du choix ; colonne collante : titre, consigne, échéance, puis le récap
+  des questions choisies et l'action dominante « Donner le devoir ».
+- **Suivi d'un devoir** : `surface-marque` « 3 / 6 rendus » avec une barre
+  blanche et le score moyen ; rendus en lignes (badges Rendu / Commencé /
+  Pas commencé, « En retard » en framboise, score à droite).
+- **Parent** : cartes d'enfant (initiale, examen, badge Abonné / Gratuit,
+  préparation en segments, minutes de la semaine et série) ; sans enfant,
+  le moment fort est le premier lien (`surface-marque`, la saisie du code
+  dans un panneau blanc `clair`, puis « Où votre enfant trouve le code » en
+  étapes numérotées à l'encre). La fiche : semaine de révision en
+  colonnes (mandarine pleine si l'objectif du soir est atteint, claire
+  sinon, ligne pointillée de l'objectif, minutes au-dessus), la jauge
+  segmentée, les matières en segments de leur couleur, les examens
+  blancs ; colonne : l'abonnement en `surface-encre` avec « Payer son
+  abonnement », puis « Ce que vous voyez » (ce que le parent ne voit pas).
+- **Établissement** : le rapport par groupe en lignes (jauge moyenne en
+  barre fine, « À retravailler » en pastilles craie avec tuile de
+  matière) ; la licence en cours en `surface-marque` (places prises,
+  barre blanche) ; enseignants et « Rattacher » dessous. Mot de passe
+  provisoire d'un compte ouvert : un avis teinte indice, le mot en
+  `font-data`, montré une fois.
+- **Élève** : « Mes groupes » — le premier devoir à faire en
+  `surface-marque` (« Commencer » blanc), les suivants en cartes blanches,
+  « Déjà rendus » en lignes vertes ; colonne : « Rejoindre un groupe »
+  (code en capitales espacées) et « Mes groupes » avec la phrase qui dit
+  ce que l'enseignant voit. Carte « Mes devoirs » sur l'accueil (seul
+  accès sur mobile, comme « Mon tuteur »). « Mon compte › Parents » : le
+  code en `surface-encre`, six chiffres en deux groupes.
+- **Corrigé à la relecture des captures** : tuiles de chiffres trop
+  hautes (icône au-dessus, moitié vide : icône à gauche, carte deux fois
+  moins haute) ; « 1 élève fragile sur 1 qui l'ont travaillée » (accord) ;
+  sous-titres des devoirs tronqués (« 18 nov. » et le nombre de rendus en
+  badge) ; semaine de révision vide à l'œil quand les minutes sont petites
+  (minutes écrites au-dessus de chaque colonne) ; nom d'élève et badge
+  « Place attribuée » qui débordaient à 360 px (licences) ; dates de la
+  licence trop serrées en console (trois colonnes → deux) ; « À rendre il
+  y a 2 jours » (→ « Échu il y a 2 jours »).

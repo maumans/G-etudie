@@ -118,12 +118,12 @@ class AccesParRoleTest extends TestCase
     public static function rolesEtEspaces(): iterable
     {
         yield 'élève' => [Role::Eleve, ['/eleve']];
-        yield 'parent' => [Role::Parent, []];
-        yield 'enseignant' => [Role::Enseignant, []];
+        yield 'parent' => [Role::Parent, ['/parent']];
+        yield 'enseignant' => [Role::Enseignant, ['/enseignant']];
         yield 'rédacteur' => [Role::Redacteur, ['/contenu']];
         yield 'relecteur' => [Role::Relecteur, ['/contenu']];
         yield 'responsable pédagogique' => [Role::AdminContenu, ['/contenu']];
-        yield 'gestionnaire' => [Role::GestionnaireEtablissement, []];
+        yield 'gestionnaire' => [Role::GestionnaireEtablissement, ['/etablissement']];
         yield 'administrateur plateforme' => [Role::Superadmin, ['/contenu', '/console']];
     }
 
@@ -136,7 +136,7 @@ class AccesParRoleTest extends TestCase
     {
         $user = User::factory()->avecRole($role)->create();
 
-        foreach (['/eleve', '/contenu', '/console'] as $adresse) {
+        foreach (['/eleve', '/contenu', '/console', '/parent', '/enseignant', '/etablissement'] as $adresse) {
             $this->actingAs($user)
                 ->get($adresse)
                 ->assertStatus(in_array($adresse, $ouverts, true) ? 200 : 403);
