@@ -13,6 +13,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { ContenuBlocs } from '@/components/contenu/contenu-blocs';
 import { ExerciceQuestion } from '@/components/questions/exercice-question';
+import { RessourcesLecon } from '@/components/ressources/ressources-lecon';
 import { SignalerErreur } from '@/components/signaler-erreur';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ import { ProgressionBarre } from '@/components/ui/progression';
 import type { DocumentBlocs } from '@/lib/contenu/blocs';
 import type { QuestionEleve } from '@/lib/contenu/questions';
 import { enregistrer } from '@/lib/hors-ligne';
+import type { RessourceEleve } from '@/lib/ressources';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import { cn } from '@/lib/utils';
@@ -39,6 +41,8 @@ export type ContenuLecon = {
     est_exemple: boolean;
     /** Mini-questions de la leçon (version publiée), par identifiant. */
     questions?: Record<string, QuestionEleve>;
+    /** Lot 12 : ressources externes vérifiées de la notion (aussi dans le pack). */
+    ressources?: RessourceEleve[];
 };
 
 type Lien = { uuid: string; titre: string };
@@ -305,6 +309,10 @@ export default function Lecon({ lecon, contexte, progression, source }: Props) {
                             <Play aria-hidden className="fill-current" />
                             M'entraîner : séance du jour
                         </Button>
+                        <RessourcesLecon
+                            ressources={lecon.ressources ?? []}
+                            className="mt-1 border-t pt-3"
+                        />
                     </section>
                 </aside>
             </div>

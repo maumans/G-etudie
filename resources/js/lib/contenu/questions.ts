@@ -83,6 +83,8 @@ export type QuestionEleve = {
     notion: string;
     /** « BEPC 2019 » : la session de l'annale d'où vient la question (lot 4). */
     annale?: string | null;
+    /** Lot 12 : la source d'une question de culture générale. */
+    sources?: string | null;
 };
 
 export type Verdict = 'juste' | 'partiel' | 'faux' | 'a_evaluer';

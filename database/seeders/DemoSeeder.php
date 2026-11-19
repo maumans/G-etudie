@@ -41,7 +41,13 @@ class DemoSeeder extends Seeder
         }
 
         // L'instant du semis : les captures d'écran s'y placent (HorlogeDemo).
-        HorlogeDemo::noter(CarbonImmutable::now());
+        // Noté au premier semis seulement : un `db:seed` relancé sur une
+        // démonstration existante (lot 12, nouveau seeder) ne doit pas
+        // déplacer l'horloge — les données déjà semées se liraient sinon
+        // plusieurs jours plus tard (séries, « il y a 3 soirs », quotas).
+        if (User::query()->where('telephone', self::COMPTES[0]['telephone'])->doesntExist() || HorlogeDemo::instant() === null) {
+            HorlogeDemo::noter(CarbonImmutable::now());
+        }
 
         $motDePasse = config('demonstration.mot_de_passe');
 
@@ -69,7 +75,7 @@ class DemoSeeder extends Seeder
         // d'exemple et Ousmane abonné (lot 9), puis des conversations
         // d'exemple avec le tuteur (lot 10), puis l'établissement, le groupe
         // et les devoirs d'exemple (lot 11).
-        $this->call([DemoContenuSeeder::class, DemoCoursSeeder::class, DemoEleveSeeder::class, DemoAnnalesSeeder::class, DemoExamensBlancsSeeder::class, DemoAbonnementsSeeder::class, DemoTuteurSeeder::class, DemoOrganisationSeeder::class]);
+        $this->call([DemoContenuSeeder::class, DemoCoursSeeder::class, DemoEleveSeeder::class, DemoAnnalesSeeder::class, DemoExamensBlancsSeeder::class, DemoAbonnementsSeeder::class, DemoTuteurSeeder::class, DemoOrganisationSeeder::class, DemoCommunauteSeeder::class]);
 
         // Lot 7 : les packs du contenu de démonstration, prêts à télécharger.
         app(PackService::class)->genererTout();

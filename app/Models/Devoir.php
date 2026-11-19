@@ -19,18 +19,19 @@ use Illuminate\Support\Carbon;
  * @property int|null $auteur_id
  * @property string $titre
  * @property string|null $consigne
+ * @property bool $defi lot 12 : défi du groupe (classement par pseudo des élèves qui l'acceptent)
  * @property Carbon $echeance_le
  * @property Carbon $publie_le
  * @property bool $est_exemple
  * @property-read int|null $questions_count
  * @property-read Groupe $groupe
  */
-#[Fillable(['groupe_id', 'auteur_id', 'titre', 'consigne', 'echeance_le', 'publie_le', 'est_exemple'])]
+#[Fillable(['groupe_id', 'auteur_id', 'titre', 'consigne', 'defi', 'echeance_le', 'publie_le', 'est_exemple'])]
 class Devoir extends Model
 {
     protected function casts(): array
     {
-        return ['echeance_le' => 'datetime', 'publie_le' => 'datetime', 'est_exemple' => 'boolean'];
+        return ['echeance_le' => 'datetime', 'publie_le' => 'datetime', 'defi' => 'boolean', 'est_exemple' => 'boolean'];
     }
 
     /** @return BelongsTo<Groupe, $this> */

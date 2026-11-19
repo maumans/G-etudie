@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -26,13 +27,14 @@ use Illuminate\Support\Carbon;
  * @property int|null $rang
  * @property int|null $matiere_id séance préparée pour une matière téléchargée (lot 7), sinon toutes matières
  * @property int|null $devoir_id séance d'un devoir (lot 11) : jamais une séance du jour
+ * @property bool $culture quiz de culture générale (lot 12) : jamais une séance du jour
  * @property list<int> $questions identifiants, dans l'ordre
  * @property int $duree_minutes
  * @property Carbon $genere_le
  * @property Carbon|null $termine_le
  * @property Carbon|null $remplacee_le
  */
-#[Fillable(['uuid', 'user_id', 'jour', 'rang', 'matiere_id', 'devoir_id', 'questions', 'duree_minutes', 'genere_le', 'termine_le', 'remplacee_le'])]
+#[Fillable(['uuid', 'user_id', 'jour', 'rang', 'matiere_id', 'devoir_id', 'culture', 'questions', 'duree_minutes', 'genere_le', 'termine_le', 'remplacee_le'])]
 class Seance extends Model
 {
     protected function casts(): array
@@ -45,12 +47,24 @@ class Seance extends Model
             'termine_le' => 'datetime',
             'rang' => 'integer',
             'remplacee_le' => 'datetime',
+            'culture' => 'boolean',
         ];
     }
 
     public function getRouteKeyName(): string
     {
         return 'uuid';
+    }
+
+    /**
+     * Les séances du jour (préparées ou commencées) : ni la séance d'un
+     * devoir (lot 11), ni un quiz de culture générale (lot 12).
+     *
+     * @param  Builder<Seance>  $requete
+     */
+    public function scopeDuJour(Builder $requete): void
+    {
+        $requete->whereNull('devoir_id')->where('culture', false);
     }
 
     /** @return BelongsTo<User, $this> */

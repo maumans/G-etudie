@@ -11,6 +11,7 @@ use App\Services\ReferentielService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -29,14 +30,16 @@ class ProgrammeController extends Controller
         $classe = $classes->firstWhere('id', $request->integer('classe')) ?? $classes->get(1) ?? $classes->first();
 
         $matieres = Matiere::query()
-            ->withCount(['chapitres' => fn ($q) => $q->where('classe_id', $classe?->id)])
+            // Lot 12 : une matière transversale (culture générale) a ses thèmes
+            // sans classe, les mêmes pour tous les examens.
+            ->withCount(['chapitres' => fn ($q) => $q->where(fn ($c) => $c->where('classe_id', $classe?->id)->orWhereNull('classe_id'))])
             ->orderBy('ordre')
             ->get();
         $matiere = $matieres->firstWhere('id', $request->integer('matiere')) ?? $matieres->first();
 
         $chapitres = $matiere === null || $classe === null ? collect() : Chapitre::query()
             ->where('matiere_id', $matiere->id)
-            ->where('classe_id', $classe->id)
+            ->where('classe_id', $matiere->transversale ? null : $classe->id)
             ->with(['notions' => fn ($q) => $q->withCount('lecons')])
             ->orderBy('ordre')
             ->orderBy('id')
@@ -49,6 +52,7 @@ class ProgrammeController extends Controller
                 'id' => $m->id,
                 'nom' => $m->nom,
                 'teinte' => $m->teinte->value,
+                'transversale' => $m->transversale,
                 'chapitres' => $m->chapitres_count,
             ]),
             'matiere_id' => $matiere?->id,
@@ -70,9 +74,18 @@ class ProgrammeController extends Controller
     {
         $donnees = $request->validate([
             'matiere_id' => ['required', 'integer', Rule::exists('matieres', 'id')],
-            'classe_id' => ['required', 'integer', Rule::exists('classes', 'id')],
+            'classe_id' => ['nullable', 'integer', Rule::exists('classes', 'id')],
             'titre' => ['required', 'string', 'max:160'],
         ]);
+
+        // Lot 12 : les thèmes d'une matière transversale n'ont pas de classe ;
+        // les chapitres des autres en ont toujours une.
+        $transversale = (bool) Matiere::query()->whereKey($donnees['matiere_id'])->value('transversale');
+        $donnees['classe_id'] = $transversale ? null : ($donnees['classe_id'] ?? null);
+
+        if (! $transversale && $donnees['classe_id'] === null) {
+            throw ValidationException::withMessages(['classe_id' => 'Choisissez la classe du chapitre.']);
+        }
 
         Chapitre::create([
             ...$donnees,

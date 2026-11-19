@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-14, lot 11)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-18, lot 12)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -20,11 +20,24 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-14 (lot 11 fait, critère tenu ; lot 10 : vraie API en attente du crédit)
+### État au 2026-11-18 (lot 12 fait, critère tenu ; lot 10 : vraie API en attente du crédit)
 
-- **Dépôt git** : `main` porte les lots 0 à 11. Les lots 3 à 11 ont été
+- **Dépôt git** : `main` porte les lots 0 à 12. Les lots 3 à 12 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 12 fait** (point 28) : **culture générale** (matière
+  transversale : tout élève, hors jauge ; question du jour la même pour
+  tous, quiz de cinq, carte de partage « Défier mes amis » ; chaque
+  question cite sa source), **ressources externes** (liens par notion,
+  liste fermée de sites dont YouTube, vérifiés par un autre relecteur,
+  dialogue « Tu quittes N'karamögö » avec le poids, dans les packs,
+  contrôle hebdomadaire des liens), **communauté encadrée** (fil « Questions
+  du groupe » signé du pseudo, filtré à l'envoi, signalement, **masquage en
+  un geste** par l'enseignant, masquage provisoire à 3 signalements,
+  parole retirée, fil fermé ; **défi du groupe** avec classement opt-in).
+  ⚠ **Au déploiement** : `migrate`, `db:seed`, **`packs:generer`**, la
+  tâche `ressources:verifier` (lundi), et saisir les **mots interdits** au
+  back-office avant d'ouvrir les fils (`MISE_EN_PRODUCTION.md` § 8, lot 12).
 - **Lot 11 fait** (point 27) : **trois espaces de plus**. **Parent** : il
   suit ses enfants en lecture seule (temps de révision de la semaine,
   jauge, matières, examens blancs) et **paie leur abonnement** ; le lien
@@ -242,6 +255,10 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
+- **Tests (lot 12)** : **695 Pest, 414 Vitest, 709 Playwright**, verts
+  (point 28). MySQL de Laragon à relancer après un redémarrage du poste
+  (`D:\Applications\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysqld.exe
+  --defaults-file=…\my.ini`) : sans lui, file et captures échouent.
 - **Tests (lot 10)** : **620 Pest, 399 Vitest** ; Playwright : 30 écrans
   et 2 parcours de plus (572 en tout), verts sur les lots relancés (point
   26). MySQL de Laragon à redémarrer s'il s'est arrêté (`mysqld.exe
@@ -360,8 +377,18 @@
    « Créer un code ». 02 Mamadou : la fiche d'Aïssatou, « Payer son
    abonnement » (simulation) ; « Suivre un autre enfant » avec le code.
    07 Mariama : le rapport, « Licences » › « Attribuer ». 08 Sékou :
-   Console › Établissements. **Lot 12** ensuite (culture générale,
-   ressources externes, communauté encadrée).
+   Console › Établissements.
+10 ter. **Maurice : essayer le lot 12** — 01 Aïssatou : accueil › « La
+   question du jour » ; « Culture générale » (barre latérale) › « Lancer un
+   quiz », puis « Défier mes amis » ; la leçon « Le théorème de Pythagore »
+   › « Pour aller plus loin » (dialogue de sortie) ; « Mes groupes » ›
+   « Questions du groupe 10e A » : poser une question, en signaler une ;
+   cocher « Paraître au classement ». 03 Fatoumata : 10e A › « Questions de
+   la classe » (le message signalé, « Masquer ») ; « Donner un devoir » ›
+   « C'est un défi du groupe » ; le « Défi du vendredi ». 04 rédacteur :
+   Back-office › Ressources › « Proposer une ressource » ; 05 relectrice :
+   « Vérifiée ». 06 : Back-office › Modération (mots refusés). **Lot 13**
+   ensuite (console plateforme : activité, contenu, revenus, impact).
 11. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -2411,6 +2438,141 @@ cette question à sa façon. Elle distingue deux notions :
      communauté du groupe (lot 12) ; vrai paiement par un parent et devoir
      en mode avion sur vrai téléphone (`A_TESTER.md`, lot 11).
 
+28. [x] **Lot 12 — culture générale, ressources externes, communauté encadrée**
+   (2026-11-18, sur `main`, un commit)
+   - **Constat** : la matière « Culture générale » existait sans épreuve,
+     donc invisible ; aucun lien sortant ; les groupes du lot 11 n'avaient
+     pas de fil (décision 5 du lot 11 : les élèves ne se voient pas).
+   - **Décisions de Maurice** (2026-11-18, plan accepté) :
+     1. dans le fil, les élèves voient le **pseudo** des auteurs (jamais
+        prénom ni numéro) ; l'enseignant voit prénom et pseudo ; la liste
+        des membres reste cachée (assouplit la décision 5 du lot 11) ;
+     2. une publication paraît **tout de suite, filtrée** (mots interdits,
+        numéros, liens, e-mails) ; signalement ; masquage en un geste par
+        l'enseignant ; masquage provisoire à **trois** signalements
+        d'élèves différents ;
+     3. « défis entre amis » = **carte de partage** du quiz (prénom seul,
+        dessinée sur l'appareil) **et défi du groupe** lancé par
+        l'enseignant, classement par pseudo **opt-in** ;
+     4. **YouTube accepté**, chaque vidéo vérifiée par un relecteur ;
+        l'élève est prévenu des suggestions et publicités du site.
+   - **Culture générale** (PLAN M10) : `matieres.transversale` — tout
+     élève la voit, hors jauge, hors coefficients, hors séance du jour et
+     hors devoirs ; ses chapitres (des thèmes) n'ont pas de classe
+     (`chapitres.classe_id` vide, Référentiel › Programme le dit). Une
+     autorité : `CatalogueEleve::questionsCulture()`, et `CultureService`
+     (question du jour **la même pour tous**, ordre stable qui passe par
+     toutes avant d'en répéter une ; quiz de cinq, jamais vues d'abord ;
+     historique). Une question de culture **cite sa source**
+     (`questions.sources`, figée dans la version, affichée sous le
+     corrigé ; sans elle, pas de relecture). Réponses par la file ; la
+     culture n'entre pas dans la maîtrise (`MaitriseService`). Un quiz est
+     une séance `culture`, exclue de la séance du jour par
+     `Seance::duJour()` (qui remplace les trois `whereNull('devoir_id')`).
+   - **Ressources externes** (PLAN M19) : `RessourceService` (seule
+     autorité) — liste fermée de sites (`config/ressources.php`, HTTPS,
+     sous-domaines admis, raccourcis et domaines déguisés refusés), un
+     rédacteur propose, un **autre** relecteur vérifie (jamais le sien,
+     même responsable pédagogique), une ressource modifiée repasse « à
+     vérifier », retrait motivé ; `ressources:verifier` chaque lundi (un
+     lien muet sort de la vue élève, « Lien cassé » au back-office).
+     Elles voyagent dans l'objet de la leçon, donc dans le pack ; chaque
+     changement visible regénère le pack de la matière. Poids annoncé
+     (saisi, sinon estimé par type et durée) ; dialogue « Tu quittes
+     N'karamögö » avant tout départ.
+   - **Communauté encadrée** (PLAN M13, critère) : `FilGroupeService`
+     (seule autorité : publier, signaler, masquer, garder, retirer la
+     parole 1 à 30 jours, fermer le fil ; 500 caractères, 10 messages par
+     jour et par groupe, 30 s entre deux, un envoi idempotent par UUID) et
+     `FiltreFil` (numéro guinéen de 9 chiffres ou plus, lien, e-mail, mots
+     comparés sans casse ni accents, en mot entier, même déguisés par des
+     lettres répétées ou des points). Qui lit et qui modère :
+     `Perimetre::peutParticiperAuFil` / `peutModererFil` ; policies
+     `participer` / `moderer` (**404**). Mots interdits tenus au
+     back-office › Modération (responsable pédagogique). Chaque geste de
+     modération est au journal des accès. **Défi du groupe** = un devoir
+     `defi` (écart n° 35 inchangé : un rendu est une séance) ;
+     `DevoirService::classement` ne nomme que les élèves qui l'acceptent
+     (`membres_groupes.classement_accepte`).
+   - **Écart** (`HORS_LIGNE.md` n° 36) : publier, signaler et modérer
+     partent en direct, pas par la file ; le brouillon est gardé sur
+     l'appareil à chaque frappe.
+   - **Permissions** : `communaute.participer` (élève),
+     `communaute.moderer` (enseignant) ; ressources : `contenu.rediger` /
+     `contenu.relire` ; modération : `contenu.administrer`. Toutes les
+     routes nouvelles portent leur `can:` (`AccesParRoleTest` vert sans
+     dérogation nouvelle).
+   - **Démonstration** (`DemoCommunauteSeeder`, tout `est_exemple`) : trois
+     thèmes (Guinée, Afrique, Monde), onze questions de faits connus avec
+     leur source (Wikipédia), un quiz déjà fait par Aïssatou ; cinq liens
+     Wikipédia et Vikidia (quatre vérifiés) ; le fil de la 10e A (trois
+     questions, deux réponses de Fatoumata, un message signalé deux fois) ;
+     le « Défi du vendredi » rendu par trois élèves dont deux classés ;
+     neuf mots interdits (développement seulement).
+   - **Critère tenu** : Pest `Communaute/FilGroupeTest` (« un élève
+     signale, l'enseignant masque en un geste, les élèves ne le voient
+     plus ») et Playwright `parcours-lot12.spec.ts` (Aïssatou signale,
+     Fatoumata touche « Masquer » une fois, la question disparaît du fil
+     d'Aïssatou).
+   - **Bugs trouvés en chemin et corrigés** : les props de séance de
+     l'instantané et de l'écran différaient pour une séance tout juste
+     créée (`culture` absent → `null`) ; `config('ressources.domaines.' .
+     $domaine)` ne lisait rien (les points du domaine passaient pour de la
+     notation pointée) ; **chaque `db:seed` déplaçait l'horloge des
+     captures** (`DemoSeeder` notait l'instant à chaque passage, même sur une
+     démonstration déjà semée) : relancé au début du lot pour semer le
+     lot 12, il a fait lire les données des lots précédents quatre jours
+     plus tard (séries, quota du tuteur, « il y a N jours »). Corrigé :
+     l'instant n'est noté qu'au premier semis (Pest `HorlogeDemoTest`) et
+     `DemoCommunauteSeeder` se date sur cette horloge ; la démonstration de
+     développement a été refaite (`migrate:fresh --seed`, accord de Maurice
+     le 2026-11-18, puis de nouveau le 2026-11-19 après une session
+     interrompue en plein parcours et la règle du quiz ci-dessous). Une leçon « Parcours 1794635505538 » laissée le
+     2026-11-14 par un parcours du lot 1 interrompu (coupure MySQL) a
+     disparu avec.
+   - **Un quiz n'est pas une séance du jour** (trouvé à la relecture de
+     « Ma progression ») : sa fin passait par `MotivationService::apresSeance`
+     — objectif du soir atteint, 20 points de séance, badge « Première
+     séance », case « Terminer une séance du jour » cochée. Désormais
+     `apresQuizCulture` : le jour compte pour la série, rien d'autre (chaque
+     réponse a ses points). Pest `Culture/CultureTest`.
+   - **Poids** (`HORS_LIGNE.md` A.11) : la question du jour tirait l'ardoise
+     de saisie et le lecteur de formules (KaTeX) dans l'accueil — coquille
+     mesurée à **410 Ko** compressés (272 Ko au lot 7, budget 500 Ko). Sur
+     l'accueil, la carte montre l'énoncé en texte et « Répondre » ;
+     l'ardoise est chargée au premier appui (`React.lazy`, gardée par le
+     service worker). Mesure après correction : **309 Ko** (`budgets.spec.ts`).
+   - **Tests ajoutés** : Pest `Communaute/FilGroupeTest` (9),
+     `Culture/CultureTest` (8), `HorlogeDemoTest` (+1), `Ressources/RessourcesTest` (10), Unit
+     `FiltreFilTest` (18) ; Vitest `communaute/lot12.test.ts` (6) ;
+     Playwright `ecrans-lot12.spec.ts` (8 écrans × 3 gabarits × 2 thèmes)
+     et `parcours-lot12.spec.ts` (2). Mis à jour : `ConnexionTest`
+     (permission de l'élève), `SeederDemonstrationTest` (+ cinq réponses
+     de quiz).
+   - **Totaux** : **695 Pest** (vert), **414 Vitest** (vert) ; `tsc`,
+     `vp check` (un avertissement antérieur au lot), Pint, Larastan niveau 7
+     et `npm run build` passent ; **709 Playwright** (vert : 699 écrans,
+     dont budgets et hors ligne, et les 10 parcours de bout en bout).
+   - **Vu avec Playwright** (`ecrans-lot12.spec.ts`, 8 écrans × 3 gabarits
+     × 2 thèmes, axe et débordement ; `parcours-lot12.spec.ts`, 3 étapes × 3
+     × 2) : corrigé à la relecture (détail `DESIGN.md` § 13, lot 12) —
+     contraste des messages signalés, bouton blanc illisible en sombre,
+     débordement à 360 px (Ressources), « Signaler » sur sa propre ligne,
+     carte des rendus étirée, « Revoir le cours » après un quiz, et le poids
+     de l'accueil (point « Poids »). Références changées, **toutes relues**
+     et attendues : accueil élève (lots 0 et 2 : la question du jour), leçon
+     (lots 2 et 3 : ressources sous « Pour aller plus loin »), saisie d'une
+     question (lot 3 : « La source »), « Mes groupes », accueil et groupe de
+     l'enseignant, nouveau devoir, groupe vu par l'établissement (lot 11 :
+     fil, défi, classement). Passage complet le 2026-11-19 sur le build,
+     port 8010, en série, file `ANNALES_EXTRACTEUR=simule` ; deux échecs
+     isolés d'écriture de capture (verrou de fichier Windows) rejoués verts.
+   - **Reste** : les vrais téléphones (`A_TESTER.md`, lot 12) ; la liste
+     de production des mots interdits (à saisir avant d'ouvrir les fils) ;
+     « Ça m'aide » sur une réponse et les classements opt-in hors groupe
+     (PLAN M9) ne sont pas faits ; du vrai contenu de culture générale,
+     sourcé, par l'équipe.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -2467,6 +2629,11 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
   passe** : l'écran dit « demande de l'aide à ton enseignant ou à
   N'karamögö » ; le canal d'assistance (et l'écran administrateur qui
   réinitialise un mot de passe) reste à définir.
+- **Lot 12** : « Ça m'aide » sur une réponse du fil et les classements
+  opt-in hors groupe (PLAN M9 : classe, établissement, région) ne sont pas
+  faits ; la liste des mots interdits de production est à saisir par le
+  responsable pédagogique ; le contenu de culture générale (sourcé) est à
+  rédiger par l'équipe.
 - [x] **Espaces parent, enseignant, gestionnaire** : faits au lot 11
   (point 27) ; enseignants et gestionnaires prennent la session de 12 h et
   la double authentification du personnel.

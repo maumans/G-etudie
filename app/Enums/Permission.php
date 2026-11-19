@@ -80,6 +80,12 @@ enum Permission: string
     /** Lot 11 : créer les établissements, nommer leurs gestionnaires, accorder des licences (console). */
     case AdministrerEtablissements = 'etablissements.administrer';
 
+    /** Lot 12 (PLAN M13) : poser des questions et répondre dans le fil de ses groupes, signaler. */
+    case ParticiperCommunaute = 'communaute.participer';
+
+    /** Lot 12 (PLAN M13) : modérer le fil de ses groupes (masquer, retirer la parole, fermer). */
+    case ModererCommunaute = 'communaute.moderer';
+
     /** Activer la double authentification sur son compte (DA4 : personnel seulement). */
     case DoubleAuthentification = 'compte.double_authentification';
 }

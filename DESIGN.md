@@ -1461,3 +1461,51 @@ la prolonge sans nouveau composant de base.
   « Place attribuée » qui débordaient à 360 px (licences) ; dates de la
   licence trop serrées en console (trois colonnes → deux) ; « À rendre il
   y a 2 jours » (→ « Échu il y a 2 jours »).
+
+### Lot 12 — culture générale, ressources externes, communauté encadrée (2026-11-18)
+
+- **Culture générale** (élève) : le moment fort est le quiz en
+  `surface-encre` (halo soleil de la culture, « Lancer un quiz » blanc,
+  classe `clair` : il reste lisible en sombre) ; puis « La question du
+  jour » jouée sur place (tuile soleil, « la même pour tous », la source
+  sous le corrigé en 12 px) ; les thèmes en filets (tuile de la matière,
+  barre fine soleil, « 5/5 faites · 80 % », bouton « Quiz »). Colonne :
+  « Défie tes amis » (dernier score en chiffre 700, « Partager mon score »
+  en `doux`) et « Mes derniers quiz ». La carte de l'accueil réutilise
+  `QuestionDuJour` (lien « Quiz ») : l'énoncé en texte sur fond craie et
+  « Répondre » en `doux` ; l'ardoise arrive au premier appui (poids). La carte de partage reprend celle de
+  l'examen blanc (encre, halo soleil, prénom seul).
+- **Ressources externes** (élève) : sous « Pour aller plus loin » de la
+  leçon, des lignes sobres (icône du type, titre, « Wikipédia ·
+  Encyclopédie · ≈ 900 Ko », flèche sortante) ; toucher ouvre « Tu quittes
+  N'karamögö » : tuile mandarine, le site, le poids (et pour une vidéo la
+  durée, le Wi-Fi, les suggestions et publicités du site), la description
+  sur fond craie, « Ouvrir Wikipédia » en action dominante, « Rester ici ».
+- **Fil du groupe** (élève et enseignant, `FilGroupe`) : une carte par
+  question (pseudo en 600, date, pastille de matière), réponses en retrait
+  avec un filet ; la réponse de l'enseignant en teinte mandarine avec
+  badge « Prof » ; actions (« Signaler » ; « Masquer », « Retirer la
+  parole ») en boutons `petite` sur la ligne de l'auteur. Chez
+  l'enseignant, les messages signalés d'abord, dans une carte au filet
+  mandarine, avec « Masquer » en bouton plein (le geste du critère) et
+  « Garder ». Aucune photo, aucun avatar : le pseudo suffit.
+- **Défi du groupe** : badge « Défi du groupe » (trophée) sur la carte du
+  devoir ; classement en lignes numérotées (1er sur pastille soleil, « toi »
+  en gras), « et 1 autre élève sans classement » ; côté enseignant, la
+  même liste sous la carte des rendus. Case « Paraître (par mon pseudo) au
+  classement » sous chaque groupe.
+- **Back-office** : « Ressources » (états en boutons d'encre, lignes avec
+  tuile de matière, badge Vérifiée / À vérifier / Lien cassé, « Vérifiée »
+  en bouton plein pour le relecteur ; colonne « Proposer une ressource » et
+  « Sites acceptés » en badges) ; « Modération » (trois chiffres des 30
+  jours en tuiles, mots refusés en pastilles retirables, ce que le filtre
+  refuse seul).
+- **Corrigé à la relecture des captures** : contraste insuffisant du
+  pseudo et de la date des messages signalés (`ink-500` sur `craie-100` →
+  `ink-600`, règle de § 2) ; « Lancer un quiz » blanc sur blanc en sombre
+  (classe `clair`) ; Ressources débordait à 360 px (la liste des notions
+  prenait la largeur de sa plus longue option : `min-w-0`) ; « Signaler »
+  occupait une ligne sous chaque message (passé sur la ligne de l'auteur) ;
+  la carte « Les rendus » d'un défi s'étirait sous une colonne plus haute
+  (`self-start`). Le trait sous le « Q » de « Quiz » et « Questions » est la
+  queue du Q de Bricolage Grotesque, pas un soulignement.

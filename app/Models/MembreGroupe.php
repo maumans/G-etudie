@@ -18,17 +18,19 @@ use Illuminate\Support\Carbon;
  * @property Carbon $rejoint_le
  * @property Carbon|null $quitte_le
  * @property int|null $retire_par
+ * @property Carbon|null $muet_jusqu_au lot 12 : parole retirée dans le fil jusqu'à cette date
+ * @property bool $classement_accepte lot 12 : apparaît (par son pseudo) au classement des défis
  * @property-read Groupe $groupe
  * @property-read User $eleve
  */
-#[Fillable(['groupe_id', 'eleve_id', 'rejoint_le', 'quitte_le', 'retire_par'])]
+#[Fillable(['groupe_id', 'eleve_id', 'rejoint_le', 'quitte_le', 'retire_par', 'muet_jusqu_au', 'classement_accepte'])]
 class MembreGroupe extends Model
 {
     protected $table = 'membres_groupes';
 
     protected function casts(): array
     {
-        return ['rejoint_le' => 'datetime', 'quitte_le' => 'datetime'];
+        return ['rejoint_le' => 'datetime', 'quitte_le' => 'datetime', 'muet_jusqu_au' => 'datetime', 'classement_accepte' => 'boolean'];
     }
 
     /** @param  Builder<self>  $requete */

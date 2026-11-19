@@ -39,7 +39,7 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
-            testIgnore: /parcours-lot(?:[123459]|10)\.spec\.ts/,
+            testIgnore: /parcours-lot(?:[123459]|10|12)\.spec\.ts/,
             dependencies: ['connexion'],
         },
         // Crée puis efface une leçon : après les captures, qu'il ne doit pas
@@ -86,6 +86,13 @@ export default defineConfig({
         {
             name: 'parcours-tuteur',
             testMatch: /parcours-lot10\.spec\.ts/,
+            dependencies: ['ecrans'],
+        },
+        // Lot 12 : Aïssatou signale un message du fil, Fatoumata le masque en
+        // un geste ; puis un quiz de culture. Tout est défait à la fin.
+        {
+            name: 'parcours-communaute',
+            testMatch: /parcours-lot12\.spec\.ts/,
             dependencies: ['ecrans'],
         },
         {

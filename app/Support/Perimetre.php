@@ -187,6 +187,23 @@ class Perimetre
         return $acteur->can(Permission::GererGroupes->value) && $groupe->enseignant_id === $acteur->getKey();
     }
 
+    /**
+     * Lot 12 (PLAN M13) : lire le fil d'un groupe et y écrire. L'élève
+     * présent dans le groupe, ou l'enseignant du groupe ; jamais un autre
+     * enseignant, ni le gestionnaire (le fil est la classe, pas un rapport).
+     */
+    public static function peutParticiperAuFil(User $acteur, Groupe $groupe): bool
+    {
+        return ($acteur->can(Permission::ParticiperCommunaute->value) && self::estMembre($acteur, $groupe))
+            || self::peutModererFil($acteur, $groupe);
+    }
+
+    /** Masquer, retirer la parole, fermer le fil : l'enseignant du groupe seulement. */
+    public static function peutModererFil(User $acteur, Groupe $groupe): bool
+    {
+        return $acteur->can(Permission::ModererCommunaute->value) && self::peutGererGroupe($acteur, $groupe);
+    }
+
     public static function estMembre(User $eleve, Groupe $groupe): bool
     {
         return MembreGroupe::query()->actifs()->where('groupe_id', $groupe->getKey())->where('eleve_id', $eleve->getKey())->exists();

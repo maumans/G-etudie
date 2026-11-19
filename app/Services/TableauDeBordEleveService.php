@@ -32,6 +32,7 @@ class TableauDeBordEleveService
         private MaitriseService $maitrise,
         private SeanceService $seances,
         private MotivationService $motivation,
+        private CultureService $culture,
     ) {}
 
     /**
@@ -71,6 +72,8 @@ class TableauDeBordEleveService
             'reprendre' => $this->reprendre($lecons, $progressions),
             'premiers_pas' => $this->premiersPas($eleve, $progressions),
             'devoirs' => $this->devoirs($eleve),
+            // Lot 12 : la question du jour de culture générale.
+            'culture' => $this->culture->etatDuJour($eleve, $maintenant->startOfDay()),
         ];
     }
 
@@ -131,7 +134,7 @@ class TableauDeBordEleveService
         $prochaine = $enCours ?? $this->seances->aVenir($eleve, $profil)->first();
         $termineeAujourdhui = Seance::query()
             ->where('user_id', $eleve->id)
-            ->whereNull('devoir_id')
+            ->duJour()
             ->whereDate('jour', CarbonImmutable::today())
             ->whereNotNull('termine_le')
             ->exists();
@@ -206,9 +209,19 @@ class TableauDeBordEleveService
             'jauge' => $this->maitrise->jauge($profil),
             'serie' => $this->motivation->serie($eleve->id),
             'seances' => $this->seances->aVenir($eleve, $profil)->map($enProps)->values()->all(),
-            'seances_matieres' => (object) $siennes->mapWithKeys(fn (Matiere $matiere) => [
-                $matiere->slug => $this->seances->aVenir($eleve, $profil, $matiere)->map($enProps)->values()->all(),
-            ])->all(),
+            'seances_matieres' => (object) [
+                ...$siennes->mapWithKeys(fn (Matiere $matiere) => [
+                    $matiere->slug => $this->seances->aVenir($eleve, $profil, $matiere)->map($enProps)->values()->all(),
+                ])->all(),
+                // Lot 12 : un quiz de culture préparé, rangé comme une séance
+                // de matière (« Lancer un quiz » hors ligne l'ouvre).
+                ...CatalogueEleve::matieresTransversales()->orderBy('ordre')->get()->mapWithKeys(fn (Matiere $matiere) => [
+                    $matiere->slug => $this->culture->aVenir($eleve)->map($enProps)->values()->all(),
+                ])->filter()->all(),
+            ],
+            // Lot 12 : la question du jour d'aujourd'hui et des six jours
+            // suivants ; hors ligne, la carte prend celle du jour de l'appareil.
+            'culture_jours' => $this->culture->joursAVenir(CarbonImmutable::today()->subDay()),
         ];
     }
 
@@ -268,7 +281,8 @@ class TableauDeBordEleveService
             ['cle' => 'profil', 'fait' => true],
             ['cle' => 'exercice', 'fait' => Tentative::query()->where('user_id', $eleve->id)->exists()],
             ['cle' => 'lecon', 'fait' => $progressions->isNotEmpty()],
-            ['cle' => 'seance', 'fait' => Seance::query()->where('user_id', $eleve->id)->whereNotNull('termine_le')->exists()],
+            // Lot 12 : un quiz de culture n'est pas une séance du jour.
+            ['cle' => 'seance', 'fait' => Seance::query()->where('user_id', $eleve->id)->where('culture', false)->whereNotNull('termine_le')->exists()],
         ];
     }
 }

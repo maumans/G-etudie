@@ -111,7 +111,7 @@ class ContenuService
      * vérification complète (FormatQuestion) se fait à l'envoi en relecture.
      * Les indices et les étapes laissés vides ne sont pas gardés.
      *
-     * @param  array{enonce: array<string, mixed>, donnees: array<string, mixed>, attendue: array<string, mixed>, indices: list<mixed>, corrige: list<mixed>, difficulte: int}  $champs
+     * @param  array{enonce: array<string, mixed>, donnees: array<string, mixed>, attendue: array<string, mixed>, indices: list<mixed>, corrige: list<mixed>, difficulte: int, sources?: string|null}  $champs  `sources` (lot 12) : absente, la source enregistrée ne change pas
      */
     public function enregistrerQuestion(Question $question, User $acteur, array $champs, int $revision, ?Notion $notion = null): Question
     {
@@ -138,6 +138,8 @@ class ContenuService
             'indices' => $indices,
             'corrige' => $corrige,
             'difficulte' => $champs['difficulte'],
+            // Lot 12 : la source (obligatoire en culture générale avant la relecture).
+            ...(array_key_exists('sources', $champs) ? ['sources' => Question::sourcesNettoyees($champs['sources'])] : []),
             'notion_id' => $notion->id ?? $question->notion_id,
         ]));
     }

@@ -1,5 +1,11 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { Archive, ClipboardList, Presentation, UsersRound } from 'lucide-react';
+import {
+    Archive,
+    ClipboardList,
+    Presentation,
+    ShieldAlert,
+    UsersRound,
+} from 'lucide-react';
 import { useState } from 'react';
 import {
     Carte,
@@ -25,6 +31,8 @@ type Groupe = ResumeGroupe & {
     actifs_semaine?: number;
     devoirs_ouverts: number;
     notions_faibles: NotionFaible[];
+    /** Lot 12 : messages signalés du fil qui attendent l'enseignant. */
+    a_moderer?: number;
 };
 
 type Props = {
@@ -194,6 +202,16 @@ function CarteGroupe({ groupe }: { groupe: Groupe }) {
                                 'devoirs ouverts',
                             )}
                         </span>
+                        {(groupe.a_moderer ?? 0) > 0 && (
+                            <span className="flex items-center gap-1.5 font-semibold text-nimba-700 dark:text-nimba-300">
+                                <ShieldAlert aria-hidden className="size-3.5" />
+                                {pluriel(
+                                    groupe.a_moderer ?? 0,
+                                    'message à modérer',
+                                    'messages à modérer',
+                                )}
+                            </span>
+                        )}
                     </span>
                 </span>
                 <ProgressionSegments

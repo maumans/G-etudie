@@ -5,6 +5,7 @@ use App\Http\Controllers\Eleve\AbonnementController;
 use App\Http\Controllers\Eleve\AccueilController;
 use App\Http\Controllers\Eleve\AnnaleController;
 use App\Http\Controllers\Eleve\CoursController;
+use App\Http\Controllers\Eleve\CultureController;
 use App\Http\Controllers\Eleve\ExamenBlancController;
 use App\Http\Controllers\Eleve\LeconController;
 use App\Http\Controllers\Eleve\PackController;
@@ -81,6 +82,11 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value])
             Route::get('packs/{pack}/morceaux/{numero}', [PackController::class, 'morceau'])->whereNumber('numero')->name('packs.morceau');
             Route::post('packs/{pack}/elements', [PackController::class, 'elements'])->name('packs.elements');
             Route::delete('packs/{pack}', [PackController::class, 'retirer'])->name('packs.retirer');
+
+            // Lot 12 : culture générale. L'écran se relit hors ligne
+            // (config/hors_ligne.php) ; un quiz se joue sur /eleve/seances/….
+            Route::get('culture', [CultureController::class, 'index'])->name('culture');
+            Route::post('culture/quiz', [CultureController::class, 'lancer'])->name('culture.quiz');
 
             // Lot 10 : le tuteur N'karamögö. En ligne seulement (hors de la
             // liste blanche, HORS_LIGNE.md A.2) ; la réponse arrive en flux.

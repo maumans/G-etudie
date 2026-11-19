@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Eleve;
 use App\Http\Controllers\Controller;
 use App\Models\Devoir;
 use App\Models\Groupe;
+use App\Models\MembreGroupe;
+use App\Models\PublicationGroupe;
 use App\Models\Seance;
 use App\Services\Organisation\DevoirService;
 use App\Services\Organisation\GesteRefuse;
@@ -48,6 +50,11 @@ class GroupeController extends Controller
             $etats[$devoir->id] = $this->devoirs->etats($devoir, collect([$eleve]))[$eleve->id];
         }
 
+        // Lot 12 : ce que l'élève a accepté, et l'activité du fil de chaque groupe.
+        $membres = MembreGroupe::query()->actifs()->where('eleve_id', $eleve->id)->whereIn('groupe_id', $groupes->modelKeys())->get()->keyBy('groupe_id');
+        $questionsFil = PublicationGroupe::query()->visibles()->whereNull('parent_id')->whereIn('groupe_id', $groupes->modelKeys())
+            ->groupBy('groupe_id')->selectRaw('groupe_id, count(*) as nombre')->pluck('nombre', 'groupe_id');
+
         return Inertia::render('eleve/groupes', [
             'groupes' => $groupes->map(fn (Groupe $groupe) => [
                 'id' => $groupe->id,
@@ -57,6 +64,8 @@ class GroupeController extends Controller
                 'examen' => $groupe->libelleExamen(),
                 'archive' => $groupe->archive_le !== null,
                 'est_exemple' => $groupe->est_exemple,
+                'classement_accepte' => (bool) $membres->get($groupe->id)?->classement_accepte,
+                'questions_fil' => (int) ($questionsFil[$groupe->id] ?? 0),
             ])->values(),
             'devoirs' => array_values(array_map(fn (Devoir $devoir): array => array_merge([
                 'id' => $devoir->id,
@@ -67,6 +76,9 @@ class GroupeController extends Controller
                 'questions' => (int) $devoir->questions_count,
                 'seance' => $seances->get($devoir->id)?->uuid,
                 'est_exemple' => $devoir->est_exemple,
+                // Lot 12 : un défi du groupe, avec son classement (opt-in).
+                'defi' => $devoir->defi,
+                'classement' => $this->devoirs->classement($devoir, $eleve),
             ], $etats[$devoir->id]), $devoirs->all())),
             'aujourdhui' => CarbonImmutable::now()->toIso8601ZuluString(),
         ]);
@@ -85,6 +97,25 @@ class GroupeController extends Controller
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Tu as rejoint « '.$groupe->nom.' ».']);
 
         return to_route('eleve.groupes.index');
+    }
+
+    /** Lot 12 : paraître, ou non, par son pseudo, au classement des défis du groupe. */
+    public function classement(Request $request, Groupe $groupe): RedirectResponse
+    {
+        Gate::authorize('voir', $groupe);
+        $accepte = (bool) $request->validate(['accepte' => ['required', 'boolean']])['accepte'];
+
+        try {
+            $this->devoirs->accepterClassement($request->user(), $groupe, $accepte);
+        } catch (GesteRefuse $refus) {
+            throw ValidationException::withMessages(['accepte' => $refus->getMessage()]);
+        }
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => $accepte
+            ? 'Ton pseudo apparaît au classement des défis de « '.$groupe->nom.' ».'
+            : 'Ton pseudo n’apparaît plus au classement.']);
+
+        return back();
     }
 
     public function quitter(Request $request, Groupe $groupe): RedirectResponse

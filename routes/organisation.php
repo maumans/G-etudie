@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Permission;
+use App\Http\Controllers\Communaute\FilController;
 use App\Http\Controllers\Compte\ParentsController as CompteParentsController;
 use App\Http\Controllers\Console\EtablissementsController as ConsoleEtablissementsController;
 use App\Http\Controllers\Eleve\DevoirController as EleveDevoirController;
@@ -88,6 +89,37 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value, 'can:'.Permiss
             ->name('groupes.rejoindre');
         Route::delete('groupes/{groupe}', [EleveGroupeController::class, 'quitter'])->name('groupes.quitter');
         Route::post('devoirs/{devoir}/commencer', [EleveDevoirController::class, 'commencer'])->name('devoirs.commencer');
+        // Lot 12 : paraître (par son pseudo) au classement des défis du groupe.
+        Route::post('groupes/{groupe}/classement', [EleveGroupeController::class, 'classement'])->name('groupes.classement');
+    });
+
+// Lot 12 (PLAN M13) : le fil « Questions du groupe », côté élève. En ligne
+// seulement (niveau C) ; le brouillon reste sur l'appareil.
+Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value, 'can:'.Permission::ParticiperCommunaute->value, ProfilEleveRequis::class])
+    ->prefix('eleve')
+    ->name('eleve.')
+    ->group(function () {
+        Route::get('groupes/{groupe}/fil', [FilController::class, 'eleve'])->name('fil.show');
+        Route::post('groupes/{groupe}/publications', [FilController::class, 'publier'])
+            ->middleware('throttle:fil')
+            ->name('fil.publier');
+        Route::post('publications/{publication}/signaler', [FilController::class, 'signaler'])
+            ->middleware('throttle:fil')
+            ->name('fil.signaler');
+    });
+
+// Lot 12 : le fil côté enseignant — répondre, masquer en un geste (critère
+// du lot), garder, retirer la parole, fermer.
+Route::middleware(['auth', 'can:'.Permission::EspaceEnseignant->value, 'can:'.Permission::ModererCommunaute->value])
+    ->prefix('enseignant')
+    ->name('enseignant.fil.')
+    ->group(function () {
+        Route::get('groupes/{groupe}/fil', [FilController::class, 'enseignant'])->name('show');
+        Route::post('groupes/{groupe}/publications', [FilController::class, 'publier'])->name('publier');
+        Route::post('publications/{publication}/masquer', [FilController::class, 'masquer'])->name('masquer');
+        Route::post('publications/{publication}/garder', [FilController::class, 'garder'])->name('garder');
+        Route::post('groupes/{groupe}/eleves/{eleve}/parole', [FilController::class, 'parole'])->name('parole');
+        Route::post('groupes/{groupe}/fil', [FilController::class, 'fermer'])->name('fermer');
     });
 
 Route::middleware(['auth', 'can:'.Permission::InviterParent->value])

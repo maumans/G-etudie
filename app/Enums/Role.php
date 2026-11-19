@@ -60,10 +60,11 @@ enum Role: string
                 Permission::UtiliserTuteur,
                 Permission::RejoindreGroupe,
                 Permission::InviterParent,
+                Permission::ParticiperCommunaute,
             ],
             // Lot 11 : le parent paie aussi l'abonnement de ses enfants.
             self::Parent => [Permission::EspaceParent, Permission::SouscrireAbonnement],
-            self::Enseignant => [Permission::EspaceEnseignant, Permission::GererGroupes],
+            self::Enseignant => [Permission::EspaceEnseignant, Permission::GererGroupes, Permission::ModererCommunaute],
             self::GestionnaireEtablissement => [Permission::EspaceEtablissement, Permission::GererEtablissement],
             self::Redacteur => [Permission::EspaceContenu, Permission::RedigerContenu, Permission::ImporterAnnales],
             // Le relecteur juge le contenu signalé ; il répond aux élèves.

@@ -17,16 +17,17 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string $slug
  * @property TeinteMatiere $teinte
  * @property int $ordre
+ * @property bool $transversale lot 12 : vue de tout élève, hors jauge et hors coefficients (culture générale)
  * @property-read int $epreuves_count withCount
  * @property-read int $chapitres_count withCount
  * @property-read int $phares_count withCount (épreuves phares)
  */
-#[Fillable(['nom', 'slug', 'teinte', 'ordre'])]
+#[Fillable(['nom', 'slug', 'teinte', 'ordre', 'transversale'])]
 class Matiere extends Model
 {
     protected function casts(): array
     {
-        return ['teinte' => TeinteMatiere::class];
+        return ['teinte' => TeinteMatiere::class, 'transversale' => 'boolean'];
     }
 
     /** @return HasMany<Epreuve, $this> */

@@ -23,4 +23,16 @@ class GroupePolicy
     {
         return Perimetre::peutGererGroupe($user, $groupe) ? Response::allow() : Response::denyAsNotFound();
     }
+
+    /** Lot 12 : le fil du groupe (élève présent ou enseignant du groupe). */
+    public function participer(User $user, Groupe $groupe): Response
+    {
+        return Perimetre::peutParticiperAuFil($user, $groupe) ? Response::allow() : Response::denyAsNotFound();
+    }
+
+    /** Lot 12 : modérer le fil (l'enseignant du groupe). */
+    public function moderer(User $user, Groupe $groupe): Response
+    {
+        return Perimetre::peutModererFil($user, $groupe) ? Response::allow() : Response::denyAsNotFound();
+    }
 }

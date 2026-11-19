@@ -6,8 +6,10 @@ use App\Enums\Filiere;
 use App\Http\Controllers\Controller;
 use App\Models\Examen;
 use App\Models\Groupe;
+use App\Models\PublicationGroupe;
 use App\Models\Serie;
 use App\Models\User;
+use App\Services\Communaute\FilGroupeService;
 use App\Services\Organisation\GesteRefuse;
 use App\Services\Organisation\GroupeService;
 use App\Services\Organisation\SuiviService;
@@ -31,6 +33,7 @@ class GroupeController extends Controller
     public function __construct(
         private GroupeService $groupes,
         private SuiviService $suivi,
+        private FilGroupeService $fil,
     ) {}
 
     public function index(Request $request): Response
@@ -93,6 +96,11 @@ class GroupeController extends Controller
 
         return Inertia::render('enseignant/groupe', [
             'suivi' => $this->suivi->groupe($groupe),
+            // Lot 12 : le fil du groupe, et ce qui attend l'enseignant.
+            'fil' => [
+                'questions' => PublicationGroupe::query()->where('groupe_id', $groupe->id)->whereNull('parent_id')->visibles()->count(),
+                'a_moderer' => $this->fil->aModerer($groupe),
+            ],
         ]);
     }
 
@@ -150,6 +158,8 @@ class GroupeController extends Controller
             'actifs_semaine' => $suivi['resume']['actifs_semaine'],
             'devoirs_ouverts' => $suivi['resume']['devoirs_ouverts'],
             'notions_faibles' => array_slice($suivi['notions_faibles'], 0, 2),
+            // Lot 12 : messages signalés du fil qui attendent l'enseignant.
+            'a_moderer' => $this->fil->aModerer($groupe),
         ];
     }
 }

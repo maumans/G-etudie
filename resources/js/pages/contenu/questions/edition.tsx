@@ -34,6 +34,7 @@ import { TYPES } from '@/components/questions/types-question';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
 import { useConfirmer } from '@/components/ui/confirm-provider';
+import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 import { documentVide, erreurBlocs } from '@/lib/contenu/blocs';
@@ -60,6 +61,9 @@ type Props = {
         indices: DocumentBlocs[];
         corrige: EtapeCorrige[];
         difficulte: number;
+        /** Lot 12 : la source (obligatoire en culture générale). */
+        sources?: string | null;
+        sources_exigees?: boolean;
         revision: number;
     };
     a_completer: string | null;
@@ -78,6 +82,7 @@ type Brouillon = {
     indices: DocumentBlocs[];
     corrige: EtapeCorrige[];
     difficulte: number;
+    sources: string;
 };
 
 /** Délai entre la dernière frappe et l'enregistrement automatique. */
@@ -142,6 +147,7 @@ export default function Edition({
                 ? question.corrige
                 : [{ titre: '', blocs: documentVide() }],
         difficulte: question.difficulte,
+        sources: question.sources ?? '',
     }));
     const [etat, setEtat] = useState<EtatEnregistrement>({
         cle: 'enregistre',
@@ -873,6 +879,26 @@ export default function Edition({
                         <p className="mt-2 text-aide text-ink-600">
                             {DIFFICULTES[brouillon.difficulte - 1]}
                         </p>
+                    </Section>
+
+                    <Section
+                        titre="La source"
+                        description={
+                            question.sources_exigees
+                                ? 'Obligatoire en culture générale : d’où vient ce fait ? Un ouvrage, un site officiel, une encyclopédie.'
+                                : 'Facultative : d’où vient l’énoncé, si ce n’est pas un texte de l’équipe.'
+                        }
+                    >
+                        <Textarea
+                            aria-label="Source de la question"
+                            value={brouillon.sources}
+                            onChange={(e) =>
+                                modifier({ sources: e.target.value })
+                            }
+                            maxLength={1000}
+                            className="min-h-16"
+                            placeholder="Ex. : Wikipédia, article « Fouta-Djallon », consulté le 12 novembre 2026."
+                        />
                     </Section>
                 </div>
 

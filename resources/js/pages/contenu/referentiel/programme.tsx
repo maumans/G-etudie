@@ -59,6 +59,8 @@ type Props = {
         id: number;
         nom: string;
         teinte: CleMatiere;
+        /** Lot 12 : thèmes sans classe, vus de tous les élèves (culture générale). */
+        transversale?: boolean;
         chapitres: number;
     }[];
     matiere_id: number | null;
@@ -206,12 +208,17 @@ export default function Programme({
                                 />
                                 <div className="grid min-w-0 gap-0.5">
                                     <h2 className="truncate text-titre-carte font-semibold">
-                                        {matiere.nom} · {classe.nom}
+                                        {matiere.nom} ·{' '}
+                                        {matiere.transversale
+                                            ? 'toutes les classes'
+                                            : classe.nom}
                                     </h2>
                                     <p className="text-aide text-ink-500">
                                         {pluriel(chapitres.length, 'chapitre')}
                                         {' · '}
                                         {pluriel(notions, 'notion')}
+                                        {matiere.transversale &&
+                                            ' · thèmes communs à tous les examens, hors jauge'}
                                     </p>
                                 </div>
                             </div>

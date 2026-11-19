@@ -87,6 +87,7 @@ class DevoirController extends Controller
             'echeance' => ['required', 'date'],
             'questions' => ['required', 'array', 'min:1', 'max:'.DevoirService::QUESTIONS_MAX],
             'questions.*' => ['string', 'uuid'],
+            'defi' => ['sometimes', 'boolean'],
         ], [], ['titre' => 'titre', 'echeance' => 'échéance', 'questions' => 'questions']);
 
         try {
@@ -98,12 +99,16 @@ class DevoirController extends Controller
                 // Une date seule : jusqu'à la fin de ce jour-là.
                 self::echeance($donnees['echeance']),
                 array_values($donnees['questions']),
+                // Lot 12 : un défi du groupe (classement par pseudo, opt-in).
+                (bool) ($donnees['defi'] ?? false),
             );
         } catch (GesteRefuse $refus) {
             throw ValidationException::withMessages([$refus->champ => $refus->getMessage()]);
         }
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Devoir donné : vos élèves le voient dans « Mes groupes ».']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => $devoir->defi
+            ? 'Défi lancé : vos élèves le voient dans « Mes groupes ».'
+            : 'Devoir donné : vos élèves le voient dans « Mes groupes ».']);
 
         return to_route('enseignant.devoirs.show', $devoir);
     }
@@ -114,6 +119,8 @@ class DevoirController extends Controller
 
         return Inertia::render('enseignant/devoir', [
             'suivi' => $this->suivi->devoir($devoir),
+            // Lot 12 : le classement d'un défi (élèves qui l'ont accepté).
+            'classement' => $this->devoirs->classement($devoir),
         ]);
     }
 

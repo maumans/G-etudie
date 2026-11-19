@@ -198,6 +198,55 @@ class CatalogueEleve
     {
         $profil = self::profil($eleve);
 
-        return $profil !== null && self::questions($profil)->whereKey($question->id)->exists();
+        return $profil !== null && (self::questions($profil)->whereKey($question->id)->exists()
+            || self::questionsCulture()->whereKey($question->id)->exists());
+    }
+
+    /**
+     * Lot 12 (PLAN M10) : les matières **transversales** (la culture
+     * générale). Tout élève qui a son profil les voit, quel que soit son
+     * examen ; elles n'ont pas d'épreuve, donc ni coefficient, ni jauge, ni
+     * place dans la séance du jour ni dans un devoir (`questions()` ne les
+     * contient pas).
+     *
+     * @return Builder<Matiere>
+     */
+    public static function matieresTransversales(): Builder
+    {
+        return Matiere::query()->where('transversale', true);
+    }
+
+    /**
+     * Les thèmes de culture générale : chapitres d'une matière transversale,
+     * sans classe.
+     *
+     * @return Builder<Chapitre>
+     */
+    public static function chapitresCulture(): Builder
+    {
+        return Chapitre::query()
+            ->whereNull('classe_id')
+            ->whereIn('matiere_id', self::matieresTransversales()->select('id'));
+    }
+
+    /**
+     * Les questions de culture générale publiées, non archivées (jamais
+     * celles d'une annale).
+     *
+     * @return Builder<Question>
+     */
+    public static function questionsCulture(?Chapitre $theme = null): Builder
+    {
+        $themes = self::chapitresCulture();
+
+        if ($theme !== null) {
+            $themes->whereKey($theme->id);
+        }
+
+        return Question::query()
+            ->whereNotNull('version_publiee_id')
+            ->where('statut', '!=', StatutContenu::Archive->value)
+            ->whereNull('sujet_partie_id')
+            ->whereHas('notion', fn (Builder $notion) => $notion->whereIn('chapitre_id', $themes->select('id')));
     }
 }

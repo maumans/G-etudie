@@ -52,11 +52,11 @@ class LeconController extends Controller
             ->with(['matiere', 'classe', 'notions'])
             ->whereHas('notions')
             ->get()
-            ->sortBy(fn (Chapitre $c) => [$c->matiere->ordre, $c->classe->ordre, $c->ordre]);
+            ->sortBy(fn (Chapitre $c) => [$c->matiere->ordre, $c->classe->ordre ?? 0, $c->ordre]);
 
         return Inertia::render('contenu/lecons/creer', [
             'groupes' => $chapitres->values()->map(fn (Chapitre $c) => [
-                'libelle' => "{$c->matiere->nom} · {$c->classe->nom} · {$c->titre}",
+                'libelle' => "{$c->matiere->nom} · ".($c->classe->nom ?? 'Toutes les classes')." · {$c->titre}",
                 'teinte' => $c->matiere->teinte->value,
                 'notions' => $c->notions->map(fn (Notion $n) => ['id' => $n->id, 'titre' => $n->titre]),
             ]),
@@ -329,7 +329,8 @@ class LeconController extends Controller
             'de_moi' => $lecon->auteur_id === $user->id,
             'modifiee_le' => $lecon->updated_at->toIso8601String(),
             'matiere' => ['nom' => $chapitre->matiere->nom, 'teinte' => $chapitre->matiere->teinte->value],
-            'classe' => $chapitre->classe->nom,
+            // Lot 12 : un thème de culture générale n'a pas de classe.
+            'classe' => $chapitre->classe->nom ?? 'Toutes les classes',
             'chapitre' => $chapitre->titre,
             'notion' => $lecon->notion->titre,
         ];

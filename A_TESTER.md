@@ -293,6 +293,63 @@
   réponses en attente, l'état du devoir chez l'enseignant.
 - État : à faire (après D11)
 
+### [Lot 12] Question du jour et quiz de culture générale en mode avion
+- Pourquoi : `HORS_LIGNE.md` B.3 « Lot 12 » : la question du jour des jours
+  suivants et un quiz préparé sont rangés sur l'appareil (instantané) ;
+  leurs réponses passent par la file.
+- Matériel : un Android d'entrée de gamme avec l'application installée
+  (HTTPS, D11), un compte élève de test, des questions de culture
+  publiées (au moins 6).
+- Comment le provoquer : 1. ouvrir l'accueil puis « Culture générale » en
+  ligne (l'instantané se range) ; 2. mode avion ; le lendemain (ou en
+  avançant la date du téléphone d'un jour), rouvrir l'application :
+  l'accueil montre la question du **nouveau** jour ; y répondre ;
+  3. « Culture générale » › « Lancer un quiz » : le quiz préparé s'ouvre ;
+  répondre aux 5 questions ; 4. couper le mode avion, attendre « Tout est
+  envoyé ».
+- Quoi observer : la question change avec le jour du téléphone ; le quiz
+  s'ouvre sans réseau ; aucune réponse perdue (« Mes derniers quiz » après
+  le retour du réseau) ; la jauge ne bouge pas (culture hors jauge) ;
+  « Défier mes amis » ouvre le menu de partage avec l'image.
+- En cas d'échec, relever : capture, date du téléphone, nombre de réponses
+  en attente, le message affiché.
+- État : à faire (après D11)
+
+### [Lot 12] Le fil d'un groupe sur un vrai téléphone, coupure en pleine saisie
+- Pourquoi : le fil est en ligne seulement (niveau C) ; le brouillon doit
+  survivre à une coupure ou à l'onglet fermé (PLAN § 9).
+- Matériel : deux téléphones élèves de test dans un même groupe, un
+  compte enseignant de test sur un ordinateur.
+- Comment le provoquer : 1. élève A écrit une question longue dans
+  « Questions du groupe », sans l'envoyer ; mode avion ; « Publier » ;
+  2. fermer l'application, la rouvrir (réseau revenu) ; 3. publier ;
+  4. élève B la signale (« Moquerie ») ; 5. l'enseignant ouvre le groupe :
+  « 1 message signalé attend votre décision » ; « Masquer » ; 6. élève B
+  rafraîchit le fil.
+- Quoi observer : à l'étape 1, le dialogue « Cette action demande une
+  connexion », rien de perdu ; à l'étape 2, le texte est revenu dans le
+  champ ; le masquage est immédiat (un geste), et le message disparaît
+  chez B ; A le voit « masqué par ton enseignant ».
+- En cas d'échec, relever : capture de chaque écran, heure, ce qui reste
+  dans le champ.
+- État : à faire (après D11)
+
+### [Lot 12] Une ressource externe sur un vrai téléphone (vidéo YouTube)
+- Pourquoi : PLAN M19 — l'élève est prévenu avant de quitter
+  l'application et de consommer des données ; le retour doit être simple.
+- Matériel : un Android avec l'application installée, une leçon avec une
+  vidéo YouTube vérifiée (back-office › Ressources), des données mobiles.
+- Comment le provoquer : ouvrir la leçon, « Pour aller plus loin » ›
+  toucher la vidéo ; lire le dialogue ; « Ouvrir YouTube » ; revenir à
+  l'application (bouton retour) ; en mode avion, toucher de nouveau le lien.
+- Quoi observer : le dialogue dit le site, la durée, le poids et prévient
+  des suggestions ; l'application YouTube ou un onglet s'ouvre ; le retour
+  ramène à la leçon, à la même position ; en mode avion, « Cet écran
+  demande une connexion », rien ne s'ouvre.
+- En cas d'échec, relever : capture, données consommées réelles pour la
+  durée vue, comportement du bouton retour.
+- État : à faire (après D11)
+
 ## 5. Téléphone partagé et profils
 
 ### [Lot 7] Deux profils sur le même téléphone, réponses hors ligne des deux (A.15 n° 4)

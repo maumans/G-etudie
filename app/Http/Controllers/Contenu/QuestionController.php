@@ -56,11 +56,11 @@ class QuestionController extends Controller
             ->with(['matiere', 'classe', 'notions'])
             ->whereHas('notions')
             ->get()
-            ->sortBy(fn (Chapitre $c) => [$c->matiere->ordre, $c->classe->ordre, $c->ordre]);
+            ->sortBy(fn (Chapitre $c) => [$c->matiere->ordre, $c->classe->ordre ?? 0, $c->ordre]);
 
         return Inertia::render('contenu/questions/creer', [
             'groupes' => $chapitres->values()->map(fn (Chapitre $c) => [
-                'libelle' => "{$c->matiere->nom} · {$c->classe->nom} · {$c->titre}",
+                'libelle' => "{$c->matiere->nom} · ".($c->classe->nom ?? 'Toutes les classes')." · {$c->titre}",
                 'teinte' => $c->matiere->teinte->value,
                 'notions' => $c->notions->map(fn (Notion $n) => ['id' => $n->id, 'titre' => $n->titre]),
             ]),
@@ -150,6 +150,9 @@ class QuestionController extends Controller
                 'indices' => $question->indices ?? [],
                 'corrige' => $question->corrige ?? [],
                 'difficulte' => $question->difficulte,
+                'sources' => $question->sources,
+                // Lot 12 : la source est exigée en culture générale.
+                'sources_exigees' => $question->notion->chapitre->matiere->transversale,
                 'revision' => $question->revision,
             ],
             // Ce qui manque avant l'envoi en relecture, dit tout de suite.
@@ -179,6 +182,7 @@ class QuestionController extends Controller
             'corrige.*.titre' => ['nullable', 'string', 'max:120'],
             'corrige.*.blocs' => ['required', 'array'],
             'difficulte' => ['required', 'integer', 'between:1,5'],
+            'sources' => ['nullable', 'string', 'max:1000'],
             'revision' => ['required', 'integer', 'min:0'],
         ]);
 
@@ -192,6 +196,7 @@ class QuestionController extends Controller
                 'blocs' => $etape['blocs'],
             ], array_values($donnees['corrige'])),
             'difficulte' => $donnees['difficulte'],
+            'sources' => $donnees['sources'] ?? null,
         ], $donnees['revision']);
 
         return to_route('contenu.questions.edit', $question);
@@ -363,7 +368,8 @@ class QuestionController extends Controller
             'de_moi' => $question->auteur_id === $user->id,
             'modifiee_le' => $question->updated_at->toIso8601String(),
             'matiere' => ['nom' => $chapitre->matiere->nom, 'teinte' => $chapitre->matiere->teinte->value],
-            'classe' => $chapitre->classe->nom,
+            // Lot 12 : un thème de culture générale n'a pas de classe.
+            'classe' => $chapitre->classe->nom ?? 'Toutes les classes',
             'chapitre' => $chapitre->titre,
             'notion' => $question->notion->titre,
             'indices' => count($question->indices ?? []),

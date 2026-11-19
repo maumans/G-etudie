@@ -8,6 +8,7 @@ import {
     TuileMatiere,
 } from '@/components/suivi/elements';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
 import { Champ } from '@/components/ui/champ';
@@ -70,6 +71,7 @@ export default function NouveauDevoir({
         consigne: '',
         echeance: demainPlus(7),
         questions: [] as string[],
+        defi: false,
     });
     const [recherche, setRecherche] = useState(filtres.recherche);
     // Les questions choisies restent connues même si un filtre les cache.
@@ -346,6 +348,28 @@ export default function NouveauDevoir({
                                     />
                                 )}
                             </Champ>
+                            <label className="flex items-start gap-3 rounded-controle border border-contour p-3 transition-colors has-[[data-state=checked]]:border-nimba-600 dark:has-[[data-state=checked]]:border-nimba-400">
+                                <Checkbox
+                                    checked={formulaire.data.defi}
+                                    onCheckedChange={(coche) =>
+                                        formulaire.setData(
+                                            'defi',
+                                            coche === true,
+                                        )
+                                    }
+                                    className="mt-0.5"
+                                />
+                                <span className="grid gap-0.5">
+                                    <span className="font-medium">
+                                        C’est un défi du groupe
+                                    </span>
+                                    <span className="text-aide text-ink-500">
+                                        Un classement par pseudo, où ne
+                                        paraissent que les élèves qui
+                                        l’acceptent.
+                                    </span>
+                                </span>
+                            </label>
                         </Carte>
 
                         <Carte className="grid gap-3">

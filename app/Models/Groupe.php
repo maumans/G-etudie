@@ -26,6 +26,7 @@ use Illuminate\Support\Carbon;
  * @property string $nom
  * @property string $code
  * @property Carbon|null $archive_le
+ * @property Carbon|null $fil_ferme_le lot 12 : l'enseignant a fermé le fil (plus de publication)
  * @property bool $est_exemple
  * @property Carbon $created_at
  * @property-read int|null $eleves_count `withCount` des membres présents
@@ -34,12 +35,12 @@ use Illuminate\Support\Carbon;
  * @property-read Examen $examen
  * @property-read Serie|null $serie
  */
-#[Fillable(['enseignant_id', 'etablissement_id', 'examen_id', 'serie_id', 'filiere', 'classe_id', 'nom', 'code', 'archive_le', 'est_exemple'])]
+#[Fillable(['enseignant_id', 'etablissement_id', 'examen_id', 'serie_id', 'filiere', 'classe_id', 'nom', 'code', 'archive_le', 'fil_ferme_le', 'est_exemple'])]
 class Groupe extends Model
 {
     protected function casts(): array
     {
-        return ['filiere' => Filiere::class, 'archive_le' => 'datetime', 'est_exemple' => 'boolean'];
+        return ['filiere' => Filiere::class, 'archive_le' => 'datetime', 'fil_ferme_le' => 'datetime', 'est_exemple' => 'boolean'];
     }
 
     /** @param  Builder<self>  $requete */

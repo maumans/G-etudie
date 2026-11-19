@@ -2,6 +2,8 @@
 
 use App\Support\HorlogeDemo;
 use Carbon\CarbonImmutable;
+use Database\Seeders\DemoSeeder;
+use Database\Seeders\ReferentielSeeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Storage;
@@ -63,6 +65,19 @@ test('la session est enregistrée à la vraie heure, pas à l\'instant du semis'
 
     Carbon::setTestNow();
 });
+
+test('un db:seed relancé sur une démonstration existante ne déplace pas l\'horloge (lot 12)', function () {
+    Storage::fake('local');
+    config(['demonstration.mot_de_passe' => 'mot-de-passe-de-test']);
+    Carbon::setTestNow('2026-11-13 11:24:40');
+    $this->seed([ReferentielSeeder::class, DemoSeeder::class]);
+
+    Carbon::setTestNow('2026-11-18 11:02:36');
+    $this->seed(DemoSeeder::class);
+    Carbon::setTestNow();
+
+    expect(HorlogeDemo::instant()?->toDateTimeString())->toBe('2026-11-13 11:24:40');
+})->group('lent');
 
 test('sans semis noté ni compte de démonstration, rien n\'est figé', function () {
     Storage::fake('local');

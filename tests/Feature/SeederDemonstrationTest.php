@@ -121,7 +121,8 @@ test('le cours de démonstration côté élève : fictif, QCM valides, deux él�
         ->and(CatalogueEleve::lecons(CatalogueEleve::profil($aissatou))->count())->toBeGreaterThan(3)
         ->and(CatalogueEleve::questions(CatalogueEleve::profil($ousmane))->count())->toBeGreaterThan(3)
         // Historique semé une fois : le second passage n'ajoute rien.
-        ->and(Tentative::where('user_id', $aissatou->id)->where('mode', '!=', ModeTentative::ExamenBlanc->value)->count())->toBe(6)
+        // (lot 12 : plus les cinq réponses de son quiz de culture générale).
+        ->and(Tentative::where('user_id', $aissatou->id)->where('mode', '!=', ModeTentative::ExamenBlanc->value)->count())->toBe(11)
         // Ses deux examens blancs (lot 5) : sept réponses, semées une fois.
         ->and(ExamenBlanc::where('user_id', $aissatou->id)->count())->toBe(2)
         ->and(Tentative::where('user_id', $aissatou->id)->where('mode', ModeTentative::ExamenBlanc->value)->count())->toBe(7)

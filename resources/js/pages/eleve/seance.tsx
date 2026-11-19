@@ -1,9 +1,11 @@
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, usePage } from '@inertiajs/react';
 import {
     BookOpen,
     CloudUpload,
     Flame,
     House,
+    Lightbulb,
+    Share2,
     UsersRound,
     X,
 } from 'lucide-react';
@@ -28,7 +30,8 @@ import { corriger, scoreAutoEvaluation } from '@/lib/contenu/questions';
 import type { QuestionEleve, ReponseQuestion } from '@/lib/contenu/questions';
 import { base, enregistrer, useHorsLigne } from '@/lib/hors-ligne';
 import { marquerSeanceTerminee } from '@/lib/progression/locale';
-import { accueil, cours } from '@/routes/eleve';
+import { partagerCarteCulture } from '@/lib/culture/carte';
+import { accueil, cours, culture as pageCulture } from '@/routes/eleve';
 import { index as groupesEleve } from '@/routes/eleve/groupes';
 
 /** Une réponse de la séance : reçue par le serveur, ou encore dans la file. */
@@ -48,6 +51,8 @@ type Props = {
         terminee: boolean;
         /** Lot 11 : la séance d'un devoir (titre, groupe, échéance). */
         devoir?: { titre: string; groupe: string; echeance_le: string } | null;
+        /** Lot 12 : un quiz de culture générale. */
+        culture?: boolean;
     };
     questions: QuestionEleve[];
     reponses: Reponse[];
@@ -229,14 +234,22 @@ export default function Seance({ seance, questions, reponses }: Props) {
                 title={
                     seance.devoir
                         ? `Devoir · ${seance.devoir.titre}`
-                        : 'Séance du jour'
+                        : seance.culture
+                          ? 'Quiz de culture générale'
+                          : 'Séance du jour'
                 }
             />
             <div className="flex min-h-dvh flex-col bg-background">
                 <header className="sticky top-0 z-20 border-b bg-background/90 backdrop-blur-md">
                     <div className="mx-auto flex h-14 w-full max-w-2xl items-center gap-3 px-4">
                         <Link
-                            href={seance.devoir ? groupesEleve() : accueil()}
+                            href={
+                                seance.devoir
+                                    ? groupesEleve()
+                                    : seance.culture
+                                      ? pageCulture()
+                                      : accueil()
+                            }
                             aria-label={
                                 seance.devoir
                                     ? 'Quitter le devoir'
@@ -273,6 +286,8 @@ export default function Seance({ seance, questions, reponses }: Props) {
                             total={questions.length}
                             duree={seance.duree_minutes}
                             devoir={seance.devoir ?? null}
+                            culture={seance.culture === true}
+                            exemple={exemple}
                         />
                     </main>
                 ) : (
@@ -487,6 +502,7 @@ function BarreAction({
                             <CorrigePasAPas
                                 key={question.uuid}
                                 etapes={question.corrige}
+                                sources={question.sources}
                                 tuteur={{
                                     question,
                                     reponse: tentative.reponse,
@@ -555,14 +571,19 @@ function Bilan({
     total,
     duree,
     devoir,
+    culture = false,
+    exemple = false,
 }: {
     justes: number;
     enPartie: number;
     total: number;
     duree: number;
     devoir: NonNullable<Props['seance']['devoir']> | null;
+    culture?: boolean;
+    exemple?: boolean;
 }) {
     const { enAttente } = useHorsLigne();
+    const { auth } = usePage().props;
     const pourcentage = Math.round((justes / Math.max(1, total)) * 100);
 
     return (
@@ -575,13 +596,19 @@ function Bilan({
             </span>
             <div className="grid gap-2">
                 <h1 className="text-[1.75rem] leading-tight titre-contraste">
-                    {devoir ? 'Devoir rendu.' : 'Séance terminée.'}{' '}
+                    {devoir
+                        ? 'Devoir rendu.'
+                        : culture
+                          ? 'Quiz terminé.'
+                          : 'Séance terminée.'}{' '}
                     <strong>Bravo.</strong>
                 </h1>
                 <p className="text-ink-600">
                     {devoir
                         ? `« ${devoir.titre} » part chez ton enseignant (${devoir.groupe}).`
-                        : `Ta séance de ${duree} minutes compte pour ta série de jours.`}
+                        : culture
+                          ? 'Partage ton score et défie tes amis : à eux de faire mieux.'
+                          : `Ta séance de ${duree} minutes compte pour ta série de jours.`}
                 </p>
             </div>
             <div className="grid justify-items-center gap-1">
@@ -616,6 +643,30 @@ function Bilan({
                 </p>
             )}
             <div className="grid w-full max-w-xs gap-2.5">
+                {culture && (
+                    <>
+                        <Button
+                            taille="grande"
+                            onClick={() =>
+                                void partagerCarteCulture({
+                                    prenom: auth.user?.prenom ?? '',
+                                    justes,
+                                    total,
+                                    exemple,
+                                }).catch(() => undefined)
+                            }
+                        >
+                            <Share2 aria-hidden />
+                            Défier mes amis
+                        </Button>
+                        <Button asChild variant="outline" taille="grande">
+                            <Link href={pageCulture()}>
+                                <Lightbulb aria-hidden />
+                                Culture générale
+                            </Link>
+                        </Button>
+                    </>
+                )}
                 {devoir && (
                     <Button asChild taille="grande">
                         <Link href={groupesEleve()}>
@@ -627,19 +678,22 @@ function Bilan({
                 <Button
                     asChild
                     taille="grande"
-                    variant={devoir ? 'outline' : 'default'}
+                    variant={devoir || culture ? 'outline' : 'default'}
                 >
                     <Link href={accueil()}>
                         <House aria-hidden />
                         Retour à l'accueil
                     </Link>
                 </Button>
-                <Button asChild variant="outline" taille="grande">
-                    <Link href={cours()}>
-                        <BookOpen aria-hidden />
-                        Revoir le cours
-                    </Link>
-                </Button>
+                {/* Lot 12 : un quiz de culture ne renvoie à aucun cours. */}
+                {!culture && (
+                    <Button asChild variant="outline" taille="grande">
+                        <Link href={cours()}>
+                            <BookOpen aria-hidden />
+                            Revoir le cours
+                        </Link>
+                    </Button>
+                )}
             </div>
         </div>
     );

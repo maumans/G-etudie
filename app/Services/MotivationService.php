@@ -78,6 +78,12 @@ class MotivationService
         $this->verifierBadges($seance->user_id, $recuLe);
     }
 
+    /** Lot 12 : la fin d'un quiz de culture générale compte comme une activité du jour, rien de plus. */
+    public function apresQuizCulture(Seance $seance, CarbonImmutable $saisiLe): void
+    {
+        $this->noterActivite($seance->user_id, $saisiLe, 0, 0);
+    }
+
     public function apresExamenBlanc(ExamenBlanc $examen): void
     {
         $this->noterActivite($examen->user_id, CarbonImmutable::instance($examen->termine_le), 0, 0);

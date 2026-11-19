@@ -4,6 +4,7 @@ namespace App\Services\Organisation;
 
 use App\Models\Devoir;
 use App\Models\Groupe;
+use App\Models\MembreGroupe;
 use App\Models\Question;
 use App\Models\Seance;
 use App\Models\Tentative;
@@ -35,7 +36,7 @@ class DevoirService
     /**
      * @param  list<string>  $questions  UUID des questions, dans l'ordre voulu
      */
-    public function creer(User $enseignant, Groupe $groupe, string $titre, ?string $consigne, CarbonImmutable $echeance, array $questions): Devoir
+    public function creer(User $enseignant, Groupe $groupe, string $titre, ?string $consigne, CarbonImmutable $echeance, array $questions, bool $defi = false): Devoir
     {
         if (! Perimetre::peutGererGroupe($enseignant, $groupe) || $groupe->archive_le !== null) {
             throw new GesteRefuse('Ce groupe n\'accepte plus de devoir.', 'groupe');
@@ -57,12 +58,13 @@ class DevoirService
             throw new GesteRefuse('Une question choisie n\'est plus publiée pour ce groupe.', 'questions');
         }
 
-        return DB::transaction(function () use ($enseignant, $groupe, $titre, $consigne, $echeance, $questions, $ids) {
+        return DB::transaction(function () use ($enseignant, $groupe, $titre, $consigne, $echeance, $questions, $ids, $defi) {
             $devoir = Devoir::create([
                 'groupe_id' => $groupe->id,
                 'auteur_id' => $enseignant->id,
                 'titre' => $titre,
                 'consigne' => $consigne,
+                'defi' => $defi,
                 'echeance_le' => $echeance,
                 'publie_le' => CarbonImmutable::now(),
             ]);
@@ -134,6 +136,54 @@ class DevoirService
                 'genere_le' => CarbonImmutable::now(),
             ]);
         });
+    }
+
+    /**
+     * Lot 12 (PLAN M13, décision du 2026-11-18) : le classement d'un défi du
+     * groupe. N'y paraissent, **par leur pseudo**, que les élèves présents
+     * qui l'ont accepté (`membres_groupes.classement_accepte`) et ont rendu
+     * le défi ; les autres sont comptés sans être nommés. Meilleur score
+     * d'abord, puis le premier rendu. `null` : ce devoir n'est pas un défi.
+     *
+     * @return array{classes: list<array{rang: int, pseudo: string, score: int, est_moi: bool}>, autres_rendus: int, rendus: int, j_accepte: bool|null}|null
+     */
+    public function classement(Devoir $devoir, ?User $lecteur = null): ?array
+    {
+        if (! $devoir->defi) {
+            return null;
+        }
+
+        $membres = MembreGroupe::query()->actifs()->where('groupe_id', $devoir->groupe_id)->with('eleve')->get();
+        $etats = $this->etats($devoir, $membres->map(fn (MembreGroupe $m) => $m->eleve));
+        $rendus = $membres->filter(fn (MembreGroupe $m) => $etats[$m->eleve_id]['etat'] === 'rendu' && $etats[$m->eleve_id]['score'] !== null);
+        $classes = $rendus->filter(fn (MembreGroupe $m) => $m->classement_accepte)
+            ->sortBy([
+                fn (MembreGroupe $a, MembreGroupe $b) => $etats[$b->eleve_id]['score'] <=> $etats[$a->eleve_id]['score'],
+                fn (MembreGroupe $a, MembreGroupe $b) => $etats[$a->eleve_id]['rendu_le'] <=> $etats[$b->eleve_id]['rendu_le'],
+                fn (MembreGroupe $a, MembreGroupe $b) => $a->eleve_id <=> $b->eleve_id,
+            ])
+            ->values();
+
+        return [
+            'classes' => array_values($classes->map(fn (MembreGroupe $m, int $i) => [
+                'rang' => $i + 1,
+                'pseudo' => $m->eleve->pseudo,
+                'score' => (int) $etats[$m->eleve_id]['score'],
+                'est_moi' => $m->eleve_id === $lecteur?->id,
+            ])->all()),
+            'autres_rendus' => $rendus->count() - $classes->count(),
+            'rendus' => $rendus->count(),
+            'j_accepte' => $lecteur === null ? null : $membres->firstWhere('eleve_id', $lecteur->id)?->classement_accepte,
+        ];
+    }
+
+    /** L'élève accepte (ou refuse) de paraître, par son pseudo, au classement des défis du groupe. */
+    public function accepterClassement(User $eleve, Groupe $groupe, bool $accepte): void
+    {
+        $membre = MembreGroupe::query()->actifs()->where('groupe_id', $groupe->id)->where('eleve_id', $eleve->id)->first()
+            ?? throw new GesteRefuse('Tu ne fais plus partie de ce groupe.');
+
+        $membre->update(['classement_accepte' => $accepte]);
     }
 
     /**

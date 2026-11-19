@@ -4,12 +4,14 @@ use App\Enums\Permission;
 use App\Http\Controllers\Contenu\AnnaleController;
 use App\Http\Controllers\Contenu\ImportAnnaleController;
 use App\Http\Controllers\Contenu\LeconController;
+use App\Http\Controllers\Contenu\ModerationController;
 use App\Http\Controllers\Contenu\PartieAnnaleController;
 use App\Http\Controllers\Contenu\QuestionController;
 use App\Http\Controllers\Contenu\Referentiel\AnneeScolaireController;
 use App\Http\Controllers\Contenu\Referentiel\MatiereController;
 use App\Http\Controllers\Contenu\Referentiel\OffreController;
 use App\Http\Controllers\Contenu\Referentiel\ProgrammeController;
+use App\Http\Controllers\Contenu\RessourceController;
 use App\Http\Controllers\Contenu\SignalementController;
 use Illuminate\Support\Facades\Route;
 
@@ -109,6 +111,31 @@ Route::middleware(['auth', 'can:'.Permission::TraiterSignalements->value])
         Route::get('/', [SignalementController::class, 'index'])->name('index');
         Route::get('{signalement}', [SignalementController::class, 'show'])->name('show');
         Route::post('{signalement}/repondre', [SignalementController::class, 'repondre'])->name('repondre');
+    });
+
+// Lot 12 (PLAN M19) : ressources externes. Tout le back-office consulte ;
+// proposer et modifier : rédacteur ; vérifier et retirer : relecteur (jamais
+// celui qui l'a proposée, RessourceService).
+Route::middleware(['auth', 'can:'.Permission::EspaceContenu->value])
+    ->prefix('contenu/ressources')
+    ->name('contenu.ressources.')
+    ->group(function () {
+        Route::get('/', [RessourceController::class, 'index'])->name('index');
+        Route::post('/', [RessourceController::class, 'store'])->middleware('can:'.Permission::RedigerContenu->value)->name('store');
+        Route::put('{ressource}', [RessourceController::class, 'update'])->middleware('can:'.Permission::RedigerContenu->value)->name('update');
+        Route::post('{ressource}/verifier', [RessourceController::class, 'verifier'])->middleware('can:'.Permission::RelireContenu->value)->name('verifier');
+        Route::post('{ressource}/retirer', [RessourceController::class, 'retirer'])->middleware('can:'.Permission::RelireContenu->value)->name('retirer');
+    });
+
+// Lot 12 (PLAN M13) : les mots refusés dans les fils des groupes
+// (responsable pédagogique).
+Route::middleware(['auth', 'can:'.Permission::EspaceContenu->value, 'can:'.Permission::AdministrerContenu->value])
+    ->prefix('contenu/moderation')
+    ->name('contenu.moderation.')
+    ->group(function () {
+        Route::get('/', [ModerationController::class, 'index'])->name('index');
+        Route::post('mots', [ModerationController::class, 'store'])->name('mots.store');
+        Route::delete('mots/{mot}', [ModerationController::class, 'destroy'])->name('mots.destroy');
     });
 
 // Référentiel (PLAN M3) : responsable pédagogique et administrateur plateforme.

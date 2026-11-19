@@ -118,6 +118,7 @@ export function ExerciceQuestion({
                 {tentative.verifiee && (
                     <CorrigePasAPas
                         etapes={question.corrige}
+                        sources={question.sources}
                         className="border-t pt-4"
                         tuteur={
                             envoyer

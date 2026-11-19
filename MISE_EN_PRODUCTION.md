@@ -352,6 +352,7 @@ Ce qu'il lance :
 | `packs:generer` | chaque nuit à 3 h | 7 | filet : un titre de chapitre modifié, une épreuve ajoutée ne regénèrent pas les packs d'eux-mêmes |
 | `paiements:verifier` | toutes les 5 min | 9 | un paiement dont le webhook s'est perdu est redemandé à l'opérateur ; sans réponse au bout de 30 min, il expire |
 | `codes:effacer-oublies` | chaque nuit à 4 h | 9 | les codes prépayés en clair d'un lot jamais marqué « remis » sont effacés au bout de 14 jours |
+| `ressources:verifier` | le lundi à 5 h | 12 | les liens des ressources externes vérifiées répondent-ils encore ? Un lien muet sort de la vue élève et apparaît « Lien cassé » au back-office (appels HTTPS sortants vers les sites de `config/ressources.php`) |
 
 Une seule ligne dans la crontab de `www-data` :
 
@@ -692,6 +693,32 @@ les reconstruit depuis la base.
   contrat signé). Le gestionnaire rattache ensuite ses enseignants.
 - **Contrôles** : § 9, point 9 ; `A_TESTER.md`, lot 11.
 
+### Lot 12 — culture générale, ressources externes, communauté encadrée
+
+- **Une seule fois** : `migrate` (tables `ressources_externes`,
+  `mots_interdits`, `publications_groupe`, `signalements_publications` ;
+  colonnes `matieres.transversale`, `questions.sources`, `seances.culture`,
+  `groupes.fil_ferme_le`, `membres_groupes.muet_jusqu_au` et
+  `classement_accepte`, `devoirs.defi` ; `chapitres.classe_id` devient
+  facultatif), puis `db:seed` (deux permissions, `communaute.participer` et
+  `communaute.moderer` ; la matière « Culture générale » devient
+  transversale), puis **`php artisan packs:generer`** : les leçons des packs
+  portent désormais leurs ressources externes (une mise à jour
+  différentielle, quelques Ko par pack).
+- **Liste des mots refusés** : la base de production n'en a aucun (la
+  liste de démonstration n'est semée qu'en développement). Le responsable
+  pédagogique la saisit dans Back-office › Modération **avant** d'ouvrir
+  les fils aux élèves ; numéros, liens et e-mails sont refusés sans liste.
+- **Planificateur** (§ 4.2) : `ressources:verifier` chaque lundi à 5 h.
+  Le serveur doit pouvoir appeler en HTTPS les sites de
+  `config/ressources.php` (pare-feu sortant ouvert sur le port 443).
+- **`.env`, file, Nginx** : rien de plus.
+- **Contenu** : la culture générale n'apparaît qu'avec des questions
+  **publiées et sourcées** (Référentiel › Programme › Culture générale :
+  thèmes communs à toutes les classes ; puis Questions). Sans elles,
+  l'écran dit que l'équipe les prépare.
+- **Contrôles** : § 9, point 10 ; `A_TESTER.md`, lot 12.
+
 ---
 
 ## 9. Vérifications après la mise en ligne
@@ -706,7 +733,7 @@ sudo supervisorctl status nkaramogo-ssr                             # RUNNING (l
 php artisan inertia:check-ssr                                        # running
 curl -s https://nkaramogo.example/ | grep -c 'data-server-rendered'  # 1 : la vitrine arrive construite
 php artisan tinker --execute="echo config('tuteur.moteur'), ' ', config('tuteur.modele');"   # « claude claude-sonnet-5-5 » (lot 10)
-php artisan schedule:list                                            # packs:generer à 3 h, paiements:verifier toutes les 5 min (lot 9)
+php artisan schedule:list                                            # packs:generer à 3 h, paiements:verifier toutes les 5 min (lot 9), ressources:verifier le lundi (lot 12)
 php artisan queue:failed                                             # aucun travail en échec
 test ! -f public/hot && echo "OK : pas de public/hot"
 ```
@@ -739,6 +766,12 @@ Dans un navigateur, en HTTPS :
    de test : créer un groupe, le rejoindre avec un compte élève de test
    (code du groupe), et voir l'élève dans le groupe ; un second
    enseignant reçoit **404** sur l'adresse de ce groupe.
+10. (Lot 12) Back-office › Modération : la liste des mots refusés n'est
+   pas vide. Avec le compte élève de test du point 9 : écrire « appelle-moi
+   au 622 12 34 56 » dans « Questions du groupe » → refusé ; une vraie
+   question → publiée ; l'enseignant de test la voit, « Masquer » → elle
+   disparaît chez l'élève. `php artisan ressources:verifier` →
+   « N liens contrôlés ».
 
 Puis dérouler les contrôles « bloqués tant que le domaine HTTPS n'existe
 pas » de `A_TESTER.md` (vrais téléphones, mode avion, deux profils,

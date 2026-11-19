@@ -36,6 +36,7 @@ use Illuminate\Support\Carbon;
  * @property array<string, mixed> $reponse_attendue
  * @property list<array<string, mixed>>|null $indices documents de blocs
  * @property list<array{titre: string, blocs: array<string, mixed>}>|null $corrige étapes
+ * @property string|null $sources d'où vient le fait (lot 12, obligatoire en culture générale)
  * @property bool $reponse_a_verifier réponse et corrigé proposés par l'IA, pas encore vérifiés
  * @property int $difficulte
  * @property string $source
@@ -51,7 +52,7 @@ use Illuminate\Support\Carbon;
  * @property-read VersionContenu|null $versionPubliee
  * @property-read SujetPartie|null $partie
  */
-#[Fillable(['uuid', 'notion_id', 'sujet_partie_id', 'ordre_sujet', 'auteur_id', 'type', 'extrait', 'enonce', 'donnees', 'reponse_attendue', 'indices', 'corrige', 'reponse_a_verifier', 'difficulte', 'source', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
+#[Fillable(['uuid', 'notion_id', 'sujet_partie_id', 'ordre_sujet', 'auteur_id', 'type', 'extrait', 'enonce', 'donnees', 'reponse_attendue', 'indices', 'corrige', 'sources', 'reponse_a_verifier', 'difficulte', 'source', 'statut', 'revision', 'version_publiee_id', 'publie_le', 'est_exemple'])]
 class Question extends Model implements ContenuRelisable
 {
     use EstRelisable;
@@ -100,7 +101,7 @@ class Question extends Model implements ContenuRelisable
     /**
      * Le brouillon, sous la forme que fige une version.
      *
-     * @return array{type: string, enonce: array<string, mixed>, donnees: array<string, mixed>, attendue: array<string, mixed>, indices: list<array<string, mixed>>, corrige: list<array{titre: string, blocs: array<string, mixed>}>, difficulte: int}
+     * @return array{type: string, enonce: array<string, mixed>, donnees: array<string, mixed>, attendue: array<string, mixed>, indices: list<array<string, mixed>>, corrige: list<array{titre: string, blocs: array<string, mixed>}>, difficulte: int, sources: string|null}
      */
     public function contenuDuBrouillon(): array
     {
@@ -112,7 +113,17 @@ class Question extends Model implements ContenuRelisable
             'indices' => $this->indices ?? [],
             'corrige' => $this->corrige ?? [],
             'difficulte' => $this->difficulte,
+            // Lot 12 : la source figée avec la question (M10 : « sourcé »).
+            'sources' => self::sourcesNettoyees($this->sources),
         ];
+    }
+
+    /** Une source vide n'en est pas une. */
+    public static function sourcesNettoyees(?string $sources): ?string
+    {
+        $sources = trim((string) $sources);
+
+        return $sources === '' ? null : mb_substr($sources, 0, 1000);
     }
 
     public function instantane(): array
@@ -141,7 +152,11 @@ class Question extends Model implements ContenuRelisable
 
         return FormatQuestion::erreur($this->type, $this->enonce, $this->donnees, $this->reponse_attendue)
             ?? FormatQuestion::erreurAides($this->indices ?? [], $this->corrige ?? [])
-            ?? (($this->corrige ?? []) === [] ? 'Le corrigé pas à pas a au moins une étape.' : null);
+            ?? (($this->corrige ?? []) === [] ? 'Le corrigé pas à pas a au moins une étape.' : null)
+            // Lot 12 (PLAN M10) : une question de culture générale dit d'où vient le fait.
+            ?? ($this->notion->chapitre->matiere->transversale && self::sourcesNettoyees($this->sources) === null
+                ? 'Une question de culture générale cite sa source (ouvrage, site officiel…).'
+                : null);
     }
 
     /** La version publiée : ce que voit l'élève (`null` si jamais publiée). */

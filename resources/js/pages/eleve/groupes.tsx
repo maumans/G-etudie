@@ -3,7 +3,9 @@ import {
     CalendarClock,
     CircleCheck,
     LogOut,
+    MessagesSquare,
     Play,
+    Trophy,
     UsersRound,
 } from 'lucide-react';
 import { Carte, EnteteEcran, TitreCarte } from '@/components/suivi/elements';
@@ -11,6 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
 import { Button } from '@/components/ui/button';
 import { Champ } from '@/components/ui/champ';
+import { Checkbox } from '@/components/ui/checkbox';
 import { useConfirmer } from '@/components/ui/confirm-provider';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
@@ -18,8 +21,21 @@ import { echeanceRelative, formaterJour } from '@/lib/dates';
 import { cn, pluriel } from '@/lib/utils';
 import { show as pageSeance } from '@/routes/eleve/seances';
 import { commencer } from '@/routes/eleve/devoirs';
-import { quitter, rejoindre } from '@/routes/eleve/groupes';
+import { show as pageFil } from '@/routes/eleve/fil';
+import { classement, quitter, rejoindre } from '@/routes/eleve/groupes';
 import type { EtatDevoir } from '@/types/suivi';
+
+type Classement = {
+    classes: {
+        rang: number;
+        pseudo: string;
+        score: number;
+        est_moi: boolean;
+    }[];
+    autres_rendus: number;
+    rendus: number;
+    j_accepte: boolean | null;
+};
 
 type Props = {
     groupes: {
@@ -30,6 +46,9 @@ type Props = {
         examen: string;
         archive: boolean;
         est_exemple: boolean;
+        /** Lot 12. */
+        classement_accepte: boolean;
+        questions_fil: number;
     }[];
     devoirs: (EtatDevoir & {
         id: number;
@@ -40,6 +59,9 @@ type Props = {
         questions: number;
         seance: string | null;
         est_exemple: boolean;
+        /** Lot 12 : un défi du groupe, et son classement (opt-in). */
+        defi?: boolean;
+        classement?: Classement | null;
     })[];
     aujourdhui: string;
 };
@@ -127,6 +149,15 @@ export default function MesGroupes({ groupes, devoirs, aujourdhui }: Props) {
                                         <span>
                                             {nomGroupe.get(devoir.groupe_id)}
                                         </span>
+                                        {devoir.defi && (
+                                            <span className="flex items-center gap-1 font-semibold">
+                                                <Trophy
+                                                    aria-hidden
+                                                    className="size-3.5"
+                                                />
+                                                Défi du groupe
+                                            </span>
+                                        )}
                                     </p>
                                     <h2
                                         className={cn(
@@ -213,6 +244,22 @@ export default function MesGroupes({ groupes, devoirs, aujourdhui }: Props) {
                                 )}
                             </section>
                         ))}
+
+                        {devoirs
+                            .filter(
+                                (d) =>
+                                    d.defi &&
+                                    d.classement &&
+                                    d.classement.rendus > 0,
+                            )
+                            .map((d) => (
+                                <ClassementDefi
+                                    key={d.id}
+                                    titre={d.titre}
+                                    groupe={nomGroupe.get(d.groupe_id) ?? ''}
+                                    classement={d.classement as Classement}
+                                />
+                            ))}
 
                         {rendus.length > 0 && (
                             <Carte aria-labelledby="titre-rendus">
@@ -372,10 +419,71 @@ export default function MesGroupes({ groupes, devoirs, aujourdhui }: Props) {
                                         </li>
                                     ))}
                                 </ul>
+                                <ul className="mt-1 grid gap-2 border-t pt-3">
+                                    {groupes
+                                        .filter(
+                                            (g) =>
+                                                !g.archive ||
+                                                g.questions_fil > 0,
+                                        )
+                                        .map((groupe) => (
+                                            <li
+                                                key={groupe.id}
+                                                className="grid gap-2"
+                                            >
+                                                <Link
+                                                    href={pageFil(groupe.id)}
+                                                    prefetch
+                                                    className="flex items-center gap-2 rounded-controle text-aide font-medium text-nimba-700 outline-none hover:underline focus-visible:outline-2 focus-visible:outline-ring dark:text-nimba-300"
+                                                >
+                                                    <MessagesSquare
+                                                        aria-hidden
+                                                        className="size-4"
+                                                    />
+                                                    Questions du groupe{' '}
+                                                    {groupe.nom}
+                                                    {groupe.questions_fil > 0 &&
+                                                        ` (${groupe.questions_fil})`}
+                                                </Link>
+                                                {!groupe.archive && (
+                                                    <label className="flex items-start gap-2 text-aide text-ink-600">
+                                                        <Checkbox
+                                                            checked={
+                                                                groupe.classement_accepte
+                                                            }
+                                                            onCheckedChange={(
+                                                                coche,
+                                                            ) =>
+                                                                router.post(
+                                                                    classement(
+                                                                        groupe.id,
+                                                                    ).url,
+                                                                    {
+                                                                        accepte:
+                                                                            coche ===
+                                                                            true,
+                                                                    },
+                                                                    {
+                                                                        preserveScroll: true,
+                                                                    },
+                                                                )
+                                                            }
+                                                            className="mt-0.5"
+                                                        />
+                                                        Paraître (par mon
+                                                        pseudo) au classement
+                                                        des défis de{' '}
+                                                        {groupe.nom}
+                                                    </label>
+                                                )}
+                                            </li>
+                                        ))}
+                                </ul>
                                 <p className="mt-2 border-t pt-3 text-meta text-ink-500">
                                     Ton enseignant voit ta jauge et tes devoirs,
                                     jamais tes échanges avec le tuteur. Les
-                                    autres élèves ne te voient pas.
+                                    autres élèves ne voient que ton pseudo, dans
+                                    le fil et au classement si tu l’acceptes.
                                 </p>
                             </Carte>
                         )}
@@ -383,5 +491,90 @@ export default function MesGroupes({ groupes, devoirs, aujourdhui }: Props) {
                 </div>
             </div>
         </>
+    );
+}
+
+/**
+ * Lot 12 : le classement d'un défi du groupe. Seuls les élèves qui l'ont
+ * accepté y paraissent, par leur pseudo ; les autres sont comptés.
+ */
+function ClassementDefi({
+    titre,
+    groupe,
+    classement,
+}: {
+    titre: string;
+    groupe: string;
+    classement: Classement;
+}) {
+    return (
+        <Carte aria-label={`Classement : ${titre}`}>
+            <TitreCarte>
+                <span className="flex items-center gap-2">
+                    <Trophy
+                        aria-hidden
+                        className="size-[18px] text-soleil-600 dark:text-soleil-400"
+                    />
+                    {titre}
+                </span>
+            </TitreCarte>
+            <p className="mt-1 text-aide text-ink-500">
+                {groupe} ·{' '}
+                {pluriel(
+                    classement.rendus,
+                    'élève a relevé',
+                    'élèves ont relevé',
+                )}{' '}
+                le défi
+            </p>
+            {classement.classes.length > 0 ? (
+                <ol className="mt-3 divide-y">
+                    {classement.classes.map((ligne) => (
+                        <li
+                            key={ligne.rang}
+                            className={cn(
+                                'flex items-center gap-3 py-2.5',
+                                ligne.est_moi && 'font-semibold',
+                            )}
+                        >
+                            <span
+                                className={cn(
+                                    'flex size-7 shrink-0 items-center justify-center rounded-full text-meta font-semibold font-data',
+                                    ligne.rang === 1
+                                        ? 'bg-soleil-400 text-soleil-900'
+                                        : 'bg-craie-100 text-ink-600 dark:bg-relief',
+                                )}
+                            >
+                                {ligne.rang}
+                            </span>
+                            <span className="flex-1 truncate">
+                                {ligne.pseudo}
+                                {ligne.est_moi && ' (toi)'}
+                            </span>
+                            <span className="font-bold font-data">
+                                {ligne.score} %
+                            </span>
+                        </li>
+                    ))}
+                </ol>
+            ) : (
+                <p className="mt-3 text-aide text-ink-600">
+                    Personne n’a encore accepté le classement.
+                </p>
+            )}
+            {classement.autres_rendus > 0 && (
+                <p className="mt-2 border-t pt-2.5 text-meta text-ink-500">
+                    Et{' '}
+                    {pluriel(
+                        classement.autres_rendus,
+                        'autre élève',
+                        'autres élèves',
+                    )}{' '}
+                    sans classement.
+                    {classement.j_accepte === false &&
+                        ' Pour y paraître, coche la case sous « Mes groupes ».'}
+                </p>
+            )}
+        </Carte>
     );
 }

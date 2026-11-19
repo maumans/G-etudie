@@ -16,6 +16,9 @@ import {
     Flag,
     House,
     LayoutDashboard,
+    Lightbulb,
+    Link2,
+    ShieldCheck,
     Library,
     ListTree,
     ScrollText,
@@ -48,6 +51,7 @@ import {
     abonnement as abonnementEleve,
     accueil as accueilEleve,
     cours as coursEleve,
+    culture as cultureEleve,
     progression as progressionEleve,
     telechargements as telechargementsEleve,
     tuteur as tuteurEleve,
@@ -56,6 +60,8 @@ import { index as annalesEleve } from '@/routes/eleve/annales';
 import { index as examensBlancs } from '@/routes/eleve/examens-blancs';
 import { index as indexAnnales } from '@/routes/contenu/annales';
 import { index as indexSignalements } from '@/routes/contenu/signalements';
+import { index as indexRessources } from '@/routes/contenu/ressources';
+import { index as indexModeration } from '@/routes/contenu/moderation';
 import { edit as monCompte } from '@/routes/compte/profil';
 
 /**
@@ -102,6 +108,14 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         actifSous: '/eleve/tuteur',
         lateralSeulement: true,
         permission: 'tuteur.utiliser',
+    },
+    {
+        // Lot 12 : sur mobile, depuis la carte « La question du jour » de l'accueil.
+        libelle: 'Culture générale',
+        icone: Lightbulb,
+        href: cultureEleve().url,
+        actifSous: '/eleve/culture',
+        lateralSeulement: true,
     },
     {
         // Lot 11 : sur mobile, depuis la carte « Mes devoirs » de l'accueil.
@@ -177,6 +191,13 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
         permission: 'contenu.relire',
     },
     {
+        // Lot 12 (PLAN M19) : liens sortants par notion.
+        libelle: 'Ressources',
+        icone: Link2,
+        href: indexRessources().url,
+        actifSous: '/contenu/ressources',
+    },
+    {
         libelle: 'Signalements',
         icone: Flag,
         href: indexSignalements().url,
@@ -189,6 +210,14 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
         href: journalTuteur().url,
         actifSous: '/contenu/tuteur',
         permission: 'tuteur.journal',
+    },
+    {
+        // Lot 12 (PLAN M13) : mots refusés dans les fils des groupes.
+        libelle: 'Modération',
+        icone: ShieldCheck,
+        href: indexModeration().url,
+        actifSous: '/contenu/moderation',
+        permission: 'contenu.administrer',
     },
 ];
 

@@ -113,6 +113,12 @@ class AppServiceProvider extends ServiceProvider
             Limit::perHour(40)->by('groupe-ip|'.$request->ip()),
         ]);
 
+        // Lot 12 : le fil d'un groupe (le service limite aussi : 10 par jour,
+        // une toutes les 30 s ; ce filet arrête un envoi en rafale).
+        RateLimiter::for('fil', fn (Request $request) => [
+            Limit::perMinute(6)->by('fil|'.($request->user()?->getAuthIdentifier() ?? 'invite')),
+        ]);
+
         $this->regenererLesPacks();
 
         // Noms courts et stables dans les colonnes polymorphes

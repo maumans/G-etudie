@@ -52,6 +52,8 @@ export type Permission =
     | 'parents.inviter'
     | 'etablissement.gerer'
     | 'etablissements.administrer'
+    | 'communaute.participer'
+    | 'communaute.moderer'
     | 'compte.double_authentification';
 
 export type Auth = {

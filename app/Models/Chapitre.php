@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  *
  * @property int $id
  * @property int $matiere_id
- * @property int $classe_id
+ * @property int|null $classe_id vide pour une matière transversale (lot 12)
  * @property string $titre
  * @property int $ordre
  * @property bool $est_exemple

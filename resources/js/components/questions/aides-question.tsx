@@ -79,9 +79,12 @@ export function CorrigePasAPas({
     etapes,
     toutVoir = false,
     tuteur,
+    sources,
     className,
 }: {
     etapes: EtapeCorrige[];
+    /** Lot 12 : d'où vient le fait (culture générale), sous le corrigé. */
+    sources?: string | null;
     /** Relecture : toutes les étapes d'emblée. */
     toutVoir?: boolean;
     tuteur?: AncrageTuteur;
@@ -158,6 +161,12 @@ export function CorrigePasAPas({
                         Tout voir
                     </Button>
                 </div>
+            )}
+            {sources && vues >= etapes.length && (
+                <p className="border-t border-dashed pt-2.5 text-meta text-ink-500">
+                    <span className="font-medium text-ink-600">Source :</span>{' '}
+                    {sources}
+                </p>
             )}
         </section>
     );

@@ -4,6 +4,7 @@ import {
     CircleCheck,
     CircleDashed,
     Clock3,
+    Trophy,
     UsersRound,
 } from 'lucide-react';
 import {
@@ -42,6 +43,13 @@ type Props = {
         }[];
         eleves: (Identite & EtatDevoir)[];
     };
+    /** Lot 12 : le classement d'un défi (élèves qui l'acceptent), sinon 
+ull. */
+    classement?: {
+        classes: { rang: number; pseudo: string; score: number }[];
+        autres_rendus: number;
+        rendus: number;
+    } | null;
 };
 
 const ETATS = {
@@ -55,7 +63,7 @@ const ETATS = {
 } as const;
 
 /** Le suivi d'un devoir (lot 11) : qui a rendu, avec quel score. */
-export default function DevoirEnseignant({ suivi }: Props) {
+export default function DevoirEnseignant({ suivi, classement = null }: Props) {
     const { groupe, devoir, eleves } = suivi;
     const rendus = eleves.filter((e) => e.etat === 'rendu');
     const part =
@@ -93,7 +101,10 @@ export default function DevoirEnseignant({ suivi }: Props) {
                 {devoir.est_exemple && <BandeauExemple />}
 
                 <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem] lg:gap-6">
-                    <Carte aria-labelledby="titre-rendus">
+                    <Carte
+                        aria-labelledby="titre-rendus"
+                        className="self-start"
+                    >
                         <TitreCarte id="titre-rendus">Les rendus</TitreCarte>
                         {eleves.length === 0 ? (
                             <div className="mt-4">
@@ -206,6 +217,57 @@ export default function DevoirEnseignant({ suivi }: Props) {
                                     : `Score moyen des rendus : ${moyenne} %`}
                             </p>
                         </section>
+                        {classement && (
+                            <Carte aria-labelledby="titre-classement">
+                                <TitreCarte id="titre-classement">
+                                    <span className="flex items-center gap-2">
+                                        <Trophy
+                                            aria-hidden
+                                            className="size-[18px] text-soleil-600 dark:text-soleil-400"
+                                        />
+                                        Classement du défi
+                                    </span>
+                                </TitreCarte>
+                                <p className="mt-1 text-aide text-ink-500">
+                                    Ce que voient les élèves : les pseudos de
+                                    ceux qui l’acceptent.
+                                </p>
+                                {classement.classes.length === 0 ? (
+                                    <p className="mt-3 text-aide text-ink-600">
+                                        Personne n’y paraît encore.
+                                    </p>
+                                ) : (
+                                    <ol className="mt-2 divide-y">
+                                        {classement.classes.map((ligne) => (
+                                            <li
+                                                key={ligne.rang}
+                                                className="flex items-center gap-3 py-2"
+                                            >
+                                                <span className="w-5 text-meta font-semibold text-ink-500 font-data">
+                                                    {ligne.rang}
+                                                </span>
+                                                <span className="flex-1 truncate">
+                                                    {ligne.pseudo}
+                                                </span>
+                                                <span className="font-semibold font-data">
+                                                    {ligne.score} %
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ol>
+                                )}
+                                {classement.autres_rendus > 0 && (
+                                    <p className="mt-2 border-t pt-2 text-meta text-ink-500">
+                                        +{' '}
+                                        {pluriel(
+                                            classement.autres_rendus,
+                                            'élève sans classement',
+                                            'élèves sans classement',
+                                        )}
+                                    </p>
+                                )}
+                            </Carte>
+                        )}
 
                         <Carte className="grid gap-3">
                             <TitreCarte>Changer l’échéance</TitreCarte>

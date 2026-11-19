@@ -18,6 +18,8 @@ import {
     UsersRound,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import type { JourCulture } from '@/components/culture/question-du-jour';
+import { QuestionDuJour } from '@/components/culture/question-du-jour';
 import type { SegmentJauge } from '@/components/jauge-preparation';
 import { JaugePreparation } from '@/components/jauge-preparation';
 import { CarteSerie } from '@/components/progression/carte-serie';
@@ -101,6 +103,8 @@ type Tableau = {
         cle: 'profil' | 'exercice' | 'lecon' | 'seance';
         fait: boolean;
     }[];
+    /** Lot 12 : la question du jour de culture générale. */
+    culture?: JourCulture | null;
 };
 
 /** « Bonjour » le jour, « Bonsoir » à partir de 18 h. */
@@ -409,6 +413,11 @@ export default function Accueil({
                                 </ul>
                             )}
                         </Carte>
+
+                        <QuestionDuJour
+                            jour={tableau.culture ?? null}
+                            lienCulture
+                        />
                     </div>
 
                     {/* Colonne latérale */}

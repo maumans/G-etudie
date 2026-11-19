@@ -67,8 +67,8 @@ class SeanceService
     {
         return Seance::query()
             ->where('user_id', $eleve->id)
-            // Lot 11 : la séance d'un devoir n'est jamais la séance du jour.
-            ->whereNull('devoir_id')
+            // Lots 11 et 12 : ni un devoir ni un quiz de culture.
+            ->duJour()
             ->whereDate('jour', CarbonImmutable::today())
             ->whereNull('termine_le')
             ->latest('id')
@@ -172,7 +172,7 @@ class SeanceService
         return Seance::query()
             ->where('user_id', $eleve->id)
             ->where('matiere_id', $matiere?->id)
-            ->whereNull('devoir_id')
+            ->duJour()
             ->whereNull('jour')
             ->whereNull('termine_le')
             ->whereNull('remplacee_le')
@@ -193,7 +193,14 @@ class SeanceService
 
         if ($seance->termine_le === null) {
             $seance->update(['termine_le' => $saisiLe, 'jour' => $seance->jour ?? $saisiLe->toDateString()]);
-            $this->motivation->apresSeance($seance, $saisiLe, $recuLe ?? CarbonImmutable::now());
+            // Lot 12 : un quiz de culture n'est pas la séance du jour — ni
+            // objectif du soir, ni points de séance, ni badge « Séance bouclée » ;
+            // le jour compte pour la série, chaque réponse a déjà ses points.
+            if ($seance->culture) {
+                $this->motivation->apresQuizCulture($seance, $saisiLe);
+            } else {
+                $this->motivation->apresSeance($seance, $saisiLe, $recuLe ?? CarbonImmutable::now());
+            }
         }
 
         return $seance;
@@ -207,7 +214,7 @@ class SeanceService
      * Lot 11 : la séance d'un devoir porte son titre, son groupe et son
      * échéance (`devoir`, sinon `null`).
      *
-     * @return array{seance: array{uuid: string, duree_minutes: int, terminee: bool, devoir: array{titre: string, groupe: string, echeance_le: string}|null}, questions: list<array<string, mixed>>, reponses: list<array<string, mixed>>}
+     * @return array{seance: array{uuid: string, duree_minutes: int, terminee: bool, culture: bool, devoir: array{titre: string, groupe: string, echeance_le: string}|null}, questions: list<array<string, mixed>>, reponses: list<array<string, mixed>>}
      */
     public function props(Seance $seance): array
     {
@@ -219,6 +226,9 @@ class SeanceService
                 'uuid' => $seance->uuid,
                 'duree_minutes' => $seance->duree_minutes,
                 'terminee' => $seance->termine_le !== null,
+                // Lot 12 : un quiz de culture générale (titre et bilan à lui).
+                // Une séance tout juste créée n'a pas encore relu le défaut de la base.
+                'culture' => $seance->culture === true,
                 'devoir' => $devoir === null ? null : [
                     'titre' => $devoir->titre,
                     'groupe' => $devoir->groupe->nom,

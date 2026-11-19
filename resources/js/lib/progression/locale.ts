@@ -47,9 +47,18 @@ export type Instantane = {
     jauge: Jauge;
     serie: Serie;
     seances: SeanceInstantane[];
-    /** Lot 7 : trois séances de plus par matière téléchargée (slug => séances). */
+    /** Lot 7 : trois séances de plus par matière téléchargée (slug => séances). Lot 12 : et un quiz de culture préparé (`culture`). */
     seances_matieres?: Record<string, SeanceInstantane[]>;
+    /** Lot 12 : la question du jour de culture générale, d'hier à dans cinq jours. */
+    culture_jours?: { date: string; question: Record<string, unknown> }[];
 };
+
+/** Lot 12 : où l'appareil range les questions du jour (table `contenus`). */
+export const PACK_CULTURE = 'culture';
+
+export function cleQuestionDuJour(date: string): string {
+    return `culture-jour:${date}`;
+}
 
 type SeanceInstantane = {
     uuid: string;
@@ -237,8 +246,52 @@ export async function rangerInstantane(
                     props: seance.props,
                 });
             }
+
+            // Lot 12 : les questions du jour à venir (les mêmes pour tout le
+            // téléphone : un contenu, pas une donnée de profil).
+            if (instantane.culture_jours) {
+                const gardees = new Set(
+                    instantane.culture_jours.map((j) =>
+                        cleQuestionDuJour(j.date),
+                    ),
+                );
+                await base.contenus
+                    .where('pack')
+                    .equals(PACK_CULTURE)
+                    .filter(
+                        (contenu) =>
+                            !gardees.has(
+                                String((contenu as { cle: unknown }).cle),
+                            ),
+                    )
+                    .delete();
+
+                for (const jour of instantane.culture_jours) {
+                    await base.contenus.put({
+                        cle: cleQuestionDuJour(jour.date),
+                        pack: PACK_CULTURE,
+                        props: jour.question,
+                    });
+                }
+            }
         },
     );
+}
+
+/** Lot 12 : la question du jour gardée pour cette date (`AAAA-MM-JJ`), ou `null`. */
+export async function questionDuJourLocale(
+    base: Pick<BaseHorsLigne, 'contenus'>,
+    date: string,
+): Promise<Record<string, unknown> | null> {
+    try {
+        const ligne = (await base.contenus.get(cleQuestionDuJour(date))) as
+            | { props?: Record<string, unknown> }
+            | undefined;
+
+        return ligne?.props ?? null;
+    } catch {
+        return null;
+    }
 }
 
 /**

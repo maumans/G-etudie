@@ -58,7 +58,13 @@ class MaitriseService
     /** Après une réponse notée (ou auto-évaluée) : sa notion est recalculée. */
     public function apresTentative(Tentative $tentative): ?Maitrise
     {
-        $notionId = Question::query()->whereKey($tentative->question_id)->value('notion_id');
+        // Lot 12 : la culture générale (matière transversale) reste hors de
+        // la maîtrise et de la jauge — pas de révision espacée, et une
+        // réponse de culture ne périme pas les séances préparées.
+        $notionId = Question::query()
+            ->whereKey($tentative->question_id)
+            ->whereHas('notion.chapitre.matiere', fn ($matiere) => $matiere->where('transversale', false))
+            ->value('notion_id');
 
         return $notionId === null ? null : $this->recalculer($tentative->user_id, (int) $notionId);
     }

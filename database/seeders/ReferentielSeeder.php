@@ -74,6 +74,11 @@ class ReferentielSeeder extends Seeder
         $annee = $this->anneeCourante();
         $this->matieres();
         $this->epreuvesPhares($annee);
+
+        // Lot 12 (PLAN M10) : la culture générale est transversale — vue de
+        // tout élève, hors jauge et hors coefficients. Structure fixe,
+        // recopiée à chaque passage.
+        Matiere::query()->where('slug', 'culture')->update(['transversale' => true]);
     }
 
     private function structure(): void

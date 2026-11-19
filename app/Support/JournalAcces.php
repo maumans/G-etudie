@@ -43,6 +43,13 @@ class JournalAcces
         'licence.attribuee' => 'Place de licence attribuée à un élève',
         'licence.reprise' => 'Place de licence reprise',
         'groupe.eleve_retire' => 'Élève retiré d\'un groupe',
+        // Lot 12.
+        'fil.publication_masquee' => 'Publication du fil masquée',
+        'fil.publication_gardee' => 'Publication du fil gardée malgré des signalements',
+        'fil.parole_retiree' => 'Parole retirée à un élève dans le fil',
+        'fil.parole_rendue' => 'Parole rendue à un élève dans le fil',
+        'fil.ferme' => 'Fil du groupe fermé',
+        'fil.ouvert' => 'Fil du groupe rouvert',
     ];
 
     public static function libelle(string $action): string

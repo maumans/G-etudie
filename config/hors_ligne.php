@@ -36,6 +36,9 @@ return [
         // Lot 7 : « Téléchargements » se relit hors ligne (l'état des packs
         // vient de l'appareil) ; les routes /eleve/packs/… n'y sont pas.
         '/eleve/telechargements$',
+        // Lot 12 : « Culture générale » se relit d'après sa copie ; la
+        // question du jour et un quiz préparé viennent de l'instantané (HL4).
+        '/eleve/culture$',
         '/compte/affichage$',
     ],
 

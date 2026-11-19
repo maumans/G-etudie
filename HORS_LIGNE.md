@@ -666,6 +666,7 @@ hors ligne ; les packs viennent ensuite.
 | — | Lot 9 (sans lot HL) : abonnements — droits d'abonné des packs (HL-D3, HL-D4) en service, variante « libre » des packs, examens blancs gratuits décomptés hors ligne, deux appareils par abonnement (HL-D8), paiement et code en ligne seulement | ✅ fait (2026-11-08), B.3 « Lot 9 » ; vrai paiement et vrais téléphones dans `A_TESTER.md` | 5 / 5 |
 | — | Lot 10 (sans lot HL) : tuteur N'karamögö en ligne seulement (niveau C), dialogue hors ligne, rien par la file (écart n° 34), panneau chargé à la demande | ✅ fait (2026-11-12), B.3 « Lot 10 » ; vraie API et vrai téléphone dans `A_TESTER.md` § 7 bis | 4 / 4 |
 | — | Lot 11 (sans lot HL) : espaces parent, enseignant, établissement en ligne seulement (niveau C) ; devoir = séance, réponses par la file ; rejoindre un groupe et lier un parent en direct | ✅ fait (2026-11-13), B.3 « Lot 11 » ; vrais téléphones dans `A_TESTER.md` | 4 / 4 |
+| — | Lot 12 (sans lot HL) : culture générale (question du jour et quiz préparés dans l'instantané, réponses par la file), ressources externes dans les packs (lien hors ligne → dialogue), fil du groupe en ligne seulement avec brouillon gardé | ✅ fait (2026-11-18), B.3 « Lot 12 » ; vrais téléphones dans `A_TESTER.md` | 5 / 5 |
 | HL8 | Terrain | ⬜ à faire | 0 / 7 |
 
 ## B.1 Décisions
@@ -1188,6 +1189,53 @@ hors ligne ; les packs viennent ensuite.
   porte son titre, le nom du groupe et l'échéance, jamais les autres
   élèves ; un élève ne voit jamais la liste de son groupe (décision 5).
 
+### Lot 12 (pas de lot HL propre, A.13) — culture générale, ressources externes, communauté encadrée
+
+- [x] **Culture générale : niveau A** (A.2) : la question du jour et les
+  quiz se répondent par `tentative.enregistrer` (le serveur recorrige),
+  la fin d'un quiz par `seance.terminer` — les mêmes services qu'une
+  séance. Un quiz est une séance marquée `culture`, **jamais la séance du
+  jour** (portée `Seance::duJour()`, qui exclut aussi les devoirs). La
+  culture n'entre ni dans la maîtrise ni dans la jauge
+  (`MaitriseService::apresTentative`) : une réponse de culture ne périme
+  pas les séances préparées. Preuve : Pest `Culture/CultureTest` (« par la
+  file : compté une fois, recorrigé, sans toucher à la maîtrise »).
+- [x] **Culture générale hors ligne (HL4 étendu)** : l'instantané porte un
+  **quiz préparé** (`seances_matieres.culture`, rangé comme les séances
+  d'une matière téléchargée : « Lancer un quiz » hors ligne ouvre
+  `prochaineSeanceLocale(…, 'culture')`) et la **question du jour d'hier
+  à dans cinq jours** (`culture_jours`, table `contenus`, paquet
+  `culture`) : hors ligne, la carte prend celle du jour **de l'appareil**
+  (`useQuestionDuJour`). L'écran `/eleve/culture` entre dans la liste
+  blanche (copie datée, niveau B). Preuve : Pest (« un quiz est préparé
+  dans l'instantané », sept jours) ; vrai téléphone : `A_TESTER.md`, lot 12.
+- [x] **Ressources externes dans les packs** (A.4 : le rendu ne dépend pas
+  de la source) : les ressources vérifiées voyagent dans l'objet de la
+  leçon (`LeconController::contenu`) ; vérifier, retirer ou un lien cassé
+  regénère le pack de la matière (différentiel : la seule leçon change).
+  Hors ligne, toucher un lien ouvre « Cet écran demande une connexion »
+  (A.3.7), jamais un clic mort. Preuve : Pest `Ressources/RessourcesTest`
+  (« la leçon du pack porte la ressource ») ; ⚠ `packs:generer` au
+  déploiement.
+- [x] **Fil du groupe : niveau C** (A.2 : « groupes et devoirs ») :
+  `/eleve/groupes/{groupe}/fil` et `/enseignant/…/fil` hors de la liste
+  blanche ; publier, signaler et modérer partent **en direct** (écart
+  n° 36). Hors ligne, « Publier » et « Signaler » ouvrent « Cette action
+  demande une connexion » et **le brouillon reste** sur l'appareil
+  (`lib/communaute/brouillon.ts`, à chaque frappe, par auteur, groupe et
+  question) ; un identifiant par envoi : un double appui ne publie qu'une
+  fois. Preuve : Vitest `communaute/lot12.test.ts` ; Pest (« le même envoi
+  reçu deux fois ne publie qu'un message »).
+- [x] **Poids** (A.11) : la carte « La question du jour » de l'accueil
+  montre l'énoncé en texte ; l'ardoise et le lecteur de formules arrivent au
+  premier appui (`React.lazy` ; le service worker garde le fragment, donc
+  hors ligne aussi). Sans cela la coquille passait à 410 Ko. Preuve :
+  `budgets.spec.ts`.
+- [x] **Données minimales** : les élèves ne voient que des pseudos (décision
+  du 2026-11-18) ; aucun numéro, lien ni e-mail ne passe le filtre
+  (`FiltreFil`) ; la carte de partage du quiz porte le prénom seul et
+  s'ouvre sans réseau (dessinée sur l'appareil).
+
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
@@ -1515,6 +1563,16 @@ hors ligne ; les packs viennent ensuite.
     serveur. Une table de rendus et une opération `devoir.rendre`
     auraient fait deux autorités pour le même geste (CLAUDE.md § 3). « Où
     en est chaque élève » se lit sur sa séance (`DevoirService::etats`).
+
+36. **2026-11-18 — Le fil du groupe hors de la file d'opérations (lot 12).**
+    A.3.5 veut tout geste élève dans la file. Une publication du fil n'a
+    de sens qu'en ligne : le serveur la filtre (mots interdits, numéros,
+    liens) et peut la refuser avec une phrase que l'élève doit lire avant
+    de reformuler ; publiée plus tard, hors de son contexte, elle
+    surprendrait la classe. Elle part donc en direct (comme rejoindre un
+    groupe, lot 11) ; ce qui protège la saisie est le **brouillon gardé**
+    sur l'appareil. Signaler et modérer aussi. Un défi du groupe, lui, est
+    un devoir : ses réponses passent par la file (écart n° 35).
 
 ## B.6 Points de vigilance
 

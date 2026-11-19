@@ -8,6 +8,7 @@ use App\Models\Chapitre;
 use App\Models\Lecon;
 use App\Models\ProgressionLecon;
 use App\Models\Question;
+use App\Models\RessourceExterne;
 use App\Support\BlocsContenu;
 use App\Support\CatalogueEleve;
 use App\Support\PresentationCours;
@@ -79,6 +80,19 @@ class LeconController extends Controller
             // lue depuis un pack les ait aussi. Une question pas (ou plus)
             // publiée n'est pas livrée ; son bloc ne s'affiche pas.
             'questions' => (object) self::miniQuestions($blocs),
+            // Lot 12 (PLAN M19) : les ressources externes vérifiées de la
+            // notion, dans l'objet aussi (une leçon du pack les montre ;
+            // hors ligne, le lien demande la connexion). Un lien que le
+            // contrôle hebdomadaire n'a pas joint n'est plus proposé.
+            'ressources' => array_values(RessourceExterne::query()
+                ->verifiees()
+                ->where('notion_id', $lecon->notion_id)
+                ->whereNull('lien_casse_le')
+                ->orderBy('type')
+                ->orderBy('id')
+                ->get()
+                ->map(fn (RessourceExterne $ressource) => $ressource->pourEleve())
+                ->all()),
         ];
     }
 
