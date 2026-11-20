@@ -30,7 +30,9 @@ let depuis = '';
 test.use({ storageState: SESSIONS.console });
 
 test.beforeAll(() => {
-    depuis = tinker('echo App\\Models\\EntreeJournalAcces::query()->max("id") ?? 0;');
+    depuis = tinker(
+        'echo App\\Models\\EntreeJournalAcces::query()->max("id") ?? 0;',
+    );
 });
 
 test.afterAll(() => {
@@ -39,24 +41,37 @@ test.afterAll(() => {
     );
 });
 
-test('lot 13 — le rapport d’impact se télécharge en PDF et l’export est journalisé', async ({ page }) => {
+test('lot 13 — le rapport d’impact se télécharge en PDF et l’export est journalisé', async ({
+    page,
+}) => {
     await figerHorloges(page, HORLOGE);
     await page.goto('/console/impact');
-    await expect(page.getByRole('heading', { level: 1, name: /impact/ })).toBeVisible(ATTENTE);
+    await expect(
+        page.getByRole('heading', { level: 1, name: /impact/ }),
+    ).toBeVisible(ATTENTE);
 
     await page.getByLabel('Examen').selectOption('BEPC');
     await expect(page).toHaveURL(/examen=BEPC/, ATTENTE);
-    await expect(page.getByText(/BEPC · Tous les établissements/)).toBeVisible(ATTENTE);
+    await expect(page.getByText(/BEPC · Tous les établissements/)).toBeVisible(
+        ATTENTE,
+    );
 
     const [telechargement] = await Promise.all([
         page.waitForEvent('download'),
         page.getByRole('link', { name: /Télécharger le rapport/ }).click(),
     ]);
-    expect(telechargement.suggestedFilename()).toMatch(/^rapport-impact-nkaramogo-\d{4}-\d{2}-\d{2}\.pdf$/);
+    expect(telechargement.suggestedFilename()).toMatch(
+        /^rapport-impact-nkaramogo-\d{4}-\d{2}-\d{2}\.pdf$/,
+    );
     const contenu = readFileSync(await telechargement.path());
     expect(contenu.subarray(0, 5).toString()).toBe('%PDF-');
     expect(contenu.length).toBeGreaterThan(10_000);
 
     await page.goto('/console/journal?action=rapport_impact.exporte');
-    await expect(page.getByRole('listitem').filter({ hasText: /Rapport d.impact exporté/ }).first()).toBeVisible(ATTENTE);
+    await expect(
+        page
+            .getByRole('listitem')
+            .filter({ hasText: /Rapport d.impact exporté/ })
+            .first(),
+    ).toBeVisible(ATTENTE);
 });

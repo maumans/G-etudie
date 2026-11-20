@@ -1546,3 +1546,24 @@ la prolonge sans nouveau composant de base.
   400 / 600 / 700), titre en contraste 400 / 700, bandeau encre pour la
   phrase-clé, deux cartes (crème, celle des assidus en pêche), courbe
   mandarine / grise en pointillés, méthode en 10 px ; une page A4.
+
+### Lot 14 — terrain (2026-11-21)
+
+- **« Ton avis »** (`components/terrain/ton-avis.tsx`) : une carte, tuile
+  mandarine 40 px, question en titre de carte ; trois réponses en
+  boutons radio de 44 px, **icône + mot + couleur** une fois choisie
+  (Oui vert, Un peu indice, Non framboise) ; étiquettes en bascules de
+  36 px ; « Envoyer mon avis » en `encre` (l'action dominante du bilan
+  reste le bouton mandarine au-dessus). Placée **sous** les actions du
+  bilan, jamais à la place : à 360 × 740 « Retour à l'accueil » reste
+  visible sans défiler. Fermable, et une fois par semaine au plus.
+- **« Cet appareil »** : grille de dix mesures sur **deux colonnes à
+  toutes les tailles** (filets par `gap-px` sur fond de bordure), 13 px
+  sur mobile ; alertes en pavé indice ; le code de diagnostic en
+  `font-data` 700 espacé, sur craie.
+- **Console › Terrain** : liste d'avis en filets (tuile de la réponse,
+  écran en ink-500, étiquettes en pavés craie, commentaire en citation
+  au trait mandarine, décision en pavé vert) ; erreurs en tuile
+  framboise, message en `font-data` ; diagnostics avec le code en
+  pastille encre. Le sélecteur de campagne **passe avant la liste sur
+  mobile** (premier réglage), en tête de colonne latérale sur ordinateur.

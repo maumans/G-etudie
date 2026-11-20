@@ -353,6 +353,7 @@ Ce qu'il lance :
 | `paiements:verifier` | toutes les 5 min | 9 | un paiement dont le webhook s'est perdu est redemandé à l'opérateur ; sans réponse au bout de 30 min, il expire |
 | `codes:effacer-oublies` | chaque nuit à 4 h | 9 | les codes prépayés en clair d'un lot jamais marqué « remis » sont effacés au bout de 14 jours |
 | `jauges:relever` | le dimanche à 22 h | 13 | la jauge de chaque élève est relevée pour la semaine : l'impact (console, rapport PDF) se lit dans ces relevés. Sans cette tâche, l'évolution de la jauge ne se mesure pas, et un dimanche manqué ne se rattrape qu'en relançant la commande le lundi (`--jour=` la veille) |
+| `terrain:purger` | chaque nuit à 4 h 30 | 14 | les diagnostics et les erreurs des appareils sont effacés après 90 jours, les avis des élèves après un an (données minimales : ce sont des mineurs) |
 | `ressources:verifier` | le lundi à 5 h | 12 | les liens des ressources externes vérifiées répondent-ils encore ? Un lien muet sort de la vue élève et apparaît « Lien cassé » au back-office (appels HTTPS sortants vers les sites de `config/ressources.php`) |
 
 Une seule ligne dans la crontab de `www-data` :
@@ -741,6 +742,22 @@ les reconstruit depuis la base.
   cache (`Cache-Control: no-store, private`).
 - **Contrôles** : § 9, point 11 ; `A_TESTER.md`, lot 13.
 
+### Lot 14 — terrain (avis des élèves, diagnostics, erreurs des appareils)
+
+- **Une seule fois** : `migrate` (tables `campagnes_terrain`,
+  `avis_eleves`, `diagnostics_appareil`, `erreurs_appareil`), puis
+  `db:seed` (deux permissions : `console.terrain` pour l'administrateur
+  plateforme, `appareil.diagnostiquer` pour l'élève).
+- **Planificateur** (§ 4.2) : `terrain:purger` chaque nuit à 4 h 30.
+- **`.env`, file, Nginx, dépendances** : rien de plus. Avis, diagnostics et
+  erreurs arrivent par la route déjà en place `POST /sync/operations`.
+- **Avant le premier essai avec de vrais élèves** : le domaine en HTTPS
+  (D11 ; sans lui, pas de service worker sur un téléphone, donc pas de
+  hors ligne à essayer), les **mots interdits** saisis (lot 12 : le
+  commentaire de « Ton avis » passe le même filtre), et les autorisations
+  écrites décrites dans `TERRAIN.md`.
+- **Contrôles** : § 9, point 12 ; `A_TESTER.md`, lot 14 ; `TERRAIN.md`.
+
 ---
 
 ## 9. Vérifications après la mise en ligne
@@ -755,7 +772,7 @@ sudo supervisorctl status nkaramogo-ssr                             # RUNNING (l
 php artisan inertia:check-ssr                                        # running
 curl -s https://nkaramogo.example/ | grep -c 'data-server-rendered'  # 1 : la vitrine arrive construite
 php artisan tinker --execute="echo config('tuteur.moteur'), ' ', config('tuteur.modele');"   # « claude claude-sonnet-5-5 » (lot 10)
-php artisan schedule:list                                            # packs:generer à 3 h, paiements:verifier toutes les 5 min (lot 9), ressources:verifier le lundi (lot 12)
+php artisan schedule:list                                            # packs:generer à 3 h, paiements:verifier toutes les 5 min (lot 9), ressources:verifier le lundi (lot 12), terrain:purger à 4 h 30 (lot 14)
 php artisan queue:failed                                             # aucun travail en échec
 test ! -f public/hot && echo "OK : pas de public/hot"
 ```
@@ -802,6 +819,13 @@ Dans un navigateur, en HTTPS :
    Console › Journal des accès montre « Rapport d'impact exporté (PDF) ».
    Console › Personnel : désactiver un compte de test connecté ailleurs →
    sa page suivante le renvoie à la connexion ; le réactiver.
+
+12. (Lot 14) `php artisan schedule:list` montre `terrain:purger`. Avec le
+   compte élève de test : « Mon compte › Appareils » montre « Cet
+   appareil » avec « Mode hors ligne : Actif » ; « Envoyer ce diagnostic »
+   affiche un code de six caractères ; Console › Terrain › Diagnostics,
+   chercher ce code → la ligne de l'appareil. « Donner mon avis » → l'avis
+   apparaît dans Console › Terrain › Avis des élèves.
 
 Puis dérouler les contrôles « bloqués tant que le domaine HTTPS n'existe
 pas » de `A_TESTER.md` (vrais téléphones, mode avion, deux profils,

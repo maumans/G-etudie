@@ -1,4 +1,5 @@
-import { router } from '@inertiajs/react';
+import { router, usePage } from '@inertiajs/react';
+import { DiagnosticAppareil } from '@/components/terrain/diagnostic-appareil';
 import { Laptop, Smartphone, Tablet, Users } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
@@ -52,6 +53,8 @@ export default function Appareils({
 }) {
     const confirmer = useConfirmer();
     const formule = useFormule();
+    const { auth } = usePage().props;
+    const eleve = auth.user?.espaces.includes('eleve') === true;
 
     const retirerAppareil = async (appareil: AppareilCompte) => {
         const accepte = await confirmer({
@@ -85,6 +88,9 @@ export default function Appareils({
                         : `Ton abonnement vaut pour ${limite_abonne.limite} appareils : ${limite_abonne.actifs} en service.`}
                 </p>
             )}
+
+            {/* Lot 14 (terrain) : la file ne tourne que pour l'élève. */}
+            {eleve && <DiagnosticAppareil />}
 
             <SectionCompte
                 titre={formule(

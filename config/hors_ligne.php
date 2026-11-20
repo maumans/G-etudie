@@ -40,6 +40,10 @@ return [
         // question du jour et un quiz préparé viennent de l'instantané (HL4).
         '/eleve/culture$',
         '/compte/affichage$',
+        // Lot 14 (terrain) : « Cet appareil » se lit sur l'appareil, et
+        // c'est souvent sans réseau qu'on en a besoin ; la liste des
+        // appareils vient de sa copie.
+        '/compte/appareils$',
     ],
 
     // Réseau d'abord : au-delà, la copie gardée est servie (A.3.1).

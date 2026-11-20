@@ -71,6 +71,6 @@ test('chaque page ne reçoit du compte que l\'identifiant, le prénom, le pseudo
                 'espace' => 'eleve',
                 'espaces' => ['eleve'],
                 'double_authentification' => false,
-                'permissions' => ['abonnement.souscrire', 'communaute.participer', 'espace.eleve', 'groupes.rejoindre', 'parents.inviter', 'tuteur.utiliser'],
+                'permissions' => ['abonnement.souscrire', 'appareil.diagnostiquer', 'communaute.participer', 'espace.eleve', 'groupes.rejoindre', 'parents.inviter', 'tuteur.utiliser'],
             ]));
 });

@@ -19,6 +19,7 @@
  */
 
 import { moteur } from '@/lib/hors-ligne';
+import { noterErreur } from '@/lib/terrain';
 
 export const CLE_RECHARGEMENT = 'nkaramogo:rechargement-apres-echec-import';
 
@@ -107,7 +108,12 @@ export async function chargerModule<Composant = unknown>(
 
     try {
         module = (await importer()) as ModulePage;
-    } catch {
+    } catch (erreur) {
+        // Lot 14 : l'équipe de terrain voit quelle page n'a pas pu se charger.
+        noterErreur('import', {
+            message: erreur instanceof Error ? erreur.message : String(erreur),
+            source: cle.replace(/^\.\//, '/'),
+        });
         const decision = deciderApresEchec({
             enLigne: env.enLigne(),
             dejaRecharge: env.lire(CLE_RECHARGEMENT) !== null,

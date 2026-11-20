@@ -20,6 +20,7 @@ import {
     Link2,
     ShieldCheck,
     Library,
+    MessageSquareHeart,
     ListTree,
     ScrollText,
     Sparkles,
@@ -38,6 +39,7 @@ import {
 } from '@/routes/console';
 import { index as impactConsole } from '@/routes/console/impact';
 import { index as journalConsole } from '@/routes/console/journal';
+import { index as terrainConsole } from '@/routes/console/terrain';
 import { index as personnelConsole } from '@/routes/console/personnel';
 import { index as codesConsole } from '@/routes/console/codes';
 import { index as paiementsConsole } from '@/routes/console/paiements';
@@ -342,6 +344,14 @@ export const NAVIGATION_CONSOLE: EntreeNavigation[] = [
         href: impactConsole().url,
         actifSous: '/console/impact',
         permission: 'console.impact',
+    },
+    // Lot 14 : avis des élèves, erreurs et diagnostics des appareils.
+    {
+        libelle: 'Terrain',
+        icone: MessageSquareHeart,
+        href: terrainConsole().url,
+        actifSous: '/console/terrain',
+        permission: 'console.terrain',
     },
     {
         libelle: 'Journal des accès',

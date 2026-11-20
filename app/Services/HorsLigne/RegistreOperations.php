@@ -18,6 +18,10 @@ class RegistreOperations
         Operations\ProgressionLecon::TYPE => Operations\ProgressionLecon::class,
         Operations\CreerSignalement::TYPE => Operations\CreerSignalement::class,
         Operations\TerminerExamenBlanc::TYPE => Operations\TerminerExamenBlanc::class,
+        // Lot 14 (terrain) : « Ton avis », diagnostic d'un appareil, erreurs captées.
+        Operations\DonnerAvis::TYPE => Operations\DonnerAvis::class,
+        Operations\EnvoyerDiagnostic::TYPE => Operations\EnvoyerDiagnostic::class,
+        Operations\SignalerErreurs::TYPE => Operations\SignalerErreurs::class,
     ];
 
     /** @var array<string, class-string<GestionnaireOperation>> */

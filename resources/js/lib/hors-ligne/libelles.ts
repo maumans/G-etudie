@@ -10,6 +10,10 @@ export const LIBELLES: Record<string, string> = {
     'lecon.progression': 'Progression dans une leçon',
     'signalement.creer': 'Signalement d’une erreur',
     'examen_blanc.terminer': 'Fin d’un examen blanc',
+    // Lot 14 (terrain).
+    'avis.donner': 'Ton avis',
+    'diagnostic.envoyer': 'Diagnostic de l’appareil',
+    'erreurs.signaler': 'Rapport d’erreurs',
 };
 
 export function libelleOperation(type: string): string {

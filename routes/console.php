@@ -24,3 +24,7 @@ Schedule::command('ressources:verifier')->weeklyOn(1, '05:00')->withoutOverlappi
 // Lot 13 (PLAN M18, « Impact ») : la jauge de chaque élève, relevée chaque
 // dimanche soir — l'évolution du rapport d'impact se lit dans ces relevés.
 Schedule::command('jauges:relever')->weeklyOn(0, '22:00')->withoutOverlapping();
+
+// Lot 14 (terrain) : diagnostics et erreurs des appareils gardés 90 jours,
+// avis des élèves un an (données minimales).
+Schedule::command('terrain:purger')->dailyAt('04:30');

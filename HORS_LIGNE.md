@@ -668,7 +668,7 @@ hors ligne ; les packs viennent ensuite.
 | — | Lot 11 (sans lot HL) : espaces parent, enseignant, établissement en ligne seulement (niveau C) ; devoir = séance, réponses par la file ; rejoindre un groupe et lier un parent en direct | ✅ fait (2026-11-13), B.3 « Lot 11 » ; vrais téléphones dans `A_TESTER.md` | 4 / 4 |
 | — | Lot 12 (sans lot HL) : culture générale (question du jour et quiz préparés dans l'instantané, réponses par la file), ressources externes dans les packs (lien hors ligne → dialogue), fil du groupe en ligne seulement avec brouillon gardé | ✅ fait (2026-11-18), B.3 « Lot 12 » ; vrais téléphones dans `A_TESTER.md` | 5 / 5 |
 | — | Lot 13 (sans lot HL) : console plateforme en ligne seulement (niveau C), rien sur l'appareil ; le PDF se télécharge, il ne passe pas par le service worker | ✅ fait (2026-11-20), B.3 « Lot 13 » | 3 / 3 |
-| HL8 | Terrain | ⬜ à faire | 0 / 7 |
+| HL8 | Terrain | 🟡 outils de l'essai faits (lot 14, 2026-11-21) : diagnostic lu sur l'appareil, erreurs captées, « Ton avis », tout par la file ; **les 7 contrôles sur vrai matériel restent à faire** (après D11, `TERRAIN.md`) | 0 / 7 |
 
 ## B.1 Décisions
 
@@ -1259,6 +1259,46 @@ hors ligne ; les packs viennent ensuite.
   jour du geste pour l'activité, `series_jours`, A.6). Aucune opération
   ajoutée à la file.
 
+### HL8 — Terrain (A.15, lot 14)
+
+- [x] **Trois opérations de plus** (A.6), branchées comme les autres
+  (`RegistreOperations::TYPES`, `libelles.ts`) : `avis.donner`
+  (priorité 8, `EspaceEleve`), `diagnostic.envoyer` et `erreurs.signaler`
+  (priorité 9, la plus basse : elles ne passent jamais devant une réponse ;
+  permission `appareil.diagnostiquer`, élève seulement, écart n° 37).
+  Seule autorité : `App\Services\TerrainService`. Un avis garde l'heure
+  du geste (`saisiLe`), comme toute opération. Preuve : Pest
+  `Terrain/TerrainTest` (17), `GestesEleveTest` (registre).
+- [x] **Diagnostic et erreurs ne sont jamais refusés** : un refus
+  s'afficherait à l'élève dans « À corriger » pour un geste qu'il n'a pas
+  fait. Au-delà des plafonds (10 diagnostics et 30 erreurs nouvelles par
+  appareil et par jour), ils sont acceptés et ignorés ; une erreur connue
+  compte toujours. Seul un avis peut être refusé, avec sa phrase
+  (numéro, lien, mot interdit, 5 par jour). Preuve : `TerrainTest`.
+- [x] **« Cet appareil » se lit sur l'appareil** (`lib/terrain/diagnostic.ts`) :
+  service worker (actif, en attente, première installation), stockage et
+  sa protection (HL-D11), packs, file (en attente, à corriger, dernier
+  envoi réussi), décalage d'horloge mesuré (A.3.6), navigateur, mémoire,
+  réseau. `/compte/appareils$` entre dans la liste blanche (niveau B) :
+  hors ligne, la liste des appareils vient de sa copie et « Cet appareil »
+  se remplit quand même (écart n° 38). Le code court est choisi par
+  l'appareil, il s'affiche donc sans réseau. Preuve : Vitest
+  `terrain.test.ts` (14), captures `lot14/eleve-cet-appareil-*`.
+- [x] **Erreurs captées** (`lib/terrain/erreurs.ts`) : `error`,
+  `unhandledrejection`, échec d'import d'une page (A.3.3,
+  `chargement-page.ts`) et geste passé « À corriger » sur échec
+  technique répété (nouvel événement `anomalie` du moteur). Gardées dans
+  `meta` (50 au plus, regroupées), écritures l'une après l'autre (deux
+  erreurs simultanées s'écrasaient : trouvé par le test), confiées à la
+  file dix secondes après la dernière. Rien sans élève connecté. Chemin
+  seul, sans domaine ni paramètres ; le serveur masque numéros, adresses
+  et jetons. Preuve : `terrain.test.ts`, `TerrainTest`.
+- [x] **Console › Terrain** : niveau C (console), hors de la liste
+  blanche. Preuve : `config/hors_ligne.php`.
+- [ ] **Les 7 contrôles A.15 sur vrai matériel** : dans `A_TESTER.md`
+  (§ 4, § 5 et § 7 quater), à dérouler pendant les essais (`TERRAIN.md`),
+  après D11.
+
 ## B.4 Tests
 
 *(cocher les lignes de A.14 au fur et à mesure)*
@@ -1596,6 +1636,18 @@ hors ligne ; les packs viennent ensuite.
     groupe, lot 11) ; ce qui protège la saisie est le **brouillon gardé**
     sur l'appareil. Signaler et modérer aussi. Un défi du groupe, lui, est
     un devoir : ses réponses passent par la file (écart n° 35).
+
+37. **2026-11-21 — Diagnostic et erreurs réservés à l'élève (lot 14).**
+    Le plan du lot les prévoyait pour tout compte. Or la file ne tourne
+    que pour un élève (A.2 : niveau A ; `definirUtilisateur` ne reçoit
+    que lui) : un diagnostic d'enseignant n'aurait jamais d'auteur. La
+    permission `appareil.diagnostiquer` va donc à l'élève seul, et « Cet
+    appareil » ne s'affiche qu'à lui. Ce sont ses téléphones qu'on essaie.
+38. **2026-11-21 — `/compte/appareils` gardé hors ligne (lot 14).** Écran
+    « en ligne seulement » jusqu'ici (A.2, niveau C par défaut). Il entre
+    dans la liste blanche : c'est sans réseau qu'on a le plus besoin du
+    diagnostic. La liste des appareils vient alors de sa copie datée ;
+    « Retirer » reste un geste en ligne.
 
 ## B.6 Points de vigilance
 

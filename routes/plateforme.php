@@ -5,6 +5,7 @@ use App\Http\Controllers\Console\ImpactController;
 use App\Http\Controllers\Console\JournalController;
 use App\Http\Controllers\Console\PersonnelController;
 use App\Http\Controllers\Console\PlateformeController;
+use App\Http\Controllers\Console\TerrainController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +38,13 @@ Route::middleware(['auth', 'can:'.Permission::EspaceConsole->value])
         Route::get('journal', [JournalController::class, 'index'])
             ->can(Permission::LireJournalAcces)
             ->name('journal.index');
+
+        // Lot 14 (terrain) : avis des élèves, diagnostics et erreurs des appareils, campagnes d'essai.
+        Route::middleware('can:'.Permission::ConsoleTerrain->value)->group(function () {
+            Route::get('terrain', [TerrainController::class, 'index'])->name('terrain.index');
+            Route::post('terrain/campagnes', [TerrainController::class, 'creerCampagne'])->name('terrain.campagnes.store');
+            Route::post('terrain/avis/{avis}/traiter', [TerrainController::class, 'traiterAvis'])->name('terrain.avis.traiter');
+        });
 
         Route::middleware('can:'.Permission::AdministrerComptes->value)->group(function () {
             Route::get('personnel', [PersonnelController::class, 'index'])->name('personnel.index');

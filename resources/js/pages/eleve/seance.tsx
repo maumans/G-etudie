@@ -19,6 +19,7 @@ import {
 } from '@/components/questions/aides-question';
 import { EnteteQuestion, VerdictQuestion } from '@/components/questions/commun';
 import { SignalerErreur } from '@/components/signaler-erreur';
+import { TonAvis } from '@/components/terrain/ton-avis';
 import { BoutonTuteur } from '@/components/tuteur/bouton-tuteur';
 import { SaisieQuestion } from '@/components/questions/saisie-question';
 import { BandeauExemple } from '@/components/ui/bandeau-exemple';
@@ -30,6 +31,7 @@ import { corriger, scoreAutoEvaluation } from '@/lib/contenu/questions';
 import type { QuestionEleve, ReponseQuestion } from '@/lib/contenu/questions';
 import { base, enregistrer, useHorsLigne } from '@/lib/hors-ligne';
 import { marquerSeanceTerminee } from '@/lib/progression/locale';
+import { doitProposerAvis, noterAvisPropose } from '@/lib/terrain/avis';
 import { partagerCarteCulture } from '@/lib/culture/carte';
 import { accueil, cours, culture as pageCulture } from '@/routes/eleve';
 import { index as groupesEleve } from '@/routes/eleve/groupes';
@@ -585,6 +587,23 @@ function Bilan({
     const { enAttente } = useHorsLigne();
     const { auth } = usePage().props;
     const pourcentage = Math.round((justes / Math.max(1, total)) * 100);
+    // Lot 14 (terrain) : « Ton avis », une fois par semaine au plus.
+    const [avis, setAvis] = useState(false);
+    const auteur = auth.user?.id ?? null;
+
+    useEffect(() => {
+        let actif = true;
+        void doitProposerAvis(base, auteur).then((proposer) => {
+            if (actif && proposer && auteur !== null) {
+                setAvis(true);
+                void noterAvisPropose(base, auteur);
+            }
+        });
+
+        return () => {
+            actif = false;
+        };
+    }, [auteur]);
 
     return (
         <div className="grid flex-1 content-center justify-items-center gap-6 py-6 text-center">
@@ -695,6 +714,20 @@ function Bilan({
                     </Button>
                 )}
             </div>
+            {avis && (
+                <TonAvis
+                    ecran={devoir ? 'devoir' : culture ? 'quiz' : 'seance'}
+                    question={
+                        devoir
+                            ? 'Ce devoir t’a aidé ?'
+                            : culture
+                              ? 'Ce quiz t’a plu ?'
+                              : 'Cette séance t’a aidé ?'
+                    }
+                    onFermer={() => setAvis(false)}
+                    className="w-full max-w-md"
+                />
+            )}
         </div>
     );
 }

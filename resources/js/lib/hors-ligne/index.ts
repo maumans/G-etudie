@@ -562,7 +562,13 @@ async function enregistrerServiceWorker(): Promise<void> {
         });
         moteur.on('etat', () => void essayerActiver());
         void essayerActiver();
-        setInterval(() => void inscription.update(), 3600_000);
+        // Sans réseau, la vérification échoue : rien à faire, elle reprend
+        // dans une heure (rejet non rattrapé trouvé par la capture d'erreurs
+        // du lot 14).
+        setInterval(
+            () => void inscription.update().catch(() => undefined),
+            3600_000,
+        );
     } catch (erreur) {
         console.warn("[N'karamögö] Service worker non inscrit :", erreur);
     }

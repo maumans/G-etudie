@@ -95,6 +95,16 @@ enum Permission: string
     /** Lot 13 : désactiver ou réactiver un compte du personnel. */
     case AdministrerComptes = 'comptes.administrer';
 
+    /** Lot 14 : Console › Terrain — avis des élèves, diagnostics et erreurs des appareils, campagnes d'essai. */
+    case ConsoleTerrain = 'console.terrain';
+
+    /**
+     * Lot 14 : envoyer le diagnostic de son appareil et les erreurs qu'il a
+     * captées (`diagnostic.envoyer`, `erreurs.signaler`). Élève seulement : la
+     * file d'opérations ne tourne que pour lui (HORS_LIGNE.md A.2).
+     */
+    case DiagnostiquerAppareil = 'appareil.diagnostiquer';
+
     /** Activer la double authentification sur son compte (DA4 : personnel seulement). */
     case DoubleAuthentification = 'compte.double_authentification';
 }

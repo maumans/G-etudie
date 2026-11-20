@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-20, lot 13)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-21, lot 14)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -16,15 +16,29 @@
 | `HORS_LIGNE.md` | Mode hors ligne : spécification complète (partie A), suivi (partie B), décisions HL-D1–HL-D12. |
 | `DEVBOOK.md` | Ce fichier : état du code, historique numéroté des décisions (section 8). |
 | `MISE_EN_PRODUCTION.md` | Mettre en ligne et y rester : serveur, `.env`, commandes de chaque déploiement, file d'attente, planificateur, journaux, sauvegardes, et ce que chaque lot demande au déploiement. Complété à chaque lot. |
+| `TERRAIN.md` | Lot 14 : organiser un essai avec de vrais élèves — autorisations, matériel, déroulé, fiche de passation, après l'essai, modèle d'autorisation parentale. |
 | `A_TESTER.md` | Tous les contrôles manuels en attente (vrais téléphones, coupures réelles, paiements réels). Créé à l'audit (2026-10-30), vide. |
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-20 (lot 13 fait, critère tenu ; lot 10 : vraie API en attente du crédit)
+### État au 2026-11-21 (lot 14 : outils de l'essai faits, critère en attente des essais ; lot 10 : vraie API en attente du crédit)
 
-- **Dépôt git** : `main` porte les lots 0 à 13. Les lots 3 à 13 ont été
+- **Dépôt git** : `main` porte les lots 0 à 14. Les lots 3 à 14 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 14 : outils faits, critère pas encore tenu** (point 30). Le
+  critère — `A_TESTER.md` exécutée sur de vrais téléphones avec de vrais
+  élèves — attend **D11** (HTTPS) et les **autorisations écrites** des
+  parents et de l'établissement : c'est `TERRAIN.md` qui dit comment
+  mener l'essai. Livré pour le rendre mesurable, tout par la file :
+  **« Ton avis »** (bilan de séance une fois par semaine, et « Mon
+  compte › Appareils »), **« Cet appareil »** (diagnostic lu sur le
+  téléphone, hors ligne aussi, envoyé avec un code de six caractères),
+  **erreurs captées** sur les appareils (sans rien de personnel), et
+  **Console › Terrain** (avis à traiter avec la décision prise, erreurs,
+  diagnostics par code, campagnes d'essai). ⚠ **Au déploiement** :
+  `migrate`, `db:seed`, et la tâche `terrain:purger` au planificateur
+  (`MISE_EN_PRODUCTION.md` § 8, lot 14).
 - **Lot 13 fait** (point 29) : **console plateforme** — vue d'ensemble,
   Activité (actifs, rétention à 7 et 30 jours, séances, examens blancs),
   Contenu (couverture, relecture, signalements et leur délai), Revenus
@@ -266,6 +280,12 @@
   souhaite, ajouter la photo détourée d'une personne majeure avec
   autorisation écrite (`public/images/vitrine/heros.webp`), posée devant
   l'illustration du héros.
+- **Tests (lot 14)** : **734 Pest, 428 Vitest**, verts (point 30) ;
+  Playwright : `ecrans-lot14.spec.ts` (32 captures) et la passe complète
+  sur le build (point 30). Captures sur ce poste : `PLAYWRIGHT_PORT=8010`,
+  `--workers=1`, sans `npm run dev`. Pour regarder un écran **sans les
+  masques** des valeurs variables : `REVUE=<dossier>` avec
+  `ecrans-lot14.spec.ts`.
 - **Tests (lot 12)** : **695 Pest, 414 Vitest, 709 Playwright**, verts
   (point 28). MySQL de Laragon à relancer après un redémarrage du poste
   (`D:\Applications\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysqld.exe
@@ -407,8 +427,17 @@
    (l'export y figure) ; Personnel : désactiver 04 Ibrahima, essayer de
    se connecter avec lui (refusé), le réactiver. Relire la **définition de
    l'assidu** et le **seuil de 10** (point 29) ; dire si un partenaire
-   (école, ONG) doit avoir son propre accès à l'impact. **Lot 14** ensuite
-   (terrain : vrais élèves, vrais téléphones).
+   (école, ONG) doit avoir son propre accès à l'impact.
+10 quinquies. **Maurice : essayer le lot 14** — 01 Aïssatou : « Moi ›
+   Appareils » : « Cet appareil », « Envoyer ce diagnostic » (noter le
+   code), « Donner mon avis » ; finir une séance du jour : la carte « Cette
+   séance t'a aidé ? » (une fois par semaine). 08 Sékou : Console ›
+   Terrain, la campagne « Essai d'exemple — Ratoma », « Traiter » un avis
+   avec une décision ; onglet « Diagnostics », chercher le code noté.
+   Puis **préparer le premier essai** avec `TERRAIN.md` : établissement,
+   lettre aux parents (à faire relire par un juriste, D9), téléphones —
+   **après D11**. Les résultats des fiches reviennent à Claude Code
+   (`A_TESTER.md` § 9, puis les corrections du lot 14 bis).
 11. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -2705,6 +2734,115 @@ cette question à sa façon. Elle distingue deux notions :
      établissement, si Maurice le veut ; `composer audit` signale 11 avis
      de sécurité **préexistants** (Laravel, Symfony) — mise à jour à
      décider à part, pas faite dans ce lot.
+
+30. [~] **Lot 14 — terrain : outils de l'essai (critère pas encore tenu)**
+   (2026-11-21, sur `main`, un commit)
+   - **Constat** : le critère du lot (« liste `A_TESTER.md` exécutée sur
+     vrais téléphones », avec de vrais élèves à Conakry et dans une
+     préfecture) **ne peut pas être tenu par Claude Code**, et il est
+     bloqué par **D11** (sans HTTPS, pas de service worker sur un
+     téléphone, donc pas de hors ligne à essayer) et par les autorisations
+     écrites (des mineurs, D9). Rien dans l'application ne disait ce qui
+     casse sur un téléphone d'élève, ni ce que l'élève en pense ; la
+     plaquette demande « test d'essai, critiques, prise en compte ».
+   - **Décisions de Maurice** (2026-11-21, plan accepté tel quel) :
+     1. `A_TESTER.md` **reste la seule liste** des contrôles (pas de copie
+        dans la console) ; les résultats remontés passent en « Contrôles
+        faits » ;
+     2. « Ton avis » **rattaché au compte** (pseudo, examen, établissement
+        lus par la plateforme seulement, jamais par un établissement) ;
+     3. les erreurs rattachées **à l'appareil seulement** ;
+     4. aucun essai sans l'accord écrit des parents et de l'établissement,
+        et seulement après D11.
+   - **Ce qui est fait** — une autorité, `App\Services\TerrainService` ;
+     tout arrive par la file d'opérations (`HORS_LIGNE.md` B.3 « HL8 ») :
+     - **« Ton avis »** (`avis.donner`) : Oui / Un peu / Non, six
+       étiquettes (`EtiquetteAvis`, mêmes clés et libellés côté appareil,
+       vérifié par un test), un mot de 300 caractères passé au filtre du
+       fil (`FiltreFil` : numéro, lien, adresse, mot interdit) ; 5 par
+       jour ; proposé dans le bilan d'une séance, d'un quiz ou d'un devoir
+       **une fois par semaine au plus** et par profil, et depuis « Mon
+       compte › Appareils » ;
+     - **diagnostic de l'appareil** (`diagnostic.envoyer`) : « Mon compte ›
+       Appareils › Cet appareil », lu sur l'appareil (hors ligne aussi),
+       alertes en clair (heure fausse, stockage non protégé, place, gestes
+       à corriger, version en attente), « Envoyer ce diagnostic » avec un
+       **code de six caractères** (alphabet de Crockford) choisi par
+       l'appareil ; le serveur ne garde que 23 clés typées, rien de
+       personnel ;
+     - **erreurs captées** (`erreurs.signaler`) : script, promesse rejetée,
+       page qui ne se charge pas (A.3.3), geste « À corriger » sur échec
+       répété ; regroupées par empreinte (nombres neutralisés), chemin sans
+       domaine ni paramètres, numéros / adresses / jetons masqués ; jamais
+       refusées (un refus s'afficherait à l'élève), plafonnées ;
+     - **Console › Terrain** (`console.terrain`, administrateur
+       plateforme) : chiffres clés, avis (réponse, écran, étiquettes,
+       commentaire, « Traiter » avec la décision — la trace de la prise en
+       compte), « Ce qui gêne », erreurs (combien de fois, navigateur,
+       version, pile), diagnostics (recherche par code sur toute la
+       garde) ; **campagnes d'essai** (nom, lieu, établissement, dates) qui
+       filtrent le tout ;
+     - **purge** : `terrain:purger` chaque nuit (diagnostics et erreurs
+       90 jours, avis un an) ;
+     - **`TERRAIN.md`** : préalables bloquants, interdits (aucune photo ni
+       vidéo de visage), matériel, la veille, déroulé d'une demi-journée
+       relié aux entrées de `A_TESTER.md`, fiche de passation, après
+       l'essai, modèle d'autorisation parentale (à faire relire, D9).
+   - **Démonstration** : `DemoTerrainSeeder` — une campagne d'exemple au
+     collège de démonstration, 12 avis d'élèves de la cohorte fictive (3
+     traités), 4 erreurs, 2 diagnostics, 3 appareils ; tout `est_exemple`
+     (bandeau).
+   - **Écarts** (`HORS_LIGNE.md` B.5, n° 37 et 38) : diagnostic et erreurs
+     **réservés à l'élève** (la file ne tourne que pour lui ; le plan les
+     prévoyait pour tout compte) ; `/compte/appareils` **entre dans la
+     liste blanche** (c'est sans réseau qu'on a besoin du diagnostic).
+   - **Bugs trouvés en chemin, corrigés** : (1) la vérification horaire du
+     service worker (`inscription.update()`) rejetait sans traitement
+     quand le réseau manquait — **trouvée par la capture d'erreurs
+     elle-même**, pendant les captures (préexistant, lot 0) ; (2) deux
+     erreurs captées dans le même instant s'écrasaient dans le stockage
+     (lire puis réécrire) : écritures l'une après l'autre (trouvé par
+     `terrain.test.ts`).
+   - **Preuve** : Pest `Terrain/TerrainTest` (17 : file une seule fois,
+     heure du geste, filtre, quota, validation, élève seul, clés du
+     diagnostic, plafonds sans refus, regroupement et anonymisation,
+     purge, accès à la console, campagne par dates et établissement,
+     validation de la campagne, traitement d'un avis et 404, libellés
+     identiques) ; `ConnexionTest` et `GestesEleveTest` mis à jour
+     (permission et registre) ; Vitest `terrain/terrain.test.ts` (14).
+     **Totaux** : `php artisan test` **734 passants**, `npm run test:js`
+     **428**, `tsc`, `vp check`, Pint, Larastan niveau 7 et
+     `npm run build` verts. Playwright `ecrans-lot14.spec.ts` (32
+     captures : 4 écrans × 360 / 768 / 1366 × clair / sombre, axe sans
+     violation sérieuse, aucun débordement). **Passe complète sur le
+     build** (776 tests, en série) : 758 verts du premier coup ; références
+     **régénérées et relues**, parce que l'écran a changé à dessein :
+     `lot7/appareils` (6, la section « Cet appareil »), `lot2/seance-bilan`
+     et `lot12/parcours-quiz-bilan` (la carte « Ton avis » sous les
+     actions ; l'action dominante reste visible à 360 × 740) ; deux
+     instabilités préexistantes repassent vertes seules
+     (`lot12/eleve-sortie` à 360 px, axe pendant une transition dans le
+     critère du lot 12) ; les parcours qui dépendent des captures ont été
+     relancés (`--no-deps`), verts. ⚠ Le parcours du lot 4 lance lui-même
+     `queue:work --once` : la commande Playwright doit porter
+     `ANNALES_EXTRACTEUR=simule` (sinon l'import tente la vraie API).
+     `parcours-lot13.spec.ts`, mal formaté depuis le lot 13, est reformaté
+     (`vp check` vert).
+   - **Vu et corrigé** (Playwright) : « 9 aviss » et « 25 foiss » (pluriel
+     invariable) ; « Une nouvelle version attend » affiché à tort pendant
+     la **première** installation du service worker (nouvel état « En
+     cours d'installation ») ; version « inconnue » au premier rendu (lue
+     sur la page Inertia) et hachage entier trop long (8 caractères) ;
+     dix lignes empilées à 360 px (grille sur deux colonnes partout) ;
+     sélecteur de campagne tout en bas à 360 px, sous la liste (remonté
+     avant la liste sur mobile, en tête de colonne sur ordinateur). Les
+     captures de référence masquent les valeurs lues sur l'appareil ; une
+     relecture sans masque (`REVUE=<dossier>`) a servi à les regarder.
+   - **Reste — le critère** : les essais eux-mêmes, après D11 et les
+     autorisations (`TERRAIN.md`) ; les 7 contrôles HL8 et toute la liste
+     `A_TESTER.md` sur vrais téléphones ; puis les corrections qui en
+     sortent (lot 14 bis). Le modèle d'autorisation parentale est à faire
+     relire par un juriste.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

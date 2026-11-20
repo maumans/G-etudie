@@ -3,7 +3,11 @@
 use App\Enums\ModeTentative;
 use App\Enums\Role;
 use App\Models\Abonnement;
+use App\Models\AvisEleve;
+use App\Models\CampagneTerrain;
 use App\Models\Chapitre;
+use App\Models\DiagnosticAppareil;
+use App\Models\ErreurAppareil;
 use App\Models\ExamenBlanc;
 use App\Models\Lecon;
 use App\Models\LotCodes;
@@ -39,6 +43,13 @@ test('un compte de démonstration par rôle, créé une fois, numéro vérifié'
     // Lot 13 : tous les élèves de la démonstration sont marqués fictifs (bandeau de la console).
     expect(ProfilEleve::query()->where('est_exemple', false)->count())->toBe(0)
         ->and(ReleveJauge::query()->count())->toBeGreaterThan(DemoPlateformeSeeder::NOMBRE * 5);
+
+    // Lot 14 : un essai fictif, semé une fois malgré deux db:seed, tout marqué.
+    expect(CampagneTerrain::query()->sole()->est_exemple)->toBeTrue()
+        ->and(AvisEleve::query()->count())->toBe(12)
+        ->and(AvisEleve::query()->where('est_exemple', false)->exists())->toBeFalse()
+        ->and(ErreurAppareil::query()->where('est_exemple', false)->exists())->toBeFalse()
+        ->and(DiagnosticAppareil::query()->pluck('code')->sort()->values()->all())->toBe(['7K3FQX', 'M4T9ZA']);
 
     foreach (DemoSeeder::COMPTES as $compte) {
         $user = User::where('telephone', $compte['telephone'])->sole();

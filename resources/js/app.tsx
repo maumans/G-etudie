@@ -4,6 +4,7 @@ import { initializeTheme } from '@/hooks/use-appearance';
 import { initialiserReglagesAffichage } from '@/hooks/use-reglages-affichage';
 import { brancherBarreNavigation } from '@/lib/barre-navigation';
 import { demarrerHorsLigne } from '@/lib/hors-ligne';
+import { demarrerTerrain } from '@/lib/terrain';
 
 // Le filet de démarrage de app.blade.php (HORS_LIGNE.md A.3.3) attend ce
 // signal : sans lui, impossible de distinguer un démarrage lent d'un code absent.
@@ -17,6 +18,8 @@ document
 // (HORS_LIGNE.md A.3.7).
 demarrerHorsLigne(router);
 brancherBarreNavigation(router);
+// Lot 14 (terrain) : erreurs captées et envoyées par la file.
+demarrerTerrain(router);
 
 void createInertiaApp({
     title: titrePage,

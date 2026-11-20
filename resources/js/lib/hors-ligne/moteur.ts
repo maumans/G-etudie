@@ -79,6 +79,8 @@ type Evenements = {
     etat: (etat: EtatHorsLigne) => void;
     acquittee: (uuid: string, resultat: Record<string, unknown> | null) => void;
     rejetee: (uuid: string, motif: string) => void;
+    /** Lot 14 : un geste passé « À corriger » (refusé, ou en échec répété). */
+    anomalie: (anomalie: Anomalie) => void;
 };
 
 export const TAILLE_LOT = 50;
@@ -103,6 +105,7 @@ export class MoteurHorsLigne {
         etat: new Set(),
         acquittee: new Set(),
         rejetee: new Set(),
+        anomalie: new Set(),
     };
 
     private utilisateurId: number | null = null;
@@ -683,20 +686,22 @@ export class MoteurHorsLigne {
         genre: Anomalie['genre'],
         motif: string,
     ): Promise<void> {
+        const anomalie: Anomalie = {
+            ...operation,
+            genre,
+            motif,
+            survenue_le: new Date(this.maintenant()).toISOString(),
+        };
         await this.base.transaction(
             'rw',
             this.base.operations,
             this.base.anomalies,
             async () => {
                 await this.base.operations.delete(operation.uuid);
-                await this.base.anomalies.put({
-                    ...operation,
-                    genre,
-                    motif,
-                    survenue_le: new Date(this.maintenant()).toISOString(),
-                });
+                await this.base.anomalies.put(anomalie);
             },
         );
+        this.auditeurs.anomalie.forEach((rappel) => rappel(anomalie));
     }
 
     private async compterEchec(

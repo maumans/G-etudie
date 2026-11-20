@@ -61,6 +61,8 @@ enum Role: string
                 Permission::RejoindreGroupe,
                 Permission::InviterParent,
                 Permission::ParticiperCommunaute,
+                // Lot 14 : la file d'opérations ne tourne que pour l'élève (HORS_LIGNE.md A.2).
+                Permission::DiagnostiquerAppareil,
             ],
             // Lot 11 : le parent paie aussi l'abonnement de ses enfants.
             self::Parent => [Permission::EspaceParent, Permission::SouscrireAbonnement],
@@ -78,7 +80,7 @@ enum Role: string
                 Permission::ImporterAnnales,
                 Permission::TraiterSignalements,
                 Permission::LireJournalTuteur,
-                ...($this === self::Superadmin ? [Permission::EspaceConsole, Permission::GererCodes, Permission::VoirPaiements, Permission::VoirCoutsTuteur, Permission::AdministrerEtablissements, Permission::VoirImpact, Permission::LireJournalAcces, Permission::AdministrerComptes] : []),
+                ...($this === self::Superadmin ? [Permission::EspaceConsole, Permission::GererCodes, Permission::VoirPaiements, Permission::VoirCoutsTuteur, Permission::AdministrerEtablissements, Permission::VoirImpact, Permission::LireJournalAcces, Permission::AdministrerComptes, Permission::ConsoleTerrain] : []),
             ],
         };
 

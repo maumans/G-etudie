@@ -830,6 +830,65 @@
   l'entrée « Compte du personnel désactivé » du journal des accès.
 - État : à faire (après D11)
 
+## 7 quater. Terrain (lot 14, `TERRAIN.md`)
+
+> Le critère du lot 14 est l'exécution de **toute** cette liste sur de
+> vrais téléphones, avec de vrais élèves : le déroulé, les autorisations
+> et la fiche de passation sont dans `TERRAIN.md`. Les trois entrées
+> ci-dessous vérifient les outils de l'essai eux-mêmes.
+
+### [Lot 14] Diagnostic d'un vrai téléphone, sans réseau
+- Pourquoi : pendant un essai, c'est souvent sur un téléphone en panne de
+  réseau qu'on a besoin du diagnostic ; il doit se lire et garder son code
+  hors ligne, puis partir seul.
+- Matériel : un Android d'entrée de gamme, l'application installée, un
+  compte élève de test, la console sur un ordinateur.
+- Comment le provoquer : « Mon compte › Appareils » ; lire « Cet
+  appareil » ; passer en mode avion ; recharger la page ; « Envoyer ce
+  diagnostic » ; noter le code ; couper le mode avion.
+- Quoi observer : hors ligne, la page s'ouvre (copie datée) et « Cet
+  appareil » se remplit ; le code de six caractères s'affiche tout de
+  suite ; « Mode hors ligne : Actif », « Application installée : Oui »,
+  le réseau et la mémoire justes ; au retour du réseau, la pastille
+  passe à « Tout est envoyé » et Console › Terrain › Diagnostics trouve
+  le code avec les mêmes valeurs.
+- En cas d'échec, relever : capture de « Cet appareil », le code, l'heure,
+  le contenu de la pastille réseau, le nombre de réponses en attente.
+- État : à faire (après D11)
+
+### [Lot 14] « Ton avis » donné en mode avion
+- Pourquoi : un avis se donne souvent en fin de séance, là où le réseau
+  manque ; il part par la file, une seule fois.
+- Matériel : un vrai téléphone, un compte élève de test qui n'a pas vu la
+  carte depuis une semaine.
+- Comment le provoquer : terminer une séance du jour en mode avion ; dans
+  le bilan, la carte « Cette séance t'a aidé ? » : « Un peu », deux
+  étiquettes, un mot ; « Envoyer mon avis » ; couper le mode avion.
+- Quoi observer : « Merci pour ton avis » tout de suite ; au retour du
+  réseau, un seul avis dans Console › Terrain › Avis des élèves, à l'heure
+  de la séance (pas à celle du retour du réseau) ; la carte ne revient pas
+  à la séance suivante. Un mot contenant un numéro de téléphone est
+  refusé, avec sa phrase, dans « À corriger ».
+- En cas d'échec, relever : capture du bilan, heure, contenu de « À
+  envoyer » / « À corriger ».
+- État : à faire (après D11)
+
+### [Lot 14] Une vraie erreur captée et remontée
+- Pourquoi : la console doit montrer ce qui casse sur les téléphones des
+  élèves, sans rien de personnel.
+- Matériel : un vrai téléphone, un compte élève de test ; un déploiement
+  de préproduction.
+- Comment le provoquer : ouvrir une page élève ; déployer une nouvelle
+  version ; sans recharger, couper le réseau et toucher un lien vers une
+  page jamais ouverte (échec d'import, `HORS_LIGNE.md` A.3.3) ; rétablir
+  le réseau.
+- Quoi observer : le filet de secours s'affiche, puis la page se recharge ;
+  dans Console › Terrain › Erreurs, une ligne « Page qui ne se charge
+  pas » avec le chemin de la page, le navigateur et la version, et rien
+  d'autre (ni numéro, ni pseudo, ni paramètre d'adresse).
+- En cas d'échec, relever : heure, capture, la ligne de la console.
+- État : à faire (après D11)
+
 ## 8. Vérifications visuelles reportées (Playwright indisponible)
 
 *(aucune entrée)*

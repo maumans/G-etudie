@@ -58,6 +58,9 @@ export type Permission =
     | 'console.impact'
     | 'console.journal'
     | 'comptes.administrer'
+    // Lot 14 (terrain).
+    | 'console.terrain'
+    | 'appareil.diagnostiquer'
     | 'compte.double_authentification';
 
 export type Auth = {

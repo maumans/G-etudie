@@ -4,6 +4,7 @@ Ce fichier est lu par Claude Code à chaque session. Il dit **comment** on
 travaille ici. Le **quoi** est dans `PLAN_NKARAMOGO.md` et `HORS_LIGNE.md`, le
 **à quoi ça ressemble** dans `DESIGN.md`, et **où on en est** dans `DEVBOOK.md`.
 Le **comment mettre en ligne** est dans `MISE_EN_PRODUCTION.md`.
+Le **comment mener un essai avec de vrais élèves** est dans `TERRAIN.md`.
 Ces fichiers sont la seule référence du projet.
 
 ---
