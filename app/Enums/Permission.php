@@ -86,6 +86,15 @@ enum Permission: string
     /** Lot 12 (PLAN M13) : modérer le fil de ses groupes (masquer, retirer la parole, fermer). */
     case ModererCommunaute = 'communaute.moderer';
 
+    /** Lot 13 (PLAN M18) : l'impact (assidus et autres) et son rapport PDF pour un partenaire. */
+    case VoirImpact = 'console.impact';
+
+    /** Lot 13 (PLAN M18) : lire le journal des accès sensibles de toute la plateforme. */
+    case LireJournalAcces = 'console.journal';
+
+    /** Lot 13 : désactiver ou réactiver un compte du personnel. */
+    case AdministrerComptes = 'comptes.administrer';
+
     /** Activer la double authentification sur son compte (DA4 : personnel seulement). */
     case DoubleAuthentification = 'compte.double_authentification';
 }

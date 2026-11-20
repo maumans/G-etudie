@@ -30,7 +30,15 @@ import {
     WalletCards,
 } from 'lucide-react';
 import type { EntreeNavigation } from '@/components/lien-navigation';
-import { accueil as accueilConsole } from '@/routes/console';
+import {
+    accueil as accueilConsole,
+    activite as activiteConsole,
+    contenu as contenuConsole,
+    revenus as revenusConsole,
+} from '@/routes/console';
+import { index as impactConsole } from '@/routes/console/impact';
+import { index as journalConsole } from '@/routes/console/journal';
+import { index as personnelConsole } from '@/routes/console/personnel';
 import { index as codesConsole } from '@/routes/console/codes';
 import { index as paiementsConsole } from '@/routes/console/paiements';
 import { index as tuteurConsole } from '@/routes/console/tuteur';
@@ -308,9 +316,45 @@ export const NAVIGATION_CONSOLE: EntreeNavigation[] = [
         actifSous: '/console/tuteur',
         permission: 'tuteur.couts',
     },
-    { libelle: 'Activité', icone: Activity },
-    { libelle: 'Contenu', icone: Library },
-    { libelle: 'Revenus', icone: Wallet },
-    { libelle: 'Impact', icone: ChartNoAxesCombined },
-    { libelle: 'Journal des accès', icone: ScrollText },
+    // Lot 13 (PLAN M18).
+    {
+        libelle: 'Activité',
+        icone: Activity,
+        href: activiteConsole().url,
+        actifSous: '/console/activite',
+    },
+    {
+        libelle: 'Contenu',
+        icone: Library,
+        href: contenuConsole().url,
+        actifSous: '/console/contenu',
+    },
+    {
+        libelle: 'Revenus',
+        icone: Wallet,
+        href: revenusConsole().url,
+        actifSous: '/console/revenus',
+        permission: 'paiements.voir',
+    },
+    {
+        libelle: 'Impact',
+        icone: ChartNoAxesCombined,
+        href: impactConsole().url,
+        actifSous: '/console/impact',
+        permission: 'console.impact',
+    },
+    {
+        libelle: 'Journal des accès',
+        icone: ScrollText,
+        href: journalConsole().url,
+        actifSous: '/console/journal',
+        permission: 'console.journal',
+    },
+    {
+        libelle: 'Personnel',
+        icone: UsersRound,
+        href: personnelConsole().url,
+        actifSous: '/console/personnel',
+        permission: 'comptes.administrer',
+    },
 ];

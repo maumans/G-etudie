@@ -54,6 +54,10 @@ export type Permission =
     | 'etablissements.administrer'
     | 'communaute.participer'
     | 'communaute.moderer'
+    // Lot 13.
+    | 'console.impact'
+    | 'console.journal'
+    | 'comptes.administrer'
     | 'compte.double_authentification';
 
 export type Auth = {

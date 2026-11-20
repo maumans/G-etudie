@@ -1509,3 +1509,40 @@ la prolonge sans nouveau composant de base.
   la carte « Les rendus » d'un défi s'étirait sous une colonne plus haute
   (`self-start`). Le trait sous le « Q » de « Quiz » et « Questions » est la
   queue du Q de Bricolage Grotesque, pas un soulignement.
+
+### Lot 13 — console plateforme (2026-11-20)
+
+- **Vue d'ensemble** : en-tête méta (date, inscrits) + `titre-contraste`
+  « La plateforme, **cette semaine** », « Rapport d'impact (PDF) » en
+  action dominante à droite ; quatre chiffres clés (`ChiffreCle` : icône
+  mandarine, chiffre 700 `font-data`, tendance en badge vert ou framboise
+  **avec flèche et mot**, jamais la couleur seule) ; colonne principale
+  (courbe des actifs et des assidus, barres des paiements par semaine) et
+  colonne de 21 rem : la carte d'impact en `surface-encre` (le moment
+  fort : la phrase « +18,5 points », chiffres en blanc sur verre), « Ce
+  qui attend l'équipe » en filets, actifs par examen en lignes compactes
+  (nom, barre fine, « 34 / 46 »).
+- **Graphiques** (`components/console/graphiques.tsx`, sans bibliothèque) :
+  un seul axe ; série mise en avant en `nimba-500` (aire teintée à 10 %),
+  série de comparaison en encre `ink-500` **en pointillés** (second
+  codage : le gris ne passe pas le plancher de saturation du validateur,
+  c'est voulu pour une série de contexte) ; légende dès deux séries ;
+  survol (réglette, points cerclés, bulle `bg-relief` à droite ou à
+  gauche selon la place) ; barres à bouts arrondis 4 px et 3 px d'écart,
+  axe entier pour des comptes ; tableau équivalent en `sr-only`.
+- **Impact** : filtres dans une carte (trois listes compactes), bandeau
+  EXEMPLE, la phrase en `surface-encre` (22-24 px en 300, chiffre en
+  `nimba-300` 700), deux cartes de groupe (celle des assidus au filet
+  mandarine), chaque mesure dans un pavé craie (écart en 24 px 700, « de
+  32,2 à 50,8 % », « 100 % en progrès ») ou, sous le seuil, une phrase
+  qui le dit ; « Comment c'est calculé » en définitions courtes et une
+  ligne de garde (bouclier vert).
+- **Journal, Personnel** : listes en filets (pas de cartes répétées),
+  tuile de 40 px par famille d'action (compte mandarine, argent vert,
+  organisation indice, console encre) ou initiale sur craie ; méta en
+  12 px ; « Désactiver » en `outline` ton `danger`, toujours confirmé.
+- **Rapport PDF** (`resources/views/rapports/impact.blade.php`) : même
+  langage que l'écran sur papier — Bricolage Grotesque (TTF statiques
+  400 / 600 / 700), titre en contraste 400 / 700, bandeau encre pour la
+  phrase-clé, deux cartes (crème, celle des assidus en pêche), courbe
+  mandarine / grise en pointillés, méthode en 10 px ; une page A4.

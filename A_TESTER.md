@@ -778,6 +778,58 @@
   avant et après.
 - État : à faire (après D11)
 
+## 7 ter. Console plateforme (lot 13)
+
+### [Lot 13] Le rapport d'impact chez un partenaire (critère du lot)
+- Pourquoi : PLAN § 12, lot 13 — « rapport d'impact exportable en PDF pour
+  un partenaire » ; il doit se lire et s'imprimer ailleurs que sur
+  l'ordinateur qui l'a fait.
+- Matériel : la production (ou la préproduction) avec au moins deux
+  dimanches de relevés ; le compte administrateur ; un téléphone Android
+  et un ordinateur Windows **sans** les polices de la marque ; une
+  imprimante.
+- Comment le provoquer : Console › Impact › 12 semaines ›
+  « Télécharger le rapport (PDF) » ; envoyer le fichier par WhatsApp à
+  son propre téléphone ; l'ouvrir dans le lecteur du téléphone, puis dans
+  Edge ou Adobe sur l'ordinateur ; l'imprimer en A4.
+- Quoi observer : une seule page ; police Bricolage Grotesque (pas une
+  police de remplacement), accents et « ö » de N'karamögö justes ; la
+  courbe tracée ; les chiffres identiques à l'écran Impact ; pas de
+  bandeau « EXEMPLE » en production ; impression sans coupure.
+- En cas d'échec, relever : le fichier lui-même, le lecteur et sa
+  version, une photo de la page imprimée.
+- État : à faire (après D11 et deux dimanches de relevés)
+
+### [Lot 13] Le premier relevé de la jauge en production
+- Pourquoi : l'impact se lit dans les relevés du dimanche ; une tâche
+  planifiée qui ne tourne pas ne se voit qu'après coup.
+- Matériel : le serveur de production, accès SSH.
+- Comment le provoquer : attendre le premier dimanche après la mise en
+  ligne ; le lundi, `php artisan tinker` →
+  `App\Models\ReleveJauge::query()->max('semaine')`.
+- Quoi observer : le lundi de la semaine écoulée ; autant de relevés que
+  d'élèves actifs (comptes non désactivés) ; dans `storage/logs`, aucune
+  erreur à 22 h.
+- En cas d'échec, relever : `php artisan schedule:list`, la crontab de
+  `www-data`, le journal Laravel du dimanche soir ; relancer
+  `php artisan jauges:relever --jour=<le dimanche>`.
+- État : à faire (après la mise en ligne)
+
+### [Lot 13] Désactiver un compte du personnel connecté sur un téléphone
+- Pourquoi : un rédacteur ou un enseignant qui quitte l'équipe doit
+  perdre l'accès tout de suite, même sur l'appareil où il reste connecté.
+- Matériel : un compte enseignant de test connecté sur un vrai téléphone
+  (application installée), le compte administrateur sur un ordinateur.
+- Comment le provoquer : Console › Personnel › « Désactiver » sur
+  l'enseignant ; sur le téléphone, toucher un lien de son espace, puis
+  fermer et rouvrir l'application.
+- Quoi observer : il est renvoyé à la connexion avec « Ce compte est
+  désactivé » ; la connexion est refusée ; après « Réactiver », il se
+  reconnecte avec son mot de passe.
+- En cas d'échec, relever : capture de l'écran du téléphone, heure, et
+  l'entrée « Compte du personnel désactivé » du journal des accès.
+- État : à faire (après D11)
+
 ## 8. Vérifications visuelles reportées (Playwright indisponible)
 
 *(aucune entrée)*

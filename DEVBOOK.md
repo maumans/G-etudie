@@ -1,6 +1,6 @@
 # DEVBOOK : N'karamögö · G-Étudie
 
-## 0. Reprise — où en est le projet (mis à jour le 2026-11-18, lot 12)
+## 0. Reprise — où en est le projet (mis à jour le 2026-11-20, lot 13)
 
 > À lire en premier. Le reste du document décrit le système ; cette section dit
 > **ce qui est fait, ce qui n'est pas encore sûr, et par quoi reprendre**.
@@ -20,11 +20,22 @@
 | `DEMARRAGE.md` | Installation de Playwright et premiers messages pour Claude Code. |
 | `AGENTS.md` | Consignes Laravel Boost générées par le kit (en anglais). En cas de conflit, `CLAUDE.md` prévaut. |
 
-### État au 2026-11-18 (lot 12 fait, critère tenu ; lot 10 : vraie API en attente du crédit)
+### État au 2026-11-20 (lot 13 fait, critère tenu ; lot 10 : vraie API en attente du crédit)
 
-- **Dépôt git** : `main` porte les lots 0 à 12. Les lots 3 à 12 ont été
+- **Dépôt git** : `main` porte les lots 0 à 13. Les lots 3 à 13 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **Lot 13 fait** (point 29) : **console plateforme** — vue d'ensemble,
+  Activité (actifs, rétention à 7 et 30 jours, séances, examens blancs),
+  Contenu (couverture, relecture, signalements et leur délai), Revenus
+  (paiements, moyens, formules, codes, abonnés), **Impact** (assidus et
+  autres : jauge et examens blancs) et son **rapport PDF** (critère :
+  `dompdf`, une page A4, journalisé), Journal des accès, Personnel
+  (désactiver / réactiver un compte, sessions fermées). Un groupe de
+  moins de 10 élèves n'est jamais chiffré. La jauge est désormais
+  **relevée chaque dimanche** (`jauges:relever`). ⚠ **Au déploiement** :
+  `composer install` (dompdf), `migrate`, `db:seed`, et le planificateur
+  porte la nouvelle tâche (`MISE_EN_PRODUCTION.md` § 8, lot 13).
 - **Lot 12 fait** (point 28) : **culture générale** (matière
   transversale : tout élève, hors jauge ; question du jour la même pour
   tous, quiz de cinq, carte de partage « Défier mes amis » ; chaque
@@ -387,8 +398,17 @@
    la classe » (le message signalé, « Masquer ») ; « Donner un devoir » ›
    « C'est un défi du groupe » ; le « Défi du vendredi ». 04 rédacteur :
    Back-office › Ressources › « Proposer une ressource » ; 05 relectrice :
-   « Vérifiée ». 06 : Back-office › Modération (mots refusés). **Lot 13**
-   ensuite (console plateforme : activité, contenu, revenus, impact).
+   « Vérifiée ». 06 : Back-office › Modération (mots refusés).
+10 quater. **Maurice : essayer le lot 13** — 08 Sékou : Console › Vue
+   d'ensemble, puis Activité, Contenu, Revenus ; Impact : changer la
+   période, choisir « BEPC » puis le « Collège exemple de Ratoma »
+   (sous 10 élèves, les chiffres disparaissent : c'est voulu) ;
+   « Télécharger le rapport (PDF) » et l'ouvrir ; Journal des accès
+   (l'export y figure) ; Personnel : désactiver 04 Ibrahima, essayer de
+   se connecter avec lui (refusé), le réactiver. Relire la **définition de
+   l'assidu** et le **seuil de 10** (point 29) ; dire si un partenaire
+   (école, ONG) doit avoir son propre accès à l'impact. **Lot 14** ensuite
+   (terrain : vrais élèves, vrais téléphones).
 11. **Équipe pédagogique** : saisir dans le référentiel le programme
    (chapitres, notions), les coefficients et les durées des matières
    phares ; confirmer la liste des phares.
@@ -543,7 +563,7 @@ permission s'exerce (section 7).
 | `SynchroService` | file d'opérations (`HORS_LIGNE.md` A.3.6) : cinq verdicts, idempotence par la base, `enTantQue`, horloge ; quatre types d'opération élève au lot 3 | ✅ étape 6 |
 | `TuteurService` | API Claude, quotas, journal, coûts | ⬜ |
 | `PaiementService` | Orange Money, MTN MoMo, codes prépayés | ⬜ |
-| `PlateformeService` | console : activité, contenu, revenus, impact | ⬜ |
+| `PlateformeService` | console : activité, contenu, revenus, impact (lot 13, point 29) ; avec `ReleveJaugeService` (relevé du dimanche), `ComptesService` (désactiver un compte du personnel), `RapportImpact` (PDF) | ✅ |
 
 ## 5. État d'avancement — frontend
 
@@ -2573,6 +2593,119 @@ cette question à sa façon. Elle distingue deux notions :
      (PLAN M9) ne sont pas faits ; du vrai contenu de culture générale,
      sourcé, par l'équipe.
 
+29. [x] **Lot 13 — console plateforme : activité, contenu, revenus, impact**
+   (2026-11-20, sur `main`, un commit)
+   - **Constat** : la console n'avait qu'un état vide (lot 0) et des
+     entrées de navigation sans écran ; la jauge est recalculée à chaque
+     fois depuis les maîtrises, **sans historique** : son évolution ne se
+     lisait nulle part ; un compte du personnel ne pouvait pas être
+     désactivé (point ouvert du point 15) ; une session ouverte survivait à
+     `desactive_le` (seule la connexion le refusait).
+   - **Décisions de Maurice** (2026-11-20, plan accepté tel quel) :
+     1. le rapport est un **vrai PDF** fait par `dompdf/dompdf` (PHP pur,
+        rien à installer sur le serveur ; **dépendance ajoutée**, 3.1.6) ;
+     2. **élève assidu** = au moins 3 séances terminées par semaine pendant
+        au moins la moitié des semaines de la période (PLAN § 15) ; les
+        quiz de culture ne comptent pas ;
+     3. **seuil d'anonymat** : un groupe de moins de 10 élèves mesurés
+        n'est pas chiffré ; aucun nom, pseudo ni numéro dans la console
+        ni dans le rapport ;
+     4. l'impact est réservé à l'**administrateur plateforme** (un rôle
+        « partenaire » plus tard s'il le faut) ;
+     5. **Console › Personnel** : désactiver / réactiver un compte du
+        personnel, sessions fermées, journalisé.
+   - **Une autorité** : `App\Services\Plateforme\PlateformeService`
+     (activité, contenu, revenus, impact) — l'accueil de la console,
+     chaque écran et le PDF y lisent leurs chiffres. Actif un jour = a
+     répondu ce jour-là (`series_jours`) ; rétention à N jours = part des
+     inscrits depuis plus de N jours qui ont répondu N jours ou plus après
+     leur inscription (non chiffrée sous 10). La couverture du programme
+     sort du contrôleur du back-office dans `App\Support\CouvertureProgramme`
+     (lue par le back-office **et** la console).
+   - **Relevé de la jauge** : table `releves_jauge` (élève, lundi de la
+     semaine, valeur ; examen, série et établissement recopiés au jour du
+     relevé), commande `jauges:relever` **le dimanche à 22 h**, par la
+     même règle que l'accueil élève (`MaitriseService::jaugesDuGroupe`) ;
+     relancer la même semaine remplace la valeur ; un compte désactivé
+     n'est plus relevé. **L'historique commence au premier passage en
+     production** : le passé ne se reconstitue pas.
+   - **Écrans** (console, `routes/plateforme.php`) : Vue d'ensemble
+     (actifs, rétention, revenus, signalements ; courbe des actifs et des
+     assidus, paiements par semaine ; carte d'impact en `surface-encre` ;
+     « Rapport d'impact (PDF) » en action dominante), Activité, Contenu,
+     Revenus (`paiements.voir`), Impact (filtres période 8/12/26 semaines,
+     examen et série, établissement ; assidus et autres côte à côte, jauge
+     et examens blancs ; méthode), Journal des accès (filtre par action,
+     auteur ou IP, dates ; appareil lu dans l'agent), Personnel. Graphiques
+     dessinés à la main (`components/console/graphiques.tsx`, pas de
+     bibliothèque) : un axe, série de comparaison en pointillés, survol
+     avec réglette et bulle, tableau équivalent pour les lecteurs d'écran.
+   - **Rapport PDF** (`RapportImpact`, vue `rapports.impact`) : une page
+     A4, Bricolage Grotesque en trois instances TTF statiques tirées de la
+     police variable (`resources/fonts/pdf`, OFL : dompdf ne lit ni woff2
+     ni polices variables), courbe en SVG, phrase-clé, deux groupes,
+     méthode et « une association, pas une cause » ; bandeau EXEMPLE si
+     des élèves fictifs y entrent ; chaque export au journal
+     (`rapport_impact.exporte`, avec les filtres).
+   - **Désactiver un compte** : `ComptesService` (seule porte) — jamais
+     son propre compte, jamais le dernier administrateur actif ; sessions
+     en base supprimées, jeton « se souvenir de moi » changé ; nouveau
+     middleware `CompteDesactive` (déconnecte une session encore ouverte,
+     **bug préexistant corrigé**) ; il laisse passer `sync/*` : la
+     synchronisation décide geste par geste (un geste fait hors ligne avant
+     la désactivation reste accepté, `SynchroService`, HORS_LIGNE.md A.6 —
+     c'est la suite complète qui l'a rappelé,
+     `SynchroEnTantQueLAuteurTest`) ; un compte qui n'est pas du personnel
+     répond 404.
+   - **Permissions** : `console.impact`, `console.journal`,
+     `comptes.administrer` (administrateur plateforme). Les routes
+     Activité et Contenu sont sous `espace.console`.
+   - **Démonstration** : `DemoPlateformeSeeder` — 60 élèves fictifs
+     (40 BEPC dont la moitié au collège de démonstration, 20 Bac SE), douze
+     semaines de séances, de jours actifs, de relevés, d'examens blancs, de
+     paiements simulés et de codes prépayés (par le vrai service), graine
+     fixe ; `profils_eleves.est_exemple` (nouvelle colonne) marque tous les
+     élèves de la démonstration et déclenche le bandeau. Le scénario fait
+     progresser les assidus (+18,5 points de jauge contre +3,5) : ce n'est
+     **pas une mesure**.
+   - **Écart** : aucun au PLAN ; la console reste en ligne seulement
+     (`HORS_LIGNE.md` B.3 « Lot 13 »).
+   - **Preuve** : Pest `Console/PlateformeTest` (11, dont le critère :
+     PDF téléchargé, `%PDF-`, chiffres de l'écran, journal) et
+     `Console/PersonnelEtJournalTest` (7) ; `SeederDemonstrationTest`
+     complété ; `AccesParRoleTest` (toutes les nouvelles routes gardées) ;
+     Larastan niveau 7 à 0 ; Playwright `ecrans-lot13.spec.ts` (42
+     captures : 7 écrans × 360 / 768 / 1366 × clair / sombre, axe sans
+     violation sérieuse, aucun débordement) et `parcours-lot13.spec.ts`
+     (le critère : filtre BEPC, « Télécharger le rapport (PDF) », fichier
+     `%PDF-` nommé, export au journal ; projet `parcours-impact`, après les
+     captures, l'entrée du journal effacée à la fin).
+     **Totaux** : `php artisan test` **717 passants** (6 277 assertions),
+     `npm run test:js` **414**, `tsc`, `vp check`, Pint, Larastan et
+     `npm run build` verts. Passe visuelle complète sur le build (projet
+     `ecrans`, en série) : 730 captures sur 733 identiques du premier
+     coup ; les trois autres (groupe vu par l'établissement à 360 px,
+     culture générale à 360 px) repassent vertes seules — instables
+     préexistantes (ordre d'élèves à égalité d'activité, ardoise chargée
+     à la demande), écrans que ce lot ne touche pas.
+   - **Vu et corrigé** (Playwright) : « % » renvoyé seul à la ligne dans
+     la carte d'impact ; étiquette « 100 % » coupée sur l'axe (colonne à la
+     largeur de la plus longue étiquette) ; « 41 h » coupé ; accords
+     « 1 notions » ; paliers à 0,5 pour des comptes ; colonnes déséquilibrées
+     de la vue d'ensemble (actifs par examen en lignes compactes) ;
+     rétention de démonstration trop belle (94 %) ; flèche absente de la
+     police du PDF ; rapport ramené à une page. Références des écrans de
+     la console des lots précédents régénérées (la navigation de la
+     console a ses vrais liens) : vue d'ensemble du lot 0 (8, refaite),
+     lot de codes et paiements du lot 9 (12 : la cohorte y ajoute ses
+     paiements et ses codes) — **toutes relues**, aucune autre ne bouge.
+   - **Reste** : le premier relevé de production (dimanche suivant la mise
+     en ligne) ; le rapport ouvert chez un partenaire (`A_TESTER.md`,
+     lot 13) ; un rôle « partenaire » qui lirait l'impact de son seul
+     établissement, si Maurice le veut ; `composer audit` signale 11 avis
+     de sécurité **préexistants** (Laravel, Symfony) — mise à jour à
+     décider à part, pas faite dans ce lot.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -2619,9 +2752,9 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
   la prochaine retouche de l'un des deux.
 - **Images et tableaux dans les leçons et les questions** : toujours hors
   du format des blocs (stockage et WebP à décider avec les packs).
-- **Désactiver un compte du personnel** : un compte qui a signé du contenu
-  ne se supprime plus lui-même (point 15) ; l'écran administrateur qui le
-  désactive reste à faire (console, lot 13).- **Domaine et hébergement** (D11) : à fixer avant la clôture du lot 0 (HTTPS).
+- [x] **Désactiver un compte du personnel** : fait au lot 13 (point 29,
+  Console › Personnel) ; un compte qui a signé du contenu ne se supprime
+  toujours pas (point 15).- **Domaine et hébergement** (D11) : à fixer avant la clôture du lot 0 (HTTPS).
 - **Logo vectoriel** : remplacera le monogramme provisoire des icônes (DA8).
 - **Fournisseur SMS** (D3) : à choisir avant le lot 8 ; d'ici là, aucun SMS
   ne part (codes dans le journal Laravel en développement).

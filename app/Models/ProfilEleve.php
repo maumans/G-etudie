@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $classe_id
  * @property int|null $etablissement_id
  * @property int $objectif_minutes
+ * @property bool $est_exemple élève fictif des données de démonstration (lot 13), jamais en masse
  * @property-read Examen $examen
  * @property-read Serie|null $serie
  */
@@ -38,6 +39,7 @@ class ProfilEleve extends Model
         return [
             'filiere' => Filiere::class,
             'objectif_minutes' => 'integer',
+            'est_exemple' => 'boolean',
         ];
     }
 

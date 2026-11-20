@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CompteDesactive;
 use App\Http\Middleware\FigerHorlogeDemo;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -35,6 +36,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->convertEmptyStringsToNull(except: [$documents]);
 
         $middleware->web(append: [
+            // Lot 13 : un compte désactivé pendant sa session est déconnecté.
+            CompteDesactive::class,
             SessionCourtePersonnel::class,
             OrdinateurPartage::class,
             HandleAppearance::class,

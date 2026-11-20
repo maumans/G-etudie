@@ -667,6 +667,7 @@ hors ligne ; les packs viennent ensuite.
 | — | Lot 10 (sans lot HL) : tuteur N'karamögö en ligne seulement (niveau C), dialogue hors ligne, rien par la file (écart n° 34), panneau chargé à la demande | ✅ fait (2026-11-12), B.3 « Lot 10 » ; vraie API et vrai téléphone dans `A_TESTER.md` § 7 bis | 4 / 4 |
 | — | Lot 11 (sans lot HL) : espaces parent, enseignant, établissement en ligne seulement (niveau C) ; devoir = séance, réponses par la file ; rejoindre un groupe et lier un parent en direct | ✅ fait (2026-11-13), B.3 « Lot 11 » ; vrais téléphones dans `A_TESTER.md` | 4 / 4 |
 | — | Lot 12 (sans lot HL) : culture générale (question du jour et quiz préparés dans l'instantané, réponses par la file), ressources externes dans les packs (lien hors ligne → dialogue), fil du groupe en ligne seulement avec brouillon gardé | ✅ fait (2026-11-18), B.3 « Lot 12 » ; vrais téléphones dans `A_TESTER.md` | 5 / 5 |
+| — | Lot 13 (sans lot HL) : console plateforme en ligne seulement (niveau C), rien sur l'appareil ; le PDF se télécharge, il ne passe pas par le service worker | ✅ fait (2026-11-20), B.3 « Lot 13 » | 3 / 3 |
 | HL8 | Terrain | ⬜ à faire | 0 / 7 |
 
 ## B.1 Décisions
@@ -1235,6 +1236,28 @@ hors ligne ; les packs viennent ensuite.
   du 2026-11-18) ; aucun numéro, lien ni e-mail ne passe le filtre
   (`FiltreFil`) ; la carte de partage du quiz porte le prénom seul et
   s'ouvre sans réseau (dessinée sur l'appareil).
+
+### Lot 13 (pas de lot HL propre, A.13) — console plateforme
+
+- [x] **Niveau C** (A.2 : « console plateforme ») : `/console/activite`,
+  `/console/contenu`, `/console/revenus`, `/console/impact` (et son
+  rapport), `/console/journal`, `/console/personnel` hors de la liste
+  blanche (`config/hors_ligne.php` inchangé) ; la console est un espace du
+  personnel (session de 12 h), jamais ouvert sur un téléphone d'élève.
+  Hors ligne, la garde de navigation ouvre « Cet écran demande une
+  connexion » (A.3.7). Preuve : liste blanche inchangée,
+  `hors-ligne.spec.ts` inchangé.
+- [x] **Le rapport PDF est un téléchargement** (`Content-Disposition:
+  attachment`, `Cache-Control: no-store, private`) : le service worker ne
+  le garde pas, aucune donnée de la plateforme ne reste dans un cache.
+  Preuve : Pest `Console/PlateformeTest` (en-têtes), Playwright
+  `ecrans-lot13.spec.ts` (« le bouton télécharge un PDF »).
+- [x] **Rien de nouveau sur l'appareil de l'élève** : le relevé de la
+  jauge se fait sur le serveur (`jauges:relever`), à partir des maîtrises
+  que la file d'opérations a déjà tenues à jour ; une réponse faite hors
+  ligne et synchronisée après le dimanche compte au relevé suivant (au
+  jour du geste pour l'activité, `series_jours`, A.6). Aucune opération
+  ajoutée à la file.
 
 ## B.4 Tests
 

@@ -41,6 +41,12 @@ class Etablissement extends Model
         return $this->hasMany(Groupe::class);
     }
 
+    /** @return HasMany<ProfilEleve, $this> lot 13 : les élèves qui l'ont choisi (filtres de l'impact) */
+    public function profils(): HasMany
+    {
+        return $this->hasMany(ProfilEleve::class);
+    }
+
     /** @return HasMany<LicenceEtablissement, $this> */
     public function licences(): HasMany
     {

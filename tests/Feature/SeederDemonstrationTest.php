@@ -8,7 +8,9 @@ use App\Models\ExamenBlanc;
 use App\Models\Lecon;
 use App\Models\LotCodes;
 use App\Models\Notion;
+use App\Models\ProfilEleve;
 use App\Models\Question;
+use App\Models\ReleveJauge;
 use App\Models\Tentative;
 use App\Models\User;
 use App\Models\VersionContenu;
@@ -17,6 +19,7 @@ use App\Support\CatalogueEleve;
 use App\Support\FormatQuestion;
 use Database\Seeders\DatabaseSeeder;
 use Database\Seeders\DemoOrganisationSeeder;
+use Database\Seeders\DemoPlateformeSeeder;
 use Database\Seeders\DemoSeeder;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role as ModeleRole;
@@ -29,8 +32,13 @@ test('un compte de démonstration par rôle, créé une fois, numéro vérifié'
     $this->seed(DatabaseSeeder::class);
     $this->seed(DatabaseSeeder::class);
 
-    // Lot 11 : plus les élèves d'exemple du groupe de démonstration.
-    expect(User::count())->toBe(count(DemoSeeder::COMPTES) + count(DemoOrganisationSeeder::ELEVES_EXEMPLE));
+    // Lot 11 : plus les élèves d'exemple du groupe de démonstration ;
+    // lot 13 : plus la cohorte fictive de la console plateforme.
+    expect(User::count())->toBe(count(DemoSeeder::COMPTES) + count(DemoOrganisationSeeder::ELEVES_EXEMPLE) + DemoPlateformeSeeder::NOMBRE);
+
+    // Lot 13 : tous les élèves de la démonstration sont marqués fictifs (bandeau de la console).
+    expect(ProfilEleve::query()->where('est_exemple', false)->count())->toBe(0)
+        ->and(ReleveJauge::query()->count())->toBeGreaterThan(DemoPlateformeSeeder::NOMBRE * 5);
 
     foreach (DemoSeeder::COMPTES as $compte) {
         $user = User::where('telephone', $compte['telephone'])->sole();

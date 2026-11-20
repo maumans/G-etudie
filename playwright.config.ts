@@ -39,7 +39,7 @@ export default defineConfig({
         {
             name: 'ecrans',
             testMatch: /\.spec\.ts/,
-            testIgnore: /parcours-lot(?:[123459]|10|12)\.spec\.ts/,
+            testIgnore: /parcours-lot(?:[123459]|10|12|13)\.spec\.ts/,
             dependencies: ['connexion'],
         },
         // Crée puis efface une leçon : après les captures, qu'il ne doit pas
@@ -93,6 +93,13 @@ export default defineConfig({
         {
             name: 'parcours-communaute',
             testMatch: /parcours-lot12\.spec\.ts/,
+            dependencies: ['ecrans'],
+        },
+        // Lot 13 : Sékou télécharge le rapport d'impact (le critère) ; l'export
+        // écrit au journal des accès, effacé à la fin.
+        {
+            name: 'parcours-impact',
+            testMatch: /parcours-lot13\.spec\.ts/,
             dependencies: ['ecrans'],
         },
         {

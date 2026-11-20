@@ -39,9 +39,7 @@ Route::middleware('auth')->group(function () {
     Route::get('contenu', ContenuTableauDeBordController::class)
         ->can(Permission::EspaceContenu)
         ->name('contenu.accueil');
-    Route::inertia('console', 'console/accueil')
-        ->can(Permission::EspaceConsole)
-        ->name('console.accueil');
+    // La console plateforme : routes/plateforme.php (lot 13).
 });
 
 // Espace élève : routes/eleve.php (accueil, parcours, cours, séance).
@@ -56,6 +54,8 @@ require __DIR__.'/hors-ligne.php';
 require __DIR__.'/paiements.php';
 
 require __DIR__.'/tuteur.php';
+
+require __DIR__.'/plateforme.php';
 
 // Lot 11 : parents, enseignants, établissements (et la console des établissements).
 require __DIR__.'/organisation.php';

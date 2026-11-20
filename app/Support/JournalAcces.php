@@ -50,11 +50,32 @@ class JournalAcces
         'fil.parole_rendue' => 'Parole rendue à un élève dans le fil',
         'fil.ferme' => 'Fil du groupe fermé',
         'fil.ouvert' => 'Fil du groupe rouvert',
+        // Lot 13.
+        'rapport_impact.exporte' => 'Rapport d\'impact exporté (PDF)',
+        'compte.desactive' => 'Compte du personnel désactivé',
+        'compte.reactive' => 'Compte du personnel réactivé',
     ];
 
     public static function libelle(string $action): string
     {
         return self::LIBELLES[$action] ?? $action;
+    }
+
+    /**
+     * La famille d'une action, pour la console (icône et filtre) : compte,
+     * argent, organisation, communaute ou console.
+     */
+    public static function famille(string $action): string
+    {
+        $prefixe = strtok($action, '.');
+
+        return match ($prefixe) {
+            'abonnement', 'code', 'lot_codes', 'licence' => 'argent',
+            'parent', 'etablissement', 'groupe' => 'organisation',
+            'fil' => 'communaute',
+            'rapport_impact' => 'console',
+            default => 'compte',
+        };
     }
 
     /**

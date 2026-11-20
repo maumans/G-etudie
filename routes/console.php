@@ -20,3 +20,7 @@ Schedule::command('codes:effacer-oublies')->dailyAt('04:00');
 
 // Lot 12 (PLAN M19) : les liens des ressources externes vérifiées répondent-ils encore ?
 Schedule::command('ressources:verifier')->weeklyOn(1, '05:00')->withoutOverlapping();
+
+// Lot 13 (PLAN M18, « Impact ») : la jauge de chaque élève, relevée chaque
+// dimanche soir — l'évolution du rapport d'impact se lit dans ces relevés.
+Schedule::command('jauges:relever')->weeklyOn(0, '22:00')->withoutOverlapping();

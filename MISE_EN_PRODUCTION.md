@@ -38,7 +38,7 @@
 |---|---|---|
 | Domaine | `nkaramogo.*` réservé (D11) | |
 | **HTTPS** | certificat valide sur tout le domaine, HTTP redirigé vers HTTPS | **sans HTTPS, pas de service worker** : ni hors ligne, ni installation, ni packs (`HORS_LIGNE.md` A.3.1) |
-| PHP | 8.3 ou plus récent (développé en 8.4), extensions : `bcmath`, `ctype`, `curl`, `dom`, `fileinfo`, `intl`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, `zip`, `zlib` | `zlib` : poids compressé des packs (lot 7) |
+| PHP | 8.3 ou plus récent (développé en 8.4), extensions : `bcmath`, `ctype`, `curl`, `dom`, `fileinfo`, `gd`, `intl`, `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`, `zip`, `zlib` | `zlib` : poids compressé des packs (lot 7) ; `gd` : images du rapport PDF (lot 13) |
 | Composer | 2.x | |
 | Node.js | 22 LTS ou plus récent (développé en 26) | construire l'interface ; **depuis le lot 8**, faire tourner le rendu serveur de la vitrine (§ 4.3) |
 | MySQL | 8.0 ou plus récent, base `utf8mb4` dédiée | |
@@ -52,7 +52,7 @@ Paquets, sur Ubuntu 24.04 par exemple :
 ```bash
 sudo apt update
 sudo apt install nginx mysql-server supervisor unzip git
-sudo apt install php8.3-fpm php8.3-cli php8.3-mysql php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip php8.3-intl php8.3-bcmath
+sudo apt install php8.3-fpm php8.3-cli php8.3-mysql php8.3-mbstring php8.3-xml php8.3-curl php8.3-zip php8.3-intl php8.3-bcmath php8.3-gd
 ```
 
 Le certificat HTTPS (Let's Encrypt) :
@@ -352,6 +352,7 @@ Ce qu'il lance :
 | `packs:generer` | chaque nuit à 3 h | 7 | filet : un titre de chapitre modifié, une épreuve ajoutée ne regénèrent pas les packs d'eux-mêmes |
 | `paiements:verifier` | toutes les 5 min | 9 | un paiement dont le webhook s'est perdu est redemandé à l'opérateur ; sans réponse au bout de 30 min, il expire |
 | `codes:effacer-oublies` | chaque nuit à 4 h | 9 | les codes prépayés en clair d'un lot jamais marqué « remis » sont effacés au bout de 14 jours |
+| `jauges:relever` | le dimanche à 22 h | 13 | la jauge de chaque élève est relevée pour la semaine : l'impact (console, rapport PDF) se lit dans ces relevés. Sans cette tâche, l'évolution de la jauge ne se mesure pas, et un dimanche manqué ne se rattrape qu'en relançant la commande le lundi (`--jour=` la veille) |
 | `ressources:verifier` | le lundi à 5 h | 12 | les liens des ressources externes vérifiées répondent-ils encore ? Un lien muet sort de la vue élève et apparaît « Lien cassé » au back-office (appels HTTPS sortants vers les sites de `config/ressources.php`) |
 
 Une seule ligne dans la crontab de `www-data` :
@@ -719,6 +720,27 @@ les reconstruit depuis la base.
   l'écran dit que l'équipe les prépare.
 - **Contrôles** : § 9, point 10 ; `A_TESTER.md`, lot 12.
 
+### Lot 13 — console plateforme (activité, contenu, revenus, impact)
+
+- **Une seule fois** : `composer install --no-dev` installe la nouvelle
+  dépendance **`dompdf/dompdf`** (PHP pur ; extensions `dom` et `mbstring`
+  déjà demandées au § 1, **`gd` ajoutée au § 1** — `sudo apt install
+  php8.3-gd` sur un serveur déjà installé) ; puis
+  `migrate` (table `releves_jauge`, colonne `profils_eleves.est_exemple`),
+  puis `db:seed` (trois permissions : `console.impact`, `console.journal`,
+  `comptes.administrer`).
+- **Planificateur** (§ 4.2) : `jauges:relever` chaque dimanche à 22 h.
+  **L'historique de la jauge commence au premier dimanche après la mise
+  en ligne** : le rapport d'impact dira « pas encore assez de mesures »
+  pendant les premières semaines, c'est normal. Pour un premier relevé
+  tout de suite : `php artisan jauges:relever`.
+- **Disque** : dompdf garde le cache de ses polices dans
+  `storage/framework/cache/dompdf` (créé au premier rapport, droits de
+  `www-data` comme le reste de `storage`).
+- **`.env`, file, Nginx** : rien de plus. Le rapport n'est jamais mis en
+  cache (`Cache-Control: no-store, private`).
+- **Contrôles** : § 9, point 11 ; `A_TESTER.md`, lot 13.
+
 ---
 
 ## 9. Vérifications après la mise en ligne
@@ -772,6 +794,14 @@ Dans un navigateur, en HTTPS :
    question → publiée ; l'enseignant de test la voit, « Masquer » → elle
    disparaît chez l'élève. `php artisan ressources:verifier` →
    « N liens contrôlés ».
+
+11. (Lot 13) `php artisan schedule:list` montre `jauges:relever` ;
+   `php artisan jauges:relever` → « N jauges relevées ». Avec le compte
+   administrateur : Console › Impact s'ouvre, « Télécharger le rapport
+   (PDF) » donne un fichier lisible (polices de la marque, une page) ;
+   Console › Journal des accès montre « Rapport d'impact exporté (PDF) ».
+   Console › Personnel : désactiver un compte de test connecté ailleurs →
+   sa page suivante le renvoie à la connexion ; le réactiver.
 
 Puis dérouler les contrôles « bloqués tant que le domaine HTTPS n'existe
 pas » de `A_TESTER.md` (vrais téléphones, mode avion, deux profils,

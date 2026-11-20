@@ -78,7 +78,7 @@ enum Role: string
                 Permission::ImporterAnnales,
                 Permission::TraiterSignalements,
                 Permission::LireJournalTuteur,
-                ...($this === self::Superadmin ? [Permission::EspaceConsole, Permission::GererCodes, Permission::VoirPaiements, Permission::VoirCoutsTuteur, Permission::AdministrerEtablissements] : []),
+                ...($this === self::Superadmin ? [Permission::EspaceConsole, Permission::GererCodes, Permission::VoirPaiements, Permission::VoirCoutsTuteur, Permission::AdministrerEtablissements, Permission::VoirImpact, Permission::LireJournalAcces, Permission::AdministrerComptes] : []),
             ],
         };
 

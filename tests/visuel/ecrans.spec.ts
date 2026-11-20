@@ -79,7 +79,7 @@ const CONNECTES: Record<
         {
             adresse: '/console',
             ecran: 'console-accueil',
-            titre: "Vue d'ensemble",
+            titre: 'La plateforme, cette semaine',
         },
         {
             adresse: '/compte/securite',

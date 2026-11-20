@@ -7,16 +7,13 @@ use App\Enums\StatutContenu;
 use App\Enums\StatutImport;
 use App\Enums\StatutSignalement;
 use App\Http\Controllers\Controller;
-use App\Models\AnneeScolaire;
-use App\Models\Chapitre;
-use App\Models\Epreuve;
 use App\Models\ImportSujet;
 use App\Models\Lecon;
-use App\Models\Notion;
 use App\Models\Question;
 use App\Models\Signalement;
 use App\Models\Sujet;
 use App\Models\User;
+use App\Support\CouvertureProgramme;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -50,7 +47,7 @@ class TableauDeBordController extends Controller
             'mes_brouillons' => $redige ? $this->presenter(
                 Lecon::query()->where('auteur_id', $user->id)->where('statut', StatutContenu::Brouillon)->latest('updated_at')->latest('id')->limit(4)->get(),
             ) : null,
-            'couverture' => $this->couverture(),
+            'couverture' => CouvertureProgramme::matieresPhares(),
             'est_exemple' => Lecon::query()->where('est_exemple', true)->exists(),
             // Lot 4 : les annales et les signalements des élèves.
             'annales' => [
@@ -92,54 +89,6 @@ class TableauDeBordController extends Controller
             ->filter(fn (Lecon $lecon) => $lecon->dernierRenvoi() !== null)
             ->take(4)
             ->values();
-    }
-
-    /**
-     * Couverture des matières phares de l'année courante : pour chaque
-     * matière et classe d'examen, la part des notions du programme qui ont
-     * une leçon publiée.
-     *
-     * @return array<int, array<string, mixed>>
-     */
-    private function couverture(): array
-    {
-        $annee = AnneeScolaire::courante();
-
-        if ($annee === null) {
-            return [];
-        }
-
-        $phares = Epreuve::query()
-            ->with(['matiere', 'examen.classe', 'serie'])
-            ->where('annee_scolaire_id', $annee->id)
-            ->where('phare', true)
-            ->get()
-            ->filter(fn (Epreuve $e) => $e->examen->classe !== null)
-            ->groupBy(fn (Epreuve $e) => $e->matiere_id.'-'.$e->examen->classe->id);
-
-        return $phares->map(function (Collection $epreuves) {
-            /** @var Epreuve $premiere */
-            $premiere = $epreuves->first();
-            $classe = $premiere->examen->classe;
-
-            $notions = Notion::query()->whereHas('chapitre', fn (Builder $q) => $q
-                ->where('matiere_id', $premiere->matiere_id)
-                ->where('classe_id', $classe->id));
-
-            return [
-                'matiere' => ['nom' => $premiere->matiere->nom, 'teinte' => $premiere->matiere->teinte->value],
-                'classe' => $classe->nom,
-                'examens' => $epreuves->map(fn (Epreuve $e) => $e->serie ? 'Bac '.$e->serie->code->value : $e->examen->code->value)->unique()->values(),
-                'chapitres' => Chapitre::query()->where('matiere_id', $premiere->matiere_id)->where('classe_id', $classe->id)->count(),
-                'notions' => (clone $notions)->count(),
-                'couvertes' => (clone $notions)->whereHas('lecons', fn (Builder $q) => $q->whereNotNull('version_publiee_id')->where('statut', '!=', StatutContenu::Archive))->count(),
-                'ordre' => [$classe->ordre, $premiere->matiere->ordre],
-            ];
-        })
-            ->sortBy('ordre')
-            ->map(fn (array $ligne) => collect($ligne)->except('ordre')->all())
-            ->values()
-            ->all();
     }
 
     /**
