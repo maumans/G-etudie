@@ -58,7 +58,7 @@ class DemoTuteurSeeder extends Seeder
             $questions = CatalogueEleve::questions($profil)
                 ->with('versionPubliee', 'notion.chapitre.matiere')
                 ->where('est_exemple', true)
-                // Les questions des cours : le corrigé d'une annale peut être réservé.
+                // Les questions des cours : le corrigé d'un sujet peut être réservé.
                 ->whereNull('sujet_partie_id')
                 ->orderBy('id')
                 ->get()

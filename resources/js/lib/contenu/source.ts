@@ -13,7 +13,7 @@ import type { PackLocal } from '@/lib/hors-ligne/packs';
  * mêmes que l'écran reçoit du serveur** : l'écran ne sait pas d'où elles
  * viennent, et le même `ContenuBlocs` les affiche. Ce que le pack ne porte
  * pas (rien de personnel), l'écran le reçoit vide : une leçon lue depuis le
- * pack n'a pas d'état de lecture, une annale pas de scores.
+ * pack n'a pas d'état de lecture, un sujet pas de scores.
  *
  * Ce fichier n'importe ni React ni Inertia, pour rester testable.
  */
@@ -48,8 +48,8 @@ const ECRANS_LOCAUX: { motif: RegExp; component: string; type: string }[] = [
     },
     // Lot 7 (HL5) : ce qu'apporte un pack.
     {
-        motif: new RegExp(`^/eleve/annales/${UUID}/?$`, 'i'),
-        component: 'eleve/annale',
+        motif: new RegExp(`^/eleve/sujets/${UUID}/?$`, 'i'),
+        component: 'eleve/sujet',
         type: 'annale',
     },
     {
@@ -171,7 +171,7 @@ async function completer(
                     .filter(Boolean),
             };
         }
-        case 'eleve/annale': {
+        case 'eleve/sujet': {
             const mode = parametres.get('mode');
 
             return {

@@ -39,7 +39,7 @@ function avisDe(User $eleve, array $charge = []): array
         'ecran' => 'seance',
         'reponse' => 'un_peu',
         'etiquettes' => ['lent', 'donnees', 'lent'],
-        'commentaire' => "  Les annales\n mettent du temps.  ",
+        'commentaire' => "  Les sujets\n mettent du temps.  ",
         'version_app' => 'abc123',
         ...$charge,
     ]);
@@ -80,7 +80,7 @@ test('un avis part par la file, une seule fois, et se relit en base', function (
         ->and($avis->appareil_id)->toBe($this->appareil->id)
         ->and($avis->reponse)->toBe(ReponseAvis::UnPeu)
         ->and($avis->etiquettes)->toBe(['lent', 'donnees'])
-        ->and($avis->commentaire)->toBe('Les annales mettent du temps.')
+        ->and($avis->commentaire)->toBe('Les sujets mettent du temps.')
         ->and($avis->version_app)->toBe('abc123')
         ->and($avis->traite_le)->toBeNull();
 });
@@ -321,7 +321,7 @@ test('l\'empreinte ignore les nombres ; anonymiser masque numéro, adresse et je
     $c = TerrainService::empreinte(TypeErreurAppareil::Script, 'Erreur ligne 12', '/a.js', 'v2');
 
     expect($a)->toBe($b)->not->toBe($c)
-        ->and(TerrainService::source('https://x.gn/eleve/annales/12?jeton=abc'))->toBe('/eleve/annales/12')
+        ->and(TerrainService::source('https://x.gn/eleve/sujets/12?jeton=abc'))->toBe('/eleve/sujets/12')
         ->and(TerrainService::source(''))->toBeNull();
 });
 

@@ -3,7 +3,7 @@
 namespace App\Support;
 
 /**
- * Ce que veut dire un refus de l'API Claude (tuteur, import des annales).
+ * Ce que veut dire un refus de l'API Claude (tuteur, import des sujets).
  *
  * Un compte sans crédit répond `400 invalid_request_error`, comme une
  * demande mal formée : le SDK n'a pas de classe à part pour ce cas. Sans

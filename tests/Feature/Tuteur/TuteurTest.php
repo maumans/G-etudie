@@ -344,7 +344,7 @@ test('hors du périmètre de l’élève : 404, jamais 403', function () {
     expect($reponse->fresh()->signale_le)->toBeNull();
 });
 
-test('une annale au corrigé réservé n’ouvre pas le tuteur, sauf pour l’abonné', function () {
+test('un sujet au corrigé réservé n’ouvre pas le tuteur, sauf pour l’abonné', function () {
     $bepc = Examen::where('code', 'BEPC')->sole();
     $maths = Matiere::where('slug', 'maths')->sole();
     $notion = notionDeTest();

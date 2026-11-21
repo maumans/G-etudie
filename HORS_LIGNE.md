@@ -1649,6 +1649,14 @@ hors ligne ; les packs viennent ensuite.
     diagnostic. La liste des appareils vient alors de sa copie datée ;
     « Retirer » reste un geste en ligne.
 
+39. **2026-11-21 — `/eleve/annales` devient `/eleve/sujets`.** On dit
+    « sujet » (décision de Maurice). La liste blanche suit
+    (`'/eleve/sujets'`) ; les copies gardées sous l'ancienne adresse ne
+    servent plus, sans dommage : aucun élève n'avait encore l'application
+    (pas de domaine, D11). L'ancienne adresse redirige vers la nouvelle
+    (301). Le type d'élément de pack reste `annale` (nom interne : un pack
+    déjà téléchargé reste lisible).
+
 ## B.6 Points de vigilance
 
 - **Changement de profil et requêtes concurrentes** (lot 7) : le

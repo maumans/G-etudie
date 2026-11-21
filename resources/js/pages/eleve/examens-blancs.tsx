@@ -21,7 +21,7 @@ import { base, useHorsLigne } from '@/lib/hors-ligne';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import { cn, pluriel } from '@/lib/utils';
-import { index as annales, show as annale } from '@/routes/eleve/annales';
+import { index as annales, show as annale } from '@/routes/eleve/sujets';
 import { show } from '@/routes/eleve/examens-blancs';
 
 type Matiere = { cle: CleMatiere; nom: string };
@@ -188,13 +188,13 @@ export default function ExamensBlancs({
                                 titre="Pas encore d’examen blanc"
                                 message={
                                     annales_disponibles > 0
-                                        ? 'Choisis une annale, puis « Conditions réelles » : le temps du vrai examen, sans aide.'
-                                        : 'Les annales de ton examen arrivent ; l’examen blanc se passe sur elles.'
+                                        ? 'Choisis un sujet, puis « Conditions réelles » : le temps du vrai examen, sans aide.'
+                                        : 'Les sujets de ton examen arrivent ; l’examen blanc se passe sur eux.'
                                 }
                                 action={
                                     <Button asChild>
                                         <Link href={annales()}>
-                                            Choisir une annale
+                                            Choisir un sujet
                                         </Link>
                                     </Button>
                                 }

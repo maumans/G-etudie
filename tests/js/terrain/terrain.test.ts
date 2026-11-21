@@ -50,8 +50,8 @@ afterEach(async () => {
 describe('erreurs captées', () => {
     it('garde le chemin seul, coupe message et pile, écarte le bruit', () => {
         expect(
-            cheminSeul('https://nkaramogo.gn/eleve/annales/12?jeton=x#a'),
-        ).toBe('/eleve/annales/12');
+            cheminSeul('https://nkaramogo.gn/eleve/sujets/12?jeton=x#a'),
+        ).toBe('/eleve/sujets/12');
         expect(cheminSeul(null)).toBeNull();
 
         const erreur = normaliserErreur(

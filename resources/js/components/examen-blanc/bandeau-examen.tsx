@@ -8,7 +8,7 @@ import {
 } from '@/lib/examen-blanc/passage';
 import type { ExamenLocal } from '@/lib/examen-blanc/passage';
 import { base } from '@/lib/hors-ligne';
-import { show as annale } from '@/routes/eleve/annales';
+import { show as annale } from '@/routes/eleve/sujets';
 
 /**
  * Un examen blanc en cours sur ce téléphone (HORS_LIGNE.md A.8) : rouvrir

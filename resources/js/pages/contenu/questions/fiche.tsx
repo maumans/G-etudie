@@ -314,7 +314,7 @@ function PanneauAction({
                 }
                 texte={
                     question.annale
-                        ? `Elle se relit avec son annale, « ${question.annale.titre} ».`
+                        ? `Elle se relit avec son sujet, « ${question.annale.titre} ».`
                         : droits.auteur
                           ? 'Un autre enseignant doit la relire : l’auteur ne relit jamais sa propre question. Vous pouvez la reprendre pour la modifier.'
                           : `Version ${enAttente?.numero ?? ''} envoyée par ${enAttente?.auteur ?? ''}.`

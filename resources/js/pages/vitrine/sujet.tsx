@@ -27,7 +27,7 @@ type Props = {
 };
 
 /**
- * Une annale publique (lot 8, PLAN M1 « SEO ») : l'énoncé complet, partie
+ * Un sujet public (lot 8, PLAN M1 « SEO ») : l'énoncé complet, partie
  * par partie, tel qu'il est tombé ; le corrigé pas à pas, l'entraînement et
  * l'examen blanc sont réservés aux inscrits. Une colonne latérale invite à
  * s'inscrire, partage le sujet sur WhatsApp et propose les autres sessions.
@@ -56,7 +56,7 @@ export default function Sujet({ sujet, autres, partage }: Props) {
                     >
                         <Link href={index()} prefetch>
                             <ArrowLeft aria-hidden />
-                            Toutes les annales
+                            Tous les sujets
                         </Link>
                     </Button>
 

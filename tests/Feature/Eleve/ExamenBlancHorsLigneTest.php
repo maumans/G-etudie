@@ -35,7 +35,7 @@ beforeEach(function () {
 });
 
 /**
- * Une annale de BEPC publiée par le circuit réel : partie 1 (4 points, deux
+ * Un sujet de BEPC publié par le circuit réel : partie 1 (4 points, deux
  * QCM, bonne réponse « a »), partie 2 (6 points, une question ouverte au
  * barème de 2 + 2 points).
  */
@@ -163,7 +163,7 @@ test('refus : version jamais publiée, réponse mal formée, durée absurde, ann
         geste($this->eleve, 'examen_blanc.terminer', chargeExamen($this, [], ['duree_minutes' => 2])),
     ])
         ->assertJsonPath('resultats.0.verdict', 'rejetee')
-        ->assertJsonPath('resultats.0.motif', 'Cette version de l\'annale n\'a jamais été publiée.')
+        ->assertJsonPath('resultats.0.motif', 'Cette version du sujet n\'a jamais été publiée.')
         ->assertJsonPath('resultats.1.verdict', 'rejetee')
         ->assertJsonPath('resultats.2.verdict', 'rejetee');
 
@@ -171,7 +171,7 @@ test('refus : version jamais publiée, réponse mal formée, durée absurde, ann
     app(ContenuService::class)->archiver($this->sujet, User::factory()->avecRole(Role::AdminContenu)->create());
     envoyer($this->jeton, [geste($this->eleve, 'examen_blanc.terminer', chargeExamen($this, []))])
         ->assertJsonPath('resultats.0.verdict', 'rejetee')
-        ->assertJsonPath('resultats.0.motif', "Cette annale n'est plus proposée : ton examen ne peut pas être noté.");
+        ->assertJsonPath('resultats.0.motif', "Ce sujet n'est plus proposé : ton examen ne peut pas être noté.");
 
     expect(ExamenBlanc::query()->count())->toBe(0);
 });
@@ -219,7 +219,7 @@ test('l\'équipe saisit la moyenne d\'admission dans le référentiel', function
 test('l\'annale donne la durée de l\'épreuve quand le sujet n\'imprime pas la sienne', function () {
     Epreuve::query()->where('matiere_id', $this->sujet->matiere_id)->where('examen_id', $this->sujet->examen_id)->update(['duree_minutes' => 120]);
 
-    $this->actingAs($this->eleve)->get(route('eleve.annales.show', ['sujet' => $this->sujet, 'mode' => 'examen']))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.show', ['sujet' => $this->sujet, 'mode' => 'examen']))
         ->assertInertia(fn (Assert $page) => $page->where('mode', 'examen')->where('duree_epreuve', 120)->where('sujet.duree_minutes', null));
 
     expect(Str::isUuid($this->sujet->uuid))->toBeTrue()

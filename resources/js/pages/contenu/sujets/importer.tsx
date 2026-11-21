@@ -17,8 +17,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { formaterPoids } from '@/lib/contenu/sujets';
 import type { CleMatiere } from '@/lib/matieres';
 import { cn } from '@/lib/utils';
-import { index } from '@/routes/contenu/annales';
-import { store } from '@/routes/contenu/annales/imports';
+import { index } from '@/routes/contenu/sujets';
+import { store } from '@/routes/contenu/sujets/imports';
 import { index as programme } from '@/routes/contenu/referentiel/programme';
 
 type Props = {
@@ -51,14 +51,14 @@ const ETAPES = [
     {
         icone: ShieldCheck,
         titre: 'Un relecteur publie',
-        texte: 'Un autre enseignant relit l’annale et toutes ses questions, puis la publie d’un geste.',
+        texte: 'Un autre enseignant relit le sujet et toutes ses questions, puis le publie d’un geste.',
     },
 ];
 
 /**
  * Back-office › Annales › Importer (PLAN M17, « import assisté ») : un PDF
  * ou une photo du sujet, ce qu'il est (examen, série, matière, session).
- * La lecture se fait en file ; l'annale apparaît en brouillon dans la liste.
+ * La lecture se fait en file ; le sujet apparaît en brouillon dans la liste.
  */
 export default function Importer({
     examens,
@@ -110,7 +110,7 @@ export default function Importer({
                 >
                     <Link href={index()} prefetch>
                         <ArrowLeft aria-hidden />
-                        Les annales
+                        Les sujets
                     </Link>
                 </Button>
                 <EnteteEcran
@@ -376,7 +376,7 @@ export default function Importer({
                         id="titre-etapes"
                         className="text-titre-carte font-semibold"
                     >
-                        Du scan à l’annale publiée
+                        Du scan au sujet publié
                     </h2>
                     <ol className="grid gap-5">
                         {ETAPES.map((etape, rang) => (

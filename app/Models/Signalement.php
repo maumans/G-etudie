@@ -12,7 +12,7 @@ use Illuminate\Support\Carbon;
 
 /**
  * « Signaler une erreur » (PLAN M5, M17) : un élève signale une question, une
- * leçon ou une annale ; l'équipe répond une fois, l'élève lit la réponse.
+ * leçon ou un sujet ; l'équipe répond une fois, l'élève lit la réponse.
  * Pas de fil de discussion (pas de messagerie libre, CLAUDE.md § 9).
  * Créé et traité par App\Services\SignalementService seulement.
  *

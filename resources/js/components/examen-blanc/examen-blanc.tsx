@@ -64,7 +64,7 @@ type Etape =
     | { cle: 'resultat'; examen: ExamenLocal; note: Note };
 
 /**
- * « Conditions réelles » d'une annale (PLAN M7, HORS_LIGNE.md A.8) : le
+ * « Conditions réelles » d'un sujet (PLAN M7, HORS_LIGNE.md A.8) : le
  * lancement (durée, règles), le passage plein écran (chronomètre discret,
  * pas d'indice, pas de corrigé), l'auto-évaluation des rédactions, puis le
  * résultat affiché tout de suite et envoyé par la file. L'examen vit sur

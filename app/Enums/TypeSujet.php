@@ -5,7 +5,7 @@ namespace App\Enums;
 /** D'où vient un sujet (PLAN § 6, `sujets.type`). */
 enum TypeSujet: string
 {
-    /** Sujet tombé à l'examen : une annale. */
+    /** Sujet tombé à l'examen : un sujet. */
     case Officiel = 'officiel';
 
     /** Sujet écrit par l'équipe pédagogique, sur le modèle de l'examen. */

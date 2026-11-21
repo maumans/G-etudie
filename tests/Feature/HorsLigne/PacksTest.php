@@ -60,7 +60,7 @@ function empreintes(Pack $pack): array
     return PackElement::where('pack_id', $pack->id)->pluck('empreinte', 'cle')->all();
 }
 
-test('un pack contient la matière, ses leçons, ses fiches et ses annales, avec les props mêmes des écrans', function () {
+test('un pack contient la matière, ses leçons, ses fiches et ses sujets, avec les props mêmes des écrans', function () {
     $lecon = leconPubliee($this->notion);
     $annale = annalePubliee(Examen::where('code', 'BEPC')->sole(), null, Matiere::where('slug', 'maths')->sole(), 2024, [$this->notion]);
     $pack = packDe($this->eleve);
@@ -83,9 +83,9 @@ test('un pack contient la matière, ses leçons, ses fiches et ses annales, avec
     $fiche = json_decode(PackElement::where('cle', "fiche:{$this->notion->chapitre_id}")->value('props'), true);
     expect($fiche['lecons'])->toBe([])->and($fiche['lecons_du_pack'])->toBe([$lecon->uuid]);
 
-    // L'annale : le même objet `sujet` que la fiche en ligne.
+    // Le sujet : le même objet `sujet` que la fiche en ligne.
     $sujet = json_decode(PackElement::where('cle', "annale:{$annale->uuid}")->value('props'), true)['sujet'];
-    $this->get(route('eleve.annales.show', $annale))->assertInertia(fn (Assert $page) => $page->where('sujet', $sujet));
+    $this->get(route('eleve.sujets.show', $annale))->assertInertia(fn (Assert $page) => $page->where('sujet', $sujet));
 });
 
 test('aucune donnée personnelle : deux élèves du même examen reçoivent exactement le même pack', function () {
@@ -113,7 +113,7 @@ test('A.14 n° 8 — après correction d\'un corrigé, seul cet élément change
     $avant = empreintes($pack);
     $this->actingAs($this->eleve)->postJson(route('eleve.packs.prendre', $pack))->assertOk();
 
-    // L'équipe corrige le corrigé de la question de l'annale après un
+    // L'équipe corrige le corrigé de la question du sujet après un
     // signalement : la publication regénère le pack (en file, GenererPack).
     $question = $annale->questions()->first();
     $redacteur = $question->auteur;
@@ -277,7 +277,7 @@ test('l\'écran Téléchargements : un pack par matière de l\'élève, poids, p
     expect(Pack::count())->toBe(CatalogueEleve::epreuves(CatalogueEleve::profil($this->eleve))->count());
 });
 
-test('la page d\'une matière nomme son pack et ses annales', function () {
+test('la page d\'une matière nomme son pack et ses sujets', function () {
     leconPubliee($this->notion);
     $annale = annalePubliee(Examen::where('code', 'BEPC')->sole(), null, Matiere::where('slug', 'maths')->sole(), 2023, [$this->notion]);
     packDe($this->eleve);

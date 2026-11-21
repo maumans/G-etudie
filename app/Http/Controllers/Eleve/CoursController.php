@@ -119,7 +119,7 @@ class CoursController extends Controller
             'maitrise' => 0,
             'faibles' => false,
             'chapitres' => PresentationCours::chapitres($profil, $matiere),
-            // Lot 7 : les annales de la matière, ouvrables depuis le pack.
+            // Lot 7 : les sujets de la matière, ouvrables depuis le pack.
             'annales' => $sujets->map(fn (Sujet $sujet) => [
                 'uuid' => $sujet->uuid,
                 'titre' => $sujet->titre,

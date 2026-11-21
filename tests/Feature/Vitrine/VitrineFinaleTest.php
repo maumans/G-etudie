@@ -91,7 +91,7 @@ test('sans partenaire configuré, la liste est vide', function () {
 test('l\'accueil porte ses balises de référencement et précharge l\'illustration du héros', function () {
     $this->get('/')
         ->assertOk()
-        ->assertSee('<meta name="description" content="Cours, annales corrigées', false)
+        ->assertSee('<meta name="description" content="Cours, sujets corrigés', false)
         ->assertSee('<link rel="canonical" href="'.url('/').'">', false)
         ->assertSee('<meta property="og:image" content="'.route('partage.image.generale').'">', false)
         ->assertSee('<link rel="preload" as="image" href="'.asset('images/vitrine/defaut/heros.svg').'" fetchpriority="high">', false)

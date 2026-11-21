@@ -34,14 +34,14 @@ class ImagePartageService
         return $this->carte('generale', [
             'surtitre' => 'Du CEE au Baccalauréat unique',
             'titre' => 'Tout pour réussir le CEE, le BEPC et le Bac.',
-            'texte' => 'Cours, annales corrigées, exercices et examens blancs, même hors connexion.',
+            'texte' => 'Cours, sujets corrigés, exercices et examens blancs, même hors connexion.',
         ]);
     }
 
     public function sujet(Sujet $sujet): string
     {
         return $this->carte('sujet-'.$sujet->slug, [
-            'surtitre' => $sujet->est_exemple ? 'Exemple, contenu fictif' : 'Annale du '.$sujet->libelleSession(),
+            'surtitre' => $sujet->est_exemple ? 'Exemple, contenu fictif' : 'Sujet du '.$sujet->libelleSession(),
             'titre' => AnnalesPubliques::titre($sujet),
             'texte' => 'L’énoncé complet, et le corrigé pas à pas pour les inscrits.',
         ]);

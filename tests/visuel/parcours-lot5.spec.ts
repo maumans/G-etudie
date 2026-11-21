@@ -5,7 +5,7 @@ import { SESSIONS } from './gabarits';
 /**
  * Critère d'acceptation du lot 5 (PLAN § 12 ; HORS_LIGNE.md A.8) : une
  * coupure en plein examen blanc — **l'onglet fermé** — ne fait rien perdre.
- * Aïssatou commence l'examen sur une annale, répond, ferme l'onglet ; en
+ * Aïssatou commence l'examen sur un sujet, répond, ferme l'onglet ; en
  * rouvrant l'application, l'accueil annonce l'examen en cours et le
  * rouvre à la bonne question, réponse gardée ; elle termine ; la note part
  * par la file et le serveur la reçoit **une seule fois**.
@@ -52,7 +52,7 @@ test('onglet fermé en plein examen : repris à la bonne question, une seule not
     test.setTimeout(180_000);
 
     const page = await context.newPage();
-    await page.goto('/eleve/annales');
+    await page.goto('/eleve/sujets');
     await page
         .getByRole('link', { name: /BEPC 2023/ })
         .first()

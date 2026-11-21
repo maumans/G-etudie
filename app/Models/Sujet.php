@@ -18,7 +18,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
 /**
- * Un sujet d'examen (PLAN M6) : une annale (`officiel`) ou un sujet maison,
+ * Un sujet d'examen (PLAN M6) : un sujet (`officiel`) ou un sujet maison,
  * découpé en parties dont les questions sont des questions ordinaires
  * (`source = annale`). Le document original (scan, PDF) reste attaché : il
  * prouve l'authenticité de la version structurée.
@@ -202,7 +202,7 @@ class Sujet extends Model implements ContenuRelisable
         $questions = $this->parties->flatMap(fn (SujetPartie $partie) => $partie->questions)->values();
 
         if (trim($this->titre) === '' || $questions->isEmpty()) {
-            return 'Une annale sans question ne part pas en relecture.';
+            return 'Un sujet sans question ne part pas en relecture.';
         }
 
         if ($questions->contains(fn (Question $q) => $q->reponse_a_verifier)) {

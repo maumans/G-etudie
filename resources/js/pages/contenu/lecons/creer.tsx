@@ -39,7 +39,7 @@ export default function Creer({
                         Une <strong>nouvelle leçon</strong>
                     </>
                 }
-                description="Choisissez la notion qu’elle enseigne : c’est elle qui relie la leçon aux exercices, aux annales et à la jauge de l’élève."
+                description="Choisissez la notion qu’elle enseigne : c’est elle qui relie la leçon aux exercices, aux sujets et à la jauge de l’élève."
                 action={
                     <Button asChild variant="outline">
                         <Link href={index()} prefetch>

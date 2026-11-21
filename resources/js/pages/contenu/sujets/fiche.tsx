@@ -56,18 +56,18 @@ import {
     restaurer,
     soumettre,
     update,
-} from '@/routes/contenu/annales';
+} from '@/routes/contenu/sujets';
 import {
     destroy as supprimerPartie,
     store as ajouterPartie,
     update as modifierPartie,
-} from '@/routes/contenu/annales/parties';
+} from '@/routes/contenu/sujets/parties';
 import {
     deplacer,
     destroy as retirerQuestion,
     store as ajouterQuestion,
     verifier,
-} from '@/routes/contenu/annales/questions';
+} from '@/routes/contenu/sujets/questions';
 import { edit as saisirQuestion } from '@/routes/contenu/questions';
 import type { StatutContenu } from '@/types';
 import type { AnnaleResume } from './index';
@@ -155,7 +155,7 @@ const DECISIONS = {
 } as const;
 
 /**
- * Fiche d'une annale (PLAN M6, M17) : la version structurée (parties,
+ * Fiche d'un sujet (PLAN M6, M17) : la version structurée (parties,
  * consignes, questions) à côté du **document original**, ce qu'il reste à
  * vérifier après l'import assisté, le circuit de relecture (le sujet et ses
  * questions ensemble) et l'historique.
@@ -181,9 +181,9 @@ export default function Fiche({
     async function archiverAnnale() {
         if (
             await confirmer({
-                titre: 'Retirer cette annale ?',
+                titre: 'Retirer ce sujet ?',
                 message:
-                    'Les élèves ne la verront plus, ni ses questions. Ses versions et les réponses déjà données restent ; elle peut être restaurée.',
+                    'Les élèves ne le verront plus, ni ses questions. Ses versions et les réponses déjà données restent ; il peut être restauré.',
                 action: 'Archiver',
                 ton: 'danger',
             })
@@ -195,7 +195,7 @@ export default function Fiche({
     return (
         <div className="grid gap-6">
             <Head
-                title={`Annale · ${sujet.matiere.nom} ${sujet.libelle_session}`}
+                title={`Sujet · ${sujet.matiere.nom} ${sujet.libelle_session}`}
             />
 
             <div className="grid gap-4">
@@ -207,7 +207,7 @@ export default function Fiche({
                 >
                     <Link href={index()} prefetch>
                         <ArrowLeft aria-hidden />
-                        Les annales
+                        Les sujets
                     </Link>
                 </Button>
                 <div className="flex min-w-0 items-start gap-3">
@@ -234,7 +234,10 @@ export default function Fiche({
                             <strong>{sujet.libelle_session}</strong>
                         </h1>
                         <div className="flex flex-wrap items-center gap-2">
-                            <BadgeStatut statut={sujet.statut} />
+                            <BadgeStatut
+                                statut={sujet.statut}
+                                genre="masculin"
+                            />
                             {sujet.est_exemple && (
                                 <Badge variant="neutre">Exemple</Badge>
                             )}
@@ -330,7 +333,7 @@ export default function Fiche({
                     ) : (
                         <Section
                             titre="Pas de document original"
-                            description="Un sujet maison n’en a pas toujours. Une annale officielle en a besoin : c’est la preuve de son authenticité."
+                            description="Un sujet maison n’en a pas toujours. Un sujet officiel en a besoin : c’est la preuve de son authenticité."
                         >
                             <span />
                         </Section>
@@ -345,7 +348,7 @@ export default function Fiche({
                         titre="Historique"
                         description={
                             versions.length === 0
-                                ? 'Aucune version : l’annale n’a jamais été envoyée en relecture.'
+                                ? 'Aucune version : le sujet n’a jamais été envoyé en relecture.'
                                 : `${pluriel(versions.length, 'version')}.`
                         }
                     >
@@ -427,7 +430,7 @@ export default function Fiche({
                                     onClick={() => void archiverAnnale()}
                                 >
                                     <Archive aria-hidden />
-                                    Retirer l’annale
+                                    Retirer le sujet
                                 </Button>
                             )}
                         </Section>
@@ -468,7 +471,7 @@ function PanneauAction({
                 titre={
                     droits.auteur ? 'En attente d’un relecteur' : 'En relecture'
                 }
-                texte="Un autre enseignant relit l’annale et toutes ses questions. L’auteur ne relit jamais sa propre annale."
+                texte="Un autre enseignant relit le sujet et toutes ses questions. L’auteur ne relit jamais son propre sujet."
                 action={
                     droits.rediger && (
                         <Button
@@ -479,7 +482,7 @@ function PanneauAction({
                             }
                         >
                             <Undo2 aria-hidden />
-                            Reprendre l’annale
+                            Reprendre le sujet
                         </Button>
                     )
                 }
@@ -491,7 +494,7 @@ function PanneauAction({
         async function envoyer() {
             if (
                 await confirmer({
-                    titre: 'Envoyer l’annale en relecture ?',
+                    titre: 'Envoyer le sujet en relecture ?',
                     message: `Le sujet part en relecture avec ses ${pluriel(nombre, 'question')}. Un autre enseignant décidera pour l’ensemble.`,
                     action: 'Envoyer en relecture',
                 })
@@ -529,7 +532,7 @@ function PanneauAction({
                         {aVerifier > 0
                             ? 'Comparez chaque énoncé au document original, corrigez la réponse attendue et le corrigé si besoin, puis confirmez.'
                             : (aCompleter ??
-                              'Toutes les réponses sont vérifiées. Un relecteur publiera l’annale et ses questions ensemble.')}
+                              'Toutes les réponses sont vérifiées. Un relecteur publiera le sujet et ses questions ensemble.')}
                     </p>
                 </div>
                 <Button
@@ -560,7 +563,7 @@ function PanneauAction({
                             }
                         >
                             <PenLine aria-hidden />
-                            Modifier l’annale
+                            Modifier le sujet
                         </Button>
                     )
                 }
@@ -612,9 +615,9 @@ function PanneauRelecture({
     async function publierAnnale() {
         if (
             await confirmer({
-                titre: 'Publier cette annale ?',
+                titre: 'Publier ce sujet ?',
                 message:
-                    'Elle et toutes ses questions seront proposées aux élèves de cet examen.',
+                    'Le sujet et toutes ses questions seront proposés aux élèves de cet examen.',
                 action: 'Publier',
             })
         ) {
@@ -695,7 +698,7 @@ function PanneauRelecture({
                     ) : (
                         <CircleCheck aria-hidden />
                     )}
-                    Publier l’annale
+                    Publier le sujet
                 </Button>
             </div>
             <Link
@@ -920,7 +923,7 @@ function LigneQuestion({
     async function retirer() {
         if (
             await confirmer({
-                titre: 'Retirer cette question de l’annale ?',
+                titre: 'Retirer cette question du sujet ?',
                 message: 'Elle disparaît (elle n’a jamais été publiée).',
                 action: 'Retirer',
                 ton: 'danger',
@@ -1441,7 +1444,7 @@ function Renseignements({
 }
 
 /**
- * Lot 9 : qui lit le corrigé détaillé de cette annale. Les abonnés, toujours ;
+ * Lot 9 : qui lit le corrigé détaillé de ce sujet. Les abonnés, toujours ;
  * les autres élèves si la case est cochée, ou d'office pour la session la plus
  * récente de l'épreuve (App\Support\DroitsAbonne). Réglage du responsable
  * pédagogique, hors du circuit de relecture.

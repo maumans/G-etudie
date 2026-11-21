@@ -18,7 +18,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 /*
  * Lot 9 : ce que l'abonnement ouvre (DroitsAbonne, décisions de Maurice du
- * 2026-11-08) — corrigés détaillés des annales (la plus récente de chaque
+ * 2026-11-08) — corrigés détaillés des sujets (la plus récente de chaque
  * épreuve offerte), pack « libre » sans les corrigés réservés, deux examens
  * blancs par mois, deux appareils par abonnement (HL-D8).
  */
@@ -34,7 +34,7 @@ beforeEach(function () {
     $this->recente = annalePubliee($bepc, null, $maths, 2024, [$this->notion]);
 });
 
-/** Les étapes de corrigé de toutes les questions d'une page d'annale. */
+/** Les étapes de corrigé de toutes les questions d'une page de sujet. */
 function etapesDe(array $sujet): array
 {
     return collect($sujet['parties'])->flatMap(fn ($p) => $p['questions'])->flatMap(fn ($q) => $q['corrige'])->all();
@@ -50,17 +50,17 @@ function packMathsDe(User $eleve): Pack
 test('sans abonnement : le corrigé de l\'annale la plus récente est offert, les autres sont réservés', function () {
     $this->actingAs($this->eleve);
 
-    $this->get(route('eleve.annales.show', $this->recente))->assertInertia(fn (Assert $page) => $page
+    $this->get(route('eleve.sujets.show', $this->recente))->assertInertia(fn (Assert $page) => $page
         ->where('sujet.corrige_verrouille', false)
         ->where('sujet', fn ($sujet) => count(etapesDe($sujet->toArray())) === 1));
 
-    $this->get(route('eleve.annales.show', $this->ancienne))->assertInertia(fn (Assert $page) => $page
+    $this->get(route('eleve.sujets.show', $this->ancienne))->assertInertia(fn (Assert $page) => $page
         ->where('sujet.corrige_verrouille', true)
         // La bonne réponse reste : l'appareil dit « juste » ou « faux ».
         ->where('sujet.parties.0.questions.0.attendue.option', 'a')
         ->where('sujet', fn ($sujet) => etapesDe($sujet->toArray()) === []));
 
-    $this->get(route('eleve.annales.index'))->assertInertia(fn (Assert $page) => $page
+    $this->get(route('eleve.sujets.index'))->assertInertia(fn (Assert $page) => $page
         ->where('sujets.donnees.0.session', 2024)
         ->where('sujets.donnees.0.corrige_ouvert', true)
         ->where('sujets.donnees.1.corrige_ouvert', false));
@@ -69,21 +69,21 @@ test('sans abonnement : le corrigé de l\'annale la plus récente est offert, le
 test('abonné : tous les corrigés', function () {
     abonner($this->eleve);
 
-    $this->actingAs($this->eleve)->get(route('eleve.annales.show', $this->ancienne))->assertInertia(fn (Assert $page) => $page
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.show', $this->ancienne))->assertInertia(fn (Assert $page) => $page
         ->where('sujet.corrige_verrouille', false)
         ->where('sujet', fn ($sujet) => count(etapesDe($sujet->toArray())) === 1));
 });
 
 test('le responsable pédagogique offre un corrigé par le back-office ; un rédacteur ne le peut pas', function () {
     $redacteur = User::factory()->avecRole(Role::Redacteur)->create();
-    $this->actingAs($redacteur)->patch(route('contenu.annales.corrige-libre', $this->ancienne), ['corrige_libre' => true])->assertForbidden();
+    $this->actingAs($redacteur)->patch(route('contenu.sujets.corrige-libre', $this->ancienne), ['corrige_libre' => true])->assertForbidden();
 
     $responsable = User::factory()->avecRole(Role::AdminContenu)->create();
-    $this->actingAs($responsable)->patch(route('contenu.annales.corrige-libre', $this->ancienne), ['corrige_libre' => true])->assertRedirect();
-    $this->get(route('contenu.annales.show', $this->ancienne))->assertInertia(fn (Assert $page) => $page->where('sujet.corrige_libre', true));
+    $this->actingAs($responsable)->patch(route('contenu.sujets.corrige-libre', $this->ancienne), ['corrige_libre' => true])->assertRedirect();
+    $this->get(route('contenu.sujets.show', $this->ancienne))->assertInertia(fn (Assert $page) => $page->where('sujet.corrige_libre', true));
 
     expect($this->ancienne->fresh()->corrige_libre)->toBeTrue();
-    $this->actingAs($this->eleve)->get(route('eleve.annales.show', $this->ancienne))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.show', $this->ancienne))
         ->assertInertia(fn (Assert $page) => $page->where('sujet.corrige_verrouille', false));
 });
 
@@ -120,7 +120,7 @@ test('le pack « libre » n\'emporte pas les corrigés réservés ; le complet, 
     expect($differentiel)->toContain('Parce que.');
 });
 
-test('offrir un corrigé met le pack à jour (une seule variante pour cette annale)', function () {
+test('offrir un corrigé met le pack à jour (une seule variante pour ce sujet)', function () {
     $pack = packMathsDe($this->eleve);
     $this->ancienne->update(['corrige_libre' => true]);
     $pack = app(PackService::class)->generer($pack);

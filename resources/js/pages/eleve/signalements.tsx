@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { EtatVide } from '@/components/ui/etat-vide';
 import { depuis } from '@/lib/dates';
 import { cn, pluriel } from '@/lib/utils';
-import { index as annales } from '@/routes/eleve/annales';
+import { index as annales } from '@/routes/eleve/sujets';
 
 type Signalement = {
     uuid: string;
@@ -67,8 +67,8 @@ export default function Signalements({
                         Mes <strong>signalements</strong>
                     </h1>
                     <p className="text-ink-600">
-                        Une erreur dans une question, une leçon ou une annale ?
-                        Tu l’as signalée, un enseignant l’a vérifiée.
+                        Une erreur dans une question, une leçon ou un sujet ? Tu
+                        l’as signalée, un enseignant l’a vérifiée.
                         {ouverts > 0 &&
                             ` ${pluriel(ouverts, 'signalement')} en cours de vérification.`}
                     </p>
@@ -81,7 +81,7 @@ export default function Signalements({
                         message="Sous chaque question, « Signaler une erreur » prévient l’équipe. Elle te répond ici."
                         action={
                             <Button asChild variant="outline">
-                                <Link href={annales()}>Voir les annales</Link>
+                                <Link href={annales()}>Voir les sujets</Link>
                             </Button>
                         }
                     />

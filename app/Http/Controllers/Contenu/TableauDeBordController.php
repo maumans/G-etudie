@@ -49,7 +49,7 @@ class TableauDeBordController extends Controller
             ) : null,
             'couverture' => CouvertureProgramme::matieresPhares(),
             'est_exemple' => Lecon::query()->where('est_exemple', true)->exists(),
-            // Lot 4 : les annales et les signalements des élèves.
+            // Lot 4 : les sujets et les signalements des élèves.
             'annales' => [
                 'a_relire' => $relit ? AnnaleController::nombreARelire($user) : null,
                 'a_verifier' => $redige ? Question::query()->where('auteur_id', $user->id)->where('reponse_a_verifier', true)->count() : null,

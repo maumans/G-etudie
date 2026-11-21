@@ -41,7 +41,7 @@ beforeEach(function () {
 
 function televerser(object $test, User $auteur, array $champs = []): TestResponse
 {
-    return $test->actingAs($auteur)->post(route('contenu.annales.imports.store'), [
+    return $test->actingAs($auteur)->post(route('contenu.sujets.imports.store'), [
         'document' => UploadedFile::fake()->createWithContent('bepc-2024.pdf', DemoAnnalesSeeder::pdfExemple('BEPC 2024')),
         'examen_id' => $test->bepc->id,
         'matiere_id' => $test->maths->id,
@@ -51,8 +51,8 @@ function televerser(object $test, User $auteur, array $champs = []): TestRespons
     ]);
 }
 
-test('critère du lot 4 : un sujet scanné devient une annale publiée, sans saisir l\'énoncé', function () {
-    televerser($this, $this->redacteur)->assertRedirect(route('contenu.annales.index'));
+test('critère du lot 4 : un sujet scanné devient un sujet publié, sans saisir l\'énoncé', function () {
+    televerser($this, $this->redacteur)->assertRedirect(route('contenu.sujets.index'));
 
     $import = ImportSujet::query()->sole();
     $sujet = $import->sujet;
@@ -74,30 +74,30 @@ test('critère du lot 4 : un sujet scanné devient une annale publiée, sans sai
         ->and($questions->first()->reponse_attendue)->toEqual(['valeur' => 11, 'tolerance' => 0, 'relative' => false]);
 
     // Pas de relecture tant qu'une réponse proposée n'est pas vérifiée.
-    $this->actingAs($this->redacteur)->post(route('contenu.annales.soumettre', $sujet))
+    $this->actingAs($this->redacteur)->post(route('contenu.sujets.soumettre', $sujet))
         ->assertSessionHasErrors(['blocs' => 'Des réponses proposées par l\'IA restent à vérifier.']);
 
     foreach ($questions as $question) {
-        $this->post(route('contenu.annales.questions.verifier', $question))->assertRedirect();
+        $this->post(route('contenu.sujets.questions.verifier', $question))->assertRedirect();
     }
 
-    $this->post(route('contenu.annales.soumettre', $sujet))->assertRedirect(route('contenu.annales.show', $sujet));
+    $this->post(route('contenu.sujets.soumettre', $sujet))->assertRedirect(route('contenu.sujets.show', $sujet));
     expect($sujet->fresh()->statut)->toBe(StatutContenu::EnRelecture)
         ->and(Question::query()->where('statut', StatutContenu::EnRelecture->value)->count())->toBe(4);
 
     // Un autre enseignant publie l'ensemble d'un geste.
-    $this->actingAs($this->relecteur)->post(route('contenu.annales.publier', $sujet), ['commentaire' => 'Fidèle.'])
-        ->assertRedirect(route('contenu.annales.show', $sujet));
+    $this->actingAs($this->relecteur)->post(route('contenu.sujets.publier', $sujet), ['commentaire' => 'Fidèle.'])
+        ->assertRedirect(route('contenu.sujets.show', $sujet));
 
     expect($sujet->fresh()->statut)->toBe(StatutContenu::Publie)
         ->and(Question::query()->where('statut', StatutContenu::Publie->value)->whereNotNull('version_publiee_id')->count())->toBe(4);
 
     // L'élève de BEPC la lit, énoncé compris.
     $eleve = eleveAvecProfil('BEPC');
-    $this->actingAs($eleve)->get(route('eleve.annales.show', $sujet))
+    $this->actingAs($eleve)->get(route('eleve.sujets.show', $sujet))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('eleve/annale')
+            ->component('eleve/sujet')
             ->where('sujet.uuid', $sujet->uuid)
             ->has('sujet.parties', 2)
             ->has('sujet.parties.0.questions', 2)
@@ -156,9 +156,9 @@ test('un échec de lecture est noté avec sa raison, et se relance', function ()
         ->and($import->erreur)->toBe('Le document n\'a pas pu être lu (format ou taille refusés).')
         ->and(Sujet::query()->count())->toBe(0);
 
-    // Relancé avec un extracteur qui lit : l'annale est créée.
+    // Relancé avec un extracteur qui lit : le sujet est créé.
     app()->instance(ExtracteurSujet::class, app(ExtracteurSimule::class));
-    $this->actingAs($this->redacteur)->post(route('contenu.annales.imports.relancer', $import))->assertRedirect();
+    $this->actingAs($this->redacteur)->post(route('contenu.sujets.imports.relancer', $import))->assertRedirect();
 
     expect($import->fresh()->statut)->toBe(StatutImport::Pret)
         ->and($import->fresh()->erreur)->toBeNull()

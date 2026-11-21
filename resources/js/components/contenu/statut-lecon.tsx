@@ -43,8 +43,33 @@ export const STATUTS: Record<
     },
 };
 
-export function BadgeStatut({ statut }: { statut: StatutContenu }) {
-    const { libelle, icone: Icone, variante } = STATUTS[statut];
+/**
+ * Un sujet est masculin (« Publié », « Archivé ») ; une leçon et une
+ * question sont féminines (2026-11-21 : on dit « sujet », plus « annale »).
+ */
+export type Genre = 'feminin' | 'masculin';
+
+const MASCULIN: Partial<
+    Record<StatutContenu, { libelle: string; pluriel: string }>
+> = {
+    publie: { libelle: 'Publié', pluriel: 'Publiés' },
+    archive: { libelle: 'Archivé', pluriel: 'Archivés' },
+};
+
+export function statutDe(statut: StatutContenu, genre: Genre = 'feminin') {
+    return genre === 'masculin'
+        ? { ...STATUTS[statut], ...MASCULIN[statut] }
+        : STATUTS[statut];
+}
+
+export function BadgeStatut({
+    statut,
+    genre = 'feminin',
+}: {
+    statut: StatutContenu;
+    genre?: Genre;
+}) {
+    const { libelle, icone: Icone, variante } = statutDe(statut, genre);
 
     return (
         <Badge variant={variante}>

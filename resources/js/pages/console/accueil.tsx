@@ -271,7 +271,7 @@ export default function Accueil({
                                         nombre: contenu.en_relecture.questions,
                                     },
                                     {
-                                        libelle: 'Annales à relire',
+                                        libelle: 'Sujets à relire',
                                         nombre: contenu.en_relecture.annales,
                                     },
                                     {

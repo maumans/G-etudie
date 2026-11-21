@@ -31,7 +31,7 @@ use RuntimeException;
  *
  * Un pack = tout le contenu **publié** d'une matière pour un examen, une
  * série et une filière : la page de la matière, ses leçons (mini-questions
- * comprises), les fiches de révision de ses chapitres, ses annales (sujet,
+ * comprises), les fiches de révision de ses chapitres, ses sujets (sujet,
  * questions, corrigés). Chaque élément porte **les props mêmes de son
  * écran** (A.4), fabriquées par les mêmes fonctions que les routes en ligne
  * (`PresentationCours`, `LeconController::contenu`, `PresentationSujet`) ;
@@ -45,11 +45,11 @@ use RuntimeException;
  * recommencer qu'un morceau. La version du pack est l'empreinte de la liste
  * de ses éléments.
  *
- * **Deux variantes** (lot 9) : une annale dont le corrigé est réservé aux
+ * **Deux variantes** (lot 9) : un sujet dont le corrigé est réservé aux
  * abonnés (DroitsAbonne) a deux éléments sous la même clé — `complet` pour
  * les abonnés, `libre` sans les étapes du corrigé (PresentationSujet::
  * sansCorrige). Tout le reste est `commun`. Chaque variante a sa version et
- * son poids ; les deux éléments d'une annale sont dans le même morceau.
+ * son poids ; les deux éléments d'un sujet sont dans le même morceau.
  * Un élève qui s'abonne ne retélécharge que ces annales-là.
  */
 class PackService
@@ -59,7 +59,7 @@ class PackService
     /** Taille visée d'un morceau, en octets de JSON brut (A.5). */
     public const TAILLE_MORCEAU = 500_000;
 
-    /** Ordre des éléments dans les morceaux : la matière d'abord, les annales à la fin. */
+    /** Ordre des éléments dans les morceaux : la matière d'abord, les sujets à la fin. */
     private const ORDRE_TYPES = ['matiere' => 0, 'fiche' => 1, 'lecon' => 2, 'annale' => 3];
 
     /**
@@ -127,7 +127,7 @@ class PackService
         $elements = $this->composer($pack);
 
         // Répartition en morceaux, dans un ordre stable, d'après la variante
-        // complète (la libre est plus légère) : l'élément libre d'une annale
+        // complète (la libre est plus légère) : l'élément libre d'un sujet
         // prend le morceau de son jumeau complet.
         uasort($elements, fn (array $a, array $b) => [self::ORDRE_TYPES[$a['type']], $a['cle'], $a['variante']] <=> [self::ORDRE_TYPES[$b['type']], $b['cle'], $b['variante']]);
         $morceau = 0;

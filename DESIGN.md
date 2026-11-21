@@ -518,6 +518,9 @@ du texte) · Parcours d'accueil (4 écrans) · Connexion / inscription par tél�
   corrigé », « Passer l'examen blanc » — jamais « Soumettre ».
 - Noms officiels exacts : **CEE**, **BEPC**, **Baccalauréat unique**, séries
   **SM / SE / SS**, « 10e année », « Terminale ».
+- **Sujet, pas annale** (2026-11-21) : « Sujets » dans un menu ou un
+  onglet, « Sujets d'examen » en titre d'écran, « Sujets corrigés » sur la
+  vitrine ; au masculin (« un sujet publié », « tous les sujets »).
 - Chiffres : `13,5 / 20`, `100 000 GNF`, `J-214`.
 - Un message d'erreur dit quoi faire : « Pas de connexion. Ta réponse est
   gardée sur le téléphone et partira toute seule. »

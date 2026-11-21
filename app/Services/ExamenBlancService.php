@@ -70,7 +70,7 @@ class ExamenBlancService
         }
 
         if (! CatalogueEleve::peutLireSujet($eleve, $sujet)) {
-            throw new OperationRejetee('Cette annale n\'est plus proposée : ton examen ne peut pas être noté.');
+            throw new OperationRejetee('Ce sujet n\'est plus proposé : ton examen ne peut pas être noté.');
         }
 
         /** @var VersionContenu|null $version */
@@ -80,7 +80,7 @@ class ExamenBlancService
             ->first();
 
         if ($version === null) {
-            throw new OperationRejetee('Cette version de l\'annale n\'a jamais été publiée.');
+            throw new OperationRejetee('Cette version du sujet n\'a jamais été publiée.');
         }
 
         [$suspecte, $motif] = $this->horloge($commenceLe, $termineLe, $passage, $horlogeSuspecteSynchro);

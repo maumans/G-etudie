@@ -42,7 +42,7 @@ class AppServiceProvider extends ServiceProvider
         // message est écrit dans le journal et rien ne part.
         $this->app->bind(EnvoiSms::class, JournalSms::class);
 
-        // Import assisté des annales (lot 4) : l'API Claude, ou la lecture
+        // Import assisté des sujets (lot 4) : l'API Claude, ou la lecture
         // simulée hors production (config/annales.php).
         $this->app->bind(ExtracteurSujet::class, fn () => config('annales.extracteur') === 'claude'
             ? new ExtracteurClaude
@@ -131,7 +131,7 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Lot 7 (HORS_LIGNE.md A.5) : une leçon, une question ou une annale
+     * Lot 7 (HORS_LIGNE.md A.5) : une leçon, une question ou un sujet
      * publiée, retirée ou corrigée fait regénérer (en file) les packs de sa
      * matière. Seuls les champs qui changent ce que voit l'élève comptent.
      */

@@ -17,7 +17,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 
 /*
  * Lot 8 — annales publiques (PLAN M1 « SEO »), décision D5 de Maurice du
- * 2026-11-06 : seule une annale **publiée dont l'autorisation de publier est
+ * 2026-11-06 : seul un sujet **publié dont l'autorisation de publier est
  * saisie** est publique ; un sujet maison aussi ; un sujet d'exemple est
  * visible mais jamais indexé. Le corrigé ne sort jamais sans compte.
  */
@@ -64,7 +64,7 @@ test('chaque sujet reçoit une adresse lisible, unique, qui ne change plus', fun
     expect($premier->fresh()->slug)->toBe('bepc-mathematiques-2021');
 });
 
-test('une annale officielle sans autorisation de publier reste fermée (D5)', function () {
+test('un sujet officiel sans autorisation de publier reste fermé (D5)', function () {
     $sujet = bepcMaths();
 
     expect($sujet->droits)->toBeNull();
@@ -82,9 +82,9 @@ test('le rédacteur saisit l\'autorisation dans le back-office : l\'annale devie
         'session' => 2018, 'type' => TypeSujet::Officiel, 'titre' => 'Mathématiques 2018',
     ]);
 
-    // La porte d'entrée réelle : le formulaire « Renseignements » de l'annale.
+    // La porte d'entrée réelle : le formulaire « Renseignements » du sujet.
     $this->actingAs($redacteur)
-        ->put(route('contenu.annales.update', $sujet), [
+        ->put(route('contenu.sujets.update', $sujet), [
             'titre' => 'Mathématiques 2018', 'session' => 2018, 'duree_minutes' => null,
             'coefficient' => null, 'droits' => 'Convention DGECS n° 12/2026', 'revision' => $sujet->revision,
         ])
@@ -156,7 +156,7 @@ test('un sujet d\'exemple est visible avec son bandeau mais jamais indexé ni da
     $this->get('/sitemap.xml')->assertDontSee($sujet->slug);
 });
 
-test('un sujet maison est public ; un brouillon ou une annale retirée ne l\'est pas', function () {
+test('un sujet maison est public ; un brouillon ou un sujet retiré ne l\'est pas', function () {
     $maison = bepcMaths(2020, ['type' => TypeSujet::BlancMaison->value]);
     $retire = bepcMaths(2019, ['droits' => 'Convention n° 2', 'statut' => 'archive']);
 

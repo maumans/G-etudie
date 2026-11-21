@@ -91,7 +91,7 @@ function PanneauMarque() {
             </div>
 
             <p className="relative text-aide text-white/60">
-                Cours, annales corrigées, exercices et examens blancs.
+                Cours, sujets corrigés, exercices et examens blancs.
             </p>
         </div>
     );

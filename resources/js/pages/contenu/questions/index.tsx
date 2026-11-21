@@ -54,7 +54,7 @@ export type QuestionResume = {
     indices: number;
     etapes: number;
     mots: number;
-    /** Question d'une annale (lot 4) : elle se relit avec son sujet. */
+    /** Question d'un sujet (lot 4) : elle se relit avec son sujet. */
     annale: {
         uuid: string;
         titre: string;

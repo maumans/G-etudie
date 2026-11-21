@@ -15,7 +15,7 @@ use RuntimeException;
 
 /**
  * Examens blancs de démonstration (lot 5, développement seulement) : deux
- * examens d'Aïssatou sur les annales **fictives** (`est_exemple`) de
+ * examens d'Aïssatou sur les sujets **fictives** (`est_exemple`) de
  * DemoAnnalesSeeder, passés par le vrai chemin (ExamenBlancService, comme
  * `examen_blanc.terminer`) : l'historique, la comparaison et le résultat
  * ont de quoi s'afficher.

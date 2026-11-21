@@ -16,7 +16,7 @@ import {
  *   formules, code, historique avec un essai refusé) et d'Ousmane (09,
  *   abonné : période en cours) ;
  * - « Payer » (formule année) ;
- * - une annale au corrigé réservé (BEPC 2023, Aïssatou) ;
+ * - un sujet au corrigé réservé (BEPC 2023, Aïssatou) ;
  * - console : codes prépayés (liste, lot d'exemple), paiements.
  */
 
@@ -65,7 +65,7 @@ const ECRANS: Ecran[] = [
         ecran: 'annale-corrige-reserve',
         session: 'eleve',
         ouvrir: async (page) => {
-            await page.goto('/eleve/annales');
+            await page.goto('/eleve/sujets');
             await page
                 .getByRole('link', { name: /BEPC 2023/ })
                 .first()

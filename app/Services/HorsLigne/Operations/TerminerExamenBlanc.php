@@ -13,7 +13,7 @@ use Illuminate\Validation\Rule;
 
 /**
  * `examen_blanc.terminer` (HORS_LIGNE.md A.6, **priorité 0**, A.8) :
- * ExamenBlancService::terminer. La charge porte tout l'examen : l'annale et
+ * ExamenBlancService::terminer. La charge porte tout l'examen : le sujet et
  * la version passées, l'heure de début et de fin (horloge de l'appareil),
  * la durée et d'où elle vient, chaque réponse avec la version vue de sa
  * question (et les critères cochés d'une rédaction), la note affichée.
@@ -67,7 +67,7 @@ class TerminerExamenBlanc implements GestionnaireOperation
     public function executer(ContexteOperation $contexte, array $charge): array
     {
         $sujet = Sujet::query()->where('uuid', $charge['sujet'])->first()
-            ?? throw new OperationRejetee('Cette annale n\'existe plus.');
+            ?? throw new OperationRejetee('Ce sujet n\'existe plus.');
 
         return $this->examens->terminer(
             $contexte->auteur,

@@ -1,7 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { FileQuestion, FileText, Library } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { relecture as relectureAnnales } from '@/routes/contenu/annales';
+import { relecture as relectureAnnales } from '@/routes/contenu/sujets';
 import { relecture as relectureLecons } from '@/routes/contenu/lecons';
 import { relecture as relectureQuestions } from '@/routes/contenu/questions';
 
@@ -38,7 +38,7 @@ export function OngletsRelecture({
         },
         {
             cle: 'annales' as const,
-            libelle: 'Annales',
+            libelle: 'Sujets',
             icone: FileText,
             nombre: annales,
             href: relectureAnnales(),

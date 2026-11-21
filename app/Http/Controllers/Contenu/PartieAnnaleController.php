@@ -16,7 +16,7 @@ use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 /**
- * La structure d'une annale en brouillon : parties (titre, barème imprimé,
+ * La structure d'un sujet en brouillon : parties (titre, barème imprimé,
  * consigne) et questions (ajout, retrait, ordre, « réponse vérifiée »).
  * Chaque geste passe par SujetService, qui revérifie sous verrou ; la
  * saisie d'une question se fait dans l'écran des questions.
@@ -32,7 +32,7 @@ class PartieAnnaleController extends Controller
 
         $this->sujets->ajouterPartie($sujet, $request->user(), $donnees['titre']);
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     public function update(Request $request, SujetPartie $partie): RedirectResponse
@@ -49,7 +49,7 @@ class PartieAnnaleController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Partie enregistrée.']);
 
-        return to_route('contenu.annales.show', $partie->sujet);
+        return to_route('contenu.sujets.show', $partie->sujet);
     }
 
     public function destroy(Request $request, SujetPartie $partie): RedirectResponse
@@ -57,7 +57,7 @@ class PartieAnnaleController extends Controller
         Gate::authorize('rediger', $partie->sujet);
         $this->sujets->supprimerPartie($partie, $request->user());
 
-        return to_route('contenu.annales.show', $partie->sujet);
+        return to_route('contenu.sujets.show', $partie->sujet);
     }
 
     public function ajouterQuestion(Request $request, SujetPartie $partie): RedirectResponse
@@ -86,9 +86,9 @@ class PartieAnnaleController extends Controller
 
         $this->sujets->retirerQuestion($question, $request->user());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Question retirée de l’annale.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Question retirée du sujet.']);
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     public function deplacerQuestion(Request $request, Question $question): RedirectResponse
@@ -99,10 +99,10 @@ class PartieAnnaleController extends Controller
 
         $this->sujets->deplacerQuestion($question, $request->user(), $donnees['sens'] === 'monter' ? -1 : 1);
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
-    /** « J'ai vérifié la réponse et le corrigé proposés » : depuis l'annale ou l'écran de saisie. */
+    /** « J'ai vérifié la réponse et le corrigé proposés » : depuis le sujet ou l'écran de saisie. */
     public function verifierQuestion(Request $request, Question $question): RedirectResponse
     {
         Gate::authorize('rediger', $question);
@@ -112,7 +112,7 @@ class PartieAnnaleController extends Controller
 
         return $request->boolean('depuis_saisie')
             ? to_route('contenu.questions.edit', $question)
-            : to_route('contenu.annales.show', $this->sujetDe($question));
+            : to_route('contenu.sujets.show', $this->sujetDe($question));
     }
 
     private function sujetDe(Question $question): Sujet

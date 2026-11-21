@@ -26,6 +26,10 @@
 - **Dépôt git** : `main` porte les lots 0 à 14. Les lots 3 à 14 ont été
   faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
   distant (DA6).
+- **On dit « sujet », plus « annale »** (point 31, décision de Maurice) :
+  menus « Sujets », titres « Sujets d'examen », vitrine « Sujets
+  corrigés » ; adresses `/eleve/sujets…` et `/contenu/sujets…` (les
+  anciennes redirigent). *Annale* ne reste qu'un nom interne du code.
 - **Lot 14 : outils faits, critère pas encore tenu** (point 30). Le
   critère — `A_TESTER.md` exécutée sur de vrais téléphones avec de vrais
   élèves — attend **D11** (HTTPS) et les **autorisations écrites** des
@@ -351,10 +355,10 @@
    jamais dans le dépôt), relancer `php artisan queue:work`, puis importer
    un **vrai** sujet scanné (`A_TESTER.md`, « Import d'un vrai sujet »).
 3. **Maurice : essayer le lot 4** — au back-office (04 rédacteur :
-   « Annales », l'annale BEPC 2022 en brouillon : comparer au document,
+   « Sujets », le sujet BEPC 2022 en brouillon : comparer au document,
    « J'ai vérifié », envoyer ; « Importer un sujet » ; 05 relectrice ou
-   06 responsable pédagogique : « Relecture › Annales », « Signalements »),
-   puis côté élève (01 Aïssatou : « Annales », BEPC 2024 en lecture et en
+   06 responsable pédagogique : « Relecture › Sujets », « Signalements »),
+   puis côté élève (01 Aïssatou : « Sujets », BEPC 2024 en lecture et en
    entraînement, « Exercices par chapitre », « Signaler une erreur »).
 4. **Équipe pédagogique** : saisir la **date de la prochaine session** de
    chaque examen (Référentiel › Épreuves) pour le compte à rebours ; **la
@@ -2844,6 +2848,76 @@ cette question à sa façon. Elle distingue deux notions :
      sortent (lot 14 bis). Le modèle d'autorisation parentale est à faire
      relire par un juriste.
 
+31. [x] **On dit « sujet », plus « annale »** (2026-11-21, sur `main`, un
+   commit)
+   - **Constat** : « annales » est le mot de France ; en Guinée, élèves et
+     enseignants disent « les sujets », « les anciens sujets », « les
+     sujets corrigés ». Le code disait déjà `Sujet` (modèle) et `/sujets`
+     (pages publiques) : seul le vocabulaire affiché ne suivait pas.
+   - **Décisions de Maurice** (2026-11-21, les quatre points acceptés) :
+     1. tout ce que voient élèves, parents et enseignants : **« Sujets »**
+        dans un menu ou un onglet, **« Sujets d'examen »** en titre
+        d'écran, **« Sujets corrigés »** sur la vitrine (ce que les élèves
+        cherchent ; titre, description et carte de partage aussi) ;
+     2. le back-office aussi (« Sujets », « Relecture › Sujets »,
+        « Vérifier le sujet », messages et confirmations) ;
+     3. les adresses : `/eleve/annales…` → `/eleve/sujets…`,
+        `/eleve/documents/annales/…` → `/eleve/documents/sujets/…`,
+        `/contenu/annales…` → `/contenu/sujets…`, `/contenu/relecture/annales`
+        → `/contenu/relecture/sujets` ; noms de route `eleve.sujets.*`,
+        `contenu.sujets.*` ; pages `eleve/sujets`, `eleve/sujet`,
+        `contenu/sujets/*`. Fait **maintenant**, tant qu'aucun élève n'a
+        l'application installée (pas de copie hors ligne à l'ancienne
+        adresse) ;
+     4. les documents : une règle de vocabulaire dans `CLAUDE.md` § 5,
+        `DESIGN.md` § 9 et `PLAN_NKARAMOGO.md` M6, sans réécrire
+        l'historique.
+   - **Anciennes adresses** : `AnciennesAdressesController` redirige
+     (301) vers la nouvelle, **paramètres compris** (`?mode=examen`) —
+     la redirection native de Laravel les perdait. Sans compte : la page
+     d'arrivée garde ses contrôles.
+   - **Accords** : le mot change de genre. Remplacement par règles,
+     phrase par phrase (cas particuliers d'abord : « un sujet publié »,
+     « tous les sujets », « Ce sujet n'est plus proposé »), puis
+     **relecture de chaque phrase visible modifiée** : elle a trouvé et
+     corrigé « une sujet officiel », « Du scan à l'sujet publié »,
+     « d'sujet », « sujets publiques », « proposée », « semées » (deux
+     règles enchaînées, ou une apostrophe échappée en PHP). La suite PHP
+     a trouvé « Ce sujet n'est plus proposée ».
+   - **Gardé tel quel (noms internes, invisibles)** : classes
+     (`AnnaleController`, `ImportAnnaleController`, `Services\Annales`),
+     table et config `annales`, permission `annales.importer`, valeur
+     `source = annale`, type d'élément de pack `annale` (un pack déjà
+     téléchargé reste lisible), clés de props (`annales`,
+     `annales_disponibles`), noms des captures de référence.
+   - **Hors ligne** : la liste blanche suit (`/eleve/sujets`),
+     `HORS_LIGNE.md` B.5 n° 39.
+   - **Preuve** : Pest `AnciennesAdressesTest` (9 : sept anciennes
+     adresses, paramètres compris ; la redirection ne donne aucun accès ;
+     les nouvelles s'ouvrent) ; tests existants mis à jour (noms de route,
+     adresses, messages). **Totaux** : `php artisan test` **743 passants**,
+     `npm run test:js` **428**, `tsc`, `vp check`, Pint, Larastan niveau 7
+     et `npm run build` verts. Vitrine en rendu serveur vérifiée
+     (`build:ssr`, processus relancé, `data-server-rendered`, aucune
+     erreur d'hydratation, « Sujets corrigés » dans le HTML).
+     **Playwright** : toutes les références **régénérées**
+     (`--update-snapshots=all`) — avec la tolérance de 1 %, le seul
+     libellé du menu passait sous le seuil et les références auraient
+     gardé « Annales » ; 776 tests verts (les écrans `eleve-sortie` et
+     `eleve-tuteur-conversation`, en échec pendant une passe de 4 h 4 sur
+     un poste chargé, repassent verts seuls).
+   - **Vu et corrigé** (Playwright) : filtres et pastilles du back-office
+     restés au féminin (« Toutes », « Les miennes », « Publiée »,
+     « Archivée ») → `statutDe(statut, 'masculin')` et `BadgeStatut
+     genre="masculin"` pour un sujet (leçons et questions restent au
+     féminin) ; confirmations « Les élèves ne **la** verront plus »,
+     « **Elle** et toutes ses questions » → au masculin. Deux imports en
+     échec et trois travaux en souffrance, laissés dans la base de
+     démonstration par un parcours du lot 4 lancé sans
+     `ANNALES_EXTRACTEUR=simule`, retirés (`queue:work --once` du parcours
+     traitait sinon un ancien travail).
+   - **Reste** : rien.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
@@ -2995,9 +3069,9 @@ la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 | `/contenu/relecture`, publier, renvoyer | `can:contenu.relire` + `LeconPolicy::relire` (jamais l'auteur) | `routes/contenu.php` |
 | archiver, restaurer | `can:contenu.administrer` | `routes/contenu.php` |
 | `/contenu/questions` (liste, fiche), `creer`, édition, envoi, reprise, modification ; `/contenu/relecture/questions`, publier, renvoyer ; archiver, restaurer | mêmes gardes que les leçons ; `QuestionPolicy` (circuit commun `PolicyContenuRelisable`) | `routes/contenu.php` |
-| `/eleve/examens-blancs`, `/eleve/examens-blancs/{uuid}` (le passage : `/eleve/annales/{uuid}?mode=examen`) | `auth` + `can:espace.eleve` ; résultat gardé par `ExamenBlancPolicy::voir` (404) | `routes/eleve.php` |
-| `/eleve/annales`, `/eleve/annales/{uuid}`, `/eleve/documents/annales/{uuid}`, `/eleve/signalements` | `auth` + `can:espace.eleve` ; annale gardée par `SujetPolicy::lire` (404) | `routes/eleve.php` |
-| `/contenu/annales` (liste, fiche, document), `/contenu/relecture/annales` ; importer (`annales/importer`, `annales/imports`, relancer) ; parties, questions d'annale, circuit | `can:espace.contenu` · `can:annales.importer` (+ `throttle:20,60`) · `can:contenu.rediger` / `relire` / `administrer` ; `SujetPolicy` | `routes/contenu.php` |
+| `/eleve/examens-blancs`, `/eleve/examens-blancs/{uuid}` (le passage : `/eleve/sujets/{uuid}?mode=examen`) | `auth` + `can:espace.eleve` ; résultat gardé par `ExamenBlancPolicy::voir` (404) | `routes/eleve.php` |
+| `/eleve/sujets`, `/eleve/sujets/{uuid}`, `/eleve/documents/sujets/{uuid}`, `/eleve/signalements` | `auth` + `can:espace.eleve` ; sujet gardé par `SujetPolicy::lire` (404) | `routes/eleve.php` |
+| `/contenu/sujets` (liste, fiche, document), `/contenu/relecture/sujets` ; importer (`sujets/importer`, `sujets/imports`, relancer) ; parties, questions d'un sujet, circuit | `can:espace.contenu` · `can:annales.importer` (+ `throttle:20,60`) · `can:contenu.rediger` / `relire` / `administrer` ; `SujetPolicy` | `routes/contenu.php` |
 | `/eleve/progression` (« Ma progression »), `/eleve/instantane` (JSON de l'appareil, HL4) | `can:espace.eleve` + profil requis | `routes/eleve.php` |
 | `/contenu/signalements`, fiche, répondre | `can:signalements.traiter` ; `SignalementPolicy` (404) | `routes/contenu.php` |
 | `/compte/*` (profil, mot de passe, numéro, affichage, vérification, suppression) | `auth`, dérogations « Mon compte » | `routes/compte.php` |

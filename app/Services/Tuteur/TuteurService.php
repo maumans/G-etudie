@@ -30,7 +30,7 @@ use Illuminate\Support\Str;
  *  - **Ancré sur notre contenu** : une question publiée que l'élève peut
  *    recevoir (CatalogueEleve), à la version qu'il avait sous les yeux, avec
  *    le corrigé validé ; ou une question libre dans une de ses matières.
- *    Une annale dont le corrigé est réservé aux abonnés (DroitsAbonne)
+ *    Un sujet dont le corrigé est réservé aux abonnés (DroitsAbonne)
  *    n'ouvre pas le tuteur : il le dévoilerait.
  *  - **Quota par jour** : `config('tuteur.quota_gratuit')` ou
  *    `quota_abonne`. Seule une explication complète décompte.
@@ -47,7 +47,7 @@ use Illuminate\Support\Str;
  */
 class TuteurService
 {
-    public const RECENTRAGE = 'Je suis là pour t’aider à réviser : tes cours, tes exercices, tes annales. Pose-moi une question sur une de tes matières, et on la travaille ensemble.';
+    public const RECENTRAGE = 'Je suis là pour t’aider à réviser : tes cours, tes exercices, tes sujets d’examen. Pose-moi une question sur une de tes matières, et on la travaille ensemble.';
 
     public const REFUS = 'Je ne peux pas répondre à cette demande. Revenons à ta révision : dis-moi ce que tu ne comprends pas dans ton cours.';
 
@@ -386,7 +386,7 @@ class TuteurService
         $sujet = $question->partie?->sujet;
 
         if ($sujet !== null && ! $this->droits->corrigeOuvert($eleve, $sujet)) {
-            throw new DemandeRefusee('Le corrigé détaillé de cette annale est réservé aux abonnés : le tuteur ne peut pas l’expliquer.', 'corrige_reserve', 403);
+            throw new DemandeRefusee('Le corrigé détaillé de ce sujet est réservé aux abonnés : le tuteur ne peut pas l’expliquer.', 'corrige_reserve', 403);
         }
 
         $corrige = array_values((array) ($version->blocs['corrige'] ?? []));

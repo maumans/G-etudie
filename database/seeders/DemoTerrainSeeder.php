@@ -39,7 +39,7 @@ class DemoTerrainSeeder extends Seeder
      */
     private const AVIS = [
         [ReponseAvis::Oui, [], 'Le corrigé pas à pas m’a aidée pour Pythagore.', 'seance', 1, null],
-        [ReponseAvis::UnPeu, [EtiquetteAvis::Lent], 'La page des annales met du temps à s’ouvrir.', 'seance', 1, null],
+        [ReponseAvis::UnPeu, [EtiquetteAvis::Lent], 'La page des sujets met du temps à s’ouvrir.', 'seance', 1, null],
         [ReponseAvis::Non, [EtiquetteAvis::PasCompris], 'Je ne savais pas où taper la réponse.', 'seance', 2, 'Champ de réponse agrandi et mis en avant (version suivante).'],
         [ReponseAvis::Oui, [EtiquetteAvis::Facile], null, 'quiz', 2, null],
         [ReponseAvis::UnPeu, [EtiquetteAvis::Donnees], 'Le téléchargement des maths est lourd.', 'appareils', 3, 'Poids affiché avant : déjà en place. Images allégées à vérifier.'],

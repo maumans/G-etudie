@@ -296,7 +296,7 @@ describe('packs sur l’appareil', () => {
             premier: true,
         });
 
-        // L'équipe corrige la leçon A et retire l'annale.
+        // L'équipe corrige la leçon A et retire le sujet.
         serveur.version = 'v3cccccccccccccc';
         serveur.elements = serveur.elements
             .filter((e) => e.cle !== `annale:${ANNALE}`)
@@ -399,7 +399,7 @@ describe('packs sur l’appareil', () => {
 
         const annale = await lirePageLocale(
             base,
-            `/eleve/annales/${ANNALE}?mode=examen`,
+            `/eleve/sujets/${ANNALE}?mode=examen`,
         );
         expect(annale?.props).toMatchObject({
             mode: 'examen',

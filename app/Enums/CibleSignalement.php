@@ -29,7 +29,7 @@ enum CibleSignalement: string
         return match ($this) {
             self::Question => 'Question',
             self::Lecon => 'Leçon',
-            self::Sujet => 'Annale',
+            self::Sujet => 'Sujet',
         };
     }
 }

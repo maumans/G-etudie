@@ -166,7 +166,7 @@
 - Comment le provoquer : se connecter (élève de démonstration +224 600 00 00 01, `DemoSeeder`), ouvrir
   `/eleve`, toucher chaque onglet, faire défiler la page.
 - Quoi observer : la barre reste visible au-dessus de la barre de gestes ;
-  « Accueil » ouvre l'accueil ; « Cours », « Annales », « Examens blancs »
+  « Accueil » ouvre l'accueil ; « Cours », « Sujets », « Examens blancs »
   affichent « … arrive bientôt » ; « Moi » ouvre le compte ; le contenu
   n'est jamais caché sous la barre en bas de page.
 - En cas d'échec, relever : capture, modèle, mode de navigation du
@@ -516,8 +516,8 @@
 - Pourquoi : `signalement.creer` passe par la file (HORS_LIGNE.md A.6) ;
   Playwright ne coupe pas le service worker comme un vrai mode avion.
 - Matériel : un Android d'entrée de gamme, Chrome, application installée ;
-  le compte 01 (Aïssatou) ou un élève BEPC qui a ouvert une annale en ligne.
-- Comment le provoquer : ouvrir « Annales », puis une annale, en ligne ;
+  le compte 01 (Aïssatou) ou un élève BEPC qui a ouvert un sujet en ligne.
+- Comment le provoquer : ouvrir « Sujets », puis un sujet, en ligne ;
   passer en mode avion ; mode « Entraînement » ; « Signaler une erreur »
   sous une question, motif « Le corrigé est faux », un message ; envoyer ;
   fermer l'application ; remettre le réseau ; rouvrir.
@@ -701,9 +701,9 @@
   réels d'un sujet dont l'équipe a le droit de se servir (test fermé, D5) :
   un **PDF** net et une **photo** de téléphone (sujet posé à plat, lumière
   du jour) ; le programme de la matière saisi (Référentiel › Programme).
-- Comment le provoquer : compte 04, « Annales › Importer un sujet »,
+- Comment le provoquer : compte 04, « Sujets › Importer un sujet »,
   examen, série, matière, session ; « Lancer la lecture » ; attendre que
-  la ligne passe de « Lecture en cours » à « Vérifier l'annale ».
+  la ligne passe de « Lecture en cours » à « Vérifier le sujet ».
 - Quoi observer : la durée de lecture ; le nombre de parties et de
   questions comparé au document ; l'énoncé **mot pour mot** (aucune phrase
   inventée, formules justes une fois rendues) ; les « [illisible] » et les

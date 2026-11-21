@@ -189,7 +189,7 @@ class SignalementController extends Controller
             $cible instanceof Sujet => [
                 'titre' => $cible->titre,
                 'matiere' => ['nom' => $cible->matiere->nom, 'teinte' => $cible->matiere->teinte->value],
-                'lien' => route('contenu.annales.show', $cible),
+                'lien' => route('contenu.sujets.show', $cible),
             ],
             default => null,
         };

@@ -66,41 +66,41 @@ Route::middleware('auth')->prefix('contenu')->name('contenu.questions.')->group(
     Route::post('questions/{question}/restaurer', [QuestionController::class, 'restaurer'])->middleware($administrer)->name('restaurer');
 });
 
-// Annales (PLAN M6, M17 ; lot 4) : même circuit que les leçons ; l'import
+// Sujets d'examen (PLAN M6, M17 ; lot 4 ; « annales » avant le 2026-11-21) : même circuit que les leçons ; l'import
 // assisté a sa permission (l'appel à l'IA a un coût) ; une fiche est gardée
 // par SujetPolicy, le document original aussi.
-Route::middleware('auth')->prefix('contenu')->name('contenu.annales.')->group(function () {
+Route::middleware('auth')->prefix('contenu')->name('contenu.sujets.')->group(function () {
     $consulter = 'can:'.Permission::EspaceContenu->value;
     $rediger = 'can:'.Permission::RedigerContenu->value;
     $relire = 'can:'.Permission::RelireContenu->value;
     $administrer = 'can:'.Permission::AdministrerContenu->value;
     $importer = 'can:'.Permission::ImporterAnnales->value;
 
-    Route::get('annales', [AnnaleController::class, 'index'])->middleware($consulter)->name('index');
-    Route::get('relecture/annales', [AnnaleController::class, 'relecture'])->middleware($relire)->name('relecture');
-    Route::get('annales/importer', [ImportAnnaleController::class, 'create'])->middleware($importer)->name('importer');
-    Route::post('annales/imports', [ImportAnnaleController::class, 'store'])->middleware([$importer, 'throttle:20,60'])->name('imports.store');
-    Route::post('annales/imports/{import}/relancer', [ImportAnnaleController::class, 'relancer'])->middleware([$importer, 'throttle:20,60'])->name('imports.relancer');
-    Route::get('annales/{sujet}', [AnnaleController::class, 'show'])->middleware($consulter)->name('show');
-    Route::get('annales/{sujet}/document', [AnnaleController::class, 'document'])->middleware($consulter)->name('document');
-    Route::put('annales/{sujet}', [AnnaleController::class, 'update'])->middleware($rediger)->name('update');
-    Route::post('annales/{sujet}/soumettre', [AnnaleController::class, 'soumettre'])->middleware($rediger)->name('soumettre');
-    Route::post('annales/{sujet}/reprendre', [AnnaleController::class, 'reprendre'])->middleware($rediger)->name('reprendre');
-    Route::post('annales/{sujet}/modifier', [AnnaleController::class, 'modifier'])->middleware($rediger)->name('modifier');
-    Route::post('annales/{sujet}/publier', [AnnaleController::class, 'publier'])->middleware($relire)->name('publier');
-    Route::post('annales/{sujet}/renvoyer', [AnnaleController::class, 'renvoyer'])->middleware($relire)->name('renvoyer');
-    Route::post('annales/{sujet}/archiver', [AnnaleController::class, 'archiver'])->middleware($administrer)->name('archiver');
-    Route::post('annales/{sujet}/restaurer', [AnnaleController::class, 'restaurer'])->middleware($administrer)->name('restaurer');
+    Route::get('sujets', [AnnaleController::class, 'index'])->middleware($consulter)->name('index');
+    Route::get('relecture/sujets', [AnnaleController::class, 'relecture'])->middleware($relire)->name('relecture');
+    Route::get('sujets/importer', [ImportAnnaleController::class, 'create'])->middleware($importer)->name('importer');
+    Route::post('sujets/imports', [ImportAnnaleController::class, 'store'])->middleware([$importer, 'throttle:20,60'])->name('imports.store');
+    Route::post('sujets/imports/{import}/relancer', [ImportAnnaleController::class, 'relancer'])->middleware([$importer, 'throttle:20,60'])->name('imports.relancer');
+    Route::get('sujets/{sujet}', [AnnaleController::class, 'show'])->middleware($consulter)->name('show');
+    Route::get('sujets/{sujet}/document', [AnnaleController::class, 'document'])->middleware($consulter)->name('document');
+    Route::put('sujets/{sujet}', [AnnaleController::class, 'update'])->middleware($rediger)->name('update');
+    Route::post('sujets/{sujet}/soumettre', [AnnaleController::class, 'soumettre'])->middleware($rediger)->name('soumettre');
+    Route::post('sujets/{sujet}/reprendre', [AnnaleController::class, 'reprendre'])->middleware($rediger)->name('reprendre');
+    Route::post('sujets/{sujet}/modifier', [AnnaleController::class, 'modifier'])->middleware($rediger)->name('modifier');
+    Route::post('sujets/{sujet}/publier', [AnnaleController::class, 'publier'])->middleware($relire)->name('publier');
+    Route::post('sujets/{sujet}/renvoyer', [AnnaleController::class, 'renvoyer'])->middleware($relire)->name('renvoyer');
+    Route::post('sujets/{sujet}/archiver', [AnnaleController::class, 'archiver'])->middleware($administrer)->name('archiver');
+    Route::post('sujets/{sujet}/restaurer', [AnnaleController::class, 'restaurer'])->middleware($administrer)->name('restaurer');
     // Lot 9 : corrigé détaillé ouvert aux élèves non abonnés (DroitsAbonne).
-    Route::patch('annales/{sujet}/corrige-libre', [AnnaleController::class, 'corrigeLibre'])->middleware($administrer)->name('corrige-libre');
+    Route::patch('sujets/{sujet}/corrige-libre', [AnnaleController::class, 'corrigeLibre'])->middleware($administrer)->name('corrige-libre');
 
-    Route::post('annales/{sujet}/parties', [PartieAnnaleController::class, 'store'])->middleware($rediger)->name('parties.store');
+    Route::post('sujets/{sujet}/parties', [PartieAnnaleController::class, 'store'])->middleware($rediger)->name('parties.store');
     Route::put('parties/{partie}', [PartieAnnaleController::class, 'update'])->middleware($rediger)->name('parties.update');
     Route::delete('parties/{partie}', [PartieAnnaleController::class, 'destroy'])->middleware($rediger)->name('parties.destroy');
     Route::post('parties/{partie}/questions', [PartieAnnaleController::class, 'ajouterQuestion'])->middleware($rediger)->name('questions.store');
-    Route::delete('annales/questions/{question}', [PartieAnnaleController::class, 'retirerQuestion'])->middleware($rediger)->name('questions.destroy');
-    Route::post('annales/questions/{question}/deplacer', [PartieAnnaleController::class, 'deplacerQuestion'])->middleware($rediger)->name('questions.deplacer');
-    Route::post('annales/questions/{question}/verifier', [PartieAnnaleController::class, 'verifierQuestion'])->middleware($rediger)->name('questions.verifier');
+    Route::delete('sujets/questions/{question}', [PartieAnnaleController::class, 'retirerQuestion'])->middleware($rediger)->name('questions.destroy');
+    Route::post('sujets/questions/{question}/deplacer', [PartieAnnaleController::class, 'deplacerQuestion'])->middleware($rediger)->name('questions.deplacer');
+    Route::post('sujets/questions/{question}/verifier', [PartieAnnaleController::class, 'verifierQuestion'])->middleware($rediger)->name('questions.verifier');
 });
 
 // Signalements des élèves (PLAN M17 ; lot 4) : relecteurs et responsable pédagogique.

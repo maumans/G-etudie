@@ -37,7 +37,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Back-office › Annales (PLAN M6, M17) : la liste des sujets et les imports
- * en cours, la file de relecture, la fiche d'une annale (document original à
+ * en cours, la file de relecture, la fiche d'un sujet (document original à
  * côté de la version structurée, parties, questions à vérifier, versions)
  * et son circuit. Les transitions passent par SujetService ; la policy dit
  * qui voit quel bouton.
@@ -71,7 +71,7 @@ class AnnaleController extends Controller
         $brouillon = $sujet->statut === StatutContenu::Brouillon;
         $classe = Classe::query()->where('examen_id', $sujet->examen_id)->first();
 
-        return Inertia::render('contenu/annales/fiche', [
+        return Inertia::render('contenu/sujets/fiche', [
             'sujet' => [
                 ...$this->presenter($sujet, $user),
                 'duree_minutes' => $sujet->duree_minutes,
@@ -85,7 +85,7 @@ class AnnaleController extends Controller
                     'nom' => $sujet->document_nom,
                     'type' => $sujet->document_type,
                     'octets' => $sujet->document_octets,
-                    'url' => route('contenu.annales.document', $sujet),
+                    'url' => route('contenu.sujets.document', $sujet),
                 ],
             ],
             'parties' => $sujet->parties->map(fn (SujetPartie $partie) => [
@@ -176,7 +176,7 @@ class AnnaleController extends Controller
 
         Inertia::flash('toast', ['type' => 'success', 'message' => 'Renseignements enregistrés.']);
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     /** Le document original : jamais servi sans la policy, jamais mis en cache public. */
@@ -205,9 +205,9 @@ class AnnaleController extends Controller
         Gate::authorize('rediger', $sujet);
         $this->sujets->soumettre($sujet, $request->user());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Annale envoyée en relecture, avec ses questions.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Sujet envoyé en relecture, avec ses questions.']);
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     public function reprendre(Request $request, Sujet $sujet): RedirectResponse
@@ -215,7 +215,7 @@ class AnnaleController extends Controller
         Gate::authorize('rediger', $sujet);
         $this->sujets->reprendre($sujet, $request->user());
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     public function modifier(Request $request, Sujet $sujet): RedirectResponse
@@ -223,7 +223,7 @@ class AnnaleController extends Controller
         Gate::authorize('rediger', $sujet);
         $this->contenu->ouvrirModification($sujet, $request->user());
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     public function publier(Request $request, Sujet $sujet): RedirectResponse
@@ -233,9 +233,9 @@ class AnnaleController extends Controller
 
         $this->sujets->publier($sujet, $request->user(), $donnees['commentaire'] ?? null);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Annale publiée : les élèves de cet examen la reçoivent.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Sujet publié : les élèves de cet examen le reçoivent.']);
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     public function renvoyer(Request $request, Sujet $sujet): RedirectResponse
@@ -245,9 +245,9 @@ class AnnaleController extends Controller
 
         $this->sujets->renvoyer($sujet, $request->user(), $donnees['commentaire']);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Annale renvoyée à son auteur.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Sujet renvoyé à son auteur.']);
 
-        return to_route('contenu.annales.relecture');
+        return to_route('contenu.sujets.relecture');
     }
 
     public function archiver(Request $request, Sujet $sujet): RedirectResponse
@@ -255,13 +255,13 @@ class AnnaleController extends Controller
         Gate::authorize('archiver', $sujet);
         $this->contenu->archiver($sujet, $request->user());
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Annale retirée : les élèves ne la voient plus.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Sujet retiré : les élèves ne le voient plus.']);
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     /**
-     * Lot 9 : ouvrir (ou refermer) le corrigé détaillé de cette annale aux
+     * Lot 9 : ouvrir (ou refermer) le corrigé détaillé de ce sujet aux
      * élèves non abonnés. Réglage commercial, pas une version : il ne passe
      * pas par la relecture. Les packs de la matière sont regénérés (le
      * corrigé change de variante, PackService).
@@ -278,7 +278,7 @@ class AnnaleController extends Controller
             ? 'Corrigé ouvert à tous les élèves.'
             : 'Corrigé réservé aux abonnés.']);
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     public function restaurer(Request $request, Sujet $sujet): RedirectResponse
@@ -286,7 +286,7 @@ class AnnaleController extends Controller
         Gate::authorize('archiver', $sujet);
         $this->contenu->restaurer($sujet, $request->user());
 
-        return to_route('contenu.annales.show', $sujet);
+        return to_route('contenu.sujets.show', $sujet);
     }
 
     private function liste(Request $request, string $vue): Response
@@ -331,8 +331,8 @@ class AnnaleController extends Controller
 
         $sujets = $requete->orderByDesc('session')->orderByDesc('updated_at')->orderByDesc('id')->paginate(20)->withQueryString();
 
-        // Ses imports à suivre : en lecture, en échec, ou dont l'annale est
-        // encore un brouillon. Une annale envoyée en relecture sort de la
+        // Ses imports à suivre : en lecture, en échec, ou dont le sujet est
+        // encore un brouillon. Un sujet envoyé en relecture sort de la
         // liste (on la retrouve plus bas).
         $imports = ImportSujet::query()
             ->with(['matiere', 'examen', 'serie', 'sujet'])
@@ -343,7 +343,7 @@ class AnnaleController extends Controller
             ->limit(6)
             ->get();
 
-        return Inertia::render('contenu/annales/index', [
+        return Inertia::render('contenu/sujets/index', [
             'sujets' => [
                 'donnees' => collect($sujets->items())->map(fn (Sujet $s) => [
                     ...$this->presenter($s, $user),
@@ -367,7 +367,7 @@ class AnnaleController extends Controller
     }
 
     /**
-     * Les annales des autres qui attendent une décision de ce relecteur.
+     * Les sujets des autres qui attendent une décision de ce relecteur.
      *
      * @param  Builder<Sujet>  $requete
      */

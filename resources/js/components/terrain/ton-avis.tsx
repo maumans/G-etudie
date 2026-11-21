@@ -206,7 +206,7 @@ export function TonAvis({
                                 maxLength={COMMENTAIRE_MAX}
                                 value={commentaire}
                                 onChange={(e) => setCommentaire(e.target.value)}
-                                placeholder="Par exemple : les annales mettent du temps à s’ouvrir."
+                                placeholder="Par exemple : les sujets mettent du temps à s’ouvrir."
                             />
                         )}
                     </Champ>

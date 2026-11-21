@@ -25,7 +25,7 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * Le circuit d'un contenu (PLAN M17) — leçons, questions et annales (les
- * questions d'une annale suivent leur sujet : App\Services\Annales\SujetService) : brouillon →
+ * questions d'un sujet suivent leur sujet : App\Services\Annales\SujetService) : brouillon →
  * en relecture → publié (→ archivé), renvoi avec commentaire, historique
  * des versions. Seule porte qui change le statut d'un contenu : les
  * contrôleurs et les seeders passent par ici, et chaque transition
@@ -145,7 +145,7 @@ class ContenuService
     }
 
     /**
-     * Enregistre les renseignements d'une annale (titre, durée et coefficient
+     * Enregistre les renseignements d'un sujet (titre, durée et coefficient
      * imprimés, référence des droits), avec le même verrou que les autres
      * brouillons. Parties et questions : App\Services\Annales\SujetService.
      *

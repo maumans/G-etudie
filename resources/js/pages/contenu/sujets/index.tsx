@@ -12,7 +12,11 @@ import {
 import { useEffect } from 'react';
 import { EnteteEcran } from '@/components/contenu/entete-ecran';
 import { OngletsRelecture } from '@/components/contenu/onglets-relecture';
-import { BadgeStatut, STATUTS } from '@/components/contenu/statut-lecon';
+import {
+    BadgeStatut,
+    STATUTS,
+    statutDe,
+} from '@/components/contenu/statut-lecon';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { EtatVide } from '@/components/ui/etat-vide';
@@ -25,8 +29,8 @@ import { depuis } from '@/lib/dates';
 import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import { cn, formaterNombre, pluriel } from '@/lib/utils';
-import { importer, index, relecture, show } from '@/routes/contenu/annales';
-import { relancer } from '@/routes/contenu/annales/imports';
+import { importer, index, relecture, show } from '@/routes/contenu/sujets';
+import { relancer } from '@/routes/contenu/sujets/imports';
 import type { StatutContenu } from '@/types';
 
 type Vue = 'toutes' | 'miennes' | 'a_relire';
@@ -145,9 +149,9 @@ export default function Annales({
     }
 
     const vues: { cle: Vue; libelle: string; nombre?: number | null }[] = [
-        { cle: 'toutes', libelle: 'Toutes' },
+        { cle: 'toutes', libelle: 'Tous' },
         ...(peut('contenu.rediger')
-            ? [{ cle: 'miennes' as Vue, libelle: 'Les miennes' }]
+            ? [{ cle: 'miennes' as Vue, libelle: 'Les miens' }]
             : []),
         ...(a_relire !== null
             ? [
@@ -163,7 +167,7 @@ export default function Annales({
     return (
         <div className="grid gap-6">
             <EnteteEcran
-                titreOnglet={relire ? 'Relecture des annales' : 'Annales'}
+                titreOnglet={relire ? 'Relecture des sujets' : 'Sujets'}
                 titre={
                     relire ? (
                         <>
@@ -171,13 +175,13 @@ export default function Annales({
                         </>
                     ) : (
                         <>
-                            Les <strong>annales</strong>
+                            Les <strong>sujets</strong>
                         </>
                     )
                 }
                 description={
                     relire
-                        ? 'Une annale se relit avec toutes ses questions, en un geste. Rien n’est publié sans un relecteur différent de l’auteur.'
+                        ? 'Un sujet se relit avec toutes ses questions, en un geste. Rien n’est publié sans un relecteur différent de l’auteur.'
                         : 'Chaque sujet garde son document original à côté de sa version structurée. Ses questions alimentent aussi les séances.'
                 }
                 action={
@@ -254,7 +258,7 @@ export default function Annales({
                             Vos imports à suivre
                         </h2>
                         <p className="text-aide text-ink-500">
-                            L’annale créée est un brouillon : rien n’est publié
+                            Le sujet créé est un brouillon : rien n’est publié
                             sans relecture.
                         </p>
                     </div>
@@ -271,12 +275,12 @@ export default function Annales({
                 className="rounded-carte border bg-card shadow-carte"
             >
                 <h2 id="titre-liste" className="sr-only">
-                    {relire ? 'Annales à relire' : 'Liste des annales'}
+                    {relire ? 'Sujets à relire' : 'Liste des sujets'}
                 </h2>
                 <div className="grid gap-3 border-b px-5 py-4">
                     <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_11rem_12rem]">
                         <SearchInput
-                            libelle="Rechercher une annale"
+                            libelle="Rechercher un sujet"
                             placeholder="Titre ou matière…"
                             valeur={filtres.recherche}
                             onRecherche={(recherche) => filtrer({ recherche })}
@@ -325,7 +329,7 @@ export default function Annales({
                             className="-mx-5 flex [scrollbar-width:none] gap-1.5 overflow-x-auto px-5"
                         >
                             <PuceStatut
-                                libelle="Toutes"
+                                libelle="Tous"
                                 nombre={total}
                                 actif={filtres.statut === null}
                                 onClick={() => filtrer({ statut: null })}
@@ -334,7 +338,9 @@ export default function Annales({
                                 (statut) => (
                                     <PuceStatut
                                         key={statut}
-                                        libelle={STATUTS[statut].libelle}
+                                        libelle={
+                                            statutDe(statut, 'masculin').libelle
+                                        }
                                         nombre={compteurs[statut]}
                                         actif={filtres.statut === statut}
                                         onClick={() =>
@@ -359,11 +365,11 @@ export default function Annales({
                             titre={
                                 relire
                                     ? 'Rien à relire pour l’instant'
-                                    : 'Aucune annale ne correspond'
+                                    : 'Aucun sujet ne correspond'
                             }
                             message={
                                 relire
-                                    ? 'Les annales envoyées en relecture par les autres apparaîtront ici.'
+                                    ? 'Les sujets envoyés en relecture par les autres apparaîtront ici.'
                                     : 'Importez un sujet scanné : l’IA le transcrit, vous vérifiez, un relecteur publie.'
                             }
                             action={
@@ -381,7 +387,7 @@ export default function Annales({
                                         taille="compacte"
                                     >
                                         <Link href={index()}>
-                                            Toutes les annales
+                                            Tous les sujets
                                         </Link>
                                     </Button>
                                 )
@@ -398,7 +404,7 @@ export default function Annales({
                         </ul>
                         <div className="flex flex-wrap items-center justify-between gap-3 border-t px-5 py-3">
                             <p className="text-aide text-ink-500">
-                                {pluriel(sujets.total, 'annale')}
+                                {pluriel(sujets.total, 'sujet')}
                             </p>
                             <Pagination
                                 page={sujets.page}
@@ -515,7 +521,7 @@ function LigneImport({ entree }: { entree: ImportResume }) {
                 )}
                 {entree.statut === 'pret' && entree.sujet ? (
                     <Button asChild taille="compacte">
-                        <Link href={show(entree.sujet)}>Vérifier l’annale</Link>
+                        <Link href={show(entree.sujet)}>Vérifier le sujet</Link>
                     </Button>
                 ) : entree.peut_relancer ? (
                     <Button
@@ -580,7 +586,7 @@ function LigneAnnale({
                     </p>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 sm:justify-end">
-                    <BadgeStatut statut={sujet.statut} />
+                    <BadgeStatut statut={sujet.statut} genre="masculin" />
                     {sujet.a_verifier > 0 && (
                         <span className="flex items-center gap-1 text-meta font-medium text-indice-700 dark:text-indice-400">
                             <Sparkles aria-hidden className="size-3.5" />

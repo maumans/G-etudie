@@ -20,7 +20,7 @@ use RuntimeException;
  * Cours de démonstration côté élève (lot 2, développement seulement) :
  * leçons **publiées** et QCM **fictifs** pour les matières phares du BEPC et
  * du Bac SE, tous marqués `est_exemple` (bandeau « EXEMPLE — contenu
- * fictif », CLAUDE.md § 5). Ni sujet d'annale, ni programme officiel : de
+ * fictif », CLAUDE.md § 5). Ni sujet de sujet, ni programme officiel : de
  * quoi voir les écrans pleins et faire un premier exercice.
  *
  * Leçons et questions passent par ContenuService, comme dans la réalité :

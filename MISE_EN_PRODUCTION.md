@@ -758,6 +758,14 @@ les reconstruit depuis la base.
   écrites décrites dans `TERRAIN.md`.
 - **Contrôles** : § 9, point 12 ; `A_TESTER.md`, lot 14 ; `TERRAIN.md`.
 
+### « Sujet » au lieu d'« annale » (2026-11-21)
+
+- Rien de plus : pas de migration, pas de `.env`. Les adresses
+  `/eleve/annales…` et `/contenu/annales…` deviennent `/eleve/sujets…` et
+  `/contenu/sujets…` ; les anciennes redirigent (301, paramètres
+  compris). Un `php artisan route:cache` (étape habituelle du déploiement)
+  prend les nouvelles routes.
+
 ---
 
 ## 9. Vérifications après la mise en ligne

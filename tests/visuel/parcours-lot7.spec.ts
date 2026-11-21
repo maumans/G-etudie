@@ -289,7 +289,7 @@ test('lot 7 — un pack téléchargé : mode avion, séance complète, rechargem
         ATTENTE,
     );
 
-    // La fiche du chapitre et une annale, depuis le pack.
+    // La fiche du chapitre et un sujet, depuis le pack.
     // Adresse tapée hors ligne : la page de la matière, depuis le pack.
     await page.goto('/eleve/cours/maths');
     await expect(
@@ -298,8 +298,8 @@ test('lot 7 — un pack téléchargé : mode avion, séance complète, rechargem
     await page.getByRole('link', { name: 'Fiche de révision' }).first().click();
     await expect(page).toHaveURL(/\/fiche$/, ATTENTE);
     await page.goBack();
-    await page.locator('a[href^="/eleve/annales/"]').first().click();
-    await expect(page).toHaveURL(/\/eleve\/annales\//, ATTENTE);
+    await page.locator('a[href^="/eleve/sujets/"]').first().click();
+    await expect(page).toHaveURL(/\/eleve\/sujets\//, ATTENTE);
     await page.goBack();
 
     // Une séance de la matière, faite jusqu'au bout sans réseau.

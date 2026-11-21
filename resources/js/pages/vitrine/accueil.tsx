@@ -56,7 +56,7 @@ const EXAMENS: {
     {
         nom: 'Baccalauréat unique',
         niveau: 'Séries SM, SE et SS',
-        detail: 'Le programme de votre série, et les annales qui vont avec.',
+        detail: 'Le programme de votre série, et les sujets qui vont avec.',
         image: 'bac',
     },
 ];
@@ -75,7 +75,7 @@ const MATIERES_VITRINE: CleMatiere[] = [
 /** Ce que la plateforme apporte, sous le héros. */
 const PREUVES: { titre: string; texte: string; icone: LucideIcon }[] = [
     {
-        titre: 'Annales corrigées depuis 2010',
+        titre: 'Sujets corrigés depuis 2010',
         texte: 'Chaque sujet dit sa session, sa série et sa matière.',
         icone: FileCheck2,
     },
@@ -167,7 +167,7 @@ const QUESTIONS: { question: string; reponse: string }[] = [
     {
         question: 'Est-ce gratuit ?',
         reponse:
-            'Les cours, une partie des annales et une matière hors connexion sont gratuits. Les corrigés détaillés de toutes les annales, les examens blancs sans limite et toutes les matières hors connexion font partie de l’abonnement (voir les tarifs).',
+            'Les cours, une partie des sujets et une matière hors connexion sont gratuits. Les corrigés détaillés de tous les sujets, les examens blancs sans limite et toutes les matières hors connexion font partie de l’abonnement (voir les tarifs).',
     },
     {
         question: 'Faut-il une connexion internet ?',
@@ -235,8 +235,8 @@ export default function Accueil({
                             <strong>le CEE, le BEPC et le Bac.</strong>
                         </h1>
                         <p className="max-w-[32rem] text-[1.0625rem] leading-relaxed text-ink-600">
-                            Cours, annales corrigées, exercices, examens blancs
-                            et suivi de vos progrès, même hors connexion.
+                            Cours, sujets corrigés, exercices, examens blancs et
+                            suivi de vos progrès, même hors connexion.
                         </p>
                         <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row">
                             <Button asChild taille="grande">
@@ -365,7 +365,7 @@ export default function Accueil({
                                 Un parcours pour <strong>chaque examen</strong>
                             </>
                         }
-                        texte="Du primaire au Baccalauréat unique : les cours, les annales et les examens blancs de votre classe, au programme guinéen."
+                        texte="Du primaire au Baccalauréat unique : les cours, les sujets et les examens blancs de votre classe, au programme guinéen."
                     />
                     <ul className="grid gap-5 md:grid-cols-3">
                         {EXAMENS.map((examen) => (
@@ -429,7 +429,7 @@ export default function Accueil({
                         <div className="grid gap-6 rounded-panneau border bg-card p-5 shadow-carte sm:p-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-12">
                             <div className="grid content-start justify-items-start gap-3">
                                 <h3 className="text-[1.5rem] leading-tight titre-contraste">
-                                    Les annales, <strong>en accès libre</strong>
+                                    Les sujets, <strong>en accès libre</strong>
                                 </h3>
                                 <p className="text-ink-600">
                                     L’énoncé de chaque sujet se lit sans compte
@@ -441,7 +441,7 @@ export default function Accueil({
                                     className="mt-2"
                                 >
                                     <Link href={annales()} prefetch>
-                                        Toutes les annales
+                                        Tous les sujets
                                         <ArrowRight aria-hidden />
                                     </Link>
                                 </Button>
@@ -860,7 +860,7 @@ function Tarification({ tarifs }: { tarifs: Tarifs }) {
                             Des tarifs <strong>à la portée de chacun</strong>
                         </>
                     }
-                    texte="Commencez gratuitement, sans limite de durée. L’abonnement ajoute les corrigés de toutes les annales, les examens blancs et toutes les matières hors connexion."
+                    texte="Commencez gratuitement, sans limite de durée. L’abonnement ajoute les corrigés de tous les sujets, les examens blancs et toutes les matières hors connexion."
                 />
                 <div className="grid gap-5 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
                     <div className="grid content-start gap-5 rounded-panneau border bg-background p-6 sm:p-8">

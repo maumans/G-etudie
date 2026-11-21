@@ -18,7 +18,7 @@ use Inertia\Response;
  */
 class Seo
 {
-    public const DESCRIPTION = 'Cours, annales corrigées depuis 2010, exercices et examens blancs pour réussir le CEE, le BEPC et le Baccalauréat unique (SM, SE, SS) en Guinée, même hors connexion.';
+    public const DESCRIPTION = 'Cours, sujets corrigés depuis 2010, exercices et examens blancs pour réussir le CEE, le BEPC et le Baccalauréat unique (SM, SE, SS) en Guinée, même hors connexion.';
 
     /**
      * @param  list<array<string, mixed>>  $jsonLd  données structurées (schema.org)

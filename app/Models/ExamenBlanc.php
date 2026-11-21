@@ -16,7 +16,7 @@ use Illuminate\Support\Carbon;
  * @property string $uuid créé sur l'appareil (v7), clé d'idempotence
  * @property int $user_id
  * @property int $sujet_id
- * @property int $version version de l'annale passée
+ * @property int $version version du sujet passée
  * @property string $mode `conditions_reelles`
  * @property int $duree_minutes
  * @property string $origine_duree `imprimee`, `epreuve` ou `choisie`

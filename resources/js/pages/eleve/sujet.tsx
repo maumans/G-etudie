@@ -34,7 +34,7 @@ import {
 } from '@/lib/contenu/sujets';
 import { MATIERES } from '@/lib/matieres';
 import { cn, pluriel } from '@/lib/utils';
-import { index } from '@/routes/eleve/annales';
+import { index } from '@/routes/eleve/sujets';
 
 type Mode = 'lecture' | 'entrainement' | 'examen';
 
@@ -45,12 +45,12 @@ type Props = {
     question: string | null;
     /** Dernier score de l'élève par question (uuid → 0-100, null : à auto-évaluer). */
     scores: Record<string, number | null>;
-    /** Durée de l'épreuve saisie par l'équipe, si l'annale n'imprime pas la sienne. */
+    /** Durée de l'épreuve saisie par l'équipe, si le sujet n'imprime pas la sienne. */
     duree_epreuve: number | null;
 };
 
 /**
- * Une annale (PLAN M6), en trois modes :
+ * Un sujet (PLAN M6), en trois modes :
  *  - **Lecture** : l'énoncé partie par partie, et sous chaque question son
  *    corrigé, dévoilé à la demande ;
  *  - **Entraînement** : question par question, avec indices, réponse par
@@ -97,7 +97,7 @@ export default function Annale({
                     >
                         <Link href={index()} prefetch>
                             <ArrowLeft aria-hidden />
-                            Les annales
+                            Les sujets
                         </Link>
                     </Button>
                     <header className="flex min-w-0 items-start gap-3.5">

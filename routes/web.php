@@ -2,6 +2,7 @@
 
 use App\Enums\Permission;
 use App\Http\Controllers\AiguillageController;
+use App\Http\Controllers\AnciennesAdressesController;
 use App\Http\Controllers\Contenu\TableauDeBordController as ContenuTableauDeBordController;
 use App\Http\Controllers\Vitrine\PartageController;
 use App\Http\Controllers\Vitrine\PlanSiteController;
@@ -11,7 +12,7 @@ use App\Http\Controllers\VitrineController;
 use App\Http\Middleware\SeulementEnDeveloppement;
 use Illuminate\Support\Facades\Route;
 
-// Vitrine (habillage public) : accueil, annales publiques, plan du site,
+// Vitrine (habillage public) : accueil, sujets publics, plan du site,
 // images de partage (lot 8). Sans compte, donc sans `can:`.
 Route::get('/', VitrineController::class)->name('home');
 Route::get('sujets', [SujetPublicController::class, 'index'])->name('vitrine.sujets.index');
@@ -24,6 +25,14 @@ Route::get('partage/n-karamogo.png', [PartageController::class, 'generale'])->na
 Route::get('partage/sujets/{slug}.png', [PartageController::class, 'sujet'])
     ->where('slug', '[a-z0-9-]+')
     ->name('partage.image.sujet');
+
+// On dit « sujet », plus « annale » (2026-11-21) : les anciennes adresses
+// mènent aux nouvelles, paramètres compris. Sans compte : la page d'arrivée
+// vérifie la connexion et la permission.
+Route::get('eleve/annales/{reste?}', AnciennesAdressesController::class)->where('reste', '.*');
+Route::get('eleve/documents/annales/{reste}', AnciennesAdressesController::class)->where('reste', '.*');
+Route::get('contenu/annales/{reste?}', AnciennesAdressesController::class)->where('reste', '.*');
+Route::get('contenu/relecture/annales', AnciennesAdressesController::class);
 
 // Catalogue du design system Ardoise : développement et tests seulement.
 Route::inertia('dev/composants', 'dev/composants')

@@ -17,9 +17,9 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidationException;
 
 /*
- * Une annale se relit avec toutes ses questions (SujetService) : un seul
- * geste du relecteur, jamais l'auteur ; une question d'annale ne se relit
- * pas seule ; archivée, l'annale disparaît du catalogue, ses questions
+ * Un sujet se relit avec toutes ses questions (SujetService) : un seul
+ * geste du relecteur, jamais l'auteur ; une question de sujet ne se relit
+ * pas seule ; archivé, le sujet disparaît du catalogue, ses questions
  * aussi.
  */
 
@@ -32,7 +32,7 @@ beforeEach(function () {
     $this->pedagogie = User::factory()->avecRole(Role::AdminContenu)->create();
 });
 
-/** Une annale de BEPC en brouillon, avec une question complète (QCM, corrigé). */
+/** Un sujet de BEPC en brouillon, avec une question complète (QCM, corrigé). */
 function annaleDeTest(object $test, int $questions = 1): Sujet
 {
     $sujet = $test->sujets->creer($test->redacteur, [
@@ -75,7 +75,7 @@ test('le relecteur publie l\'annale et toutes ses questions d\'un geste ; la ver
         ->and($version->blocs['parties'][0]['questions'])->toBe($questions->pluck('uuid')->all());
 });
 
-test('l\'auteur ne relit pas son annale ; le renvoi rend tout au brouillon', function () {
+test('l\'auteur ne relit pas son sujet ; le renvoi rend tout au brouillon', function () {
     $sujet = $this->sujets->soumettre(annaleDeTest($this), $this->redacteur);
 
     expect(fn () => $this->sujets->publier($sujet, $this->redacteur))
@@ -109,7 +109,7 @@ test('une question d\'annale ne se relit pas seule, ni ne part seule en relectur
 
     $this->sujets->soumettre($sujet, $this->redacteur);
 
-    // Elle n'est pas dans la file des questions, mais l'annale est dans la sienne.
+    // Elle n'est pas dans la file des questions, mais le sujet est dans la sienne.
     $this->actingAs($this->relecteur)->get(route('contenu.questions.relecture'))
         ->assertInertia(fn ($page) => $page->where('questions.total', 0)->where('annales_a_relire', 1));
     $this->post(route('contenu.questions.publier', $question))->assertForbidden();
@@ -119,13 +119,13 @@ test('retirer une question jamais publiée la supprime ; une question publiée r
     $sujet = annaleDeTest($this, 2);
     [$premiere, $seconde] = $sujet->questions()->get()->all();
 
-    $this->actingAs($this->redacteur)->delete(route('contenu.annales.questions.destroy', $premiere))->assertRedirect();
+    $this->actingAs($this->redacteur)->delete(route('contenu.sujets.questions.destroy', $premiere))->assertRedirect();
     expect(Question::query()->find($premiere->id))->toBeNull();
 
     $this->sujets->publier($this->sujets->soumettre($sujet->fresh(), $this->redacteur), $this->relecteur);
     $this->contenu->ouvrirModification($sujet->fresh(), $this->redacteur);
 
-    $this->delete(route('contenu.annales.questions.destroy', $seconde))
+    $this->delete(route('contenu.sujets.questions.destroy', $seconde))
         ->assertSessionHasErrors(['question' => 'Une question déjà publiée ne se retire pas : archivez-la depuis sa fiche.']);
 });
 
@@ -141,14 +141,14 @@ test('archivée, l\'annale sort du catalogue de l\'élève, ses questions aussi'
 
     expect(CatalogueEleve::sujets($profil)->count())->toBe(0)
         ->and(CatalogueEleve::questions($profil)->whereNotNull('sujet_partie_id')->count())->toBe(0);
-    $this->actingAs($eleve)->get(route('eleve.annales.show', $sujet))->assertNotFound();
+    $this->actingAs($eleve)->get(route('eleve.sujets.show', $sujet))->assertNotFound();
 });
 
 test('une partie se modifie en brouillon seulement, avec une consigne valide', function () {
     $sujet = annaleDeTest($this);
     $partie = $sujet->parties()->first();
 
-    $this->actingAs($this->redacteur)->put(route('contenu.annales.parties.update', $partie), [
+    $this->actingAs($this->redacteur)->put(route('contenu.sujets.parties.update', $partie), [
         'titre' => 'Exercice 1 (révisé)', 'bareme' => 4.5, 'consigne' => blocsDeTest('Soit ABC un triangle.'),
     ])->assertRedirect();
 
@@ -156,13 +156,13 @@ test('une partie se modifie en brouillon seulement, avec une consigne valide', f
         ->and($partie->fresh()->bareme)->toBe('4.50')
         ->and($partie->fresh()->consigne)->toEqual(blocsDeTest('Soit ABC un triangle.'));
 
-    $this->put(route('contenu.annales.parties.update', $partie), [
+    $this->put(route('contenu.sujets.parties.update', $partie), [
         'titre' => 'X', 'bareme' => null, 'consigne' => ['type' => 'doc', 'content' => [['type' => 'script']]],
     ])->assertSessionHasErrors('consigne');
 
     // En relecture, plus de retouche.
     $this->sujets->soumettre($sujet->fresh(), $this->redacteur);
-    $this->put(route('contenu.annales.parties.update', $partie), ['titre' => 'Autre', 'bareme' => null, 'consigne' => blocsDeTest()])
+    $this->put(route('contenu.sujets.parties.update', $partie), ['titre' => 'Autre', 'bareme' => null, 'consigne' => blocsDeTest()])
         ->assertSessionHasErrors('statut');
 });
 
@@ -170,11 +170,11 @@ test('un autre rédacteur consulte l\'annale mais ne la modifie pas', function (
     $sujet = annaleDeTest($this);
     $autre = User::factory()->avecRole(Role::Redacteur)->create();
 
-    $this->actingAs($autre)->get(route('contenu.annales.show', $sujet))->assertOk()
-        ->assertInertia(fn ($page) => $page->component('contenu/annales/fiche')->where('droits.rediger', false));
-    $this->put(route('contenu.annales.update', $sujet), ['titre' => 'Piraté', 'session' => 2021, 'revision' => $sujet->revision])
+    $this->actingAs($autre)->get(route('contenu.sujets.show', $sujet))->assertOk()
+        ->assertInertia(fn ($page) => $page->component('contenu/sujets/fiche')->where('droits.rediger', false));
+    $this->put(route('contenu.sujets.update', $sujet), ['titre' => 'Piraté', 'session' => 2021, 'revision' => $sujet->revision])
         ->assertForbidden();
 
     // Un élève n'entre pas dans le back-office (le `can:` de la route).
-    $this->actingAs(eleveAvecProfil('BEPC'))->get(route('contenu.annales.show', $sujet))->assertForbidden();
+    $this->actingAs(eleveAvecProfil('BEPC'))->get(route('contenu.sujets.show', $sujet))->assertForbidden();
 });

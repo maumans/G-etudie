@@ -66,9 +66,9 @@ import {
     telechargements as telechargementsEleve,
     tuteur as tuteurEleve,
 } from '@/routes/eleve';
-import { index as annalesEleve } from '@/routes/eleve/annales';
+import { index as annalesEleve } from '@/routes/eleve/sujets';
 import { index as examensBlancs } from '@/routes/eleve/examens-blancs';
-import { index as indexAnnales } from '@/routes/contenu/annales';
+import { index as indexAnnales } from '@/routes/contenu/sujets';
 import { index as indexSignalements } from '@/routes/contenu/signalements';
 import { index as indexRessources } from '@/routes/contenu/ressources';
 import { index as indexModeration } from '@/routes/contenu/moderation';
@@ -91,10 +91,10 @@ export const NAVIGATION_ELEVE: EntreeNavigation[] = [
         actifAussiSous: ['/eleve/lecons', '/eleve/chapitres'],
     },
     {
-        libelle: 'Annales',
+        libelle: 'Sujets',
         icone: FileText,
         href: annalesEleve().url,
-        actifSous: '/eleve/annales',
+        actifSous: '/eleve/sujets',
     },
     {
         libelle: 'Examens blancs',
@@ -189,10 +189,10 @@ export const NAVIGATION_CONTENU: EntreeNavigation[] = [
         actifSous: '/contenu/questions',
     },
     {
-        libelle: 'Annales',
+        libelle: 'Sujets',
         icone: FileText,
         href: indexAnnales().url,
-        actifSous: '/contenu/annales',
+        actifSous: '/contenu/sujets',
     },
     {
         libelle: 'Relecture',

@@ -3,7 +3,7 @@ import type { QuestionEleve } from '@/lib/contenu/questions';
 import type { CleMatiere } from '@/lib/matieres';
 
 /**
- * Une annale telle que l'élève la reçoit (`App\Support\PresentationSujet`) :
+ * Un sujet tel que l'élève la reçoit (`App\Support\PresentationSujet`) :
  * la version publiée de la structure, et la version publiée de chaque
  * question. Un objet de contenu (HORS_LIGNE.md A.4) : l'écran ne sait pas
  * s'il vient des props ou d'un pack (lot 7).

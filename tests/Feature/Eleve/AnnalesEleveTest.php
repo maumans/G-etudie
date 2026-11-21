@@ -30,7 +30,7 @@ beforeEach(function () {
     $this->eleve = eleveAvecProfil('BEPC');
 });
 
-test('l\'élève voit les annales de son examen, pas celles des autres ; un brouillon ou un autre examen : 404', function () {
+test('l\'élève voit les sujets de son examen, pas celles des autres ; un brouillon ou un autre examen : 404', function () {
     $bepc = Examen::where('code', 'BEPC')->sole();
     $bac = Examen::where('code', 'BAC')->sole();
     $maths = Matiere::where('slug', 'maths')->sole();
@@ -41,18 +41,18 @@ test('l\'élève voit les annales de son examen, pas celles des autres ; un brou
         'session' => 2020, 'type' => TypeSujet::Officiel, 'titre' => 'Brouillon',
     ]);
 
-    $this->actingAs($this->eleve)->get(route('eleve.annales.index'))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
-            ->component('eleve/annales')
+            ->component('eleve/sujets')
             ->where('resume.sujets', 1)
             ->where('resume.exercices', 1)
             ->has('sujets.donnees', 1)
             ->where('sujets.donnees.0.uuid', $siennes->uuid)
             ->where('sujets.donnees.0.libelle_session', 'BEPC 2024'));
 
-    $this->get(route('eleve.annales.show', $autre))->assertNotFound();
-    $this->get(route('eleve.annales.show', $brouillon))->assertNotFound();
+    $this->get(route('eleve.sujets.show', $autre))->assertNotFound();
+    $this->get(route('eleve.sujets.show', $brouillon))->assertNotFound();
 });
 
 test('la fiche reçoit l\'objet de contenu : versions publiées, question retirée absente', function () {
@@ -60,7 +60,7 @@ test('la fiche reçoit l\'objet de contenu : versions publiées, question retir�
     $retiree = $sujet->questions()->orderBy('ordre_sujet')->get()[1];
     app(ContenuService::class)->archiver($retiree, User::factory()->avecRole(Role::AdminContenu)->create());
 
-    $this->actingAs($this->eleve)->get(route('eleve.annales.show', ['sujet' => $sujet, 'mode' => 'entrainement']))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.show', ['sujet' => $sujet, 'mode' => 'entrainement']))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page
             ->where('mode', 'entrainement')
@@ -81,7 +81,7 @@ test('« Exercices par chapitre » ne montre que le chapitre demandé, recherche
 
     $chapitre = $this->notion->chapitre_id;
 
-    $this->actingAs($this->eleve)->get(route('eleve.annales.index', ['vue' => 'exercices', 'chapitre' => $chapitre]))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.index', ['vue' => 'exercices', 'chapitre' => $chapitre]))
         ->assertInertia(fn (Assert $page) => $page
             ->where('sujets', null)
             ->where('exercices.total', 2)
@@ -90,11 +90,11 @@ test('« Exercices par chapitre » ne montre que le chapitre demandé, recherche
             ->where('exercices.donnees.1.libelle_session', 'BEPC 2022')
             ->has('chapitres', 2));
 
-    $this->get(route('eleve.annales.index', ['vue' => 'exercices', 'recherche' => 'identités']))
+    $this->get(route('eleve.sujets.index', ['vue' => 'exercices', 'recherche' => 'identités']))
         ->assertInertia(fn (Assert $page) => $page->where('exercices.total', 1));
 });
 
-test('une réponse d\'entraînement sur une annale passe par la file et compte', function () {
+test('une réponse d\'entraînement sur un sujet passe par la file et compte', function () {
     $sujet = annalePubliee(Examen::where('code', 'BEPC')->sole(), null, Matiere::where('slug', 'maths')->sole(), 2024, [$this->notion]);
     $question = $sujet->questions()->sole();
     $jeton = appareilDe($this->eleve);
@@ -107,7 +107,7 @@ test('une réponse d\'entraînement sur une annale passe par la file et compte',
     expect($tentative->mode)->toBe(ModeTentative::Entrainement)
         ->and($tentative->score)->toBe(100);
 
-    $this->actingAs($this->eleve)->get(route('eleve.annales.show', $sujet))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.show', $sujet))
         ->assertInertia(fn (Assert $page) => $page->where("scores.{$question->uuid}", 100));
 });
 
@@ -115,16 +115,16 @@ test('le document original : l\'élève qui lit l\'annale l\'ouvre, les autres n
     Storage::disk('local')->put('annales/doc.pdf', '%PDF');
     $sujet = annalePubliee(Examen::where('code', 'BEPC')->sole(), null, Matiere::where('slug', 'maths')->sole(), 2024, [$this->notion], document: true);
 
-    $this->actingAs($this->eleve)->get(route('eleve.annales.document', $sujet))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.document', $sujet))
         ->assertOk()
         ->assertHeader('Content-Type', 'application/pdf');
 
-    $this->actingAs(eleveAvecProfil('BAC', 'SE'))->get(route('eleve.annales.document', $sujet))->assertNotFound();
+    $this->actingAs(eleveAvecProfil('BAC', 'SE'))->get(route('eleve.sujets.document', $sujet))->assertNotFound();
 
     // Le service worker ne copie pas un PDF de plusieurs Mo : la règle de
     // la liste blanche (préfixe par segment, « $ » final borné).
     $segments = fn (string $chemin) => array_values(array_filter(explode('/', $chemin)));
-    $cible = $segments((string) parse_url(route('eleve.annales.document', $sujet), PHP_URL_PATH));
+    $cible = $segments((string) parse_url(route('eleve.sujets.document', $sujet), PHP_URL_PATH));
     $garde = collect(config('hors_ligne.pages'))->contains(function (string $motif) use ($segments, $cible) {
         $borne = str_ends_with($motif, '$');
         $prefixe = $segments(rtrim($motif, '$'));
@@ -136,7 +136,7 @@ test('le document original : l\'élève qui lit l\'annale l\'ouvre, les autres n
     expect($garde)->toBeFalse();
 });
 
-test('une question d\'annale publiée dit d\'où elle vient, aussi dans une séance', function () {
+test('une question d\'sujet publié dit d\'où elle vient, aussi dans une séance', function () {
     $sujet = annalePubliee(Examen::where('code', 'BEPC')->sole(), null, Matiere::where('slug', 'maths')->sole(), 2019, [$this->notion]);
 
     expect(PresentationQuestion::publiee($sujet->questions()->sole())['annale'])->toBe('BEPC 2019')
@@ -144,16 +144,16 @@ test('une question d\'annale publiée dit d\'où elle vient, aussi dans une séa
 });
 
 test('sans annale, l\'élève a un état vide ; l\'écran ne casse pas', function () {
-    $this->actingAs($this->eleve)->get(route('eleve.annales.index'))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.index'))
         ->assertOk()
         ->assertInertia(fn (Assert $page) => $page->where('resume.sujets', 0)->has('matieres', 0));
 });
 
-test('la notion d\'une annale d\'une autre classe n\'entre pas dans le catalogue de l\'élève', function () {
+test('la notion d\'un sujet d\'une autre classe n\'entre pas dans le catalogue de l\'élève', function () {
     $terminale = notionAilleurs('chimie', 'Terminale', 'Le pH');
     $bac = Examen::where('code', 'BAC')->sole();
     annalePubliee($bac, Serie::where('code', 'SE')->sole(), Matiere::where('slug', 'chimie')->sole(), 2024, [$terminale]);
 
-    $this->actingAs($this->eleve)->get(route('eleve.annales.index'))
+    $this->actingAs($this->eleve)->get(route('eleve.sujets.index'))
         ->assertInertia(fn (Assert $page) => $page->where('resume.sujets', 0)->where('resume.exercices', 0));
 });

@@ -12,7 +12,7 @@ import { formaterGnf } from '@/lib/utils';
 /** Une prochaine session saisie par l'équipe (jamais devinée). */
 export type SessionExamen = { examen: string; nom: string; date: string };
 
-/** Une ligne de liste d'annale publique (`AnnalesPubliques::carte`). */
+/** Une ligne de liste de sujet public (`AnnalesPubliques::carte`). */
 export type CarteSujet = {
     slug: string;
     titre: string;

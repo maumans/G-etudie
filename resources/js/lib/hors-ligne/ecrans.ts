@@ -3,7 +3,7 @@
  * partagée à chaque page par `hors_ligne_pages` (config/hors_ligne.php).
  *
  * Préfixes comparés **par segment** : « /lecons » couvre « /lecons/12 », pas
- * « /lecons-admin » ; un « $ » final borne le préfixe (« /annales$ » = la
+ * « /lecons-admin » ; un « $ » final borne le préfixe (« /sujets$ » = la
  * liste seulement).
  *
  * ⚠ Copie conforme de `estEcranGarde` dans resources/service-worker/sw.js :

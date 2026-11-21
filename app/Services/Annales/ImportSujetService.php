@@ -36,9 +36,9 @@ use Throwable;
  *
  *  1. `demarrer` garde le document (disque privé) et met l'import en file ;
  *  2. `traiter` (job TraiterImportSujet) fait lire le document par
- *     l'extracteur, vérifie la proposition et crée l'annale **en brouillon**,
+ *     l'extracteur, vérifie la proposition et crée le sujet **en brouillon**,
  *     chaque question marquée « réponse à vérifier » ;
- *  3. le rédacteur vérifie, puis l'annale suit le circuit (SujetService).
+ *  3. le rédacteur vérifie, puis le sujet suit le circuit (SujetService).
  *
  * L'énoncé n'est jamais perdu : une réponse proposée incohérente fait passer
  * la question en question ouverte, avec un avertissement.
@@ -56,7 +56,7 @@ class ImportSujetService
     public function demarrer(User $auteur, UploadedFile $fichier, array $cible): ImportSujet
     {
         if (! $auteur->can(Permission::ImporterAnnales->value)) {
-            throw new AuthorizationException('Vous ne pouvez pas importer d\'annale.');
+            throw new AuthorizationException('Vous ne pouvez pas importer de sujet.');
         }
 
         if ($this->notions($cible['examen'], $cible['matiere']) === []) {
@@ -119,7 +119,7 @@ class ImportSujetService
     }
 
     /**
-     * Lit le document et crée l'annale en brouillon. Ne lève jamais : un
+     * Lit le document et crée le sujet en brouillon. Ne lève jamais : un
      * échec est noté sur l'import, avec sa raison.
      */
     public function traiter(ImportSujet $import): ImportSujet
@@ -163,7 +163,7 @@ class ImportSujetService
     }
 
     /**
-     * La proposition devient une annale en brouillon : parties, consignes,
+     * La proposition devient un sujet en brouillon : parties, consignes,
      * questions (réponses à vérifier). Tout ou rien.
      *
      * @param  array<int, string>  $notions

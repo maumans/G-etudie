@@ -60,7 +60,7 @@ class AnnaleController extends Controller
         $tousSujets = CatalogueEleve::sujets($profil)->get(['id', 'matiere_id', 'session', 'est_exemple']);
         $faites = Tentative::query()->where('user_id', $request->user()->id)->distinct()->pluck('question_id')->flip();
 
-        return Inertia::render('eleve/annales', [
+        return Inertia::render('eleve/sujets', [
             'examen' => $profil->libelleExamen(),
             'filtres' => $filtres,
             'est_exemple' => $tousSujets->contains('est_exemple', true),
@@ -92,7 +92,7 @@ class AnnaleController extends Controller
         $contenu = PresentationSujet::publiee($sujet) ?? abort(404);
 
         // Lot 9 : le corrigé détaillé est réservé aux abonnés, sauf
-        // l'annale la plus récente et celles que l'équipe a ouvertes.
+        // le sujet le plus récent et celles que l'équipe a ouvertes.
         if (! $this->droits->corrigeOuvert($request->user(), $sujet)) {
             $contenu = PresentationSujet::sansCorrige($contenu);
         }
@@ -118,13 +118,13 @@ class AnnaleController extends Controller
             ? $request->string('mode')->toString()
             : 'lecture';
 
-        return Inertia::render('eleve/annale', [
+        return Inertia::render('eleve/sujet', [
             'sujet' => $contenu,
             'mode' => $mode,
             'question' => $request->string('question')->toString() ?: null,
             'scores' => (object) $scores->all(),
             // Lot 5 : la durée de l'épreuve saisie par l'équipe, quand
-            // l'annale n'imprime pas la sienne (sinon, l'élève choisit).
+            // le sujet n'imprime pas la sienne (sinon, l'élève choisit).
             'duree_epreuve' => self::dureeEpreuve($sujet),
         ]);
     }
@@ -204,7 +204,7 @@ class AnnaleController extends Controller
     }
 
     /**
-     * Les exercices d'annales d'un chapitre (ou de tous), du plus récent au
+     * Les exercices de sujets d'un chapitre (ou de tous), du plus récent au
      * plus ancien : la vue que les élèves n'ont nulle part ailleurs.
      *
      * @param  array<string, mixed>  $filtres
@@ -253,7 +253,7 @@ class AnnaleController extends Controller
     }
 
     /**
-     * Les chapitres où des annales ont des exercices, avec leur nombre.
+     * Les chapitres où des sujets ont des exercices, avec leur nombre.
      *
      * @return list<array{id: int, titre: string, matiere: string, cle: string, exercices: int}>
      */
@@ -283,7 +283,7 @@ class AnnaleController extends Controller
     }
 
     /**
-     * Les questions d'annales que l'élève peut recevoir.
+     * Les questions de sujets que l'élève peut recevoir.
      *
      * @return Builder<Question>
      */

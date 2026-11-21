@@ -57,7 +57,7 @@ return [
     'tarifs' => [
         'gratuit' => [
             'Les cours de toutes les matières de votre examen',
-            'Une partie des annales, avec leurs corrigés',
+            'Une partie des sujets, avec leurs corrigés',
             'La séance du jour et la jauge de préparation',
             'Une matière téléchargée pour réviser hors connexion',
         ],
@@ -79,7 +79,7 @@ return [
         ],
         'abonnement' => [
             'Tout ce qui est gratuit',
-            'Les corrigés détaillés de toutes les annales depuis 2010',
+            'Les corrigés détaillés de tous les sujets depuis 2010',
             'Les examens blancs, sans limite',
             'Toutes les matières de votre examen hors connexion',
         ],

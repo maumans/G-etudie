@@ -61,7 +61,7 @@ export default function ContenuPage({
                     />
                     <ChiffreCle
                         icone={<FileText aria-hidden className={icone} />}
-                        libelle="Annales publiées"
+                        libelle="Sujets publiés"
                         valeur={formaterNombre(contenu.publies.annales)}
                         note={`${formaterNombre(contenu.en_relecture.annales)} en relecture · ${formaterNombre(contenu.imports_en_cours)} import(s) en cours`}
                     />

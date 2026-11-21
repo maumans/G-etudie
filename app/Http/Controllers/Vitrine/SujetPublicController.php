@@ -14,7 +14,7 @@ use Inertia\Inertia;
 use Inertia\Response;
 
 /**
- * Les annales publiques (lot 8, PLAN M1 « SEO ») : une page par sujet, ce
+ * Les sujets publics (lot 8, PLAN M1 « SEO ») : une page par sujet, ce
  * que les élèves tapent dans Google (« sujet bac sm 2019 maths »). L'énoncé
  * est visible ; le corrigé est réservé aux inscrits. Qui est public : seule
  * AnnalesPubliques en décide (D5).
@@ -66,7 +66,7 @@ class SujetPublicController extends Controller
         ]);
 
         return Seo::appliquer($reponse, Seo::page(
-            titre: 'Annales du CEE, du BEPC et du Bac',
+            titre: 'Sujets corrigés du CEE, du BEPC et du Bac',
             description: 'Les sujets du CEE, du BEPC et du Baccalauréat unique (SM, SE, SS) depuis 2010, par matière et par année : l’énoncé en clair, le corrigé pas à pas pour les inscrits.',
             // Une page filtrée reste la même liste : une seule adresse canonique par filtre.
             canonique: route('vitrine.sujets.index', array_filter(['examen' => $examen, 'matiere' => $matiere?->slug])),

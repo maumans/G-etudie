@@ -81,7 +81,7 @@ export type QuestionEleve = {
     matiere: string;
     matiere_nom: string;
     notion: string;
-    /** « BEPC 2019 » : la session de l'annale d'où vient la question (lot 4). */
+    /** « BEPC 2019 » : la session du sujet d'où vient la question (lot 4). */
     annale?: string | null;
     /** Lot 12 : la source d'une question de culture générale. */
     sources?: string | null;

@@ -48,8 +48,8 @@ import type {
 import { formaterJourHeure } from '@/lib/dates';
 import { MATIERES } from '@/lib/matieres';
 import { cn } from '@/lib/utils';
-import { show as ficheAnnale } from '@/routes/contenu/annales';
-import { verifier } from '@/routes/contenu/annales/questions';
+import { show as ficheAnnale } from '@/routes/contenu/sujets';
+import { verifier } from '@/routes/contenu/sujets/questions';
 import { index, show, soumettre, update } from '@/routes/contenu/questions';
 import type { QuestionResume } from './index';
 
@@ -366,7 +366,7 @@ export default function Edition({
                                 prefetch
                             >
                                 <ArrowLeft aria-hidden />
-                                L’annale
+                                Le sujet
                             </Link>
                         ) : (
                             <Link href={index()} prefetch>
@@ -471,7 +471,7 @@ export default function Edition({
                         <p className="text-aide text-ink-600">
                             {question.annale.a_verifier
                                 ? 'L’énoncé a été transcrit du document ; la réponse attendue et le corrigé sont des propositions de l’IA. Comparez l’énoncé au document original, corrigez ce qui doit l’être, puis confirmez.'
-                                : 'Réponse vérifiée. Cette question partira en relecture avec son annale.'}
+                                : 'Réponse vérifiée. Cette question partira en relecture avec son sujet.'}
                         </p>
                     </div>
                 </div>

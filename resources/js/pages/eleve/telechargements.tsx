@@ -173,7 +173,7 @@ export default function Telechargements({
                     </h1>
                     <p className="max-w-xl text-ink-600">
                         Télécharge une matière une fois : ses leçons, ses fiches
-                        et ses annales s’ouvrent ensuite sans connexion, et tes
+                        et ses sujets s’ouvrent ensuite sans connexion, et tes
                         réponses partent toutes seules au retour du réseau.
                     </p>
                 </header>
@@ -365,7 +365,7 @@ function LignePack({
     const contenu = [
         pluriel(pack.compte.lecons, 'leçon'),
         pluriel(pack.compte.fiches, 'fiche'),
-        pluriel(pack.compte.annales, 'annale'),
+        pluriel(pack.compte.annales, 'sujet'),
     ].join(' · ');
 
     let etat: React.ReactNode = null;

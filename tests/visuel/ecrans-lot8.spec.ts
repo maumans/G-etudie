@@ -9,7 +9,7 @@ import { GABARITS, THEMES, capturer, figerHorloges } from './gabarits';
  * - l'accueil public complet : question jouable (chargée à l'approche),
  *   annales en accès libre, tarifs, questions — la page entière ;
  * - la question jouable après « Vérifier » (verdict et corrigé) ;
- * - la liste des annales publiques ;
+ * - la liste des sujets publics ;
  * - un sujet public (BEPC 2024, exemple) : énoncé, corrigé réservé,
  *   partage WhatsApp.
  */
@@ -75,7 +75,7 @@ const ECRANS: { ecran: string; ouvrir: (page: Page) => Promise<void> }[] = [
         ouvrir: async (page) => {
             await page.goto('/sujets');
             await expect(
-                page.getByRole('heading', { level: 1, name: /Les annales/ }),
+                page.getByRole('heading', { level: 1, name: /Les sujets/ }),
             ).toBeVisible(ATTENTE);
         },
     },
@@ -125,7 +125,7 @@ for (const gabarit of GABARITS.filter((g) => g.nom !== '412')) {
     }
 }
 
-test("le lien d'une section depuis une page d'annales mène à la section", async ({
+test("le lien d'une section depuis une page de sujets mène à la section", async ({
     page,
 }) => {
     await page.goto('/sujets');

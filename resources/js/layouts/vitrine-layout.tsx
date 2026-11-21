@@ -7,11 +7,11 @@ import { accueil as accueilEleve } from '@/routes/eleve';
 
 /**
  * Navigation publique : les sections de l'accueil (ancres préfixées par
- * « / » pour fonctionner aussi depuis les pages d'annales) et les annales.
+ * « / » pour fonctionner aussi depuis les pages de sujets) et les sujets.
  */
 const SECTIONS = [
     { libelle: 'Examens', ancre: '/#titre-examens' },
-    { libelle: 'Annales', ancre: '/sujets' },
+    { libelle: 'Sujets corrigés', ancre: '/sujets' },
     { libelle: 'Comment ça marche', ancre: '/#titre-etapes' },
     { libelle: 'Tarifs', ancre: '/#titre-tarifs' },
     { libelle: 'Questions', ancre: '/#titre-questions' },

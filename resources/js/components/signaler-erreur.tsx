@@ -41,7 +41,7 @@ type Motif = (typeof MOTIFS_SIGNALEMENT)[number]['valeur'];
 
 /**
  * « Signaler une erreur » (PLAN M5) : un lien discret sous une question, une
- * leçon ou une annale, qui ouvre une feuille (motif, précision facultative).
+ * leçon ou un sujet, qui ouvre une feuille (motif, précision facultative).
  * Le signalement part par la file d'opérations (`signalement.creer`,
  * HORS_LIGNE.md A.6) : sans réseau, il attend et part au retour, une fois.
  * L'équipe répond dans « Mes signalements » — pas de discussion.

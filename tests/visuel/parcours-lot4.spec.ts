@@ -4,19 +4,19 @@ import { SESSIONS } from './gabarits';
 
 /**
  * Critère d'acceptation du lot 4 (PLAN § 12), par les vrais écrans : un
- * sujet scanné devient une annale structurée publiable **sans saisie
+ * sujet scanné devient un sujet structurée publiable **sans saisie
  * manuelle de l'énoncé**. Le rédacteur téléverse le PDF ; la lecture tourne
  * en file (ici `queue:work --once`, extracteur simulé sans clé d'API) ; il
- * vérifie les réponses proposées et envoie l'annale ; le responsable
+ * vérifie les réponses proposées et envoie le sujet ; le responsable
  * pédagogique la publie ; l'élève de BEPC la trouve et s'y entraîne.
  *
- * Tourne après les captures ; l'annale créée est effacée à la fin.
+ * Tourne après les captures ; le sujet créé est effacé à la fin.
  */
 test.use({ viewport: { width: 1366, height: 768 } });
 
 const ATTENTE = { timeout: 30_000 };
 
-/** Une session qu'aucune annale de démonstration n'occupe. */
+/** Une session qu'aucun sujet de démonstration n'occupe. */
 const SESSION = '2015';
 
 /** Un PDF minimal : il suffit qu'il soit reconnu comme PDF. */
@@ -25,7 +25,7 @@ const PDF = Buffer.from(
 );
 
 test.afterAll(() => {
-    // Aucun écran n'efface une annale (on archive) : nettoyage du test seulement.
+    // Aucun écran n'efface un sujet (on archive) : nettoyage du test seulement.
     execFileSync('php', [
         'artisan',
         'tinker',
@@ -34,7 +34,7 @@ test.afterAll(() => {
     ]);
 });
 
-test('un sujet scanné devient une annale publiée, que l’élève travaille', async ({
+test('un sujet scanné devient un sujet publié, que l’élève travaille', async ({
     browser,
 }) => {
     // Trois comptes, une lecture en file : plus long qu'une capture.
@@ -45,7 +45,7 @@ test('un sujet scanné devient une annale publiée, que l’élève travaille', 
         storageState: SESSIONS.contenu,
     });
     const redacteur = await redaction.newPage();
-    await redacteur.goto('/contenu/annales/importer');
+    await redacteur.goto('/contenu/sujets/importer');
     await redacteur.getByLabel('Le document').setInputFiles({
         name: `bepc-${SESSION}.pdf`,
         mimeType: 'application/pdf',
@@ -59,7 +59,7 @@ test('un sujet scanné devient une annale publiée, que l’élève travaille', 
         .selectOption({ label: 'Mathématiques' });
     await redacteur.getByLabel('Session', { exact: true }).fill(SESSION);
     await redacteur.getByRole('button', { name: 'Lancer la lecture' }).click();
-    await expect(redacteur).toHaveURL(/\/contenu\/annales$/, ATTENTE);
+    await expect(redacteur).toHaveURL(/\/contenu\/sujets$/, ATTENTE);
     await expect(
         redacteur.getByText(`Mathématiques · BEPC ${SESSION}`).first(),
     ).toBeVisible(ATTENTE);
@@ -79,7 +79,7 @@ test('un sujet scanné devient une annale publiée, que l’élève travaille', 
         .getByRole('listitem')
         .filter({ hasText: `BEPC ${SESSION}` })
         .first();
-    await ligne.getByRole('link', { name: 'Vérifier l’annale' }).click();
+    await ligne.getByRole('link', { name: 'Vérifier le sujet' }).click();
     await expect(
         redacteur.getByRole('heading', {
             level: 1,
@@ -110,16 +110,16 @@ test('un sujet scanné devient une annale publiée, que l’élève travaille', 
     );
     await redaction.close();
 
-    // — Le responsable pédagogique publie l'annale et ses questions.
+    // — Le responsable pédagogique publie le sujet et ses questions.
     const relecture = await browser.newContext({
         storageState: SESSIONS.pedagogie,
     });
     const relecteur = await relecture.newPage();
-    await relecteur.goto('/contenu/relecture/annales');
+    await relecteur.goto('/contenu/relecture/sujets');
     await relecteur
         .getByRole('link', { name: new RegExp(`BEPC ${SESSION}`) })
         .click();
-    await relecteur.getByRole('button', { name: 'Publier l’annale' }).click();
+    await relecteur.getByRole('button', { name: 'Publier le sujet' }).click();
     await relecteur
         .getByRole('alertdialog')
         .getByRole('button', { name: 'Publier' })
@@ -130,7 +130,7 @@ test('un sujet scanné devient une annale publiée, que l’élève travaille', 
     // — L'élève de BEPC la trouve, la lit et s'y entraîne.
     const eleve = await browser.newContext({ storageState: SESSIONS.eleve });
     const page = await eleve.newPage();
-    await page.goto('/eleve/annales');
+    await page.goto('/eleve/sujets');
     await page
         .getByRole('link', { name: new RegExp(`BEPC ${SESSION}`) })
         .click();

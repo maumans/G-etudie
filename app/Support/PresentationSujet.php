@@ -8,7 +8,7 @@ use App\Models\Sujet;
 use App\Models\VersionContenu;
 
 /**
- * L'annale telle que l'appareil la reçoit (`SujetEleve` de
+ * Le sujet tel que l'appareil la reçoit (`SujetEleve` de
  * `lib/contenu/sujets.ts`) : la **version publiée** de la structure, et la
  * version publiée de chacune de ses questions (PresentationQuestion). Un
  * objet de contenu, comme la leçon (HORS_LIGNE.md A.4) : l'écran ne sait pas
@@ -30,7 +30,7 @@ class PresentationSujet
     }
 
     /**
-     * Lot 9 : l'annale sans ses corrigés détaillés (DroitsAbonne). La bonne
+     * Lot 9 : le sujet sans ses corrigés détaillés (DroitsAbonne). La bonne
      * réponse reste — l'appareil corrige et dit « juste » ou « faux » —,
      * les étapes du corrigé partent, et `corrige_verrouille` le dit à
      * l'écran. Même fonction pour la page en ligne et le pack « libre ».
@@ -94,7 +94,7 @@ class PresentationSujet
             'document' => $sujet->document_chemin === null ? null : [
                 'type' => $sujet->document_type,
                 'octets' => $sujet->document_octets,
-                'url' => route('eleve.annales.document', $sujet),
+                'url' => route('eleve.sujets.document', $sujet),
             ],
             'parties' => array_map(fn (array $partie) => [
                 'uuid' => $partie['uuid'],

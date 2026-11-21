@@ -334,7 +334,7 @@ class QuestionController extends Controller
     private static function aRelirePar(Builder $requete, User $user): void
     {
         $requete->where('statut', StatutContenu::EnRelecture)
-            // Une question d'annale se relit avec son sujet (SujetService).
+            // Une question de sujet se relit avec son sujet (SujetService).
             ->whereNull('sujet_partie_id')
             ->where(fn (Builder $q) => $q->whereNull('auteur_id')->orWhere('auteur_id', '!=', $user->id))
             ->whereDoesntHave('versions', fn (Builder $q) => $q->whereNull('decision')->where('auteur_id', $user->id));

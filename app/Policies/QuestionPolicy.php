@@ -10,10 +10,10 @@ use Illuminate\Auth\Access\Response;
 /**
  * Qui fait quoi sur une question dans le back-office : le circuit de
  * relecture commun aux contenus. L'élève ne voit jamais une question par
- * une route : il la reçoit dans une séance, une leçon ou une annale
+ * une route : il la reçoit dans une séance, une leçon ou un sujet
  * (CatalogueEleve).
  *
- * Une question d'annale se relit **avec son sujet** (SujetService) : pas de
+ * Une question de sujet se relit **avec son sujet** (SujetService) : pas de
  * relecture à part.
  */
 class QuestionPolicy extends PolicyContenuRelisable
@@ -21,17 +21,17 @@ class QuestionPolicy extends PolicyContenuRelisable
     public function relire(User $user, ContenuRelisable $contenu): Response
     {
         if ($contenu instanceof Question && $contenu->sujet_partie_id !== null) {
-            return Response::deny('Cette question se relit avec son annale.');
+            return Response::deny('Cette question se relit avec son sujet.');
         }
 
         return parent::relire($user, $contenu);
     }
 
-    /** Envoyer seule en relecture : jamais une question d'annale. */
+    /** Envoyer seule en relecture : jamais une question de sujet. */
     public function soumettre(User $user, Question $question): Response
     {
         if ($question->sujet_partie_id !== null) {
-            return Response::deny('Cette question part en relecture avec son annale.');
+            return Response::deny('Cette question part en relecture avec son sujet.');
         }
 
         return $this->rediger($user, $question);

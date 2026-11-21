@@ -45,7 +45,7 @@ function adresse(
 }
 
 /**
- * Les annales publiques (lot 8) : par examen et par matière, de la session
+ * Les sujets publics (lot 8) : par examen et par matière, de la session
  * la plus récente à la plus ancienne. Ce que les élèves cherchent dans
  * Google mène ici ; chaque ligne ouvre l'énoncé.
  */
@@ -60,11 +60,11 @@ export default function Sujets({
 
     return (
         <>
-            <Head title="Annales du CEE, du BEPC et du Bac" />
+            <Head title="Sujets corrigés du CEE, du BEPC et du Bac" />
             <div className="mx-auto grid max-w-7xl gap-8 px-4 pt-8 pb-20 sm:px-6 lg:px-8 lg:pt-12 lg:pb-28">
                 <header className="grid max-w-3xl gap-3">
                     <h1 className="text-[2rem] leading-[1.08] titre-contraste sm:text-[2.75rem]">
-                        Les annales, <strong>du CEE au Bac</strong>
+                        Les sujets, <strong>du CEE au Bac</strong>
                     </h1>
                     <p className="text-[1.0625rem] leading-relaxed text-ink-600">
                         L’énoncé de chaque sujet, en clair, par examen et par
@@ -77,7 +77,7 @@ export default function Sujets({
 
                 <div className="grid gap-8 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-10">
                     <nav
-                        aria-label="Filtrer les annales"
+                        aria-label="Filtrer les sujets"
                         className="grid content-start gap-6"
                     >
                         <GroupeFiltres titre="Examen">
@@ -160,7 +160,7 @@ export default function Sujets({
                             <EtatVide
                                 illustration={FileText}
                                 titre="Pas encore de sujet publié ici"
-                                message="Les annales sont publiées au fur et à mesure, dès que leur autorisation de publication est signée. Inscrivez-vous : les cours et les exercices vous attendent déjà."
+                                message="Les sujets sont publiés au fur et à mesure, dès que leur autorisation de publication est signée. Inscrivez-vous : les cours et les exercices vous attendent déjà."
                                 action={
                                     <Button asChild>
                                         <Link href={register()} prefetch>

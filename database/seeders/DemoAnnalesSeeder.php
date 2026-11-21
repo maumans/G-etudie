@@ -46,7 +46,7 @@ class DemoAnnalesSeeder extends Seeder
     public function run(ImportSujetService $imports, SujetService $sujets, SignalementService $signalements): void
     {
         if (app()->isProduction()) {
-            throw new RuntimeException('Les annales de démonstration ne sont jamais semées en production.');
+            throw new RuntimeException('Les sujets de démonstration ne sont jamais semés en production.');
         }
 
         if (Sujet::query()->where('est_exemple', true)->exists()) {

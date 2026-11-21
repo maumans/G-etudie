@@ -77,7 +77,7 @@ export default function Matieres({
                         Le <strong>référentiel</strong> pédagogique
                     </>
                 }
-                description="La source unique des cours, des exercices, des annales et de la jauge : matières, épreuves, programme."
+                description="La source unique des cours, des exercices, des sujets et de la jauge : matières, épreuves, programme."
                 action={
                     <Button onClick={() => setEdition('nouvelle')}>
                         <Plus aria-hidden />

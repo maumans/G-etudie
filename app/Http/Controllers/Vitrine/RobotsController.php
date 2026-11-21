@@ -10,7 +10,7 @@ use Illuminate\Http\Response;
  * `/robots.txt` (lot 8), servi par Laravel et non plus en fichier : il doit
  * donner l'adresse **absolue** du plan du site, propre au domaine (D11).
  * Les espaces connectés sont fermés aux moteurs (ils redirigent de toute
- * façon vers la connexion) ; la vitrine, les annales publiques et leurs
+ * façon vers la connexion) ; la vitrine, les sujets publics et leurs
  * images de partage sont ouvertes. `VITRINE_INDEXER=false` (préproduction)
  * ferme tout (Seo::indexationPermise, même règle que la balise robots).
  */

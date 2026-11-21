@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Builder;
  * Seule réponse à « ceci est-il ouvert à cet élève ? » pour ce que
  * l'abonnement ajoute (PLAN M16, D4 ; décisions de Maurice du 2026-11-08) :
  *
- *  - **corrigé détaillé d'une annale** : ouvert à l'abonné ; pour les autres,
+ *  - **corrigé détaillé d'un sujet** : ouvert à l'abonné ; pour les autres,
  *    ouvert si l'équipe a coché « corrigé en accès libre », et d'office pour
  *    la session la plus récente de chaque épreuve. La bonne réponse reste
  *    toujours là (l'appareil corrige) ; seules les étapes du corrigé partent ;

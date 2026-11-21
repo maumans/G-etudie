@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Collection;
  *    DEVBOOK point 15) ;
  *  - ses **questions** : celles de ces chapitres qui ont une version
  *    publiée et ne sont pas archivées (même règle que les leçons, lot 3) ;
- *    celles d'une annale, seulement si l'annale est en ligne (lot 4) ;
+ *    celles d'un sujet, seulement si le sujet est en ligne (lot 4) ;
  *  - ses **annales** : publiées, non archivées, de son examen, sa série et
  *    sa filière, dans ses matières (lot 4).
  *
@@ -141,7 +141,7 @@ class CatalogueEleve
             ->whereNotNull('version_publiee_id')
             ->where('statut', '!=', StatutContenu::Archive->value)
             ->whereHas('notion', fn (Builder $notion) => $notion->whereIn('chapitre_id', $chapitres))
-            // Une question d'annale suit son sujet : publié, pas archivé
+            // Une question de sujet suit son sujet : publié, pas archivé
             // (groupé : le OU ne doit pas s'unir aux conditions précédentes).
             ->where(fn (Builder $q) => $q->whereNull('sujet_partie_id')
                 ->orWhereHas('partie.sujet', fn (Builder $sujet) => self::sujetEnLigne($sujet)));
@@ -231,7 +231,7 @@ class CatalogueEleve
 
     /**
      * Les questions de culture générale publiées, non archivées (jamais
-     * celles d'une annale).
+     * celles d'un sujet).
      *
      * @return Builder<Question>
      */

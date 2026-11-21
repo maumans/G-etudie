@@ -10,7 +10,7 @@ import { register } from '@/routes';
 const LETTRES = 'ABCDEFGHIJ';
 
 /**
- * Une question d'annale sur la page publique (lot 8) : l'énoncé tel qu'il
+ * Une question de sujet sur la page publique (lot 8) : l'énoncé tel qu'il
  * est imprimé, et ce que la question propose (options, éléments à relier
  * ou à ordonner, texte à trous) — **jamais la réponse** : le serveur ne
  * l'envoie pas (AnnalesPubliques). Le corrigé est annoncé, réservé aux

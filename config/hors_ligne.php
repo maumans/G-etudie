@@ -6,10 +6,10 @@
 | `pages` : liste blanche des écrans gardés par le service worker (copie par
 | utilisateur, réseau d'abord). Préfixes comparés par segment : « /lecons »
 | couvre « /lecons/12 », pas « /lecons-admin » ; un « $ » final borne le
-| préfixe (« /annales$ » = la liste seulement). La même règle vit dans
+| préfixe (« /sujets$ » = la liste seulement). La même règle vit dans
 | resources/service-worker/sw.js et resources/js/lib/hors-ligne/ecrans.ts.
 |
-| Chaque lot y ajoute ses écrans de niveau B (A.2) : leçons (lot 2), annales
+| Chaque lot y ajoute ses écrans de niveau B (A.2) : leçons (lot 2), sujets d'examen
 | (lot 4), progression (lot 6)…
 */
 
@@ -22,10 +22,10 @@ return [
         '/eleve/lecons',
         '/eleve/chapitres',
         '/eleve/seances',
-        // Lot 4 : une annale déjà ouverte se relit d'après sa copie (packs au
+        // Lot 4 : un sujet déjà ouvert se relit d'après sa copie (packs au
         // lot 7) ; le document original (/eleve/documents/…), lui, reste en
         // ligne seulement.
-        '/eleve/annales',
+        '/eleve/sujets',
         '/eleve/signalements$',
         // Lot 5 : l'historique et les résultats se relisent d'après leur copie.
         '/eleve/examens-blancs',

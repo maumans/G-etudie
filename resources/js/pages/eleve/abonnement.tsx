@@ -103,8 +103,8 @@ export default function Abonnement({
                     </h1>
                     <p className="max-w-xl text-ink-600">
                         Les cours et la séance du jour restent gratuits.
-                        L’abonnement ajoute les corrigés détaillés de toutes les
-                        annales, les examens blancs sans limite et toutes tes
+                        L’abonnement ajoute les corrigés détaillés de tous les
+                        sujets, les examens blancs sans limite et toutes tes
                         matières hors connexion.
                     </p>
                 </header>

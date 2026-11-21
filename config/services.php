@@ -35,7 +35,7 @@ return [
         ],
     ],
 
-    // Import assisté des annales (lot 4) puis tuteur (lot 10) : jamais dans le dépôt.
+    // Import assisté des sujets (lot 4) puis tuteur (lot 10) : jamais dans le dépôt.
     'anthropic' => [
         'cle' => env('ANTHROPIC_API_KEY'),
     ],

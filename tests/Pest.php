@@ -285,7 +285,7 @@ function geste(User $auteur, string $type, array $charge, ?string $saisiLe = nul
     ];
 }
 
-/** Une annale publiée (circuit réel), une question par notion donnée. */
+/** Un sujet publié (circuit réel), une question par notion donnée. */
 function annalePubliee(Examen $examen, ?Serie $serie, Matiere $matiere, int $session, array $notions, bool $document = false): Sujet
 {
     $sujets = app(SujetService::class);

@@ -11,11 +11,11 @@ import {
 /**
  * Écrans du lot 4 (annales, import assisté, signalements), sur les données
  * de démonstration (DemoAnnalesSeeder : tout est « EXEMPLE » — trois
- * annales publiées, une en brouillon avec des réponses à vérifier, deux
+ * sujets publiés, une en brouillon avec des réponses à vérifier, deux
  * signalements d'Aïssatou). Rien n'est modifié : la file est simulée, les
  * écrans du back-office sont seulement ouverts.
  *
- * L'import de bout en bout (téléversement → annale publiée → lue par
+ * L'import de bout en bout (téléversement → sujet publié → lue par
  * l'élève) : parcours-lot4.spec.ts.
  */
 
@@ -34,7 +34,7 @@ async function aller(page: Page, adresse: string, titre: string | RegExp) {
     ).toBeVisible(ATTENTE);
 }
 
-/** Une annale s'ouvre depuis une liste par son libellé (l'uuid change à chaque semis). */
+/** Un sujet s'ouvre depuis une liste par son libellé (l'uuid change à chaque semis). */
 async function ouvrir(page: Page, adresse: string, lien: RegExp) {
     await aller(page, adresse, /./);
     await page.getByRole('link', { name: lien }).first().click();
@@ -46,19 +46,19 @@ const ECRANS: Record<'contenu' | 'pedagogie' | 'eleve', Ecran[]> = {
     contenu: [
         {
             ecran: 'annales',
-            ouvrir: (page) => aller(page, '/contenu/annales', 'Les annales'),
+            ouvrir: (page) => aller(page, '/contenu/sujets', 'Les sujets'),
         },
         {
             ecran: 'annales-importer',
             ouvrir: (page) =>
-                aller(page, '/contenu/annales/importer', 'Importer un sujet'),
+                aller(page, '/contenu/sujets/importer', 'Importer un sujet'),
         },
         {
             ecran: 'annales-fiche-a-verifier',
             ouvrir: async (page) => {
                 await ouvrir(
                     page,
-                    '/contenu/annales?statut=brouillon',
+                    '/contenu/sujets?statut=brouillon',
                     /BEPC 2022/,
                 );
                 await expect(page.getByText(/à vérifier/).first()).toBeVisible(
@@ -73,7 +73,7 @@ const ECRANS: Record<'contenu' | 'pedagogie' | 'eleve', Ecran[]> = {
             ouvrir: async (page) => {
                 await ouvrir(
                     page,
-                    '/contenu/annales?statut=publie',
+                    '/contenu/sujets?statut=publie',
                     /BEPC 2024/,
                 );
                 await expect(page.getByText('En ligne').first()).toBeVisible(
@@ -103,12 +103,12 @@ const ECRANS: Record<'contenu' | 'pedagogie' | 'eleve', Ecran[]> = {
     eleve: [
         {
             ecran: 'eleve-annales',
-            ouvrir: (page) => aller(page, '/eleve/annales', /annales/),
+            ouvrir: (page) => aller(page, '/eleve/sujets', /sujets/),
         },
         {
             ecran: 'eleve-annales-exercices',
             ouvrir: async (page) => {
-                await aller(page, '/eleve/annales?vue=exercices', /annales/);
+                await aller(page, '/eleve/sujets?vue=exercices', /sujets/);
                 await expect(
                     page.getByRole('tab', { name: /Exercices par chapitre/ }),
                 ).toHaveAttribute('aria-selected', 'true');
@@ -117,7 +117,7 @@ const ECRANS: Record<'contenu' | 'pedagogie' | 'eleve', Ecran[]> = {
         {
             ecran: 'eleve-annale-lecture',
             ouvrir: async (page) => {
-                await ouvrir(page, '/eleve/annales', /BEPC 2024/);
+                await ouvrir(page, '/eleve/sujets', /BEPC 2024/);
                 await page
                     .getByRole('button', { name: 'Voir le corrigé' })
                     .first()
@@ -133,7 +133,7 @@ const ECRANS: Record<'contenu' | 'pedagogie' | 'eleve', Ecran[]> = {
         {
             ecran: 'eleve-annale-entrainement',
             ouvrir: async (page) => {
-                await ouvrir(page, '/eleve/annales', /BEPC 2023/);
+                await ouvrir(page, '/eleve/sujets', /BEPC 2023/);
                 await page.getByRole('tab', { name: /Entraînement/ }).click();
                 await expect(page.getByText(/sur 3/)).toBeVisible(ATTENTE);
             },
@@ -141,7 +141,7 @@ const ECRANS: Record<'contenu' | 'pedagogie' | 'eleve', Ecran[]> = {
         {
             ecran: 'eleve-signaler',
             ouvrir: async (page) => {
-                await ouvrir(page, '/eleve/annales', /BEPC 2023/);
+                await ouvrir(page, '/eleve/sujets', /BEPC 2023/);
                 await page.getByRole('tab', { name: /Entraînement/ }).click();
                 await page
                     .getByRole('button', { name: 'Signaler une erreur' })

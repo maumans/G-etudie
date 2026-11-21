@@ -57,7 +57,7 @@ export type ExamenLocal = {
 /** Au-delà, un saut d'horloge pendant l'examen est signalé (A.8). */
 export const SAUT_MAX_MS = 5 * 60_000;
 
-/** Les durées proposées quand ni l'annale ni l'épreuve n'en donnent une. */
+/** Les durées proposées quand ni le sujet ni l'épreuve n'en donnent une. */
 export const DUREES_AU_CHOIX = [60, 120, 180, 240];
 
 type Table = BaseHorsLigne['examens_blancs'];
@@ -66,7 +66,7 @@ function table(base: BaseHorsLigne): Table {
     return base.examens_blancs;
 }
 
-/** La durée de l'examen : imprimée sur l'annale, sinon celle de l'épreuve. */
+/** La durée de l'examen : imprimée sur le sujet, sinon celle de l'épreuve. */
 export function dureeConnue(
     sujet: SujetEleve,
     dureeEpreuve: number | null,
@@ -112,7 +112,7 @@ export async function demarrer(
     return examen;
 }
 
-/** L'examen de cet élève sur cette annale, pas encore envoyé. */
+/** L'examen de cet élève sur ce sujet, pas encore envoyé. */
 export async function examenEnCours(
     base: BaseHorsLigne,
     auteur: number,

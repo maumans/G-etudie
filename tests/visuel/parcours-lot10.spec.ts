@@ -7,7 +7,7 @@ import { SESSIONS, THEMES, capturer, figerHorloges } from './gabarits';
  * Critère d'acceptation du lot 10 (PLAN § 12) : **une explication en flux
  * en moins de 3 s pour démarrer ; refus propre hors sujet.**
  *
- * Aïssatou (01) ouvre l'annale BEPC 2024 en lecture, « Voir le corrigé »,
+ * Aïssatou (01) ouvre le sujet BEPC 2024 en lecture, « Voir le corrigé »,
  * puis « Explique-moi » : on mesure le temps entre l'appui et le premier
  * mot écrit dans la feuille (tuteur simulé, diffusé mot à mot comme
  * l'API). La réponse s'écrit en plusieurs fois avant d'être finie. Puis,
@@ -74,7 +74,7 @@ test('« Explique-moi » : le premier mot en moins de 3 s, puis la suite en flux
     await figerHorloges(page, HORLOGE);
     await page.setViewportSize({ width: 412, height: 915 });
 
-    await page.goto('/eleve/annales');
+    await page.goto('/eleve/sujets');
     await page
         .getByRole('link', { name: /BEPC 2024/ })
         .first()

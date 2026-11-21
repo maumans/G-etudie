@@ -54,12 +54,12 @@ Route::middleware(['auth', 'can:'.Permission::EspaceEleve->value])
             Route::post('seance', [SeanceController::class, 'commencer'])->name('seance.commencer');
             Route::get('seances/{seance}', [SeanceController::class, 'show'])->name('seances.show');
 
-            // Lot 4 : annales (lecture, entraînement) et « Mes signalements ».
-            Route::get('annales', [AnnaleController::class, 'index'])->name('annales.index');
-            Route::get('annales/{sujet}', [AnnaleController::class, 'show'])->name('annales.show');
+            // Lot 4 : sujets d'examen (lecture, entraînement) et « Mes signalements ».
+            Route::get('sujets', [AnnaleController::class, 'index'])->name('sujets.index');
+            Route::get('sujets/{sujet}', [AnnaleController::class, 'show'])->name('sujets.show');
             // Hors du préfixe gardé hors ligne (config/hors_ligne.php) : le
             // service worker ne copie pas un PDF de plusieurs Mo.
-            Route::get('documents/annales/{sujet}', [AnnaleController::class, 'document'])->name('annales.document');
+            Route::get('documents/sujets/{sujet}', [AnnaleController::class, 'document'])->name('sujets.document');
             Route::get('signalements', [SignalementController::class, 'index'])->name('signalements');
 
             // Lot 5 : examens blancs. Le passage se fait sur la fiche de

@@ -8,12 +8,12 @@ use App\Models\Sujet;
 use Illuminate\Database\Eloquent\Builder;
 
 /**
- * Les annales visibles **sans compte** (lot 8, PLAN M1 « SEO ») — seule
+ * Les sujets visibles **sans compte** (lot 8, PLAN M1 « SEO ») — seule
  * autorité : la liste `/sujets`, la page `/sujets/{slug}`, le plan du site
  * et l'image de partage passent tous par ici.
  *
  * Un sujet est public s'il est en ligne (CatalogueEleve::sujetEnLigne) **et**
- *  - c'est une annale officielle dont l'autorisation de publier est saisie
+ *  - c'est un sujet officiel dont l'autorisation de publier est saisie
  *    (champ « Droits de publication », D5 : rien de public pendant le test
  *    fermé, décision de Maurice du 2026-11-06) ;
  *  - ou c'est un sujet maison, écrit par l'équipe ;

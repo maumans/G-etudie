@@ -226,6 +226,10 @@ exercices, les annales, la jauge et l'examen blanc.
 - « Signaler une erreur » sur chaque question (M17).
 
 ### M6 — Annales et corrigés · MVP
+
+> **Vocabulaire (2026-11-21)** : dans l'application, on dit **« sujets »**
+> (« Sujets d'examen », « Sujets corrigés »), plus « annales » — c'est le
+> mot des élèves guinéens. Ce plan garde « annales » comme nom du module.
 - Classement : examen → session (année) → série → matière.
 - Trois modes pour chaque sujet :
   1. **Lecture** : énoncé + corrigé détaillé.

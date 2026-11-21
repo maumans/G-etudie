@@ -20,7 +20,7 @@ import type { CleMatiere } from '@/lib/matieres';
 import { MATIERES } from '@/lib/matieres';
 import { cn, pluriel } from '@/lib/utils';
 import { cours } from '@/routes/eleve';
-import { index, show } from '@/routes/eleve/annales';
+import { index, show } from '@/routes/eleve/sujets';
 
 type Vue = 'sujets' | 'exercices';
 
@@ -127,7 +127,7 @@ export default function Annales({
 
     return (
         <>
-            <Head title="Annales" />
+            <Head title="Sujets d’examen" />
             <div className="grid grid-cols-1 gap-6">
                 <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
                     <div className="grid gap-1.5">
@@ -135,7 +135,7 @@ export default function Annales({
                             {examen}
                         </p>
                         <h1 className="text-[1.75rem] leading-tight titre-contraste lg:text-titre-ecran-large">
-                            Les <strong>annales</strong> de ton examen
+                            Les <strong>sujets</strong> de ton examen
                         </h1>
                         <p className="max-w-xl text-ink-600">
                             Les vrais sujets, avec un corrigé pas à pas.
@@ -149,7 +149,7 @@ export default function Annales({
                 {resume.sujets === 0 ? (
                     <EtatVide
                         illustration={FileText}
-                        titre="Les annales de ton examen arrivent"
+                        titre="Les sujets de ton examen arrivent"
                         message="L’équipe transcrit les sujets et rédige leurs corrigés. En attendant, révise tes cours."
                         action={
                             <Button asChild variant="outline">
@@ -364,7 +364,7 @@ export default function Annales({
                                     id="titre-bilan"
                                     className="text-aide font-medium text-white/70"
                                 >
-                                    Ton entraînement sur les annales
+                                    Ton entraînement sur les sujets
                                 </h2>
                                 <p className="flex items-baseline gap-1.5">
                                     <span className="text-[2.25rem] leading-none font-bold tracking-tight font-data">
@@ -379,7 +379,7 @@ export default function Annales({
                                 </p>
                                 <ProgressionBarre
                                     valeur={part}
-                                    libelle={`${part} % des exercices d’annales faits`}
+                                    libelle={`${part} % des exercices de sujets faits`}
                                     className="bg-white/15"
                                 />
                                 <p className="text-aide text-white/75">

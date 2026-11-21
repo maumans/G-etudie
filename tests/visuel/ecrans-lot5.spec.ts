@@ -32,9 +32,9 @@ async function aller(page: Page, adresse: string, titre: string | RegExp) {
     ).toBeVisible(ATTENTE);
 }
 
-/** La fiche d'une annale, en « Conditions réelles ». */
+/** La fiche d'un sujet, en « Conditions réelles ». */
 async function conditionsReelles(page: Page, session: RegExp) {
-    await aller(page, '/eleve/annales', /annales/);
+    await aller(page, '/eleve/sujets', /sujets/);
     await page.getByRole('link', { name: session }).first().click();
     await page.getByRole('tab', { name: /Conditions réelles|Examen/ }).click();
     await expect(

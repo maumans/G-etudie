@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { abonnement } from '@/routes/eleve';
 
 /**
- * Lot 9 : le corrigé détaillé de cette annale est réservé aux abonnés
+ * Lot 9 : le corrigé détaillé de ce sujet est réservé aux abonnés
  * (App\Support\DroitsAbonne). La bonne réponse, elle, reste : l'élève sait
  * s'il a juste. Même affichage en ligne et depuis un pack « libre ».
  */

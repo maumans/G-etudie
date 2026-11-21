@@ -7,7 +7,7 @@ import type { CarteSujet } from '@/lib/vitrine';
 import { show } from '@/routes/vitrine/sujets';
 
 /**
- * Une annale publique dans une liste (vitrine, `/sujets`) — recette « ligne
+ * Un sujet public dans une liste (vitrine, `/sujets`) — recette « ligne
  * de liste » de DESIGN.md : tuile de la matière, titre, sous-titre, action
  * ronde. Toute la ligne est le lien.
  */

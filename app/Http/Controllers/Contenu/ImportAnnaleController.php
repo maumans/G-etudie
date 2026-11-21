@@ -20,8 +20,8 @@ use Inertia\Response;
 
 /**
  * Back-office › Annales › Importer (PLAN M17) : téléverser un sujet scanné ;
- * la lecture se fait en file (ImportSujetService), la liste des annales
- * montre l'avancement et ouvre l'annale créée.
+ * la lecture se fait en file (ImportSujetService), la liste des sujets
+ * montre l'avancement et ouvre le sujet créé.
  */
 class ImportAnnaleController extends Controller
 {
@@ -40,7 +40,7 @@ class ImportAnnaleController extends Controller
             ->map(fn (Chapitre $c) => $c->getAttribute('examen_id').':'.$c->matiere_id)
             ->values();
 
-        return Inertia::render('contenu/annales/importer', [
+        return Inertia::render('contenu/sujets/importer', [
             'examens' => Examen::query()->with('series')->orderBy('ordre')->get()->map(fn (Examen $e) => [
                 'id' => $e->id,
                 'code' => $e->code->value,
@@ -90,16 +90,16 @@ class ImportAnnaleController extends Controller
             'type' => TypeSujet::from($donnees['type']),
         ]);
 
-        Inertia::flash('toast', ['type' => 'success', 'message' => 'Document reçu : la lecture commence. L’annale apparaîtra ici en brouillon.']);
+        Inertia::flash('toast', ['type' => 'success', 'message' => 'Document reçu : la lecture commence. Le sujet apparaîtra ici en brouillon.']);
 
-        return to_route('contenu.annales.index');
+        return to_route('contenu.sujets.index');
     }
 
     public function relancer(Request $request, ImportSujet $import): RedirectResponse
     {
         $this->imports->relancer($import, $request->user());
 
-        return to_route('contenu.annales.index');
+        return to_route('contenu.sujets.index');
     }
 
     /**

@@ -26,7 +26,7 @@ use Illuminate\Support\Carbon;
  * @property int $id
  * @property string $uuid
  * @property int $notion_id
- * @property int|null $sujet_partie_id partie d'annale (lot 4), sinon `null`
+ * @property int|null $sujet_partie_id partie de sujet (lot 4), sinon `null`
  * @property int $ordre_sujet
  * @property int|null $auteur_id
  * @property TypeQuestion $type

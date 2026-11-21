@@ -24,7 +24,7 @@ use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 /**
- * Le circuit d'une annale (PLAN M6, M17) : le sujet et ses questions sont
+ * Le circuit d'un sujet (PLAN M6, M17) : le sujet et ses questions sont
  * relus **ensemble**. Envoyer le sujet en relecture y envoie ses questions en
  * brouillon ; le relecteur publie ou renvoie le tout en un geste. Chaque
  * transition passe par ContenuService (verrous, « jamais relu par son
@@ -45,7 +45,7 @@ class SujetService
      */
     public function creer(User $auteur, array $cible, ?array $document = null, bool $estExemple = false): Sujet
     {
-        $this->exiger($auteur->can(Permission::RedigerContenu->value), 'Vous ne pouvez pas rédiger d\'annale.');
+        $this->exiger($auteur->can(Permission::RedigerContenu->value), 'Vous ne pouvez pas rédiger de sujet.');
 
         return Sujet::create([
             'uuid' => (string) Str::uuid7(),
@@ -254,7 +254,7 @@ class SujetService
     private function partieDe(Question $question): SujetPartie
     {
         return SujetPartie::query()->with('sujet')->whereKey($question->sujet_partie_id)->first()
-            ?? throw ValidationException::withMessages(['question' => 'Cette question n\'appartient à aucune annale.']);
+            ?? throw ValidationException::withMessages(['question' => 'Cette question n\'appartient à aucun sujet.']);
     }
 
     /**
@@ -272,7 +272,7 @@ class SujetService
             /** @var Sujet $frais */
             $frais = Sujet::query()->whereKey($sujet->id)->lockForUpdate()->firstOrFail();
 
-            $this->exiger(Perimetre::peutRediger($acteur, $frais), 'Vous ne pouvez pas modifier cette annale.');
+            $this->exiger(Perimetre::peutRediger($acteur, $frais), 'Vous ne pouvez pas modifier ce sujet.');
 
             if ($frais->statut !== StatutContenu::Brouillon) {
                 throw ValidationException::withMessages(['statut' => 'Seul un brouillon se modifie. Ouvrez d\'abord une modification.']);

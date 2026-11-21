@@ -29,7 +29,7 @@ import { fiche } from '@/routes/eleve/chapitres';
 import { show as pageLecon } from '@/routes/eleve/lecons';
 import { commencer } from '@/routes/eleve/seance';
 import { show as pageSeance } from '@/routes/eleve/seances';
-import { show as pageAnnale } from '@/routes/eleve/annales';
+import { show as pageAnnale } from '@/routes/eleve/sujets';
 import { telechargements } from '@/routes/eleve';
 import { usePacksLocaux } from '@/hooks/use-packs-locaux';
 import { afficherDepuisLaBase, base, horsLigneSur } from '@/lib/hors-ligne';
@@ -67,7 +67,7 @@ type Props = {
     /** `?faibles=1` : seulement les notions à travailler (filtrées par le serveur). */
     faibles: boolean;
     chapitres: Chapitre[];
-    /** Lot 7 : les annales de la matière (ouvrables depuis le pack). */
+    /** Lot 7 : les sujets de la matière (ouvrables depuis le pack). */
     annales?: {
         uuid: string;
         titre: string;
@@ -260,7 +260,7 @@ export default function Matiere({
                         className="grid gap-3"
                     >
                         <h2 id="titre-annales" className="text-titre-carte">
-                            Annales
+                            Sujets d’examen
                         </h2>
                         <ul className="divide-y rounded-carte border bg-card shadow-carte">
                             {annales.map((annale) => (
@@ -325,7 +325,7 @@ function BandePack({
                     className="size-4 text-juste-600 dark:text-juste-400"
                 />
                 {depuisLePack
-                    ? 'Lu depuis ton téléchargement : cours, fiches et annales s’ouvrent sans réseau.'
+                    ? 'Lu depuis ton téléchargement : cours, fiches et sujets s’ouvrent sans réseau.'
                     : `${nom} est sur ce téléphone : tu peux la réviser sans réseau.`}
             </p>
         );
@@ -351,7 +351,7 @@ function BandePack({
                 <span className="text-aide text-ink-600">
                     Télécharge {nom} une fois (
                     {formaterOctets(pack.taille_octets)}) : leçons, fiches et
-                    annales.
+                    sujets.
                 </span>
             </span>
             <ChevronRight

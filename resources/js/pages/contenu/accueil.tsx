@@ -24,7 +24,7 @@ import { cn, formaterNombre, pluriel } from '@/lib/utils';
 import {
     index as indexAnnales,
     relecture as relectureAnnales,
-} from '@/routes/contenu/annales';
+} from '@/routes/contenu/sujets';
 import { create, edit, index, relecture, show } from '@/routes/contenu/lecons';
 import { index as indexSignalements } from '@/routes/contenu/signalements';
 import { index as programme } from '@/routes/contenu/referentiel/programme';
@@ -237,8 +237,8 @@ export default function Accueil({
 
                     <div className="grid content-start gap-6">
                         <Section
-                            titre="Annales et signalements"
-                            description={`${pluriel(annales.publiees, 'annale publiée', 'annales publiées')}.`}
+                            titre="Sujets et signalements"
+                            description={`${pluriel(annales.publiees, 'sujet publié', 'sujets publiés')}.`}
                             contenuClassName="px-2 pb-2"
                         >
                             <ul className="grid gap-0.5">
@@ -262,7 +262,7 @@ export default function Accueil({
                                     annales.a_relire !== null && {
                                         cle: 'relire',
                                         icone: ClipboardCheck,
-                                        libelle: 'Annales à relire',
+                                        libelle: 'Sujets à relire',
                                         nombre: annales.a_relire,
                                         href: relectureAnnales().url,
                                     },

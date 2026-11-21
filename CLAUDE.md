@@ -232,6 +232,11 @@ règles ne se rediscutent pas.
   fictif ». Les seeders de démo le posent systématiquement.
 - Noms exacts : **CEE** (pas CEPE), **BEPC**, **Baccalauréat unique**, séries
   **SM, SE, SS**, filière **franco-arabe**.
+- On dit **sujet** (« Sujets » dans un menu, « Sujets d'examen » en titre,
+  « Sujets corrigés » sur la vitrine), jamais **annale** dans un texte lu
+  (décision de Maurice, 2026-11-21 : c'est le mot des élèves guinéens).
+  Accorder au masculin : « un sujet publié ». *Annale* reste un nom
+  interne du code (classes, types de pack, permission `annales.importer`).
 - Aucun texte copié de manuels ou de sites tiers.
 
 ## 6. Vérification visuelle (Playwright) — définition de « vu »
