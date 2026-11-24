@@ -3029,11 +3029,10 @@ cette question à sa façon. Elle distingue deux notions :
      production du script ; références `lot8/vitrine-accueil` et
      `lot8/question-jouee` refaites sur le build et relues, le reste du
      lot 8 et du lot 0 identique (132 captures).
-   - **À confirmer par Maurice** : la règle de la photo (`DESIGN.md` § 8,
-     `CLAUDE.md` § 3 bis) demande une personne **majeure** avec son
-     **autorisation écrite** de diffusion. Si la photo est générée par
-     une IA ou vient d'une banque d'images, garder la preuve de la licence
-     d'usage commercial.
+   - **Droits de la photo : en règle, confirmé par Maurice le
+     2026-11-24** (règle de `DESIGN.md` § 8 et `CLAUDE.md` § 3 bis :
+     personne majeure, autorisation écrite de diffusion, ou licence
+     d'usage commercial). Maurice garde la pièce justificative.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
