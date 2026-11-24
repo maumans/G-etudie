@@ -2960,6 +2960,34 @@ cette question à sa façon. Elle distingue deux notions :
      (`DEMARRAGE.md` § 2).
    - **À faire par Maurice** : changer `DEMO_MOT_DE_PASSE` dans `.env`
      avant toute préproduction accessible en ligne.
+   - **Vérifié** : 743 Pest, 428 Vitest, build ; Playwright lot 14, 30
+     captures sur 32 identiques aux références locales. Pendant ces
+     passes, deux pannes **extérieures au projet** : MySQL de Laragon
+     arrêté puis relancé, et un autre projet de Maurice (« MANS CORP. »)
+     servi sur le port 8010, que Playwright réutilisait sans rien dire
+     (`reuseExistingServer`) : **sur ce poste, `PLAYWRIGHT_PORT=8020`**.
+     Les sessions de démonstration enregistrées expirent (12 h pour le
+     personnel) : ne pas lancer les écrans avec `--no-deps` après une
+     pause, l'étape `connexion` les refait.
+
+33. [x] **Capture « Cet appareil » stabilisée** (2026-11-24)
+   - **Constat** : `lot14/eleve-cet-appareil` à 360 px changeait de
+     hauteur d'un passage à l'autre (3 196 puis 3 016 px). Deux causes :
+     la liste « Où ton compte est gardé » grossit d'un appareil à chaque
+     passage de Playwright (ordre et hauteur des lignes changent), et les
+     valeurs lues sur l'appareil (navigateur, place) reviennent à la ligne
+     selon leur longueur ; les alertes, elles, dépendent du navigateur de
+     test (service worker encore en installation).
+   - **Décision** : `capturer()` (`tests/visuel/gabarits.ts`) accepte une
+     **`zone`** : seule cette partie est comparée, débordement et axe
+     restent vérifiés sur la page entière. L'écran compare la seule
+     section « Cet appareil » (la liste des appareils est capturée au
+     lot 7), avec des valeurs de longueur fixe (`figerVariables`) et sans
+     les alertes (repère `data-alertes-appareil`, vues dans la relecture
+     `REVUE`).
+   - **Preuve** : 6 références régénérées et relues ; trois passages de
+     suite sans mise à jour (`--repeat-each=3`) : 18 comparaisons sur 18
+     identiques ; lot 14 entier vert (32).
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

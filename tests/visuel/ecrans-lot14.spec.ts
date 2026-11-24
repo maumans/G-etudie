@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import {
     GABARITS,
     SESSIONS,
@@ -29,6 +29,8 @@ type Ecran = {
     session: string;
     figer: boolean;
     ouvrir: (page: Page) => Promise<void>;
+    /** Ne comparer qu'une partie de la page (voir `capturer`). */
+    zone?: (page: Page) => Locator;
 };
 
 const titreConsole = (page: Page) =>
@@ -81,7 +83,19 @@ const ECRANS: Ecran[] = [
     {
         ecran: 'eleve-cet-appareil',
         session: SESSIONS.eleve,
-        figer: false,
+        // Valeurs lues sur l'appareil (navigateur, place, heure) : texte de
+        // longueur fixe, sinon leur retour à la ligne change la hauteur.
+        figer: true,
+        // La section « Cet appareil » seule : la liste « Où ton compte est
+        // gardé » grossit d'un appareil à chaque passage de Playwright
+        // (ordre et hauteur changent) ; elle est capturée au lot 7.
+        zone: (page) =>
+            page
+                .locator('section')
+                .filter({
+                    has: page.getByRole('heading', { name: 'Cet appareil' }),
+                })
+                .first(),
         ouvrir: async (page) => {
             await page.goto('/compte/appareils');
             await expect(
@@ -93,6 +107,13 @@ const ECRANS: Ecran[] = [
             await page.getByRole('button', { name: 'Donner mon avis' }).click();
             await page.getByRole('radio', { name: 'Un peu' }).click();
             await page.getByRole('button', { name: 'C’est lent' }).click();
+            // Les alertes dépendent du navigateur de test (service worker
+            // encore en installation au premier chargement, horloge) : leur
+            // présence changerait la hauteur. Elles sont vues dans la
+            // relecture sans masque (REVUE).
+            await page
+                .locator('[data-alertes-appareil]')
+                .evaluateAll((el) => el.forEach((e) => e.remove()));
         },
     },
 ];
@@ -130,7 +151,10 @@ for (const gabarit of GABARITS.filter((g) => g.nom !== '412')) {
                             ecran.ecran,
                             gabarit.nom,
                             theme.nom,
-                            { figerVariables: ecran.figer },
+                            {
+                                figerVariables: ecran.figer,
+                                zone: ecran.zone?.(page),
+                            },
                         );
                     });
                 });

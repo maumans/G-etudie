@@ -149,6 +149,7 @@ export function DiagnosticAppareil() {
                 <ul
                     className="grid gap-1.5 rounded-controle border border-indice-400/50 bg-indice-400/15 p-3 text-aide"
                     data-capture="variable"
+                    data-alertes-appareil
                 >
                     {alertes.map((alerte) => (
                         <li key={alerte} className="flex items-start gap-2">

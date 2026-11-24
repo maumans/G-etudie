@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { ADRESSE } from '../../playwright.config';
 
 /** Matrice de DESIGN.md § 12 : l'Android d'entrée de gamme est l'appareil de référence. */
@@ -92,6 +92,10 @@ export const SESSIONS = {
 /**
  * Vérifie un écran (débordement, axe) puis le compare à sa capture de
  * référence `captures/<lot>/<ecran>-<gabarit>-<theme>.png`.
+ *
+ * `zone` : ne comparer qu'une partie de la page, quand le reste dépend de
+ * données qui grossissent à chaque passage (la liste des appareils, par
+ * exemple). Débordement et axe restent vérifiés sur la page entière.
  */
 export async function capturer(
     page: Page,
@@ -99,7 +103,10 @@ export async function capturer(
     ecran: string,
     gabarit: string,
     theme: string,
-    { figerVariables = false }: { figerVariables?: boolean } = {},
+    {
+        figerVariables = false,
+        zone,
+    }: { figerVariables?: boolean; zone?: Locator } = {},
 ): Promise<void> {
     await page.evaluate(() => document.fonts.ready);
 
@@ -119,14 +126,17 @@ export async function capturer(
     await verifierSansDebordement(page);
     await verifierAccessibilite(page);
     // Tableau de segments : une chaîne « lot0/… » serait aplatie en « lot0-… ».
-    await expect(page).toHaveScreenshot(
-        [lot, `${ecran}-${gabarit}-${theme}.png`],
-        {
-            fullPage: true,
-            // Heures, durées écoulées : changent à chaque passage.
-            mask: [page.locator('[data-capture="variable"]')],
-        },
-    );
+    const nom = [lot, `${ecran}-${gabarit}-${theme}.png`];
+    // Heures, durées écoulées : changent à chaque passage.
+    const mask = [page.locator('[data-capture="variable"]')];
+
+    if (zone) {
+        await expect(zone).toHaveScreenshot(nom, { mask });
+
+        return;
+    }
+
+    await expect(page).toHaveScreenshot(nom, { fullPage: true, mask });
 }
 
 /**
