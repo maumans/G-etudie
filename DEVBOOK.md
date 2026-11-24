@@ -24,8 +24,12 @@
 ### État au 2026-11-21 (lot 14 : outils de l'essai faits, critère en attente des essais ; lot 10 : vraie API en attente du crédit)
 
 - **Dépôt git** : `main` porte les lots 0 à 14. Les lots 3 à 14 ont été
-  faits **directement sur `main`**, à la demande de Maurice. Pas de dépôt
-  distant (DA6).
+  faits **directement sur `main`**, à la demande de Maurice. Dépôt distant
+  **privé** `github.com/maumans/G-etudie` (`origin`, branché par Maurice
+  après DA6). **Ni les captures de référence ni le dossier ministère ne
+  sont dans le dépôt** (point 32 : `.gitignore` complété, historique
+  purgé le 2026-11-24 ; sauvegarde de l'ancien historique dans
+  `.sauvegardes/`, ignoré).
 - **On dit « sujet », plus « annale »** (point 31, décision de Maurice) :
   menus « Sujets », titres « Sujets d'examen », vitrine « Sujets
   corrigés » ; adresses `/eleve/sujets…` et `/contenu/sujets…` (les
@@ -2917,6 +2921,45 @@ cette question à sa façon. Elle distingue deux notions :
      `ANNALES_EXTRACTEUR=simule`, retirés (`queue:work --once` du parcours
      traitait sinon un ancien travail).
    - **Reste** : rien.
+
+32. [x] **Dépôt propre avant GitHub : `.gitignore` et historique purgé**
+   (2026-11-24, sur `main`)
+   - **Constat** (audit en lecture seule) : **aucun secret réel** dans Git,
+     ni dans les fichiers suivis ni dans l'historique (`APP_KEY` et
+     `ANTHROPIC_API_KEY` du `.env` n'apparaissent nulle part ; les
+     mentions des documents sont des exemples, `sk-ant-…`). Mais :
+     - `tests/visuel/captures/` : 828 PNG, 135 Mo par version, **403 Mo
+       dans l'historique** (2 333 versions : chaque régénération en
+       ajoute une copie) ; la CI ne lance pas Playwright ;
+     - `docs/presentation-ministere/` (PDF, PowerPoint, captures) :
+       **suivi alors que `/docs` était dans le `.gitignore`** (ajouté
+       après coup : ignorer ne retire pas du suivi) ; 60 Mo d'historique ;
+     - trous du `.gitignore` : `.env.local`, `.env.testing`… non ignorés ;
+       rien pour les clés et certificats (la clé de signature du Play
+       Store viendra, D12), ni pour les fichiers Windows ;
+     - le mot de passe de démonstration est `password` (pas une fuite :
+       il n'existe que hors production ; trop faible pour une préproduction
+       en ligne).
+   - **Décisions de Maurice** (2026-11-24) : purger l'historique et
+     remplacer `main` sur GitHub ; retirer le dossier ministère du dépôt ;
+     le dépôt GitHub est **privé**.
+   - **Fait** : `.gitignore` réorganisé par blocs commentés (secrets et
+     environnements `.env.*` sauf `.env.example`, clés `*.pem` `*.key`
+     `*.p12` `*.pfx` `*.keystore` `*.jks`, `google-services.json` ;
+     captures de référence ; relectures `REVUE` et rapports Lighthouse ;
+     `/docs` ; `/.sauvegardes` ; couverture ; `Thumbs.db`, `desktop.ini`) ;
+     captures et dossier ministère retirés du suivi (**ils restent sur le
+     poste**) ; historique réécrit sans eux (`git filter-repo`) puis
+     `main` poussée en remplacement sur GitHub. Sauvegarde complète de
+     l'ancien historique : `.sauvegardes/g-etudie-avant-purge-2026-11-24.bundle`
+     (ignoré ; `git clone` de ce fichier rend l'ancien dépôt).
+   - **Conséquences** : les identifiants de commit cités plus haut dans ce
+     DEVBOOK sont ceux d'avant la purge (le message de commit, lui, est
+     inchangé) ; une autre copie du dépôt doit être **re-clonée** ; sur un
+     poste neuf, les captures de référence se créent au premier passage
+     (`DEMARRAGE.md` § 2).
+   - **À faire par Maurice** : changer `DEMO_MOT_DE_PASSE` dans `.env`
+     avant toute préproduction accessible en ligne.
 
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*

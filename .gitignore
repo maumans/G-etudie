@@ -1,27 +1,66 @@
-/.phpunit.cache
-/bootstrap/ssr
+# Ce qui ne va jamais sur GitHub (DEVBOOK.md, point 32) : secrets,
+# fichiers générés, dépendances, données locales et fichiers lourds.
+
+# --- Secrets et environnements ---------------------------------------
+# Tout .env sauf le modèle : .env, .env.local, .env.testing, .env.production…
+.env
+.env.*
+!.env.example
+/auth.json
+/storage/*.key
+# Clés et certificats (dont la clé de signature du Play Store, D12)
+*.pem
+*.key
+*.p12
+*.pfx
+*.keystore
+*.jks
+google-services.json
+
+# --- Dépendances --------------------------------------------------------
+/vendor
 /node_modules
+
+# --- Fichiers générés ---------------------------------------------------
 /public/build
-/public/fonts-manifest.dev.json
 /public/hot
 /public/storage
-/storage/*.key
-/storage/pail
+/public/fonts-manifest.dev.json
+/bootstrap/ssr
 /resources/js/actions
 /resources/js/routes
 /resources/js/wayfinder
-/vendor
-.DS_Store
-.env
-.env.backup
-.env.production
-.phpactor.json
+/storage/pail
+/.phpunit.cache
 .phpunit.result.cache
-Homestead.json
-Homestead.yaml
-npm-debug.log
-yarn-error.log
-/auth.json
+/coverage
+
+# --- Tests : résultats, sessions et références locales -------------------
+/test-results
+/playwright-report
+/.playwright-mcp
+# Sessions des comptes de démonstration (cookies)
+/tests/visuel/.auth
+# Captures de référence Playwright : propres au poste (police, rendu), 135 Mo
+# par version ; la CI ne lance pas Playwright. Un autre poste les crée à son
+# premier passage (`npx playwright test --update-snapshots`, DEMARRAGE.md).
+/tests/visuel/captures
+# Relectures sans masque (`REVUE=…`) et rapports Lighthouse
+/tests/visuel/revue
+/tests/lighthouse/*.json
+/tests/lighthouse/*.html
+
+# --- Documents de travail hors code ---------------------------------------
+# Dossier ministère (PDF, PowerPoint) : gardé sur le poste.
+/docs
+# Sauvegardes locales du dépôt (git bundle)
+/.sauvegardes
+
+# --- Éditeurs, outils et assistants (réglages personnels) -----------------
+# CLAUDE.md, AGENTS.md, .mcp.json, boost.json et .claude/skills sont versionnés :
+# ce sont les règles de travail du projet (DEVBOOK.md, point 2).
+/.claude/settings.local.json
+/.claude/launch.json
 /.fleet
 /.idea
 /.nova
@@ -29,8 +68,6 @@ yarn-error.log
 /.zed
 /.agents
 /.amp
-/.claude/settings.local.json
-/.claude/launch.json
 /.codex
 /.cursor
 /.factory
@@ -40,10 +77,15 @@ yarn-error.log
 /.pi
 /opencode.json
 /opencode.jsonc
-# CLAUDE.md, AGENTS.md, .mcp.json, boost.json et .claude/skills sont versionnés :
-# ce sont les règles de travail du projet (DEVBOOK.md, point 2).
-/.playwright-mcp
-/test-results
-/tests/visuel/.auth
-/playwright-report
-/docs
+.phpactor.json
+Homestead.json
+Homestead.yaml
+
+# --- Journaux et fichiers système -----------------------------------------
+npm-debug.log
+yarn-error.log
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~

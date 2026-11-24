@@ -257,7 +257,8 @@ Pour **chaque** écran créé ou modifié :
    sombre (lui donner la classe `clair`). Liste complète : compétence
    `design-ardoise`, « Relecture d'une capture ».
 5. Lancer l'audit axe (`@axe-core/playwright`) sur l'écran.
-6. Enregistrer les captures validées dans `tests/visuel/captures/` et mettre à
+6. Enregistrer les captures validées dans `tests/visuel/captures/` (sur le
+   poste : ce dossier n'est pas dans le dépôt, `.gitignore`) et mettre à
    jour `tests/visuel/ecrans.spec.ts` si l'écran est un écran clé.
 7. Écrire dans le DEVBOOK ce qui a été vu et corrigé.
 

@@ -34,6 +34,18 @@ npx playwright install chromium
 
 Redémarre Claude Code, puis tape `/mcp` : `playwright` doit apparaître connecté.
 
+**Captures de référence** : elles ne sont **pas dans le dépôt** (propres à
+chaque poste, 135 Mo par version ; `.gitignore`, DEVBOOK point 32). Sur un
+poste neuf, la première passe les crée, après avoir arrêté `npm run dev` et
+vérifié l'absence de `public/hot` :
+
+```bash
+npm run build
+PLAYWRIGHT_PORT=8010 npx playwright test --workers=1 --update-snapshots
+```
+
+Puis les regarder avant de s'y fier : elles deviennent la référence du poste.
+
 ## 3. Le premier message à coller dans Claude Code
 
 Passe en **mode plan** (Maj + Tab), puis colle :
