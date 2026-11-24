@@ -3034,6 +3034,33 @@ cette question à sa façon. Elle distingue deux notions :
      personne majeure, autorisation écrite de diffusion, ou licence
      d'usage commercial). Maurice garde la pièce justificative.
 
+35. [x] **Déploiement Laravel Cloud : `npm ci` refusait le verrou**
+   (2026-11-24, panne remontée par Maurice)
+   - **Constat** : le déploiement échouait à `npm ci` : « package.json and
+     package-lock.json are not in sync … Missing: @rolldown/binding-*@1.2.16
+     from lock file ». Le verrou déclarait les 15 variantes de `rolldown`
+     (le moteur de build de Vite+) comme dépendances facultatives, mais
+     n'en contenait **aucune** entrée — pas même celle de Windows. Défaut
+     de npm 11 sous Windows (le verrou avait été mis à jour sur le poste,
+     commits « PACKAGE-LOCK ») : il écarte les variantes des autres
+     systèmes. `npm install --package-lock-only`, même après avoir retiré
+     l'entrée `rolldown`, ne les ajoutait pas. Tous les autres paquets à
+     variantes (Tailwind, Rollup, lightningcss, oxc) étaient complets.
+   - **Décision** : ajouter les 15 entrées manquantes **à la version déjà
+     utilisée** (1.2.16), d'après le registre npm (adresse, empreinte
+     d'intégrité, `os`, `cpu`, `libc`, moteurs) : 258 lignes ajoutées,
+     rien d'autre modifié. Pour que ça ne revienne pas :
+     `scripts/completer-verrou.mjs` (réparation, en une commande) et le
+     test `tests/js/verrou-npm.test.ts`, qui échoue si une dépendance
+     facultative du verrou n'a pas son entrée (on le voit au test, plus au
+     déploiement).
+   - **Preuve** : `npm ci --dry-run` sur une copie sans `node_modules`
+     (545 paquets) ; sur le poste, les commandes exactes du serveur
+     (`npm ci --audit false` puis `npm run build`) passent ; le script,
+     lancé sur le verrou fautif de GitHub, produit le verrou réparé octet
+     pour octet ; Vitest **430** (2 de plus), `tsc`, `vp check` verts.
+   - **Reste** : relancer le déploiement sur Laravel Cloud (Maurice).
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 
