@@ -13,13 +13,31 @@ test('sans photo déposée, la vitrine n\'en annonce aucune', function () {
             ->where('photoHeros', null));
 });
 
-test('une photo déposée dans public/ est livrée à la vitrine', function () {
+test('une photo déposée dans public/ est livrée à la vitrine, sans petite version', function () {
     // favicon.svg existe toujours dans public/ : il tient lieu de photo.
     config(['vitrine.photo_heros' => 'favicon.svg']);
 
     $this->get('/')
         ->assertInertia(fn (Assert $page) => $page
-            ->where('photoHeros', asset('favicon.svg')));
+            ->where('photoHeros.src', asset('favicon.svg'))
+            ->where('photoHeros.srcset', null));
+});
+
+test('la photo du héros livrée : dimensions réelles et petite version pour les téléphones', function () {
+    // La photo du dépôt (public/images/vitrine/heros.webp et heros-560.webp).
+    config(['vitrine.photo_heros' => 'images/vitrine/heros.webp']);
+    [$largeur, $hauteur] = getimagesize(public_path('images/vitrine/heros.webp'));
+
+    $this->get('/')
+        ->assertInertia(fn (Assert $page) => $page
+            ->where('photoHeros.src', asset('images/vitrine/heros.webp'))
+            ->where('photoHeros.largeur', $largeur)
+            ->where('photoHeros.hauteur', $hauteur)
+            ->where('photoHeros.srcset', asset('images/vitrine/heros-560.webp').' 560w, '.asset('images/vitrine/heros.webp').' '.$largeur.'w'));
+
+    // Assez légère pour la vitrine (premier écran, données chères).
+    expect(filesize(public_path('images/vitrine/heros.webp')))->toBeLessThan(150 * 1024)
+        ->and(filesize(public_path('images/vitrine/heros-560.webp')))->toBeLessThan(60 * 1024);
 });
 
 test('un chemin vide ou un dossier ne passe pas pour une photo', function (string $chemin) {

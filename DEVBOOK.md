@@ -2989,6 +2989,52 @@ cette question à sa façon. Elle distingue deux notions :
      suite sans mise à jour (`--repeat-each=3`) : 18 comparaisons sur 18
      identiques ; lot 14 entier vert (32).
 
+34. [x] **Vitrine : la photo d'une élève remplace l'illustration du héros**
+   (2026-11-24, demande de Maurice)
+   - **Constat** : Maurice a fourni une photo détourée (une élève, sac sur
+     l'épaule, cahiers contre elle, fond transparent) et la vitrine
+     « BrightPath » comme modèle. Le code prévoyait la photo, mais
+     seulement **posée devant** l'illustration du Nimba au crépuscule.
+   - **Décision** : la photo **remplace** l'illustration (repli : sans
+     photo, l'illustration revient). Composition (`VisuelHeros`,
+     `PhotoDetouree`, `pages/vitrine/accueil.tsx`) : arche pêche (le
+     Nimba), cercles du soleil de la marque derrière le visage, halo flou,
+     bas fondu dans la page (la photo est coupée à la taille) ; trois
+     fiches qui flottent — jauge « Prêt pour le BEPC » (haut droite),
+     série « 6 soirs de suite » (épaule, à partir de 640 px), séance du
+     jour (bas gauche, plus étroite sur téléphone). Pas de chiffre de
+     vitrine inventé (« 50K+ », « 4,9 ★ » de la référence) : les fiches
+     montrent l'application, pas des statistiques.
+   - **Image** : recadrée sur la silhouette, WebP 1 000 px (**82 Ko**) et
+     560 px (**37 Ko**) contre 176 Ko fournis ;
+     `ImagesVitrine::photoHeros()` livre `src`, `srcset`, `tailles`
+     (`TAILLES_PHOTO`, seule règle de l'attribut `sizes`) et les
+     dimensions (rien ne bouge au chargement). **Préchargement** par le
+     document, avant les scripts (`Seo::page(precharger:)` accepte
+     désormais `srcset`) ; l'illustration n'est plus téléchargée. React 19
+     ajoute son propre préchargement de l'image prioritaire : mêmes
+     adresses, le navigateur ne la télécharge qu'une fois (vérifié).
+   - **Vu et corrigé** (Playwright, 360 / 768 / 1366, clair et sombre) :
+     cercles **coupés net** en haut (le masque de fondu, posé sur tout le
+     bloc, coupait ce qui dépassait : cercles sortis du masque et
+     abaissés) ; à 360 px, la fiche « Séance du jour » cachait les mains
+     et les cahiers (plus étroite et plus basse sur téléphone).
+   - **Preuve** : Pest `VitrineTest` (dimensions, petite version, poids
+     ≤ 150 Ko et ≤ 60 Ko) et `VitrineFinaleTest` (préchargement de la
+     photo en deux tailles, jamais de l'illustration ; sans photo,
+     l'illustration) ; rendu serveur reconstruit et relancé :
+     `data-server-rendered`, **aucune erreur d'hydratation**, une seule
+     photo téléchargée ; **Lighthouse mobile : performance 94 (95, 94,
+     94), accessibilité 100, SEO 100** (92 avant), dans les conditions de
+     production du script ; références `lot8/vitrine-accueil` et
+     `lot8/question-jouee` refaites sur le build et relues, le reste du
+     lot 8 et du lot 0 identique (132 captures).
+   - **À confirmer par Maurice** : la règle de la photo (`DESIGN.md` § 8,
+     `CLAUDE.md` § 3 bis) demande une personne **majeure** avec son
+     **autorisation écrite** de diffusion. Si la photo est générée par
+     une IA ou vient d'une banque d'images, garder la preuve de la licence
+     d'usage commercial.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 

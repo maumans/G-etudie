@@ -5,6 +5,7 @@ import {
     Check,
     ChevronDown,
     FileCheck2,
+    Flame,
     Smartphone,
     Timer,
     WifiOff,
@@ -30,6 +31,17 @@ import { index as annales } from '@/routes/vitrine/sujets';
 
 /** Le moteur de questions et KaTeX n'arrivent qu'à l'approche de la question. */
 const QuestionDemo = lazy(() => import('@/components/vitrine/question-demo'));
+
+/** La photo du héros (`App\Support\ImagesVitrine::photoHeros`). */
+type PhotoHeros = {
+    src: string;
+    /** « …-560.webp 560w, ….webp 1000w », ou null sans petite version. */
+    srcset: string | null;
+    /** L'attribut `sizes` (ImagesVitrine::TAILLES_PHOTO), avec `srcset`. */
+    tailles: string | null;
+    largeur: number;
+    hauteur: number;
+};
 
 /** Emplacements d'image de la vitrine (`App\Support\ImagesVitrine`). */
 type Illustrations = Record<'heros' | 'cee' | 'bepc' | 'bac' | 'soir', string>;
@@ -193,7 +205,8 @@ const QUESTIONS: { question: string; reponse: string }[] = [
  * l'engagement, les étapes jusqu'à l'examen, l'application et ce qui arrive
  * ensuite, les questions, un appel final. Les images viennent de
  * `config/vitrine.php` (dessins par défaut, remplaçables) ; la photo du
- * héros, si Maurice la fournit, se pose devant l'illustration. Vouvoiement ;
+ * héros, si Maurice la fournit, remplace l'illustration du héros (détourée
+ * sur une arche, 2026-11-24). Vouvoiement ;
  * aucun chiffre ni témoignage non sourcé.
  */
 type Partenaire = { nom: string; logo: string; url: string | null };
@@ -209,7 +222,7 @@ export default function Accueil({
     partenaires,
 }: {
     illustrations: Illustrations;
-    photoHeros: string | null;
+    photoHeros: PhotoHeros | null;
     compteARebours: SessionExamen[];
     /** « 2026-11-07 », jour du serveur. */
     aujourdhui: string;
@@ -971,47 +984,73 @@ function ListeAvantages({ avantages }: { avantages: string[] }) {
 }
 
 /**
- * Le visuel du héros : l'illustration (dessin par défaut ou image choisie
- * par Maurice), la photo détourée devant si elle est fournie, et deux
- * fiches de l'application qui débordent du cadre — un élève imaginaire,
- * décrit aux lecteurs d'écran par une phrase.
+ * Le visuel du héros. Avec la photo (`config('vitrine.photo_heros')`) : une
+ * élève détourée sur une arche pêche (le Nimba), les cercles du soleil de la
+ * marque derrière elle, et trois fiches de l'application qui flottent
+ * autour — la recette des références (DESIGN.md § 0.1, « BrightPath »).
+ * Sans photo : l'illustration du Nimba au crépuscule, encadrée. Les fiches
+ * montrent un élève imaginaire, décrit aux lecteurs d'écran par une phrase.
  */
 function VisuelHeros({
     illustration,
     photo,
 }: {
     illustration: string;
-    photo: string | null;
+    photo: PhotoHeros | null;
 }) {
     return (
         <figure className="relative mx-auto w-full max-w-[34rem] lg:max-w-none">
             <figcaption className="sr-only">
-                Le Nimba au crépuscule, et un chemin qui monte vers le sommet ;
-                devant, la séance du jour et la jauge de préparation d'un élève.
+                {photo
+                    ? 'Une élève sourit, son sac sur l’épaule et ses cahiers contre elle ; autour d’elle, sa série de soirs, la séance du jour et sa jauge de préparation.'
+                    : 'Le Nimba au crépuscule, et un chemin qui monte vers le sommet ; devant, la séance du jour et la jauge de préparation d’un élève.'}
             </figcaption>
-            <div className="relative overflow-hidden rounded-panneau bg-nimba-200 ring-1 ring-black/5">
-                <img
-                    src={illustration}
-                    alt=""
-                    width={600}
-                    height={700}
-                    fetchPriority="high"
-                    className="aspect-[5/4] w-full object-cover object-[50%_70%] sm:aspect-[6/7] lg:aspect-square dark:brightness-90"
-                />
-                {photo && (
+
+            {photo ? (
+                <PhotoDetouree photo={photo} />
+            ) : (
+                <div className="relative overflow-hidden rounded-panneau bg-nimba-200 ring-1 ring-black/5">
                     <img
-                        src={photo}
+                        src={illustration}
                         alt=""
-                        width={900}
-                        height={1100}
-                        className="absolute bottom-0 left-1/2 h-[92%] w-auto -translate-x-1/2 object-contain"
+                        width={600}
+                        height={700}
+                        fetchPriority="high"
+                        className="aspect-[5/4] w-full object-cover object-[50%_70%] sm:aspect-[6/7] lg:aspect-square dark:brightness-90"
                     />
-                )}
-            </div>
+                </div>
+            )}
+
+            {/* Série : à gauche, à hauteur d'épaule (avec la photo). */}
+            {photo && (
+                <div
+                    aria-hidden
+                    className="absolute top-[30%] -left-2 hidden animate-in items-center gap-3 rounded-carte border bg-card py-3 pr-4 pl-3 shadow-flottant duration-700 [animation-delay:350ms] [animation-fill-mode:both] fade-in slide-in-from-bottom-3 sm:flex lg:-left-8"
+                >
+                    <span className="flex size-9 items-center justify-center rounded-full bg-nimba-500 text-white">
+                        <Flame className="size-[1.125rem] fill-current" />
+                    </span>
+                    <span className="grid">
+                        <span className="text-[0.9375rem] leading-tight font-semibold">
+                            6 soirs de suite
+                        </span>
+                        <span className="text-aide text-ink-500">
+                            Sa série de révisions
+                        </span>
+                    </span>
+                </div>
+            )}
 
             <div
                 aria-hidden
-                className="absolute -bottom-6 left-3 grid w-64 animate-in gap-3 rounded-carte border bg-card p-4 shadow-flottant duration-700 [animation-delay:250ms] [animation-fill-mode:both] fade-in slide-in-from-bottom-3 sm:-left-6 lg:-left-10"
+                className={cn(
+                    'absolute left-3 grid animate-in gap-3 rounded-carte border bg-card p-4 shadow-flottant duration-700 [animation-delay:250ms] [animation-fill-mode:both] fade-in slide-in-from-bottom-3 sm:-left-6 lg:-left-10',
+                    // Avec la photo, sur téléphone : plus étroite et plus
+                    // basse, pour ne pas cacher ses mains et ses cahiers.
+                    photo
+                        ? 'bottom-0 w-56 sm:bottom-[6%] sm:w-64'
+                        : '-bottom-6 w-64',
+                )}
             >
                 <span className="flex items-center gap-3">
                     <span
@@ -1056,7 +1095,10 @@ function VisuelHeros({
 
             <div
                 aria-hidden
-                className="absolute top-6 -right-2 hidden w-52 animate-in gap-2 rounded-carte border bg-card p-4 shadow-flottant duration-700 [animation-delay:450ms] [animation-fill-mode:both] fade-in slide-in-from-bottom-3 sm:grid lg:-right-6"
+                className={cn(
+                    'absolute -right-2 hidden w-52 animate-in gap-2 rounded-carte border bg-card p-4 shadow-flottant duration-700 [animation-delay:450ms] [animation-fill-mode:both] fade-in slide-in-from-bottom-3 sm:grid lg:-right-6',
+                    photo ? 'top-[12%]' : 'top-6',
+                )}
             >
                 <span className="text-aide text-ink-500">
                     Prêt pour le BEPC
@@ -1076,6 +1118,49 @@ function VisuelHeros({
                 </span>
             </div>
         </figure>
+    );
+}
+
+/**
+ * La photo détourée sur son arche : le bas de la photo (coupée à la taille)
+ * et de l'arche se fond dans la page, aucun bord net. Image servie en deux
+ * tailles (`srcset`), dimensions connues : rien ne bouge au chargement.
+ */
+function PhotoDetouree({ photo }: { photo: PhotoHeros }) {
+    return (
+        <div className="relative isolate aspect-square">
+            {/* Le soleil de la marque, derrière son visage. Hors du fondu :
+                le masque couperait net ce qui dépasse du cadre. */}
+            <Cercles className="absolute top-[-4%] left-[56%] -z-10 w-[84%] -translate-x-1/2 text-nimba-600/25 dark:text-nimba-300/20" />
+            <span
+                aria-hidden
+                className="absolute top-[14%] left-[56%] -z-10 size-[30%] -translate-x-1/2 rounded-full bg-nimba-500/25 blur-2xl dark:bg-nimba-400/20"
+            />
+            {/* L'arche (le Nimba, en pêche) et la photo, fondues vers le bas. */}
+            <div className="absolute inset-0 [mask-image:linear-gradient(to_bottom,black_78%,transparent)]">
+                <div
+                    aria-hidden
+                    className="absolute inset-x-[7%] top-[16%] bottom-0 rounded-t-full bg-nimba-500/[0.16] dark:bg-nimba-400/[0.13]"
+                />
+                <ImagePhoto photo={photo} />
+            </div>
+        </div>
+    );
+}
+
+function ImagePhoto({ photo }: { photo: PhotoHeros }) {
+    return (
+        <img
+            src={photo.src}
+            srcSet={photo.srcset ?? undefined}
+            sizes={photo.tailles ?? undefined}
+            alt=""
+            width={photo.largeur || undefined}
+            height={photo.hauteur || undefined}
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-x-0 bottom-0 mx-auto h-full w-auto max-w-full object-contain object-bottom drop-shadow-[0_18px_30px_rgb(140_60_20/0.18)]"
+        />
     );
 }
 

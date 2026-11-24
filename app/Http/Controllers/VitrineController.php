@@ -23,10 +23,11 @@ class VitrineController extends Controller
     public function __invoke(): Response
     {
         $illustrations = ImagesVitrine::illustrations();
+        $photo = ImagesVitrine::photoHeros();
 
         $reponse = Inertia::render('vitrine/accueil', [
             'illustrations' => $illustrations,
-            'photoHeros' => ImagesVitrine::photoHeros(),
+            'photoHeros' => $photo,
             'compteARebours' => self::compteARebours(),
             // Le jour du serveur (Guinée, UTC) : la page construite par le
             // serveur et celle hydratée par le téléphone comptent les mêmes
@@ -47,9 +48,13 @@ class VitrineController extends Controller
             titre: 'Préparer le CEE, le BEPC et le Baccalauréat',
             canonique: url('/'),
             jsonLd: Seo::site(),
-            // L'illustration du héros est l'élément le plus grand de l'écran :
-            // annoncée dans le document, elle n'attend pas le rendu de React.
-            precharger: [$illustrations['heros']],
+            // Le visuel du héros est l'élément le plus grand de l'écran :
+            // annoncé dans le document, il n'attend pas le rendu de React. La
+            // photo, si elle est là, remplace l'illustration (qui n'est
+            // alors pas téléchargée du tout).
+            precharger: [$photo === null
+                ? $illustrations['heros']
+                : ['href' => $photo['src'], 'srcset' => $photo['srcset'], 'tailles' => $photo['tailles']]],
         ));
     }
 

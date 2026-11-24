@@ -22,7 +22,7 @@ class Seo
 
     /**
      * @param  list<array<string, mixed>>  $jsonLd  données structurées (schema.org)
-     * @param  list<string>  $precharger  images à précharger (élément le plus grand de l'écran)
+     * @param  list<string|array{href: string, srcset?: string|null, tailles?: string|null}>  $precharger  images à précharger (élément le plus grand de l'écran) ; avec `srcset`, le navigateur précharge la version qu'il affichera
      * @return array<string, mixed>
      */
     public static function page(
@@ -45,7 +45,14 @@ class Seo
             'robots' => $indexer && self::indexationPermise() ? 'index, follow, max-image-preview:large' : 'noindex, follow',
             'type' => $type,
             'json_ld' => $jsonLd,
-            'precharger' => $precharger,
+            'precharger' => array_map(
+                fn (string|array $image) => is_string($image) ? ['href' => $image, 'srcset' => null, 'tailles' => null] : [
+                    'href' => $image['href'],
+                    'srcset' => $image['srcset'] ?? null,
+                    'tailles' => $image['tailles'] ?? null,
+                ],
+                $precharger,
+            ),
         ];
     }
 

@@ -44,7 +44,7 @@
         --}}
         @php($seo ??= null)
         @foreach ($seo['precharger'] ?? [] as $image)
-            <link rel="preload" as="image" href="{{ $image }}" fetchpriority="high">
+            <link rel="preload" as="image" href="{{ $image['href'] }}"@if ($image['srcset']) imagesrcset="{{ $image['srcset'] }}" imagesizes="{{ $image['tailles'] }}"@endif fetchpriority="high">
         @endforeach
 
         @if (\App\Ssr\ScriptsDifferes::actifs($page['component']))

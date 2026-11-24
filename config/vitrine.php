@@ -31,9 +31,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | Facultative. Chemin, depuis public/, d'une photo détourée (WebP à fond
-    | transparent, 900 × 1100 px environ, ≤ 150 Ko), posée devant
-    | l'illustration du héros. Une personne majeure, avec son autorisation
-    | écrite (DESIGN.md § 8). Absente : l'illustration seule.
+    | transparent, recadrée sur la silhouette, 1 000 px de large environ,
+    | ≤ 150 Ko), avec à côté sa petite version `<nom>-560.webp` pour les
+    | téléphones. Présente, elle remplace l'illustration du héros (posée sur
+    | une arche pêche). Une personne majeure, avec son autorisation écrite
+    | (DESIGN.md § 8). Absente : l'illustration seule.
     |
     */
 

@@ -3,6 +3,7 @@
 use App\Enums\TypeQuestion;
 use App\Models\Examen;
 use App\Support\Habillages;
+use App\Support\ImagesVitrine;
 use App\Support\QuestionDemonstration;
 use Illuminate\Support\Carbon;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -88,7 +89,9 @@ test('sans partenaire configuré, la liste est vide', function () {
     $this->get('/')->assertInertia(fn (Assert $page) => $page->has('partenaires', 0));
 });
 
-test('l\'accueil porte ses balises de référencement et précharge l\'illustration du héros', function () {
+test('l\'accueil porte ses balises de référencement ; sans photo, il précharge l\'illustration du héros', function () {
+    config(['vitrine.photo_heros' => 'images/vitrine/absente.webp']);
+
     $this->get('/')
         ->assertOk()
         ->assertSee('<meta name="description" content="Cours, sujets corrigés', false)
@@ -97,6 +100,18 @@ test('l\'accueil porte ses balises de référencement et précharge l\'illustrat
         ->assertSee('<link rel="preload" as="image" href="'.asset('images/vitrine/defaut/heros.svg').'" fetchpriority="high">', false)
         ->assertSee('"@type":"WebSite"', false)
         ->assertSee('<title>Préparer le CEE, le BEPC et le Baccalauréat · ', false);
+});
+
+test('avec la photo du héros, la page précharge la photo en deux tailles, jamais l\'illustration', function () {
+    config(['vitrine.photo_heros' => 'images/vitrine/heros.webp']);
+    $largeur = getimagesize(public_path('images/vitrine/heros.webp'))[0];
+
+    $this->get('/')
+        ->assertOk()
+        ->assertSee('<link rel="preload" as="image" href="'.asset('images/vitrine/heros.webp').'" imagesrcset="'
+            .asset('images/vitrine/heros-560.webp').' 560w, '.asset('images/vitrine/heros.webp').' '.$largeur.'w" imagesizes="'
+            .e(ImagesVitrine::TAILLES_PHOTO).'" fetchpriority="high">', false)
+        ->assertDontSee('images/vitrine/defaut/heros.svg', false);
 });
 
 test('une page sans balises dédiées garde la description générale, sans balise robots', function () {

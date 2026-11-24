@@ -13,7 +13,9 @@ use Illuminate\Support\Facades\File;
  *   `config/vitrine.php` ; un chemin qui ne mène à aucun fichier retombe sur
  *   le dessin par défaut, la vitrine n'a jamais de trou.
  * - La photo du héros : une personne majeure, autorisation écrite signée.
- *   Facultative ; absente, le héros montre l'illustration seule.
+ *   Facultative. Présente, elle **remplace** l'illustration du héros
+ *   (détourée sur une arche, 2026-11-24) ; absente, le héros montre
+ *   l'illustration.
  */
 class ImagesVitrine
 {
@@ -35,11 +37,50 @@ class ImagesVitrine
         return $illustrations;
     }
 
-    public static function photoHeros(): ?string
+    /** Largeur de la petite version, servie aux téléphones. */
+    public const LARGEUR_PETITE = 560;
+
+    /**
+     * Largeur affichée de la photo (attribut `sizes`) : 34rem au plus
+     * (le visuel du héros), la largeur de l'écran moins ses marges sur
+     * téléphone. Seule règle, lue par la page et par le préchargement.
+     */
+    public const TAILLES_PHOTO = '(min-width: 640px) 34rem, calc(100vw - 2rem)';
+
+    /**
+     * La photo du héros, avec ses dimensions (le navigateur réserve sa
+     * place : rien ne bouge au chargement) et, si elle existe à côté, sa
+     * petite version `<nom>-560.<ext>` pour les téléphones.
+     *
+     * @return array{src: string, srcset: string|null, tailles: string|null, largeur: int, hauteur: int}|null
+     */
+    public static function photoHeros(): ?array
     {
         $chemin = self::cheminValide(config('vitrine.photo_heros'));
 
-        return $chemin === null ? null : asset($chemin);
+        if ($chemin === null) {
+            return null;
+        }
+
+        $taille = @getimagesize(public_path($chemin)) ?: [0, 0];
+        $infos = pathinfo($chemin);
+        $dossier = $infos['dirname'] ?? '.';
+        $petite = self::cheminValide(
+            ($dossier === '.' ? '' : $dossier.'/')
+            .$infos['filename'].'-'.self::LARGEUR_PETITE.'.'.($infos['extension'] ?? 'webp'),
+        );
+
+        $srcset = $petite === null || $taille[0] <= self::LARGEUR_PETITE
+            ? null
+            : asset($petite).' '.self::LARGEUR_PETITE.'w, '.asset($chemin).' '.$taille[0].'w';
+
+        return [
+            'src' => asset($chemin),
+            'srcset' => $srcset,
+            'tailles' => $srcset === null ? null : self::TAILLES_PHOTO,
+            'largeur' => (int) $taille[0],
+            'hauteur' => (int) $taille[1],
+        ];
     }
 
     /**

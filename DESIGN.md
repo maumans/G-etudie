@@ -501,8 +501,20 @@ du texte) · Parcours d'accueil (4 écrans) · Connexion / inscription par tél�
   photo **fournie par Maurice**, d'une personne **majeure**, avec son
   **autorisation écrite signée** de diffusion. Déposée en
   `public/images/vitrine/heros.webp` (`config('vitrine.photo_heros')`) : WebP à
-  fond transparent (personne détourée), ≈ 900 × 1100 px, ≤ 150 Ko ; elle se
-  pose **devant** l'illustration du héros. Aucune autre photo de personne.
+  fond transparent (personne détourée), **recadrée sur la silhouette**,
+  ≈ 1 000 px de large, ≤ 150 Ko, avec à côté sa petite version
+  `heros-560.webp` (≤ 60 Ko) pour les téléphones. **Depuis le 2026-11-24, elle
+  remplace l'illustration du héros** (recette « BrightPath ») : la photo sur
+  une **arche pêche** (le Nimba, `bg-nimba-500/[0.16]`), les **cercles du
+  soleil** de la marque derrière le visage, un halo flou, le bas de l'arche et
+  de la photo **fondu** dans la page (aucun bord net, la photo est coupée à la
+  taille) ; trois fiches flottent autour — la jauge (« Prêt pour le BEPC »,
+  en haut à droite), la série (« 6 soirs de suite », à hauteur d'épaule) et
+  la séance du jour (en bas à gauche, plus étroite sur téléphone pour ne pas
+  cacher les mains). Préchargée par le document, en deux tailles
+  (`imagesrcset`), avant les scripts ; l'illustration n'est alors plus
+  téléchargée. Sans photo, l'illustration revient, encadrée. Aucune autre
+  photo de personne.
 - Interdit : personnages ou logos protégés, photos de mineurs réels, photos de
   banque d'images génériques.
 - États vides illustrés et **toujours accompagnés d'une action** (« Aucun examen
