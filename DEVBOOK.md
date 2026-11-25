@@ -3099,6 +3099,26 @@ cette question à sa façon. Elle distingue deux notions :
      sérieuse, aucun débordement) ; parcours d'inscription existants verts.
      `MISE_EN_PRODUCTION.md` § 3, étape 12 réécrite (qui ouvre quel compte).
 
+37. [x] **Barre latérale : le pied n'est plus coupé sur un écran bas**
+   (2026-11-25, remonté par Maurice en production)
+   - **Constat** : sur un écran d'ordinateur bas (portable, fenêtre
+     réduite), le bas de la barre latérale disparaissait : plus de « Mon
+     compte » ni de « Se déconnecter ». La barre fait la hauteur de l'écran
+     (`sticky`, `h-dvh`), mais la liste des liens ne pouvait ni rétrécir ni
+     défiler : longue (un administrateur voit la console et le
+     back-office), elle poussait le pied hors de la barre. Même défaut dans
+     l'espace élève (12 liens, puis la pastille réseau et la carte « Qui
+     révise ? »). Préexistant depuis le lot 0, révélé par la liste qui
+     s'est allongée lot après lot.
+   - **Décision** : l'en-tête et le pied ne rétrécissent jamais
+     (`shrink-0`) ; la liste prend la place restante et **défile**
+     (`min-h-0 flex-1 overflow-y-auto`) — `CoquePersonnel` (back-office,
+     console, enseignant, établissement, parent) et `EleveLayout`.
+   - **Preuve** : `tests/visuel/barre-laterale.spec.ts` (fenêtre 1366 ×
+     560 : console, back-office, espace élève ; le pied reste à l'écran, le
+     dernier lien s'atteint en défilant) — **échoue sans la correction**
+     (3 sur 3), passe avec ; les 112 captures du lot 0 inchangées.
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 

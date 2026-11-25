@@ -33,11 +33,16 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
             <aside className="sticky top-0 hidden h-dvh w-64 shrink-0 flex-col gap-8 border-r px-4 pt-5 pb-4 lg:flex print:hidden">
                 <Link
                     href={accueilEleve()}
-                    className="self-start rounded-controle px-2 outline-none focus-visible:outline-2 focus-visible:outline-ring"
+                    className="shrink-0 self-start rounded-controle px-2 outline-none focus-visible:outline-2 focus-visible:outline-ring"
                 >
                     <Marque />
                 </Link>
-                <nav aria-label="Espace élève" className="grid gap-0.5">
+                {/* La liste défile sur un écran bas : la pastille réseau et
+                    la carte de l'élève (profils, déconnexion) restent visibles. */}
+                <nav
+                    aria-label="Espace élève"
+                    className="-mx-1 grid min-h-0 flex-1 content-start gap-0.5 overflow-y-auto overscroll-contain px-1"
+                >
                     {NAVIGATION_ELEVE.map((entree) => (
                         <LienNavigation
                             key={entree.libelle}
@@ -47,7 +52,7 @@ export default function EleveLayout({ children }: { children: ReactNode }) {
                         />
                     ))}
                 </nav>
-                <div className="mt-auto grid gap-3">
+                <div className="grid shrink-0 gap-3">
                     <PastilleReseau className="justify-self-start" />
                     <CarteEleve />
                 </div>

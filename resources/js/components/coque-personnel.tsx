@@ -115,9 +115,15 @@ export function CoquePersonnel({
                     sombre ? 'dark bg-[#16110d] text-ink-900' : 'bg-background',
                 )}
             >
-                <EnTete espace={espace} accueil={accueil} lateral />
-                {navigation}
-                <PiedCompte actuel={cle} className="mt-auto" />
+                <div className="shrink-0">
+                    <EnTete espace={espace} accueil={accueil} lateral />
+                </div>
+                {/* La liste défile sur un écran bas : le pied (compte,
+                    déconnexion) reste toujours visible, jamais coupé. */}
+                <div className="-mx-1 min-h-0 flex-1 overflow-y-auto overscroll-contain px-1">
+                    {navigation}
+                </div>
+                <PiedCompte actuel={cle} className="shrink-0" />
             </aside>
 
             <div className="min-w-0 flex-1">
