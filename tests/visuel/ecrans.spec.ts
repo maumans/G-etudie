@@ -93,6 +93,12 @@ const CONNECTES: Record<
 const PUBLICS = [
     { adresse: '/login', ecran: 'connexion', titre: 'Se connecter' },
     { adresse: '/register', ecran: 'inscription', titre: 'Créer un compte' },
+    // 2026-11-25 : un parent ouvre son compte seul (vouvoiement).
+    {
+        adresse: '/register?profil=parent',
+        ecran: 'inscription-parent',
+        titre: 'Créer un compte',
+    },
     {
         adresse: '/mot-de-passe-oublie',
         ecran: 'mot-de-passe-oublie',

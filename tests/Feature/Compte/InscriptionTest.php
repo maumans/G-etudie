@@ -65,3 +65,34 @@ test('un mot de passe simple de 8 caractères suffit (D3 : pas de règle de comp
     $this->post(route('register.store'), $donnees(['password' => 'abcdefgh']))
         ->assertSessionHasNoErrors();
 });
+
+/* ---------- Profil : élève ou parent (2026-11-25) ---------- */
+
+test('sans profil choisi, l\'inscription ouvre un compte élève', function () use ($donnees) {
+    $this->post(route('register.store'), $donnees())->assertRedirect();
+
+    expect(User::sole()->getRoleNames()->all())->toBe(['eleve']);
+});
+
+test('un parent ouvre son compte seul, arrive dans son espace et y suit son enfant par code', function () use ($donnees) {
+    $this->post(route('register.store'), $donnees(['profil' => 'parent', 'pseudo' => 'papa_mariama']))
+        ->assertRedirect(route('compte.verification.edit'));
+
+    $parent = User::sole();
+    expect($parent->getRoleNames()->all())->toBe(['parent'])
+        ->and(EntreeJournalAcces::query()->where('action', 'compte.cree')->sole()->details)->toBe(['profil' => 'parent']);
+
+    // L'aiguillage l'envoie dans l'espace parent, vide, avec la saisie du code.
+    $this->get('/accueil')->assertRedirect('/parent');
+    $this->get('/parent')->assertOk()
+        ->assertInertia(fn (Assert $page) => $page->component('parent/accueil')->has('enfants', 0));
+    // Et jamais dans l'espace élève.
+    $this->get('/eleve')->assertForbidden();
+});
+
+test('on ne s\'inscrit ni enseignant, ni administrateur, ni avec un profil inventé', function (string $profil) use ($donnees) {
+    $this->post(route('register.store'), $donnees(['profil' => $profil]))
+        ->assertSessionHasErrors('profil');
+
+    expect(User::query()->count())->toBe(0);
+})->with(['enseignant', 'superadmin', 'admin_contenu', 'gestionnaire_etablissement', 'inconnu']);

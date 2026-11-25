@@ -3061,6 +3061,44 @@ cette question à sa façon. Elle distingue deux notions :
      pour octet ; Vitest **430** (2 de plus), `tsc`, `vp check` verts.
    - **Reste** : relancer le déploiement sur Laravel Cloud (Maurice).
 
+36. [x] **Comptes en production : `compte:creer` et inscription des parents**
+   (2026-11-25, demande de Maurice après la première mise en ligne)
+   - **Constat** : en production, aucun compte n'existe (les comptes de
+     démonstration ne sont créés que hors production). Le premier
+     administrateur se créait par un long `php artisan tinker` où le mot de
+     passe restait écrit dans l'historique (Laravel Cloud › Commands). Et
+     **aucune porte n'ouvrait un compte parent** : l'inscription donnait
+     toujours le rôle élève, alors que l'espace parent (lot 11) attend un
+     parent qui saisit le code de son enfant.
+   - **Décision** :
+     1. `php artisan compte:creer {role} {telephone} {prenom}` : rôles
+        `superadmin`, `admin_contenu`, `redacteur`, `relecteur`, `parent`
+        (l'élève s'inscrit seul ; l'enseignant et le gestionnaire passent
+        par leur établissement, la commande le dit) ; **mot de passe
+        provisoire** de 10 caractères sans 0/O/1/l/I, montré une seule
+        fois ; numéro tenu pour vérifié ; journalisé
+        (`compte.ouvert_par_administrateur`, sans le mot de passe). Une
+        seule autorité : `ComptesService::ouvrir`. La fabrication du mot
+        de passe provisoire et du pseudo, qui vivait dans
+        `EtablissementService`, passe dans `App\Support\CompteProvisoire`
+        (utilisée par les deux).
+     2. **Inscription « Je suis élève / Je suis parent »**
+        (`CreateNewUser::PROFILS`, élève par défaut) ; textes au
+        vouvoiement pour le parent ; `/register?profil=parent` ouvre la
+        page sur « parent ». Le profil est une liste fermée : on ne
+        s'inscrit **ni enseignant, ni administrateur** en trafiquant le
+        formulaire (testé). Le parent arrive dans son espace, vide, avec
+        la saisie du code.
+   - **Preuve** : Pest `Console/CreerCompteTest` (le mot de passe affiché
+     permet de se connecter par la vraie page et mène à la console ; rôles
+     refusés avec leur porte indiquée ; numéro pris ou invalide ; prénom
+     vide ; rien du mot de passe au journal) et `Compte/InscriptionTest`
+     (élève par défaut ; parent → `/parent`, jamais `/eleve` ; cinq profils
+     interdits) : **765 Pest** verts ; captures `lot0/inscription` et
+     `lot0/inscription-parent` (4 tailles × 2 thèmes, axe sans violation
+     sérieuse, aucun débordement) ; parcours d'inscription existants verts.
+     `MISE_EN_PRODUCTION.md` § 3, étape 12 réécrite (qui ouvre quel compte).
+
 *(Claude Code ajoute ici un point numéroté par lot ou par décision : le constat,
 la décision, la preuve — tests ajoutés et nombre total de tests passants.)*
 

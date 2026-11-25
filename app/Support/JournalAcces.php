@@ -39,6 +39,7 @@ class JournalAcces
         'etablissement.rattache' => 'Compte rattaché à un établissement',
         'etablissement.retire' => 'Compte retiré d\'un établissement',
         'compte.ouvert_par_etablissement' => 'Compte du personnel ouvert (mot de passe provisoire)',
+        'compte.ouvert_par_administrateur' => 'Compte ouvert par l’administrateur (mot de passe provisoire)',
         'licence.accordee' => 'Licence d\'établissement accordée',
         'licence.attribuee' => 'Place de licence attribuée à un élève',
         'licence.reprise' => 'Place de licence reprise',

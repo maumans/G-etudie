@@ -279,27 +279,37 @@ sudo nginx -t && sudo systemctl reload nginx
 **11. Les services permanents** : file d'attente et planificateur, § 4.
 
 **12. Le premier administrateur plateforme** (aucun compte n'existe en
-production). Remplacer le numéro, le prénom, le pseudo et le mot de passe :
+production : les comptes de démonstration ne sont jamais créés). Après
+`migrate` et `db:seed` (sans eux, les rôles n'existent pas), avec son
+numéro (9 chiffres) et son prénom :
 
 ```bash
-php artisan tinker --execute '$u = App\Models\User::create(["telephone" => App\Support\Telephone::normaliser("620000000"), "prenom" => "Prénom", "pseudo" => "admin", "password" => "UN_MOT_DE_PASSE_LONG"]); $u->forceFill(["telephone_verifie_le" => now()])->save(); $u->syncRoles(["superadmin"]); echo "Compte créé : ", $u->id, PHP_EOL;'
+php artisan compte:creer superadmin 620000000 Maurice
 ```
 
-Puis se connecter, ouvrir « Mon compte › Sécurité » et **activer la double
-authentification** tout de suite.
+Sur Laravel Cloud : l'environnement › **Commands**. La commande affiche le
+numéro de connexion, le pseudo et un **mot de passe provisoire, montré une
+seule fois** (aucun mot de passe sur la ligne de commande : rien ne reste
+dans l'historique). Puis se connecter (`/login`), changer ce mot de passe
+(« Mon compte › Mot de passe ») et **activer la double authentification**
+(« Mon compte › Sécurité ») tout de suite.
 
-Les **autres comptes du personnel** (la console ne sait pas encore en créer)
-se créent de la même façon, en changeant le rôle dans `syncRoles([...])` :
+Les **autres comptes** :
 
-| Rôle | Pour qui |
-|---|---|
-| `redacteur` | écrit leçons, questions, annales |
-| `relecteur` | relit et publie |
-| `admin_contenu` | responsable pédagogique : référentiel, relecture, signalements |
-| `superadmin` | administrateur plateforme (console) |
+| Rôle | Pour qui | Comment |
+|---|---|---|
+| `superadmin` | administrateur plateforme (console) | `php artisan compte:creer superadmin …` |
+| `admin_contenu` | responsable pédagogique : référentiel, relecture, signalements | `php artisan compte:creer admin_contenu …` |
+| `redacteur` | écrit leçons, questions, sujets | `php artisan compte:creer redacteur …` |
+| `relecteur` | relit et publie | `php artisan compte:creer relecteur …` |
+| `gestionnaire_etablissement` | gère un établissement | Console › Établissements › « Nommer le gestionnaire » (mot de passe provisoire montré une fois) |
+| `enseignant` | ses groupes et ses devoirs | le gestionnaire, depuis son espace Établissement (même principe) |
+| `eleve` | élève | s'inscrit seul (`/register`) |
+| `parent` | parent | s'inscrit seul (`/register`, « Je suis parent », ou `/register?profil=parent`), puis saisit le code que son enfant crée dans « Mon compte › Parents » ; `compte:creer parent …` reste possible |
 
-Chacun active ensuite sa double authentification (« Mon compte ›
-Sécurité »). Les élèves, eux, s'inscrivent seuls.
+Chacun change son mot de passe provisoire à la première connexion ; le
+personnel active sa double authentification (« Mon compte › Sécurité »).
+Chaque ouverture est inscrite au journal des accès (Console › Journal).
 
 **13. Vérifier** : § 9.
 

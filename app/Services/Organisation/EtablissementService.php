@@ -11,12 +11,12 @@ use App\Models\MembreGroupe;
 use App\Models\RattachementEtablissement;
 use App\Models\User;
 use App\Services\AbonnementService;
+use App\Support\CompteProvisoire;
 use App\Support\JournalAcces;
 use App\Support\Telephone;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 
 /**
  * Les établissements partenaires (lot 11, PLAN M14, décision 3) :
@@ -70,10 +70,10 @@ class EtablissementService
             $motDePasse = null;
 
             if ($user === null) {
-                $motDePasse = self::motDePasseProvisoire();
+                $motDePasse = CompteProvisoire::motDePasse();
                 $user = User::create([
                     'prenom' => $prenom,
-                    'pseudo' => self::pseudoLibre($prenom),
+                    'pseudo' => CompteProvisoire::pseudoLibre($prenom),
                     'telephone' => $telephone,
                     'password' => Hash::make($motDePasse),
                 ]);
@@ -184,29 +184,5 @@ class EtablissementService
             ->where('eleve_id', $eleve->id)
             ->whereHas('groupe', fn ($groupe) => $groupe->ouverts()->where('etablissement_id', $etablissement->id))
             ->exists();
-    }
-
-    private static function motDePasseProvisoire(): string
-    {
-        // Lisible au téléphone : sans 0/O, 1/l/I.
-        $alphabet = 'abcdefghjkmnpqrstuvwxyz23456789';
-        $mot = '';
-
-        for ($i = 0; $i < 10; $i++) {
-            $mot .= $alphabet[random_int(0, strlen($alphabet) - 1)];
-        }
-
-        return $mot;
-    }
-
-    private static function pseudoLibre(string $prenom): string
-    {
-        $base = Str::of($prenom)->ascii()->lower()->replaceMatches('/[^a-z0-9]/', '')->limit(14, '')->value() ?: 'membre';
-
-        do {
-            $pseudo = $base.'_'.random_int(100, 9999);
-        } while (User::query()->where('pseudo', $pseudo)->exists());
-
-        return $pseudo;
     }
 }
